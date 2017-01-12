@@ -1,0 +1,26 @@
+bower_components
+node_modules
+nbproject
+bower
+dist
+templates-cache.generated.js
+.tmp
+__pycache__
+env
+test-server/env
+test-server/__pycache__
+e2e-test-results
+templates-cache.generated.js
+.env
+npm-debug.log
+dist/
+*.egg-info
+*.pyc
+
+# VIM related files
+*.swo
+*.swp
+*.swn
+*.swm
+_build
+_build_html
