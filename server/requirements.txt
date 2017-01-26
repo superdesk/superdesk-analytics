@@ -1,0 +1,9 @@
+nose
+nose-timer
+pep8
+flake8
+flake8-docstrings
+wooper
+requests
+requests-mock
+-e git://github.com/superdesk/superdesk-core.git@350181d#egg=Superdesk_Core

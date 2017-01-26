@@ -24,3 +24,6 @@ dist/
 *.swm
 _build
 _build_html
+.pydevproject
+.project
+.settings

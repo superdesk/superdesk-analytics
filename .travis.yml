@@ -1,0 +1,40 @@
+language: python
+
+python: 3.5
+
+sudo: false
+
+services:
+    - mongodb
+    - elasticsearch
+    - redis-server
+
+addons:
+  apt:
+    sources:
+    - mongodb-3.0-precise
+    packages:
+    - mongodb-org-server
+
+cache:
+  directories:
+    - $HOME/.cache/pip
+    - $HOME/.npm
+
+before_install:
+    - nvm install node
+    - nvm use node
+    - node --version
+    - rm -f .npm/*.lock
+    - npm install -g npm@latest
+    - npm config set loglevel warn
+node_js:
+    - '6'
+install:
+    - npm install --python=python2.7
+    - cd server && pip install -q -r requirements.txt && cd ..
+before_script:
+    - export DISPLAY=:99.0
+    - sh -e /etc/init.d/xvfb start
+script:
+    - make test
