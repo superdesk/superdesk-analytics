@@ -57,7 +57,6 @@ Feature: Activity report
         """
         {
         	"operation": "publish",
-        	"desk": "#desks._id#",
         	"operation_date": "#DATE#",
         	"group_by": ["desk"],
         	"subject":[{"qcode": "05007000", "name": "university"}],
@@ -72,7 +71,6 @@ Feature: Activity report
         """
         {
         	"operation": "publish",
-        	"desk": "#desks._id#",
         	"group_by": ["desk"],
         	"subject":[{"qcode": "05007000", "name": "university"}],
         	"keywords": ["UNIVERSITY"],
