@@ -20,7 +20,7 @@ export function SavedActivityReports(api, $filter, $q, $rootScope) {
     var _getAll = function(page, items, params) {
         var endPoint = 'saved_activity_reports';
 
-        return api.query(endPoint, {max_results: 200, page: page}, params).then((result) => {
+        return api.query(endPoint, { max_results: 200, page: page }, params).then((result) => {
             var allItems = [],
                 currPage = page;
 
@@ -29,10 +29,12 @@ export function SavedActivityReports(api, $filter, $q, $rootScope) {
             } else {
                 allItems = result._items;
             }
+            
             if (result._links.next) {
                 currPage++;
                 return _getAll(endPoint, currPage, allItems, params);
             }
+            
             return $filter('sortByName')(allItems);
         });
     };
@@ -77,5 +79,6 @@ export function SavedActivityReports(api, $filter, $q, $rootScope) {
     };
 
     // reset cache on update
-    $rootScope.$on('savedactivityreport:update', angular.bind(this, this.resetSavedActivityReports));
+    $rootScope.$on('savedactivityreport:update',
+    		angular.bind(this, this.resetSavedActivityReports));
 }

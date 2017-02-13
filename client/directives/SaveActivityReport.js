@@ -1,4 +1,5 @@
-SaveActivityReport.$inject = ['$location', 'asset', 'api', 'session', 'notify', 'config', '$rootScope', 'lodash'];
+SaveActivityReport.$inject = ['$location', 'asset', 'api', 'session',
+							  'notify', 'config', '$rootScope', 'lodash'];
 
 /**
  * @ngdoc directive
@@ -14,6 +15,7 @@ SaveActivityReport.$inject = ['$location', 'asset', 'api', 'session', 'notify', 
  * @description A directive that generates the activity report save dialog
  */
 export function SaveActivityReport($location, asset, api, session, notify, config, $rootScope, _) {
+
     return {
         template: require('../views/save-activity-report.html'),
         link: function(scope, element, attrs, controller) {
@@ -44,11 +46,13 @@ export function SaveActivityReport($location, asset, api, session, notify, confi
                 if (activityReportEdit._id) {
                     originalActivityReport = activityReportEdit;
                 }
+                
                 activityReportEdit.owner = session.identity._id;
                 activityReportEdit.operation_date = formatDate(activityReport.operation_date);
                 $rootScope.$broadcast('savedactivityreport:update');
 
-                api('saved_activity_reports', session.identity).save(originalActivityReport, activityReportEdit)
+                api('saved_activity_reports', session.identity)
+                	.save(originalActivityReport, activityReportEdit)
                     .then(onSuccess, onFail);
             };
 
@@ -70,7 +74,8 @@ export function SaveActivityReport($location, asset, api, session, notify, confi
              * @description Format given date for save
              */
             function formatDate(date) {
-                return date ? moment(date, config.model.dateformat).format('YYYY-MM-DD') : null; // jshint ignore:line
+                return date ? moment(date, config.model.dateformat).format('YYYY-MM-DD') : null;
+                // jshint ignore:line
             }
         }
     };
