@@ -34,3 +34,6 @@ def init_app(app):
 
     superdesk.privilege(name='processed_items_report', label='Activity Report View',
                         description='User can view activity reports.')
+
+    superdesk.privilege(name='processed_items_report', label='Activity Report View',
+                        description='User can view activity reports.')
