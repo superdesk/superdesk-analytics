@@ -3,7 +3,7 @@ var path = require('path')
 var root = path.dirname(path.dirname(__dirname))
 
 module.exports = {
-    options: {configFile: path.join(root, '.eslintrc')},
+    options: {configFile: path.join(root, '.eslintrc.json')},
     app: {
         src: require('./files').scripts,
         envs: ['browser', 'amd']
