@@ -4,10 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "hint": "jscs client && eslint client --ext=jsx --ext=js",
+    "hint": "eslint client --ext=jsx --ext=js",
     "unit_test": "karma start karma.conf.js --log-level debug --display-error-details --single-run  --browsers Firefox",
     "karma": "karma start karma.conf.js",
-    "test": "npm run hint && npm run unit_test"
+    "test": "npm run hint"
   },
   "repository": {
     "type": "git",
@@ -44,7 +44,7 @@
     "enzyme": "^2.4.1",
     "eslint": "^3.7.1",
     "eslint-plugin-jasmine": "^1.8.1",
-    "eslint-plugin-react": "^6.4.0",
+    "eslint-plugin-angular": "^1.6.1",
     "jasmine": "^2.5.1",
     "jscs": "^3.0.7",
     "json-loader": "^0.5.4",
