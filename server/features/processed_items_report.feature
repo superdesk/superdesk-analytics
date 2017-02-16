@@ -26,16 +26,16 @@ Feature: Processed Items Report
         """
         {
         	"user": "#CONTEXT_USER_ID#",
-        	"starting_time": "2017-01-02T09:03:26+0000",
-        	"ending_time": "2018-02-22T09:03:26+0000"
+        	"start_time": "2017-01-02T09:03:26+0000",
+        	"end_time": "2018-02-22T09:03:26+0000"
         }
         """
         Then we get existing resource
         """
         {
         "user": "#CONTEXT_USER_ID#",
-        "starting_time": "2017-01-02T09:03:26+0000",
-        "ending_time": "2018-02-22T09:03:26+0000",
+        "start_time": "2017-01-02T09:03:26+0000",
+        "end_time": "2018-02-22T09:03:26+0000",
         "report": {"corrected_items": 0,"killed_items": 0,"total_items": 2,"published_items": 2, "spiked_items": 0}
         }
         """
@@ -65,16 +65,16 @@ Feature: Processed Items Report
         """
         {
         	"user": "#CONTEXT_USER_ID#",
-        	"starting_time": "2017-01-02T09:03:26+0000",
-        	"ending_time": "2018-02-22T09:03:26+0000"
+        	"start_time": "2017-01-02T09:03:26+0000",
+        	"end_time": "2018-02-22T09:03:26+0000"
         }
         """
         Then we get existing resource
         """
         {
         "user": "#CONTEXT_USER_ID#",
-        "starting_time": "2017-01-02T09:03:26+0000",
-        "ending_time": "2018-02-22T09:03:26+0000",
+        "start_time": "2017-01-02T09:03:26+0000",
+        "end_time": "2018-02-22T09:03:26+0000",
         "report": {"corrected_items": 0,"killed_items": 0,"total_items": 1,"published_items": 0, "spiked_items": 1}
         }
         """
@@ -104,16 +104,16 @@ Feature: Processed Items Report
         """
         {
         	"user": "#CONTEXT_USER_ID#",
-        	"starting_time": "2017-01-02T09:03:26+0000",
-        	"ending_time": "2018-02-22T09:03:26+0000"
+        	"start_time": "2017-01-02T09:03:26+0000",
+        	"end_time": "2018-02-22T09:03:26+0000"
         }
         """
         Then we get existing resource
         """
         {
         "user": "#CONTEXT_USER_ID#",
-        "starting_time": "2017-01-02T09:03:26+0000",
-        "ending_time": "2018-02-22T09:03:26+0000",
+        "start_time": "2017-01-02T09:03:26+0000",
+        "end_time": "2018-02-22T09:03:26+0000",
         "report": {"corrected_items": 2,"killed_items": 0,"total_items": 2,"published_items": 0, "spiked_items": 0}
         }
         """
@@ -143,16 +143,16 @@ Feature: Processed Items Report
         """
         {
         	"user": "#CONTEXT_USER_ID#",
-        	"starting_time": "2017-01-02T09:03:26+0000",
-        	"ending_time": "2018-02-22T09:03:26+0000"
+        	"start_time": "2017-01-02T09:03:26+0000",
+        	"end_time": "2018-02-22T09:03:26+0000"
         }
         """
         Then we get existing resource
         """
         {
         "user": "#CONTEXT_USER_ID#",
-        "starting_time": "2017-01-02T09:03:26+0000",
-        "ending_time": "2018-02-22T09:03:26+0000",
+        "start_time": "2017-01-02T09:03:26+0000",
+        "end_time": "2018-02-22T09:03:26+0000",
         "report": {"corrected_items": 0,"killed_items": 2,"total_items": 2, "published_items": 0, "spiked_items": 0}
         }
         """
