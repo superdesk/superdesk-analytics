@@ -25,23 +25,23 @@ class ProcessedItemsResource(Resource):
 class ProcessedItemsService(BaseService):
 
     def get_items(self, query):
-        """Return the result of the item search by the given query.
+        """Returns the result of the item search by the given query.
 
-        :param query: query on users
-        :return: items list
+        :param dict query: query on users
+        :return Cursor: cursor on items list
         """
         return get_resource_service('archive_versions').get(req=None, lookup=query)
 
     def count_items(self, items_list, state, start, end):
-        """Return the number of items which were modified in a given time interval and having a certain state.
+        """Returns the number of items which were modified in a given time interval and having a certain state.
 
-        If no state is give, it will return all items modified in the given time interval.
+        If 'state' has the value None, the total number of items modified in a given time interval is returned.
 
         :param list items_list: list of items based on the query
         :param string state: item's state
         :param datetime start: starting time of the given interval
         :param datetime end: ending time of the given interval
-        :return: items
+        :return integer: number of items
         """
         if state:
             items = sum(1 for i in items_list
@@ -54,12 +54,13 @@ class ProcessedItemsService(BaseService):
         return items
 
     def search_items(self, doc):
-        """Returns a report having:the total number of items processed by a given user and the number of published,
+        """Returns a report on processed items by user.
 
-        spiked,corrected and killed items by a given user.
+        The report will contain the total number of items processed by a given user and
+        the number of published,spiked,corrected and killed items by a given user.
 
         :param dict doc: document used for generating the report
-        :return: report
+        :return dict: report
         """
         query = {
             "task.user": str(doc['user'])
