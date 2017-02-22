@@ -9,6 +9,7 @@ ActivityReportView.$inject = ['$location', 'asset'];
  * @description A directive that displays the generated activity report
  */
 export function ActivityReportView($location, asset) {
+	
     return {
         template: require('../views/activity-report-view.html'),
         scope: {},
@@ -28,7 +29,8 @@ export function ActivityReportView($location, asset) {
              * @description Initialises the activity report object
              */
             function initActivityReport() {
-                if (scope.activityReport.group_by instanceof Array && scope.activityReport.group_by[0] === 'desk') {
+                if (scope.activityReport.group_by instanceof Array 
+                	&& scope.activityReport.group_by[0] === 'desk') {
                     scope.reportType = 'groupByDesk';
                 } else {
                     scope.reportType = 'simple';

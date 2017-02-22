@@ -15,21 +15,26 @@ import * as directive from './directives';
 
 
 function cacheIncludedTemplates($templateCache) {
-    $templateCache.put('activity-report-parameters.html', require('./views/activity-report-parameters.html'));
-    $templateCache.put('activity-report-grouping.html', require('./views/activity-report-grouping.html'));
-    $templateCache.put('save-activity-report-dialog.html', require('./views/save-activity-report-dialog.html'));
+    $templateCache.put('activity-report-parameters.html', 
+    		require('./views/activity-report-parameters.html'));
+    $templateCache.put('activity-report-grouping.html', 
+    		require('./views/activity-report-grouping.html'));
+    $templateCache.put('save-activity-report-dialog.html', 
+    		require('./views/save-activity-report-dialog.html'));
 }
+
 cacheIncludedTemplates.$inject = ['$templateCache'];
 
 
 /**
  * @ngdoc module
  * @module superdesk.analytics
- * @name superdesk.analytics
+ * @name superdesk.analytics 
  * @packageName analytics
  * @description Superdesk analytics specific application.
  */
 export default angular.module('superdesk.analytics', [])
+
     .service('savedActivityReports', svc.SavedActivityReports)
 
     .directive('sdActivityReportContainer', directive.ActivityReportContainer)

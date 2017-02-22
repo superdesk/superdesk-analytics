@@ -22,6 +22,7 @@ SavedActivityReports.$inject = [
  * @description A directive that renders the activity reports lists
  */
 export function SavedActivityReports($rootScope, api, session, modal, notify, gettext, asset,
+
     $location, desks, privileges, config, savedActivityReports) {
     return {
         template: require('../views/saved-activity-reports.html'),
@@ -52,10 +53,12 @@ export function SavedActivityReports($rootScope, api, session, modal, notify, ge
                     scope.globalSavedActivityReports = [];
                     scope.activityReports = activityReports;
                     _.forEach(scope.activityReports, (savedActivityReport) => {
-                        savedActivityReport.operation_date = formatDate(savedActivityReport.operation_date);
+                        savedActivityReport.operation_date = 
+                        	formatDate(savedActivityReport.operation_date);
                         if (savedActivityReport.owner === session.identity._id) {
                             scope.userSavedActivityReports.push(savedActivityReport);
                         }
+                        
                         if (savedActivityReport.is_global) {
                             scope.globalSavedActivityReports.push(savedActivityReport);
                         }
@@ -122,7 +125,8 @@ export function SavedActivityReports($rootScope, api, session, modal, notify, ge
              * @description Format given date for save
              */
             function formatDate(date) {
-                return date ? moment(date).format(config.model.dateformat) : null; // jshint ignore:line
+                return date ? moment(date).format(config.model.dateformat) : null; 
+                // jshint ignore:line
             }
         }
     };

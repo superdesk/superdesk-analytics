@@ -17,7 +17,8 @@ ActivityReportPanel.$inject = [
  * @requires $rootScope
  * @description A directive that generates the sidebar containing activity report parameters
  */
-export function ActivityReportPanel($location, desks, asset, config, metadata, api, session, notify, $rootScope) {
+export function ActivityReportPanel($location, desks, asset, config, \
+		metadata, api, session, notify, $rootScope) {
     return {
         template: require('../views/activity-report-panel.html'),
         scope: {},
@@ -39,7 +40,8 @@ export function ActivityReportPanel($location, desks, asset, config, metadata, a
                 scope.panelTab = 'editingActivityReport';
                 scope.innerTab = 'parameters';
                 scope.activityReport = args;
-                scope.group_by = {desk: args.hasOwnProperty('group_by') && args.group_by.indexOf('desk') >= 0};
+                scope.group_by = { desk: args.hasOwnProperty('group_by') 
+                				   && args.group_by.indexOf('desk') >= 0 };
             });
 
             scope.$watch('group_by.desk', (groupByDesk) => {
@@ -60,8 +62,8 @@ export function ActivityReportPanel($location, desks, asset, config, metadata, a
              * @description Initialises the activity report object
              */
             scope.initActivityReport = function() {
-                scope.activityReport = {operation: 'publish', desk: desks.activeDeskId};
-                scope.group_by = {desk: false};
+                scope.activityReport = { operation: 'publish', desk: desks.activeDeskId };
+                scope.group_by = { desk: false };
             };
 
             /**
@@ -142,7 +144,8 @@ export function ActivityReportPanel($location, desks, asset, config, metadata, a
              * @description Format given date for generate
              */
             function formatDate(date) {
-                return date ? moment(date, config.model.dateformat).format('YYYY-MM-DD') : null; // jshint ignore:line
+                return date ? moment(date, config.model.dateformat).format('YYYY-MM-DD') : null;
+                // jshint ignore:line
             }
         }
     };
