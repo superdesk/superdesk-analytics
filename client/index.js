@@ -10,14 +10,11 @@
 
 import './styles/analytics.scss';
 
-import * as svc from './services';
-import * as directive from './directives';
+import './activity_reports';
 
 
 function cacheIncludedTemplates($templateCache) {
-    $templateCache.put('activity-report-parameters.html', require('./views/activity-report-parameters.html'));
-    $templateCache.put('activity-report-grouping.html', require('./views/activity-report-grouping.html'));
-    $templateCache.put('save-activity-report-dialog.html', require('./views/save-activity-report-dialog.html'));
+    $templateCache.put('activity-report.html', require('./activity_reports/views/activity-report.html'));
 }
 cacheIncludedTemplates.$inject = ['$templateCache'];
 
@@ -27,19 +24,10 @@ cacheIncludedTemplates.$inject = ['$templateCache'];
  * @module superdesk.analytics
  * @name superdesk.analytics
  * @packageName analytics
- * @description Superdesk analytics specific application.
+ * @description Superdesk analytics module.
  */
-export default angular.module('superdesk.analytics', [])
-    .service('savedActivityReports', svc.SavedActivityReports)
-
-    .directive('sdActivityReportContainer', directive.ActivityReportContainer)
-    .directive('sdActivityReportPanel', directive.ActivityReportPanel)
-    .directive('sdActivityReportView', directive.ActivityReportView)
-    .directive('sdSaveActivityReport', directive.SaveActivityReport)
-    .directive('sdSavedActivityReports', directive.SavedActivityReports)
-
+export default angular.module('superdesk.analytics', ['superdesk.analytics.activity-report'])
     .run(cacheIncludedTemplates)
-
     .config(['superdeskProvider', function(superdesk) {
         superdesk.activity('analytics', {
             label: gettext('Analytics'),
