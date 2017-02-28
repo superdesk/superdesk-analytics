@@ -18,15 +18,16 @@
                 </select>
             </div>
 
+            <label translate>Operation date</label>
             <div class="multiple">
-            <div class="field">
-                <label for="parameters-operation_date_start" translate>Operation date from</label>
-                <div sd-datepicker ng-model="activityReport.operation_date_start"
-                    id="parameters-operation_date_start" required></div>
-            </div>
+                <div class="field">
+                    <label for="parameters-operation_date_start" translate>From</label>
+                    <div sd-datepicker ng-model="activityReport.operation_date_start"
+                         id="parameters-operation_date_start" required></div>
+                </div>
 
             <div class="field">
-                <label for="parameters-operation_date_end" translate>Operation date to</label>
+                <label for="parameters-operation_date_end" translate>To</label>
                 <div sd-datepicker ng-model="activityReport.operation_date_end"
                     id="parameters-operation_date_end" required></div>
             </div>

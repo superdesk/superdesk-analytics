@@ -17,11 +17,11 @@
             <button id="grouping-tab" type="button" class="tab-box__item" ng-class="{'tab-box__item--active': innerTab==='grouping'}" ng-click="display('grouping')" translate>Grouping</button>
         </div>
 
-        <form name="editReportForm">
-            <div ng-include="'activity-report-parameters.html'"
-                 ng-show="innerTab==='parameters'"></div>
-            <div ng-include="'activity-report-grouping.html'"
-                 ng-show="innerTab==='grouping'"></div>
+        <form name="editReportForm" ng-include="'activity-report-parameters.html'"
+              ng-show="innerTab==='parameters'">
+        </form>
+        <form name="editReportForm" ng-include="'activity-report-grouping.html'"
+              ng-show="innerTab==='grouping'">
         </form>
 
         <div>

@@ -77,6 +77,14 @@
     @include transition(left 0.2s ease);
     border-right: 2px solid #bbb;
 
+    .tab-box {
+        margin: -10px -20px 0;
+    }
+
+    .datepicker-input {
+        min-width: 0;
+    }
+
     .header {
         height: $nav-height + 1;
         border-bottom: 1px solid #ddd;
@@ -123,6 +131,7 @@
         padding-bottom: $bottom-view-padding;
         &.pull { bottom: 60px; }
         &.pull-heigher { bottom: 120; }
+        &.views { padding: 0; }
     }
 
     .list {
@@ -206,8 +215,8 @@
             background: none;
             i {
                 width: 18px;
-                  background-repeat: no-repeat;
-                  margin-top: 5px;
+                background-repeat: no-repeat;
+                margin-top: 5px;
             }
         }
     }
