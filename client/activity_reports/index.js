@@ -8,8 +8,6 @@
  * at https://www.sourcefabric.org/superdesk/license
  */
 
-import './styles/analytics.scss';
-
 import * as svc from './services';
 import * as directive from './directives';
 
@@ -51,5 +49,3 @@ angular.module('superdesk.analytics.activity-report', [])
             priority: -800
         });
     }]);
-
-console.log('bibi', directive.ActivityReportContainer);

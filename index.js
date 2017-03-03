@@ -1,8 +1,8 @@
 // styles
-import './client/styles/analytics.scss'
+import './client/styles/analytics.scss';
 
 // scripts
-import analyticsModule from './client'
+import analyticsModule from './client';
 
 // configureAnalytics.$inject = ['superdeskProvider']
 // function configureAnalytics(superdesk) {
@@ -20,4 +20,4 @@ import analyticsModule from './client'
 // }
 
 // export default analyticsModule.config(configureAnalytics)
-export default analyticsModule
+export default analyticsModule;
