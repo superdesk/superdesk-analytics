@@ -28,7 +28,8 @@ class TrackActivityResource(Resource):
     item_methods = ['GET', 'DELETE']
     resource_methods = ['POST']
 
-    privileges = {'POST': 'track_users_report', 'DELETE': 'track_users_report', 'GET': 'track_users_report'}
+    privileges = {'POST': 'track_activity_report', 'DELETE': 'track_activity_report',
+                  'GET': 'track_activity_report'}
 
 
 class TrackActivityService(BaseService):

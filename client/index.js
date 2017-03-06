@@ -9,12 +9,19 @@
  */
 
 import './styles/analytics.scss';
+import * as ctrl from './controllers';
 
 import './activity_reports';
+import './processed_items_report';
+import './track_activity_report';
 
 
 function cacheIncludedTemplates($templateCache) {
     $templateCache.put('activity-report.html', require('./activity_reports/views/activity-report.html'));
+    $templateCache.put('processed-items-report.html',
+        require('./processed_items_report/views/processed-items-report.html'));
+    $templateCache.put('track-activity-report.html',
+        require('./track_activity_report/views/track-activity-report.html'));
 }
 cacheIncludedTemplates.$inject = ['$templateCache'];
 
@@ -26,12 +33,18 @@ cacheIncludedTemplates.$inject = ['$templateCache'];
  * @packageName analytics
  * @description Superdesk analytics module.
  */
-export default angular.module('superdesk.analytics', ['superdesk.analytics.activity-report'])
+export default angular.module('superdesk.analytics',
+    ['superdesk.analytics.activity-report', 'superdesk.analytics.processed-items-report',
+        'superdesk.analytics.track-activity-report'])
+    .controller('AnalyticsController', ctrl.AnalyticsController)
+
     .run(cacheIncludedTemplates)
+
     .config(['superdeskProvider', function(superdesk) {
         superdesk.activity('analytics', {
             label: gettext('Analytics'),
             when: '/analytics',
+            controller: 'AnalyticsController',
             template: require('./views/analytics.html'),
             topTemplateUrl: 'scripts/apps/dashboard/views/workspace-topnav.html',
             sideTemplateUrl: 'scripts/apps/workspace/views/workspace-sidenav.html',

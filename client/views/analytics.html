@@ -1,7 +1,15 @@
 <div class="subnav subnav--plain">
-  <header>
-      <h3 class="subnav__page-title" translate>Analytics</h3>
-  </header>
+    <header>
+        <h3 class="subnav__page-title" translate>Analytics</h3>
+    </header>
+
+    <div class="report-selector">
+        <select id="reports" ng-options="r as r.name for r in reports" ng-model="report">
+        </select>
+    </div>
 </div>
 
-<div ng-include="'activity-report.html'"></div>
+
+<div ng-include="'activity-report.html'" ng-if="report.id === 'activity-report'"></div>
+<div ng-include="'processed-items-report.html'" ng-if="report.id === 'processed-items-report'"></div>
+<div ng-include="'track-activity-report.html'" ng-if="report.id === 'track-activity-report'"></div>

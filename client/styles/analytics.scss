@@ -5,6 +5,14 @@
 @import '~variables.scss';
 @import '~animation.scss';
 
+.report-selector {
+    position: absolute;
+    left: 120px;
+    top: 10px;
+    width: 180px;
+    background-color: $sd-background;
+}
+
 .report-page-container {
     .report-content {
         position: absolute;
@@ -45,7 +53,7 @@
     }
 }
 
-.activity-report-parameters {
+.report-parameters {
     .keywords {
         @include clearfix();
     }
@@ -126,6 +134,17 @@
     .content {
         position: absolute;
         top:$nav-height; left:0px; bottom:0px; right:0px;
+        padding: 20px;
+        overflow: auto;
+        padding-bottom: $bottom-view-padding;
+        &.pull { bottom: 60px; }
+        &.pull-heigher { bottom: 120; }
+        &.views { padding: 0; }
+    }
+
+    .content-no-header {
+        position: absolute;
+        top:0px; left:0px; bottom:0px; right:0px;
         padding: 20px;
         overflow: auto;
         padding-bottom: $bottom-view-padding;
