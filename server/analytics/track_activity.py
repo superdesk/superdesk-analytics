@@ -33,57 +33,69 @@ class TrackActivityResource(Resource):
 
 
 class TrackActivityService(BaseService):
-    def create_query(self, doc):
-
-        archive_version_query = {
-            '$and': [
-                {'task.user': str(doc['user'])},
-                {'task.desk': str(doc['desk'])},
-                {'task.stage': str(doc['stage'])}
-            ]
-        }
-
-        return archive_version_query
-
     def get_items(self, query):
+        """Returns the result of the item search by the given query.
+
+        :param dict query: query on user, desk and stage
+        :return Cursor: cursor on items list
+        """
         archive_version_items = superdesk.get_resource_service('archive_versions').get(req=None, lookup=query)
         return archive_version_items
 
-    # returns the item-versioncreated pair from archive_versions
     def establish_time(self, query, state):
+        """Returns the item-versioncreated pair from archive_versions
+
+        :param dict query: query on user, desk and stage
+        :param string state: state in_progress, submitted, created
+        :return List of tuples
+        """
         all_items = self.get_items(query)
         items = [(i['guid'], i['versioncreated']) for i in all_items if (i['state'] in state)]
         time_item_pair = []
-        pairs = [(key,) + tuple(elem for _, elem in group) for key, group in groupby(items, lambda pair: pair[0])]
-        for element in pairs:
+        for element in [(key,) + tuple(elem for _, elem in group) for key,
+                        group in groupby(items, lambda pair: pair[0])]:
             time_item_pair.append((element[0], element[-1]))
 
         return time_item_pair
 
     def get_each_item_time(self, query, items):
+        """Returns the item-versioncreated pair for started and resolved items
+
+        :param dict query: query on user, desk and stage
+        :param cursor items
+        :return List of tuples: pair item-time_started and item-time_resolved
+        """
         item_start_time = []
         item_end_time = []
         list_of_items = []
-        for it in items:
-            list_of_items.append(it['guid'])
-            individual_items = set(list_of_items)
-        # returns the item-versioncreated pair of all started items
+        list_of_items = []
+
+        list_of_items = [it['guid'] for it in items]
+        individual_items = set(list_of_items)
         in_progress = self.establish_time(query, ('in_progress', 'submitted', 'created'))
-        # returns the item-versioncreated pair of all resolved items
         resolved = self.establish_time(query, ('published', 'corrected'))
-        for i in individual_items:
-            for p in in_progress:
-                if i == p[0]:
-                    item_start_time.append((i, p[-1]))
-        for i in individual_items:
-            for r in resolved:
-                if i == r[0]:
-                    item_end_time.append((i, r[-1]))
+        for p in in_progress:
+            if p[0] in individual_items:
+                item_start_time.append((p[0], p[-1]))
+        for r in resolved:
+            if r[0] in individual_items:
+                item_end_time.append((r[0], r[-1]))
 
         return item_start_time, item_end_time
 
-    def search_without_grouping(self, doc):
-        query = self.create_query(doc)
+    def generate_report(self, doc):
+        """Returns a report on elapsed time between started and resolved item.
+
+        The report will contain the amount of time elapsed since a user started the work on an item
+        until he resolved that item.
+        :param dict doc: document used for generating the report
+        :return dict: report
+        """
+        query = {'$and': [
+            {'task.user': str(doc['user'])},
+            {'task.desk': str(doc['desk'])},
+            {'task.stage': str(doc['stage'])}]
+        }
         items = self.get_items(query)
         result_list = []
         details = []
@@ -102,6 +114,6 @@ class TrackActivityService(BaseService):
 
     def create(self, docs):
         for doc in docs:
-            doc['report'] = self.search_without_grouping(doc)
+            doc['report'] = self.generate_report(doc)
         docs = super().create(docs)
         return docs
