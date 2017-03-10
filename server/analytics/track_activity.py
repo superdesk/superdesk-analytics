@@ -65,23 +65,19 @@ class TrackActivityService(BaseService):
         :param cursor items
         :return List of tuples: pair item-time_started and item-time_resolved
         """
-        item_start_time = []
-        item_end_time = []
-        list_of_items = []
-        list_of_items = []
+        individual_items = set([it['guid'] for it in items])
+        items_in_progress = self.establish_time(query, ('in_progress', 'submitted', 'created'))
+        items_resolved = self.establish_time(query, ('published', 'corrected'))
 
-        list_of_items = [it['guid'] for it in items]
-        individual_items = set(list_of_items)
-        in_progress = self.establish_time(query, ('in_progress', 'submitted', 'created'))
-        resolved = self.establish_time(query, ('published', 'corrected'))
-        for p in in_progress:
-            if p[0] in individual_items:
-                item_start_time.append((p[0], p[-1]))
-        for r in resolved:
-            if r[0] in individual_items:
-                item_end_time.append((r[0], r[-1]))
+        items_times = {}
+        for item in items_in_progress:
+            if item[0] in individual_items:
+                items_times[item[0]] = {'start_time': item[-1]}
+        for item in items_resolved:
+            if item[0] in individual_items and item[0] in items_times:
+                items_times[item[0]]['end_time'] = item[-1]
 
-        return item_start_time, item_end_time
+        return items_times
 
     def generate_report(self, doc):
         """Returns a report on elapsed time between started and resolved item.
@@ -98,19 +94,12 @@ class TrackActivityService(BaseService):
         }
         items = self.get_items(query)
         result_list = []
-        details = []
 
-        item_start_time, item_end_time = self.get_each_item_time(query, items)
-        for i in item_start_time:
-            for j in item_end_time:
-                if i[0] == j[0]:
-                    details.append((i[0], i[-1], j[-1]))
-        for element in details:
-            elements = {'item_id': element[0], 'entered_stage_at': element[1], 'left_stage': element[2],
-                        'time_elapsed': str(element[2] - element[1])}
-            result_list.append(elements)
-
-        return {'info': result_list}
+        for item_id, item_times in self.get_each_item_time(query, items).items():
+            result_list.append({'item_id': item_id, 'entered_stage_at': item_times['start_time'],
+                                'left_stage': item_times['end_time'],
+                                'time_elapsed': str(item_times['end_time'] - item_times['start_time'])})
+        return result_list
 
     def create(self, docs):
         for doc in docs:
