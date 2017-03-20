@@ -1,6 +1,6 @@
 // Karma configuration
 // Generated on Mon Sep 26 2016 12:33:25 GMT+0200 (CEST)
-var webpackConfig = require('./webpack.config.js')
+var webpackConfig = require('./webpack.config.js');
 
 module.exports = function(config) {
     // in karma, entry is read from files prop
@@ -34,7 +34,8 @@ module.exports = function(config) {
         // enable / disable colors in the output (reporters and logs)
         colors: true,
         // level of logging
-        // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
+        // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN ||
+        //                  config.LOG_INFO || config.LOG_DEBUG
         logLevel: config.LOG_INFO,
         // enable / disable watching file and executing tests whenever any file changes
         autoWatch: true,
@@ -47,6 +48,6 @@ module.exports = function(config) {
         // Concurrency level
         // how many browser should be started simultaneous
         concurrency: Infinity,
-        webpack: webpackConfig,
-    })
-}
+        webpack: webpackConfig
+    });
+};

@@ -2,7 +2,7 @@
     <div class="header">
         <ul>
             <li id="activity-report-edit" ng-click="changeTab('editingActivityReport')"
-                ng-class="{active: panelTab === 'editingActivityReport'}" translate>Activity Report
+                ng-class="{active: panelTab === 'editingActivityReport'}" translate>Edit Report
             </li>
             <li id="saved-activity-reports" 
                 ng-class="{active: panelTab === 'savedReports'}" 
@@ -18,10 +18,8 @@
         </div>
 
         <form name="editReportForm">
-            <div ng-include="'activity-report-parameters.html'"
-                 ng-show="innerTab==='parameters'"></div>
-            <div ng-include="'activity-report-grouping.html'"
-                 ng-show="innerTab==='grouping'"></div>
+            <div ng-include="'activity-report-parameters.html'" ng-show="innerTab==='parameters'"></div>
+            <div ng-include="'activity-report-grouping.html'" ng-show="innerTab==='grouping'"></div>
         </form>
 
         <div>

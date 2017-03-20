@@ -26,7 +26,7 @@ def init_app(app):
     service = SavedActivityReportService(endpoint_name, backend=superdesk.get_backend())
     SavedActivityReportResource(endpoint_name, app=app, service=service)
 
-    endpoint_name = 'track_users_report'
+    endpoint_name = 'track_activity_report'
     service = TrackActivityService(endpoint_name, backend=superdesk.get_backend())
     TrackActivityResource(endpoint_name, app=app, service=service)
 
@@ -36,7 +36,6 @@ def init_app(app):
 
     superdesk.privilege(name='activity_reports', label='Activity Report View',
                         description='User can view activity reports.')
-
-    superdesk.privilege(name='track_users_report', label='Activity Report View')
-    superdesk.privilege(name='processed_items_report', label='Activity Report View',
+    superdesk.privilege(name='track_activity_report', label='Track Activity Report View')
+    superdesk.privilege(name='processed_items_report', label='Processed Items Report View',
                         description='User can view activity reports.')

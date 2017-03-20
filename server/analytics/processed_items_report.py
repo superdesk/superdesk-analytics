@@ -1,3 +1,5 @@
+from datetime import timezone
+
 from superdesk import get_resource_service
 from superdesk.services import BaseService
 
@@ -43,6 +45,8 @@ class ProcessedItemsService(BaseService):
         :param datetime end: ending time of the given interval
         :return integer: number of items
         """
+        start = start.replace(tzinfo=timezone.utc)
+        end = end.replace(hour=23, minute=59, second=59, tzinfo=timezone.utc)
         if state:
             items = sum(1 for i in items_list
                         if i['state'] == state and i['_updated'] >= start and

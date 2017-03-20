@@ -2,7 +2,7 @@ SavedActivityReports.$inject = ['api', '$filter', '$q', '$rootScope'];
 
 /**
  * @ngdoc service
- * @module superdesk.apps.analytics
+ * @module superdesk.apps.analytics.activity-report
  * @name SavedActivityReports
  * @requires api, $filter, $q, $rootScope
  * @description A service that handles the retrieval of the saved activity reports
