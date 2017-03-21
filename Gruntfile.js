@@ -1,17 +1,15 @@
-'use strict'
-
 var path = require('path');
 
 module.exports = function(grunt) {
-
     // util for grunt.template
     grunt.toJSON = function(input) {
-        return JSON.stringify(input)
-    }
+        return JSON.stringify(input);
+    };
 
     var config = {
         pkg: grunt.file.readJSON(path.join(__dirname, 'package.json')),
         tmpDir: '.tmp',
+        appDir: 'client',
         distDir: 'dist',
         specDir: 'spec',
         tasksDir: 'tasks',
@@ -20,7 +18,7 @@ module.exports = function(grunt) {
         livereloadPort: 35729
     };
 
-    grunt.initConfig(config)
+    grunt.initConfig(config);
 
     require('load-grunt-tasks')(grunt, {
         config: path.join(__dirname, 'package'),
@@ -32,9 +30,9 @@ module.exports = function(grunt) {
     require('load-grunt-config')(grunt, {
         config: config,
         configPath: path.join(__dirname, 'tasks', 'options')
-    })
+    });
 
-    grunt.registerTask('hint', ['eslint'])
+    grunt.registerTask('hint', ['eslint']);
 
     grunt.registerTask('test', ['ngtemplates:dev', 'karma:unit']);
     grunt.registerTask('ci', ['test', 'hint']);

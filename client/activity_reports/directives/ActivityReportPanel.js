@@ -4,7 +4,7 @@ ActivityReportPanel.$inject = [
 
 /**
  * @ngdoc directive
- * @module superdesk.apps.analytics
+ * @module superdesk.apps.analytics.activity-report
  * @name sdActivityReportPanel
  * @requires $location
  * @requires desks

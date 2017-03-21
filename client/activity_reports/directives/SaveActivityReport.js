@@ -2,7 +2,7 @@ SaveActivityReport.$inject = ['$location', 'asset', 'api', 'session', 'notify', 
 
 /**
  * @ngdoc directive
- * @module superdesk.apps.analytics
+ * @module superdesk.apps.analytics.activity-report
  * @name sdSaveActivityReport
  * @requires $location
  * @requires asset
