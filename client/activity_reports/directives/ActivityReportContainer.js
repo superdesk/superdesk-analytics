@@ -1,6 +1,6 @@
 /**
  * @ngdoc directive
- * @module superdesk.apps.analytics
+ * @module superdesk.apps.analytics.activity-report
  * @name sdActivityReportContainer
  * @description Container directive
  */

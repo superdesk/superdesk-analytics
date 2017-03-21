@@ -5,7 +5,7 @@ SavedActivityReports.$inject = [
 
 /**
  * @ngdoc directive
- * @module superdesk.apps.analytics
+ * @module superdesk.apps.analytics.activity-report
  * @name sdSavedActivityReports
  * @requires $rootScope
  * @requires api

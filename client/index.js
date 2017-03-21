@@ -9,15 +9,21 @@
  */
 
 import './styles/analytics.scss';
+import * as ctrl from './controllers';
+import * as directive from './analytics-widget/directives';
 
-import * as svc from './services';
-import * as directive from './directives';
+import './activity_reports';
+import './processed_items_report';
+import './track_activity_report';
+import './analytics-widget';
 
 
 function cacheIncludedTemplates($templateCache) {
-    $templateCache.put('activity-report-parameters.html', require('./views/activity-report-parameters.html'));
-    $templateCache.put('activity-report-grouping.html', require('./views/activity-report-grouping.html'));
-    $templateCache.put('save-activity-report-dialog.html', require('./views/save-activity-report-dialog.html'));
+    $templateCache.put('activity-report.html', require('./activity_reports/views/activity-report.html'));
+    $templateCache.put('processed-items-report.html',
+        require('./processed_items_report/views/processed-items-report.html'));
+    $templateCache.put('track-activity-report.html',
+        require('./track_activity_report/views/track-activity-report.html'));
 }
 cacheIncludedTemplates.$inject = ['$templateCache'];
 
@@ -27,16 +33,12 @@ cacheIncludedTemplates.$inject = ['$templateCache'];
  * @module superdesk.analytics
  * @name superdesk.analytics
  * @packageName analytics
- * @description Superdesk analytics specific application.
+ * @description Superdesk analytics module.
  */
-export default angular.module('superdesk.analytics', [])
-    .service('savedActivityReports', svc.SavedActivityReports)
-
-    .directive('sdActivityReportContainer', directive.ActivityReportContainer)
-    .directive('sdActivityReportPanel', directive.ActivityReportPanel)
-    .directive('sdActivityReportView', directive.ActivityReportView)
-    .directive('sdSaveActivityReport', directive.SaveActivityReport)
-    .directive('sdSavedActivityReports', directive.SavedActivityReports)
+export default angular.module('superdesk.analytics',
+    ['superdesk.analytics.activity-report', 'superdesk.analytics.processed-items-report',
+        'superdesk.analytics.track-activity-report', 'superdesk.analytics.analytics-widget'])
+    .controller('AnalyticsController', ctrl.AnalyticsController)
 
     .run(cacheIncludedTemplates)
 
@@ -44,6 +46,7 @@ export default angular.module('superdesk.analytics', [])
         superdesk.activity('analytics', {
             label: gettext('Analytics'),
             when: '/analytics',
+            controller: 'AnalyticsController',
             template: require('./views/analytics.html'),
             topTemplateUrl: 'scripts/apps/dashboard/views/workspace-topnav.html',
             sideTemplateUrl: 'scripts/apps/workspace/views/workspace-sidenav.html',
@@ -51,3 +54,12 @@ export default angular.module('superdesk.analytics', [])
             priority: -800
         });
     }]);
+
+angular.module('superdesk.apps.analytics', [
+    'superdesk.apps.authoring.widgets',
+    'superdesk.apps.desks',
+    'superdesk.apps.workspace'
+])
+    .controller('AggregateCtrl', ctrl.AggregateCtrl)
+    .directive('sdAnalyticsSettings', directive.AnalyticsSettings)
+    .directive('sdWidgetGroup', directive.WidgetGroup);

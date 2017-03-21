@@ -2,7 +2,7 @@ ActivityReportView.$inject = ['$location', 'asset'];
 
 /**
  * @ngdoc directive
- * @module superdesk.apps.analytics
+ * @module superdesk.apps.analytics.activity-report
  * @name sdActivityReportView
  * @requires $location
  * @requires asset

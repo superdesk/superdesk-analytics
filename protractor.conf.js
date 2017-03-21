@@ -1,5 +1,3 @@
-'use strict';
-
 var path = require('path');
 
 function getChromeOptions() {
@@ -45,6 +43,7 @@ var config = {
     onPrepare: function() {
         require('./spec/helpers/setup')({fixture_profile: 'app_prepopulate_data'});
         var reporters = require('jasmine-reporters');
+
         jasmine.getEnv().addReporter(
             new reporters.JUnitXmlReporter({
                 savePath: 'e2e-test-results',
@@ -55,6 +54,7 @@ var config = {
             this.specDone = function(result) {
                 if (result.failedExpectations.length > 0) {
                     var name = result.fullName.split(' ');
+
                     console.log('at ' + name[0] + ': ' + result.description);
                 }
             };

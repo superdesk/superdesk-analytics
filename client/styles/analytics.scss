@@ -5,6 +5,14 @@
 @import '~variables.scss';
 @import '~animation.scss';
 
+.report-selector {
+    position: absolute;
+    left: 120px;
+    top: 10px;
+    width: 180px;
+    background-color: $sd-background;
+}
+
 .report-page-container {
     .report-content {
         position: absolute;
@@ -45,7 +53,7 @@
     }
 }
 
-.activity-report-parameters {
+.report-parameters {
     .keywords {
         @include clearfix();
     }
@@ -76,6 +84,14 @@
     @include  box-shadow(inset -1px 0px 6px 0px rgba(0,0,0,.1));
     @include transition(left 0.2s ease);
     border-right: 2px solid #bbb;
+
+    .tab-box {
+        margin: -10px -20px 0;
+    }
+
+    .datepicker-input {
+        min-width: 0;
+    }
 
     .header {
         height: $nav-height + 1;
@@ -123,6 +139,18 @@
         padding-bottom: $bottom-view-padding;
         &.pull { bottom: 60px; }
         &.pull-heigher { bottom: 120; }
+        &.views { padding: 0; }
+    }
+
+    .content-no-header {
+        position: absolute;
+        top:0px; left:0px; bottom:0px; right:0px;
+        padding: 20px;
+        overflow: auto;
+        padding-bottom: $bottom-view-padding;
+        &.pull { bottom: 60px; }
+        &.pull-heigher { bottom: 120; }
+        &.views { padding: 0; }
     }
 
     .list {
@@ -206,8 +234,8 @@
             background: none;
             i {
                 width: 18px;
-                  background-repeat: no-repeat;
-                  margin-top: 5px;
+                background-repeat: no-repeat;
+                margin-top: 5px;
             }
         }
     }
