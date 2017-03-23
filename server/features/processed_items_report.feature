@@ -12,13 +12,13 @@ Feature: Processed published items
         """
      	Given "users"
         """
-        [{"_id":"58a2b6b6f078e40de225913d","username": "user1", "password": "password", "email": "user1@domain.com", "sign_off": "fb", "user_type": "administrator","role": "#roles._id#"}]
+        [{"username": "user1", "password": "password", "email": "user1@domain.com", "sign_off": "fb", "user_type": "administrator","role": "#roles._id#"}]
         """
         When we login as user "user1" with password "password" and user type "admin"
         Given "archive"
         """
         [{"_id": "item1", "headline": "test", "slugline": "test", "state": "fetched",
-          "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#","user": "58a2b6b6f078e40de225913d"},"original_creator": "#CONTEXT_USER_ID#",
+          "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#","user": "#users._id#"},"original_creator": "#CONTEXT_USER_ID#",
           "_current_version": 0, "guid": "item1"}]
         """
         When we publish "#archive._id#" with "publish" type and "published" state
@@ -39,7 +39,7 @@ Feature: Processed published items
 		When we post to "/processed_items_report" with success
         """
         {
-        	"users": ["#CONTEXT_USER_ID#", "58a2b6b6f078e40de225913d"],
+        	"users": ["#CONTEXT_USER_ID#", "#users._id#"],
         	"start_time": "2017-01-02T09:03:26+0000",
         	"end_time": "2018-02-22T09:03:26+0000"
         }
@@ -47,24 +47,24 @@ Feature: Processed published items
         Then we get existing resource
         """
         {
-        "users": ["#CONTEXT_USER_ID#", "58a2b6b6f078e40de225913d"],
+        "users": ["#CONTEXT_USER_ID#", "#users._id#"],
         "start_time": "2017-01-02T09:03:26+0000",
         "end_time": "2018-02-22T09:03:26+0000",
         "report": [{"user": "#CONTEXT_USER_ID#","processed_items": {"corrected_items": 0,"killed_items": 0,"total_items": 2,"published_items": 2, "spiked_items": 0}},
-        	{"user": "58a2b6b6f078e40de225913d", "processed_items":{"corrected_items": 0,"killed_items": 0,"total_items": 2,"published_items": 2, "spiked_items": 0}}]
+        	{"user": "#users._id#", "processed_items":{"corrected_items": 0,"killed_items": 0,"total_items": 2,"published_items": 2, "spiked_items": 0}}]
         }
         """
     @auth
     Scenario: Processed spiked items
  		Given "users"
         """
-        [{"_id":"58a2b6b6f078e40de225913d","username": "user1", "password": "password", "email": "user1@domain.com", "sign_off": "fb", "user_type": "administrator"}]
+        [{"username": "user1", "password": "password", "email": "user1@domain.com", "sign_off": "fb", "user_type": "administrator"}]
         """
         When we login as user "user1" with password "password" and user type "admin"
         Given "archive"
         """
         [{"_id": "item1", "headline": "test", "slugline": "test", "state": "fetched",
-          "task": {"user": "58a2b6b6f078e40de225913d"},"original_creator": "#CONTEXT_USER_ID#",
+          "task": {"user": "#users._id#"},"original_creator": "#CONTEXT_USER_ID#",
           "_current_version": 0, "guid": "item1"}]
         """
         When we spike "item1"
@@ -85,7 +85,7 @@ Feature: Processed published items
 		When we post to "/processed_items_report" with success
         """
         {
-        	"users": ["#CONTEXT_USER_ID#", "58a2b6b6f078e40de225913d"],
+        	"users": ["#CONTEXT_USER_ID#", "#users._id#"],
         	"start_time": "2017-01-02T09:03:26+0000",
         	"end_time": "2018-02-22T09:03:26+0000"
         }
@@ -93,11 +93,11 @@ Feature: Processed published items
         Then we get existing resource
         """
         {
-        "users": ["#CONTEXT_USER_ID#", "58a2b6b6f078e40de225913d"],
+        "users": ["#CONTEXT_USER_ID#", "#users._id#"],
         "start_time": "2017-01-02T09:03:26+0000",
         "end_time": "2018-02-22T09:03:26+0000",
         "report": [{"user": "#CONTEXT_USER_ID#","processed_items": {"corrected_items": 0,"killed_items": 0,"total_items": 1,"published_items": 0, "spiked_items": 1}},
-        	{"user": "58a2b6b6f078e40de225913d", "processed_items":{"corrected_items": 0,"killed_items": 0,"total_items": 1,"published_items": 0, "spiked_items": 1}}]
+        	{"user": "#users._id#" ,"processed_items":{"corrected_items": 0,"killed_items": 0,"total_items": 1,"published_items": 0, "spiked_items": 1}}]
         }
         """
    	@auth
@@ -112,13 +112,13 @@ Feature: Processed published items
         """
      	Given "users"
         """
-        [{"_id":"58a2b6b6f078e40de225913d","username": "user1", "password": "password", "email": "user1@domain.com", "sign_off": "fb", "user_type": "administrator","role": "#roles._id#"}]
+        [{"username": "user1", "password": "password", "email": "user1@domain.com", "sign_off": "fb", "user_type": "administrator","role": "#roles._id#"}]
         """
         When we login as user "user1" with password "password" and user type "admin"
         Given "archive"
         """
         [{"_id": "item1", "headline": "test", "slugline": "test", "state": "published",
-          "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#","user": "58a2b6b6f078e40de225913d"},"original_creator": "#CONTEXT_USER_ID#",
+          "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#","user": "#users._id#"},"original_creator": "#CONTEXT_USER_ID#",
           "_current_version": 0, "guid": "item1"}]
         """
         When we publish "#archive._id#" with "correct" type and "corrected" state
@@ -139,7 +139,7 @@ Feature: Processed published items
 		When we post to "/processed_items_report" with success
         """
         {
-        	"users": ["#CONTEXT_USER_ID#", "58a2b6b6f078e40de225913d"],
+        	"users": ["#CONTEXT_USER_ID#", "#users._id#"],
         	"start_time": "2017-01-02T09:03:26+0000",
         	"end_time": "2018-02-22T09:03:26+0000"
         }
@@ -147,11 +147,11 @@ Feature: Processed published items
         Then we get existing resource
         """
         {
-        "users": ["#CONTEXT_USER_ID#", "58a2b6b6f078e40de225913d"],
+        "users": ["#CONTEXT_USER_ID#", "#users._id#"],
         "start_time": "2017-01-02T09:03:26+0000",
         "end_time": "2018-02-22T09:03:26+0000",
         "report": [{"user": "#CONTEXT_USER_ID#","processed_items": {"corrected_items": 2,"killed_items": 0,"total_items": 2,"published_items": 0, "spiked_items": 0}},
-        	{"user": "58a2b6b6f078e40de225913d", "processed_items":{"corrected_items": 2,"killed_items": 0,"total_items": 2,"published_items": 0, "spiked_items": 0}}]
+        	{"user": "#users._id#", "processed_items":{"corrected_items": 2,"killed_items": 0,"total_items": 2,"published_items": 0, "spiked_items": 0}}]
         }
         """
   	@auth
@@ -166,13 +166,13 @@ Given "roles"
         """
      	Given "users"
         """
-        [{"_id":"58a2b6b6f078e40de225913d","username": "user1", "password": "password", "email": "user1@domain.com", "sign_off": "fb", "user_type": "administrator","role": "#roles._id#"}]
+        [{"username": "user1", "password": "password", "email": "user1@domain.com", "sign_off": "fb", "user_type": "administrator","role": "#roles._id#"}]
         """
         When we login as user "user1" with password "password" and user type "admin"
         Given "archive"
         """
         [{"_id": "item1", "headline": "test", "slugline": "test", "state": "corrected",
-          "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#","user": "58a2b6b6f078e40de225913d"},"original_creator": "#CONTEXT_USER_ID#",
+          "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#","user": "#users._id#"},"original_creator": "#CONTEXT_USER_ID#",
           "_current_version": 1, "guid": "item1"}]
         """
         When we publish "#archive._id#" with "kill" type and "killed" state
@@ -193,7 +193,7 @@ Given "roles"
 		When we post to "/processed_items_report" with success
         """
         {
-        	"users": ["#CONTEXT_USER_ID#", "58a2b6b6f078e40de225913d"],
+        	"users": ["#CONTEXT_USER_ID#", "#users._id#"],
         	"start_time": "2017-01-02T09:03:26+0000",
         	"end_time": "2018-02-22T09:03:26+0000"
         }
@@ -201,10 +201,10 @@ Given "roles"
         Then we get existing resource
         """
         {
-        "users": ["#CONTEXT_USER_ID#", "58a2b6b6f078e40de225913d"],
+        "users": ["#CONTEXT_USER_ID#", "#users._id#"],
         "start_time": "2017-01-02T09:03:26+0000",
         "end_time": "2018-02-22T09:03:26+0000",
         "report": [{"user": "#CONTEXT_USER_ID#","processed_items": {"corrected_items": 0,"killed_items": 2,"total_items": 2,"published_items": 0, "spiked_items": 0}},
-        	{"user": "58a2b6b6f078e40de225913d", "processed_items":{"corrected_items": 0,"killed_items": 2,"total_items": 2,"published_items": 0, "spiked_items": 0}}]
+        	{"user": "#users._id#", "processed_items":{"corrected_items": 0,"killed_items": 2,"total_items": 2,"published_items": 0, "spiked_items": 0}}]
         }
         """
