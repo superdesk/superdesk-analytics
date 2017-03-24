@@ -51,4 +51,4 @@ export default angular.module('superdesk.analytics',
             category: 'analytics',
             priority: -800
         });
-    }]);
+    }])
