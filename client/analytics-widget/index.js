@@ -17,9 +17,9 @@
  * @description Superdesk analytics widget.
  */
 
-angular.module('superdesk.analytics.analytics-widget', [])
+angular.module('superdesk.analytics.analytics-widget', ['superdesk.apps.aggregate', 'superdesk.apps.dashboard.widgets'])
     .config(['dashboardWidgetsProvider', function(dashboardWidgets) {
-        dashboardWidgets.addWidget('analytics', {
+        dashboardWidgets.addWidget('analytics-widget', {
             label: gettext('Analytics widget'),
             multiple: true,
             icon: 'archive',
@@ -28,7 +28,7 @@ angular.module('superdesk.analytics.analytics-widget', [])
             sizex: 1,
             sizey: 2,
             thumbnail: require('./thumbnail.svg'),
-            template: require('./analytics-widget.html'),
+            templateUrl: require('./analytics-widget.html'),
             configurationTemplate: require('./configuration.html'),
             description: 'This wiget allows you to view the analytics reports',
             custom: true
