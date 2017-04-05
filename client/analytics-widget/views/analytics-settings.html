@@ -1,0 +1,57 @@
+<div class="modal-header">
+    <a href="" class="close" ng-click="cancel()"><i class="icon-close-small"></i></a>
+    <h3 translate>Analytics settings <span ng-if="settings.desk" translate>for "{{settings.desk.name}}" Desk</span></h3>
+</div>
+
+<div class="modal-body analytics-settings" sd-wizard data-name="analyticssettings"
+     data-current-step="step.current" ng-init="setCurrentStep()" data-finish="cancel()">
+    <div sd-wizard-step data-title="{{ :: 'Desks' | translate }}" data-code="desks"
+         data-hide="shouldHideStep('desks')">
+        <div class="content">
+            <div ng-if="widget">
+                <span class="pull-right" sd-character-count data-item="widget.configuration.label" data-limit="30"></span>
+            </div>
+            <div class="legend" translate>Select desks for view</div>
+            <div class="desk" ng-repeat="desk in desks | orderBy: 'name' track by desk._id">
+                <div class="desk-title">
+                    {{desk.name}}
+                    <span sd-switch class="pull-right" ng-model="editGroups[desk._id].selected" ng-click="setDeskInfo(desk._id)"></span>
+                </div>
+                <ul class="stages clearfix" ng-if="editGroups[desk._id].selected">
+                    <li ng-repeat="stage in deskStages[desk._id]">
+                        <span sd-check ng-model="editGroups[stage._id].selected" ng-click="setStageInfo(stage._id)"></span> {{stage.name}}
+                    </li>
+                    <li>
+                        <span sd-check ng-model="editGroups[desk._id + ':scheduled'].selected" ng-click="setScheduledDeskOutputInfo(desk._id + ':scheduled')"></span> <span translate>Output/Scheduled</span>
+                    </li>
+                    <li>
+                        <span sd-check ng-model="editGroups[desk._id + ':output'].selected" ng-click="setDeskOutputInfo(desk._id + ':output')"></span><span translate>Output/Published</span>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+    <div sd-wizard-step data-title="{{ :: 'Operation type' | translate }}" data-code="maxitems"
+         data-hide="shouldHideStep('maxitems')">
+        <div class="content">
+            <div class="legend" translate>Select desired operation</div>
+            <div class="groups">
+                <div ng-repeat="desk in desks" class="clearfix">
+                    <div class="desk-title pull-left" ng-if="desk.name === 'Sports Desk'">
+                        {{deskLookup.name}} : <span>{{deskLookup.name}}</span>
+                    </div>
+                    <div class="box-items-count pull-right"><input type="number" id="maxItems" ng-model="max.max_items" min="1" max="25" required></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="modal-footer">
+    <button id="previousBtn" class="btn btn--pull-left" ng-if="step.current !== 'desks' && !displayOnlyCurrentStep" ng-click="previous()" translate>Previous</button>
+    <button id="nextBtn" class="btn" ng-if="step.current !== 'desks' && !displayOnlyCurrentStep" ng-click="next()" translate>Next</button>
+    <button class="btn btn--primary" ng-click="save()" translate>Done</button>
+</div>

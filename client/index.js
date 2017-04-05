@@ -10,10 +10,12 @@
 
 import './styles/analytics.scss';
 import * as ctrl from './controllers';
+import * as directive from './analytics-widget/directives';
 
 import './activity_reports';
 import './processed_items_report';
 import './track_activity_report';
+import './analytics-widget';
 
 
 function cacheIncludedTemplates($templateCache) {
@@ -35,7 +37,7 @@ cacheIncludedTemplates.$inject = ['$templateCache'];
  */
 export default angular.module('superdesk.analytics',
     ['superdesk.analytics.activity-report', 'superdesk.analytics.processed-items-report',
-        'superdesk.analytics.track-activity-report'])
+        'superdesk.analytics.track-activity-report', 'superdesk.analytics.analytics-widget'])
     .controller('AnalyticsController', ctrl.AnalyticsController)
 
     .run(cacheIncludedTemplates)
@@ -51,4 +53,13 @@ export default angular.module('superdesk.analytics',
             category: 'analytics',
             priority: -800
         });
-    }]);
+    }])
+
+angular.module('superdesk.apps.analytics', [
+    'superdesk.apps.authoring.widgets',
+    'superdesk.apps.desks',
+    'superdesk.apps.workspace'
+])
+    .controller('AggregateCtrl', ctrl.AggregateCtrl)
+    .directive('sdAnalyticsSettings', directive.AnalyticsSettings)
+    .directive('sdWidgetGroup', directive.WidgetGroup);
