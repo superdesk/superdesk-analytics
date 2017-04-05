@@ -68,7 +68,7 @@ class TrackActivityService(BaseService):
             results[item['guid']] = {'entered_stage_at': item['_updated'], 'item': item}
 
         for item in other_stage_items:
-            if item['guid'] in results and results[item['guid']]['entered_stage_at'] < item['_updated']:
+            if item['guid'] in results and results[item['guid']]['entered_stage_at'] <= item['_updated']:
                 if 'left_stage_at' not in results[item['guid']] or \
                         results[item['guid']]['left_stage_at'] > item['_updated']:
                     results[item['guid']]['left_stage_at'] = item['_updated']
