@@ -16,11 +16,10 @@
                 </div>
             </div>
 
-            <label for="user" translate>User</label>
+            <label for="users" translate>Users</label>
             <div class="term-editor data visible">
-                <div id="user" sd-typeahead items="users" ng-model="user"
-                    search="searchUsers(term)" select="selectUser(item)" term="selectedTerm"
-                    data-disabled="selectedUser">
+                <div id="users" sd-typeahead items="users" ng-model="users"
+                    search="searchUsers(term)" select="selectUser(item)" term="selectedTerm">
                     <ul>
                         <li typeahead-item="t" ng-repeat="t in users">
                             {{ :: t.display_name }}
@@ -29,8 +28,10 @@
                 </div>
             </div>
 
-            <div ng-if="selectedUser">
-                {{ selectedUser.display_name }}<i class="icon-close-small" ng-click="removeUser()"></i>
+            <div ng-if="selectedUser" 
+                 ng-repeat = "user in selectedUsersName">
+                {{ user}}
+                <i class="icon-close-small" ng-click="removeUser(user)"></i>
             </div>
         </fieldset>&nbsp;
     </form>

@@ -25,6 +25,8 @@ export function ProcessedItemsReportPanel(config, api, session, notify, $rootSco
              */
             scope.init = function() {
                 scope.selectedUser = null;
+                scope.selectedUsers = [];
+                scope.selectedUsersName = [];
             };
 
             /**
@@ -55,7 +57,9 @@ export function ProcessedItemsReportPanel(config, api, session, notify, $rootSco
              * @description Sets the selected user
              */
             scope.selectUser = function(user) {
-                scope.selectedUser = user;
+                scope.selectedUser = user._id;
+                scope.selectedUsers.push(user._id);
+                scope.selectedUsersName.push(user.display_name);
             };
 
             /**
@@ -63,8 +67,13 @@ export function ProcessedItemsReportPanel(config, api, session, notify, $rootSco
              * @name sdProcessedItemsReportPanel#removeUser
              * @description Removes the selected user
              */
-            scope.removeUser = function() {
-                scope.selectedUser = null;
+            scope.removeUser = function(item) {
+                for (var i = scope.selectedUsersName.length; i--;) {
+                    if (scope.selectedUsersName[i] === item) {
+                        scope.selectedUsers.splice(i, 1);
+                        scope.selectedUsersName.splice(i, 1);
+                    }
+                }
             };
 
             /**
@@ -87,7 +96,7 @@ export function ProcessedItemsReportPanel(config, api, session, notify, $rootSco
                 }
 
                 var query = {start_time: formatDate(scope.start_time), end_time: formatDate(scope.end_time),
-                    user: scope.selectedUser._id};
+                    users: scope.selectedUsers};
 
                 api('processed_items_report', session.identity).save({}, query)
                     .then(onSuccess, onFail);

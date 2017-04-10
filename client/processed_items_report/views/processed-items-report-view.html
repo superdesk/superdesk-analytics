@@ -3,18 +3,20 @@
     <div>
         <table>
             <tr>
+                <th translate>User</th>
                 <th translate>Corrected</th>
                 <th translate>Killed</th>
                 <th translate>Published</th>
                 <th translate>Spiked</th>
                 <th translate>Total</th>
             </tr>
-            <tr>
-                <td>{{processedItemsReport.report.corrected_items }}</td>
-                <td>{{processedItemsReport.report.killed_items }}</td>
-                <td>{{processedItemsReport.report.published_items }}</td>
-                <td>{{processedItemsReport.report.spiked_items }}</td>
-                <td>{{processedItemsReport.report.total_items }}</td>
+            <tr ng-repeat="item in processedItemsReport.report" >
+                    <td>{{ item.user.display_name}}</td>
+                    <td>{{ item.processed_items.corrected_items }}</td>
+                    <td>{{ item.processed_items.killed_items }}</td>
+                    <td>{{ item.processed_items.published_items }}</td>
+                    <td>{{ item.processed_items.spiked_items }}</td>
+                    <td>{{ item.processed_items.total_items }}</td>
             </tr>
         </table>
     </div>
