@@ -50,8 +50,31 @@ Feature: Processed published items
         "users": ["#CONTEXT_USER_ID#", "#users._id#"],
         "start_time": "2017-01-02T09:03:26+0000",
         "end_time": "2018-02-22T09:03:26+0000",
-        "report": [{"user": "#CONTEXT_USER_ID#","processed_items": {"corrected_items": 0,"killed_items": 0,"total_items": 2,"published_items": 2, "spiked_items": 0}},
-        	{"user": "#users._id#", "processed_items":{"corrected_items": 0,"killed_items": 0,"total_items": 2,"published_items": 2, "spiked_items": 0}}]
+        "report": [{
+        	"user": 
+	        	{
+	        		"_id": "#CONTEXT_USER_ID#",
+	        	 	"display_name": "__any_value__"
+	       			},
+        	 "processed_items": 
+        	 	{
+        	 		"corrected_items": 0,
+        	 		"killed_items": 0,
+        	 		"total_items": 2,
+        	 		"published_items": 2, 
+        	 		"spiked_items": 0
+        	 	}},
+        	{
+        		"user": {
+        			"_id": "#users._id#",
+        			"display_name": "#users.username#"}, 
+        		"processed_items":{
+        			"corrected_items": 0,
+        			"killed_items": 0,
+        			"total_items": 2,
+        			"published_items": 2, 
+        			"spiked_items": 0
+        		}}]
         }
         """
     @auth
@@ -96,8 +119,31 @@ Feature: Processed published items
         "users": ["#CONTEXT_USER_ID#", "#users._id#"],
         "start_time": "2017-01-02T09:03:26+0000",
         "end_time": "2018-02-22T09:03:26+0000",
-        "report": [{"user": "#CONTEXT_USER_ID#","processed_items": {"corrected_items": 0,"killed_items": 0,"total_items": 1,"published_items": 0, "spiked_items": 1}},
-        	{"user": "#users._id#" ,"processed_items":{"corrected_items": 0,"killed_items": 0,"total_items": 1,"published_items": 0, "spiked_items": 1}}]
+        "report": [{
+        	"user": 
+	        	{
+	        		"_id": "#CONTEXT_USER_ID#",
+	        	 	"display_name": "__any_value__"
+	       			},
+        	 "processed_items": 
+        	 	{
+        	 		"corrected_items": 0,
+        	 		"killed_items": 0,
+        	 		"total_items": 1,
+        	 		"published_items": 0, 
+        	 		"spiked_items": 1
+        	 	}},
+        	{
+        		"user": {
+        			"_id": "#users._id#",
+        			"display_name": "#users.username#"}, 
+        		"processed_items":{
+        			"corrected_items": 0,
+        			"killed_items": 0,
+        			"total_items": 1,
+        			"published_items": 0, 
+        			"spiked_items": 1
+        		}}]
         }
         """
    	@auth
@@ -150,13 +196,37 @@ Feature: Processed published items
         "users": ["#CONTEXT_USER_ID#", "#users._id#"],
         "start_time": "2017-01-02T09:03:26+0000",
         "end_time": "2018-02-22T09:03:26+0000",
-        "report": [{"user": "#CONTEXT_USER_ID#","processed_items": {"corrected_items": 2,"killed_items": 0,"total_items": 2,"published_items": 0, "spiked_items": 0}},
-        	{"user": "#users._id#", "processed_items":{"corrected_items": 2,"killed_items": 0,"total_items": 2,"published_items": 0, "spiked_items": 0}}]
-        }
+        "report": [{
+        	"user": 
+	        	{
+	        		"_id":"#CONTEXT_USER_ID#",
+	        	 	"display_name": "__any_value__"
+	        	 	},
+        	 "processed_items": 
+        	 	{
+        	 		"corrected_items": 2,
+        	 		"killed_items": 0,
+        	 		"total_items": 2,
+        	 		"published_items": 0, 
+        	 		"spiked_items": 0
+        	 	}},
+        	{
+        		"user": {
+        			"_id":"#users._id#",
+        			"display_name": "#users.username#"}, 
+        		"processed_items":{
+        			"corrected_items": 2,
+        			"killed_items": 0,
+        			"total_items": 2,
+        			"published_items": 0, 
+        			"spiked_items": 0
+        		}}]
+        		
+        	}
         """
   	@auth
   	Scenario: Processed killed items
-Given "roles"
+		Given "roles"
      	"""
      	[{"name": "Admin", "privileges": {"ingest":  1, "archive": 1, "fetch": 1, "publish": 1}}]
      	"""
@@ -204,7 +274,31 @@ Given "roles"
         "users": ["#CONTEXT_USER_ID#", "#users._id#"],
         "start_time": "2017-01-02T09:03:26+0000",
         "end_time": "2018-02-22T09:03:26+0000",
-        "report": [{"user": "#CONTEXT_USER_ID#","processed_items": {"corrected_items": 0,"killed_items": 2,"total_items": 2,"published_items": 0, "spiked_items": 0}},
-        	{"user": "#users._id#", "processed_items":{"corrected_items": 0,"killed_items": 2,"total_items": 2,"published_items": 0, "spiked_items": 0}}]
-        }
+        "report": [{
+        	"user": 
+	        	{
+	        		"_id":"#CONTEXT_USER_ID#",
+	        	 	"display_name": "__any_value__"
+	        	 	},
+        	 "processed_items": 
+        	 	{
+        	 		"corrected_items": 0,
+        	 		"killed_items": 2,
+        	 		"total_items": 2,
+        	 		"published_items": 0, 
+        	 		"spiked_items": 0
+        	 	}},
+        	{
+        		"user": {
+        			"_id":"#users._id#",
+        			"display_name": "#users.username#"}, 
+        		"processed_items":{
+        			"corrected_items": 0,
+        			"killed_items": 2,
+        			"total_items": 2,
+        			"published_items": 0, 
+        			"spiked_items": 0
+        		}}]
+        		
+        	}
         """

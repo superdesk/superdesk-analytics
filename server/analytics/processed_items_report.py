@@ -37,6 +37,14 @@ class ProcessedItemsService(BaseService):
         """
         return get_resource_service('archive_versions').get(req=None, lookup=query)
 
+    def get_user(self, id):
+        """Returns one user by a given id.
+
+        :param ObjectId id: user id
+        :return : user's details
+        """
+        return get_resource_service('users').find_one(req=None, _id=id)
+
     def count_items(self, items_list, state, start, end):
         """Returns the number of items which were modified in a given time interval and having a certain state.
 
@@ -101,7 +109,12 @@ class ProcessedItemsService(BaseService):
         report = []
 
         for user in doc['users']:
-                report.append({'user': user, 'processed_items': self.search_items_single_user(doc, user)})
+                user_details = self.get_user(user)
+                report.append({
+                    'user': {
+                        '_id': user_details['_id'],
+                        'display_name': user_details['display_name']},
+                    'processed_items': self.search_items_single_user(doc, user)})
 
         return report
 
