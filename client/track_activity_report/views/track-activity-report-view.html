@@ -1,17 +1,7 @@
 <div ng-if="trackActivityReport">
-    <h3 translate>TrackActivity Report</h3>
-    <div>
-        <table>
-            <tr>
-                <th translate>Item</th>
-                <th translate>Entered Stage</th>
-                <th translate>Left Stage</th>
-            </tr>
-            <tr ng-repeat="item in trackActivityReport.report">
-                <td>{{ :: item.item.headline }} ({{ :: item.item.slugline }})</td>
-                <td>{{ :: formatDate(item.entered_stage_at) }}</td>
-                <td>{{ :: formatDate(item.left_stage_at) }}</td>
-            </tr>
-        </table>
+    <h3 translate>Track Activity Report</h3>
+
+    <div sd-after-render="generateChart">
+        <div id="container" style="min-width: 310px; max-width: 800px; height: 400px; margin: 0 auto"></div>
     </div>
 </div>

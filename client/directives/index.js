@@ -1,0 +1,1 @@
+export {AfterRender} from './AfterRender';

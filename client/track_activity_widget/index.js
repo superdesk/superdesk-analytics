@@ -9,11 +9,10 @@
  */
 
 import * as ctrl from './controllers';
-import * as directive from './directives';
 
 
 function cacheIncludedTemplates($templateCache) {
-    $templateCache.put('track_activity_widget_configuration.html', require('./views/configuration.html'));
+    $templateCache.put('track_activity_widget_settings.html', require('./views/track_activity_widget_settings.html'));
     $templateCache.put('track_activity_widget.html', require('./views/track_activity_widget.html'));
 }
 cacheIncludedTemplates.$inject = ['$templateCache'];
@@ -26,30 +25,31 @@ cacheIncludedTemplates.$inject = ['$templateCache'];
  * @packageName analytics.track_activity_widget
  * @description Superdesk track activity widget.
  */
-export default angular.module('superdesk.analytics.track_activity_widget', [
-        'superdesk.apps.aggregate',
-        'superdesk.apps.dashboard.widgets',
-        'superdesk.apps.authoring.widgets',
-        'superdesk.apps.desks',
-        'superdesk.apps.workspace'
-    ])
+export default angular.module('superdesk.analytics.track-activity-widget', [
+    'superdesk.apps.dashboard.widgets',
+    'superdesk.apps.authoring.widgets',
+    'superdesk.apps.desks',
+    'superdesk.apps.workspace',
+    'superdesk.analytics.track-activity-report'
+])
 
     .run(cacheIncludedTemplates)
     .config(['dashboardWidgetsProvider', function(dashboardWidgets) {
         dashboardWidgets.addWidget('track_activity_widget', {
-            label: gettext('Track Activity Widget'),
-            multiple: true,
+            label: gettext('Track Activity'),
+            multiple: false,
             icon: 'archive',
             max_sizex: 2,
-            max_sizey: 3,
+            max_sizey: 2,
             sizex: 1,
             sizey: 2,
             thumbnail: require('./thumbnail.svg'),
             template: 'track_activity_widget.html',
-            configurationTemplate: 'track_activity_widget_configuration.html',
+            configurationTemplate: 'track_activity_widget_settings.html',
             description: 'This wiget allows you to view the track activity reports',
             custom: true
         });
     }])
+
     .controller('TrackActivityWidgetController', ctrl.TrackActivityWidgetController)
-    .directive('sdTrackActivityWidgetSettings', directive.TrackActivityWidgetSettings);
+    .controller('TrackActivityWidgetSettingsController', ctrl.TrackActivityWidgetSettingsController);

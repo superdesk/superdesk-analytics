@@ -1,0 +1,53 @@
+<div ng-controller="TrackActivityWidgetSettingsController"  class="widget-config track-activity">
+
+<div class="modal-header">
+    <a href="" class="close" ng-click="cancel()"><i class="icon-close-small"></i></a>
+    <h3 translate>Track Activity Widget Settings</span></h3>
+</div>
+
+<div class="modal-body track-activity-settings">
+    <form name="trackActivityReportForm">
+        <div class="field">
+            <label for="days-ago" translate>Starting</label>
+            <select id="days-ago" ng-model="widget.days_ago"
+                ng-options="days_ago for days_ago in [1,2,3,4,5,6,7]">
+            </select>
+            <label for="days-ago" translate>days ago</label>
+        </div>
+
+        <div class="field">
+            <label for="desk" translate>Desk</label>
+            <select id="desk" name="desk"
+                ng-options="d._id as d.name for d in desks" ng-model="widget.desk">
+            </select>
+        </div>
+
+        <div class="field">
+            <label for="stage" translate>Stage</label>
+            <select id="stage" name="stage"
+                ng-options="s._id as s.name for s in stages" ng-model="widget.stage" ng-disabled="!widget.desk">
+            </select>
+        </div>
+
+        <label for="user" translate>User</label>
+        <div class="term-editor data visible">
+            <div id="user" sd-typeahead items="users" ng-model="user"
+                search="searchUsers(term)" select="selectUser(item)" term="selectedTerm"
+                data-disabled="selectedUser">
+                <ul>
+                    <li typeahead-item="t" ng-repeat="t in users">
+                        {{ :: t.display_name }}
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div ng-if="selectedUser">
+            {{ selectedUser.display_name }}<i class="icon-close-small" ng-click="removeUser()"></i>
+        </div>
+    </form>
+</div>
+
+<div class="modal-footer">
+    <button class="btn btn--primary" ng-click="save()" ng-disabled="!trackActivityReportForm.$valid" translate>Done</button>
+</div>

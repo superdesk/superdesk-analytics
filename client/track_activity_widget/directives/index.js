@@ -1,1 +1,0 @@
-export {TrackActivityWidgetSettings} from './TrackActivityWidgetSettings';

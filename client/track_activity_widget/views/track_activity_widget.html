@@ -3,56 +3,9 @@
         ng-class="{wrap: acc.selected && !$root.config.features.customMonitoringWidget, 'custom-widget': $root.config.features.customMonitoringWidget}">
     </div>
 
-    <h3>cucu</h3>
-    <div class="content-list-holder">
-            <div sd-shadow>
-                <div class="content-list" ng-if="!acc.state.solo">
-                    <div class="desk" ng-repeat="group in acc.cards track by group._id">
-                        <div class="stage" ng-show="total">
-                            <div sd-stage-header></div>
-                            <div class="stage-content" ng-style="acc.getMaxHeightStyle(group.max_items)"
-                                 ng-show="acc.getExpandedState(group._id) || acc.state.solo"
-                                 sd-widget-group
-                                 data-stage="group"
-                                 data-total="total"
-                                 data-allowed="true"
-                                 data-show-empty="false"
-                                 data-max-items="group.max_items"
-                                 data-action="acc.preview(item)"
-                                 data-selected="acc.selected"
-                                 data-filter="group.query">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="content-list" ng-if="acc.state.solo">
-                    <div class="desk" ng-init="group = acc.state.solo">
-                        <div class="stage" ng-show="total">
-                            <div sd-stage-header></div>
-                            <div class="stage-content" ng-show="acc.getExpandedState(group._id) || acc.state.solo"
-                                 sd-widget-group
-                                 data-stage="group"
-                                 data-total="total"
-                                 data-allowed="true"
-                                 data-show-empty="false"
-                                 data-max-items="100"
-                                 data-action="acc.preview(item)"
-                                 data-selected="acc.selected"
-                                 data-filter="group.query">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-    <div class="preview preview-widget" ng-init="contenttab = true" 
-        ng-if="acc.selected"
-        ng-class="{wrap: !acc.selected && !$root.config.features.customMonitoringWidget, 'custom-widget': $root.config.features.customMonitoringWidget}">
-        <div class="nav">
-            <button class="backlink" href="" ng-if="!$root.config.features.customMonitoringWidget" ng-click="acc.preview()"><span class="ng-scope" translate>Back</span></button>
+    <div sd-after-render="generateChart">
+        <div ng-if="trackActivityReport">
+            <div id="container" style="min-width: 310px; max-width: 800px; height: 400px; margin: 0 auto"></div>
         </div>
     </div>
 </div>
-
