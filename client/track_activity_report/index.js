@@ -8,6 +8,7 @@
  * at https://www.sourcefabric.org/superdesk/license
  */
 
+import * as svc from './services';
 import * as directive from './directives';
 
 
@@ -19,6 +20,9 @@ import * as directive from './directives';
  * @description Superdesk analytics track activity report.
  */
 angular.module('superdesk.analytics.track-activity-report', [])
+    .service('trackActivityChart', svc.TrackActivityChart)
+    .service('trackActivityReport', svc.TrackActivityReport)
+
     .directive('sdTrackActivityReportContainer', directive.TrackActivityReportContainer)
     .directive('sdTrackActivityReportPanel', directive.TrackActivityReportPanel)
     .directive('sdTrackActivityReportView', directive.TrackActivityReportView)

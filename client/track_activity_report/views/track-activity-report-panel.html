@@ -2,6 +2,14 @@
     <form name="trackActivityReportForm">
         <fieldset class="report-parameters">
             <div class="field">
+                <label for="days-ago" translate>Starting</label>
+                <select id="days-ago" ng-model="report.days_ago"
+                    ng-options="days_ago for days_ago in [1,2,3,4,5,6,7]">
+                </select>
+                <label for="days-ago" translate>days ago</label>
+            </div>
+
+            <div class="field">
                 <label for="desk" translate>Desk</label>
                 <select id="desk" name="desk"
                     ng-options="d._id as d.name for d in desks" ng-model="report.desk">
@@ -36,6 +44,6 @@
 
     <div>
         <button id="generate_processed_items_report" class="btn btn--primary" ng-click="generate()"
-            ng-disabled="!validForm()" translate>Generate</button>
+            ng-disabled="!trackActivityReportForm.$valid" translate>Generate</button>
     </div>
 </div>

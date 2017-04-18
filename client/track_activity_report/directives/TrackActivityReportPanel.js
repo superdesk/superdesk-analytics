@@ -1,5 +1,5 @@
 TrackActivityReportPanel.$inject = [
-    'config', 'api', 'session', 'notify', '$rootScope', 'desks'
+    'config', 'api', 'session', 'notify', '$rootScope', 'desks', 'trackActivityReport'
 ];
 
 /**
@@ -12,13 +12,16 @@ TrackActivityReportPanel.$inject = [
  * @requires notify
  * @requires $rootScope
  * @requires desks
+ * @requires trackActivityReport
  * @description A directive that generates the sidebar containing track activity report parameters
  */
-export function TrackActivityReportPanel(config, api, session, notify, $rootScope, desks) {
+export function TrackActivityReportPanel(config, api, session, notify, $rootScope, desks, trackActivityReport) {
     return {
         template: require('../views/track-activity-report-panel.html'),
         scope: {},
         link: function(scope, element, attrs, controller) {
+            var daysAgoDefault = 2;
+
             /**
              * @ngdoc method
              * @name sdTrackActivityReportPanel#init
@@ -30,12 +33,10 @@ export function TrackActivityReportPanel(config, api, session, notify, $rootScop
                 scope.desks = desks.desks._items;
                 scope.stages = null;
                 scope.selectedUser = null;
-                scope.report = {};
+                scope.report = {days_ago: daysAgoDefault};
                 if (currentDesk) {
-                    scope.report = {desk: currentDesk._id, stage: currentDesk.working_stage};
+                    scope.report = {desk: currentDesk._id, stage: currentDesk.working_stage, days_ago: daysAgoDefault};
                     scope.stages = desks.deskStages[currentDesk._id];
-                } else {
-                    scope.report = {};
                 }
             };
 
@@ -98,8 +99,8 @@ export function TrackActivityReportPanel(config, api, session, notify, $rootScop
              * @description Generate the report
              */
             scope.generate = function() {
-                function onSuccess(trackActivityReport) {
-                    $rootScope.$broadcast('view:track_activity_report', trackActivityReport);
+                function onSuccess(report) {
+                    $rootScope.$broadcast('view:track_activity_report', report);
                     notify.success(gettext('The track activity report was genereated successfully'));
                 }
 
@@ -111,12 +112,7 @@ export function TrackActivityReportPanel(config, api, session, notify, $rootScop
                     }
                 }
 
-                api('track_activity_report', session.identity).save({}, scope.report)
-                    .then(onSuccess, onFail);
-            };
-
-            scope.validForm = function() {
-                return scope.trackActivityReportForm.$valid && scope.selectedUser;
+                trackActivityReport.generate(scope.report).then(onSuccess, onFail);
             };
 
             scope.initalize();
