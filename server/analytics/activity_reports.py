@@ -103,7 +103,42 @@ class ActivityReportService(BaseService):
                 }
             }
         }
-        return {'items': self.get_items(query).count()}
+
+        items = self.get_items(query)
+
+        diffDays = abs(report['operation_date_start'] - report['operation_date_end'])
+        if diffDays.days < 2:
+            report = {'items': items.count(), 'no_items_per_hour': self.get_items_hourly(items)}
+        else:
+            report = {'items': items.count(), 'no_items_per_day': self.get_items_daily(items)}
+
+        return report
+
+    def get_items_daily(self, items):
+        new_format = "%Y-%m-%d"
+        dict_of_days = {}
+
+        if 'aggregations' in items.hits and 'items_over_days' in items.hits['aggregations']:
+            days_buckets = items.hits['aggregations']['items_over_days']['buckets']
+
+            for d in days_buckets:
+                days = datetime.strptime(d['key_as_string'], "%Y-%m-%dT%H:%M:%S.%fZ")
+                days.strftime(new_format)
+                dict_of_days[str(days)] = d['doc_count']
+        return dict_of_days
+
+    def get_items_hourly(self, items):
+        new_format = "%Y-%m-%d %H:%M:%S"
+        dict_of_hours = {}
+
+        if 'aggregations' in items.hits and 'items_over_hours' in items.hits['aggregations']:
+            hours_buckets = items.hits['aggregations']['items_over_hours']['buckets']
+
+            for h in hours_buckets:
+                hours = datetime.strptime(h['key_as_string'], "%Y-%m-%dT%H:%M:%S.%fZ")
+                hours.strftime(new_format)
+                dict_of_hours[str(hours)] = h['doc_count']
+            return dict_of_hours
 
     def search_items_with_groupping(self, report):
         """Return the report without grouping by desk
