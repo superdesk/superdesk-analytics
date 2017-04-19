@@ -28,9 +28,9 @@
                 </div>
             </div>
 
-            <div ng-if="selectedUser" 
-                 ng-repeat = "user in selectedUsersName">
-                {{ user}}
+            <div ng-if="selectedUsers.length>0" 
+                 ng-repeat = "user in selectedUsers">
+                {{ user.display_name}}
                 <i class="icon-close-small" ng-click="removeUser(user)"></i>
             </div>
         </fieldset>&nbsp;

@@ -24,9 +24,7 @@ export function ProcessedItemsReportPanel(config, api, session, notify, $rootSco
              * @description Initialises the processed items report object
              */
             scope.init = function() {
-                scope.selectedUser = null;
                 scope.selectedUsers = [];
-                scope.selectedUsersName = [];
             };
 
             /**
@@ -57,9 +55,10 @@ export function ProcessedItemsReportPanel(config, api, session, notify, $rootSco
              * @description Sets the selected user
              */
             scope.selectUser = function(user) {
-                scope.selectedUser = user._id;
-                scope.selectedUsers.push(user._id);
-                scope.selectedUsersName.push(user.display_name);
+                scope.selectedUsers.push({
+                    display_name: user.display_name,
+                    _id: user._id
+                });
             };
 
             /**
@@ -68,10 +67,9 @@ export function ProcessedItemsReportPanel(config, api, session, notify, $rootSco
              * @description Removes the selected user
              */
             scope.removeUser = function(item) {
-                for (var i = scope.selectedUsersName.length; i--;) {
-                    if (scope.selectedUsersName[i] === item) {
+                for (var i = scope.selectedUsers.length; i--;) {
+                    if (scope.selectedUsers[i] === item) {
                         scope.selectedUsers.splice(i, 1);
-                        scope.selectedUsersName.splice(i, 1);
                     }
                 }
             };
@@ -103,7 +101,7 @@ export function ProcessedItemsReportPanel(config, api, session, notify, $rootSco
             };
 
             scope.validForm = function() {
-                return scope.processedItemsReportForm.$valid && scope.selectedUser;
+                return scope.processedItemsReportForm.$valid && scope.selectedUsers;
             };
 
             /**

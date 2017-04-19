@@ -14,7 +14,13 @@ class ProcessedItemsResource(Resource):
     schema = {
         'users': {
             'type': 'list',
-            'schema': metadata_schema['original_creator']
+            'schema': {
+                'type': 'dict',
+                'schema': {
+                    '_id': metadata_schema['original_creator'],
+                    'display_name': {'type': 'string'}
+                }
+            }
         },
         'start_time': {'type': 'datetime'},
         'end_time': {'type': 'datetime'},
@@ -41,7 +47,7 @@ class ProcessedItemsService(BaseService):
         """Returns one user by a given id.
 
         :param ObjectId id: user id
-        :return : user's details
+        :return Cursor:cursor on user's details
         """
         return get_resource_service('users').find_one(req=None, _id=id)
 
@@ -109,12 +115,12 @@ class ProcessedItemsService(BaseService):
         report = []
 
         for user in doc['users']:
-                user_details = self.get_user(user)
+                user_details = self.get_user(user['_id'])
                 report.append({
                     'user': {
                         '_id': user_details['_id'],
                         'display_name': user_details['display_name']},
-                    'processed_items': self.search_items_single_user(doc, user)})
+                    'processed_items': self.search_items_single_user(doc, user['_id'])})
 
         return report
 

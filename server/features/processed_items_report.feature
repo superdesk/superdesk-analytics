@@ -12,7 +12,7 @@ Feature: Processed published items
         """
      	Given "users"
         """
-        [{"username": "user1", "password": "password", "email": "user1@domain.com", "sign_off": "fb", "user_type": "administrator","role": "#roles._id#"}]
+        [{"display_name": "user1", "username": "user1", "password": "password", "email": "user1@domain.com", "sign_off": "fb", "user_type": "administrator","role": "#roles._id#"}]
         """
         When we login as user "user1" with password "password" and user type "admin"
         Given "archive"
@@ -39,7 +39,13 @@ Feature: Processed published items
 		When we post to "/processed_items_report" with success
         """
         {
-        	"users": ["#CONTEXT_USER_ID#", "#users._id#"],
+        	"users": [{
+		        	"_id": "#CONTEXT_USER_ID#",
+		        	"display_name": "__any_value__"},
+	        	{
+	        		"_id": "#users._id#",
+	        		"display_name": "#users.display_name#"
+        	}],
         	"start_time": "2017-01-02T09:03:26+0000",
         	"end_time": "2018-02-22T09:03:26+0000"
         }
@@ -47,7 +53,12 @@ Feature: Processed published items
         Then we get existing resource
         """
         {
-        "users": ["#CONTEXT_USER_ID#", "#users._id#"],
+        "users": [{
+        	"_id": "#CONTEXT_USER_ID#",
+        	"display_name": "__any_value__"},
+        	{"_id": "#users._id#",
+        	"display_name": "#users.display_name#"
+        }],
         "start_time": "2017-01-02T09:03:26+0000",
         "end_time": "2018-02-22T09:03:26+0000",
         "report": [{
@@ -67,7 +78,7 @@ Feature: Processed published items
         	{
         		"user": {
         			"_id": "#users._id#",
-        			"display_name": "#users.username#"}, 
+        			"display_name": "#users.display_name#"}, 
         		"processed_items":{
         			"corrected_items": 0,
         			"killed_items": 0,
@@ -81,7 +92,7 @@ Feature: Processed published items
     Scenario: Processed spiked items
  		Given "users"
         """
-        [{"username": "user1", "password": "password", "email": "user1@domain.com", "sign_off": "fb", "user_type": "administrator"}]
+        [{"display_name": "user1","username": "user1", "password": "password", "email": "user1@domain.com", "sign_off": "fb", "user_type": "administrator"}]
         """
         When we login as user "user1" with password "password" and user type "admin"
         Given "archive"
@@ -108,7 +119,12 @@ Feature: Processed published items
 		When we post to "/processed_items_report" with success
         """
         {
-        	"users": ["#CONTEXT_USER_ID#", "#users._id#"],
+        	"users": [{
+	        	"_id": "#CONTEXT_USER_ID#",
+	        	"display_name": "__any_value__"},
+	        	{"_id": "#users._id#",
+	        	"display_name": "#users.display_name#"
+        	}],
         	"start_time": "2017-01-02T09:03:26+0000",
         	"end_time": "2018-02-22T09:03:26+0000"
         }
@@ -116,7 +132,12 @@ Feature: Processed published items
         Then we get existing resource
         """
         {
-        "users": ["#CONTEXT_USER_ID#", "#users._id#"],
+        "users": [{
+	        	"_id": "#CONTEXT_USER_ID#",
+	        	"display_name": "__any_value__"},
+	        	{"_id": "#users._id#",
+	        	"display_name": "#users.display_name#"
+        	}],
         "start_time": "2017-01-02T09:03:26+0000",
         "end_time": "2018-02-22T09:03:26+0000",
         "report": [{
@@ -136,7 +157,7 @@ Feature: Processed published items
         	{
         		"user": {
         			"_id": "#users._id#",
-        			"display_name": "#users.username#"}, 
+        			"display_name": "#users.display_name#"}, 
         		"processed_items":{
         			"corrected_items": 0,
         			"killed_items": 0,
@@ -158,7 +179,7 @@ Feature: Processed published items
         """
      	Given "users"
         """
-        [{"username": "user1", "password": "password", "email": "user1@domain.com", "sign_off": "fb", "user_type": "administrator","role": "#roles._id#"}]
+        [{"display_name": "user1","username": "user1", "password": "password", "email": "user1@domain.com", "sign_off": "fb", "user_type": "administrator","role": "#roles._id#"}]
         """
         When we login as user "user1" with password "password" and user type "admin"
         Given "archive"
@@ -185,7 +206,12 @@ Feature: Processed published items
 		When we post to "/processed_items_report" with success
         """
         {
-        	"users": ["#CONTEXT_USER_ID#", "#users._id#"],
+        	"users": [{
+	        	"_id": "#CONTEXT_USER_ID#",
+	        	"display_name": "__any_value__"},
+	        	{"_id": "#users._id#",
+	        	"display_name": "#users.display_name#"
+        	}],
         	"start_time": "2017-01-02T09:03:26+0000",
         	"end_time": "2018-02-22T09:03:26+0000"
         }
@@ -193,7 +219,12 @@ Feature: Processed published items
         Then we get existing resource
         """
         {
-        "users": ["#CONTEXT_USER_ID#", "#users._id#"],
+        "users": [{
+	        	"_id": "#CONTEXT_USER_ID#",
+	        	"display_name": "__any_value__"},
+	        	{"_id": "#users._id#",
+	        	"display_name": "#users.display_name#"
+        	}],
         "start_time": "2017-01-02T09:03:26+0000",
         "end_time": "2018-02-22T09:03:26+0000",
         "report": [{
@@ -213,7 +244,7 @@ Feature: Processed published items
         	{
         		"user": {
         			"_id":"#users._id#",
-        			"display_name": "#users.username#"}, 
+        			"display_name": "#users.display_name#"}, 
         		"processed_items":{
         			"corrected_items": 2,
         			"killed_items": 0,
@@ -236,7 +267,7 @@ Feature: Processed published items
         """
      	Given "users"
         """
-        [{"username": "user1", "password": "password", "email": "user1@domain.com", "sign_off": "fb", "user_type": "administrator","role": "#roles._id#"}]
+        [{"display_name": "user1","username": "user1", "password": "password", "email": "user1@domain.com", "sign_off": "fb", "user_type": "administrator","role": "#roles._id#"}]
         """
         When we login as user "user1" with password "password" and user type "admin"
         Given "archive"
@@ -263,7 +294,12 @@ Feature: Processed published items
 		When we post to "/processed_items_report" with success
         """
         {
-        	"users": ["#CONTEXT_USER_ID#", "#users._id#"],
+        	"users": [{
+	        	"_id": "#CONTEXT_USER_ID#",
+	        	"display_name": "__any_value__"},
+	        	{"_id": "#users._id#",
+	        	"display_name": "#users.display_name#"
+        	}],
         	"start_time": "2017-01-02T09:03:26+0000",
         	"end_time": "2018-02-22T09:03:26+0000"
         }
@@ -271,7 +307,12 @@ Feature: Processed published items
         Then we get existing resource
         """
         {
-        "users": ["#CONTEXT_USER_ID#", "#users._id#"],
+        "users": [{
+	        	"_id": "#CONTEXT_USER_ID#",
+	        	"display_name": "__any_value__"},
+	        	{"_id": "#users._id#",
+	        	"display_name": "#users.display_name#"
+        	}],
         "start_time": "2017-01-02T09:03:26+0000",
         "end_time": "2018-02-22T09:03:26+0000",
         "report": [{
@@ -291,7 +332,7 @@ Feature: Processed published items
         	{
         		"user": {
         			"_id":"#users._id#",
-        			"display_name": "#users.username#"}, 
+        			"display_name": "#users.display_name#"}, 
         		"processed_items":{
         			"corrected_items": 0,
         			"killed_items": 2,
