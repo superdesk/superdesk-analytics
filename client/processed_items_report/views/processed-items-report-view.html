@@ -1,21 +1,6 @@
 <div ng-if="processedItemsReport">
     <h3 translate>Processed Items Report</h3>
-    <div>
-        <table>
-            <tr>
-                <th translate>Corrected</th>
-                <th translate>Killed</th>
-                <th translate>Published</th>
-                <th translate>Spiked</th>
-                <th translate>Total</th>
-            </tr>
-            <tr>
-                <td>{{processedItemsReport.report.corrected_items }}</td>
-                <td>{{processedItemsReport.report.killed_items }}</td>
-                <td>{{processedItemsReport.report.published_items }}</td>
-                <td>{{processedItemsReport.report.spiked_items }}</td>
-                <td>{{processedItemsReport.report.total_items }}</td>
-            </tr>
-        </table>
+    <div sd-after-render="generateChart">
+        <div id="container" style="min-width: 310px; max-width: 800px; height: 400px; margin: 0 auto"></div>
     </div>
 </div>
