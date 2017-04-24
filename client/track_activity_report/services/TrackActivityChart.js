@@ -19,7 +19,8 @@ TrackActivityChart.$inject = ['lodash', 'moment', 'desks'];
 export function TrackActivityChart(_, moment, desks) {
     var finisheItemColor = 'green',
         unfinishedItemColor = 'yellow',
-        sentBackColor = 'brown';
+        sentBackColor = 'brown',
+        publishedColor = 'blue';
 
     /**
      * @ngdoc method
@@ -43,11 +44,16 @@ export function TrackActivityChart(_, moment, desks) {
             desk = desks.deskLookup[report.desk],
             stage = desks.stageLookup[report.stage];
 
-        _.forEach(report.report, (item) => {
+        var sortedReport = _.sortBy(report.report, [(item) => item.item.headline]);
+
+        _.forEach(sortedReport, (item) => {
             categories.push(item.item.headline);
             var itemData = {low: moment(item.entered_stage_at).unix()};
 
-            if (item.left_stage_at) {
+            if (item.published_on) {
+                itemData.high = moment(item.published_on).unix();
+                itemData.color = publishedColor;
+            } else if (item.left_stage_at) {
                 itemData.high = moment(item.left_stage_at).unix();
                 itemData.color = item.sent_back ? sentBackColor : finisheItemColor;
             } else {
@@ -95,8 +101,11 @@ export function TrackActivityChart(_, moment, desks) {
                         high = formatTimestamp(this.high),
                         format = span + '<b>entered: ' + low + '</b>';
 
-                    if (this.color === finisheItemColor) {
+                    if (this.color === finisheItemColor || this.color === sentBackColor) {
                         format += ' - <b>left: ' + high + '</b>';
+                    }
+                    if (this.color === publishedColor) {
+                        format += ' - <b>published: ' + high + '</b>';
                     }
                     format += '<br/>';
                     return format;
