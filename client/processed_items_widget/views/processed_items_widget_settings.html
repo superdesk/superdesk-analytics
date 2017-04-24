@@ -1,17 +1,24 @@
-<div class="content-no-header pull pull-higher">
+<div ng-controller="ProcessedItemsWidgetSettingsController"  class="widget-config processed-items">
+
+<div class="modal-header">
+    <a href="" class="close" ng-click="cancel()"><i class="icon-close-small"></i></a>
+    <h3 translate>Processed Items Widget Settings</h3>
+</div>
+
+<div class="modal-body processed-items-settings">
     <form name="processedItemsReportForm">
         <fieldset class="report-parameters">
             <label translate>Time interval</label>
             <div class="multiple">
                 <div class="field">
                     <label for="start_time" translate>From</label>
-                    <div sd-datepicker ng-model="start_time"
+                    <div sd-datepicker ng-model="widget.start_time"
                          id="start_time" required></div>
                 </div>
 
                 <div class="field">
                     <label for="end_time" translate>To</label>
-                    <div sd-datepicker ng-model="end_time"
+                    <div sd-datepicker ng-model="widget.end_time" 
                         id="end_time" required></div>
                 </div>
             </div>
@@ -19,7 +26,7 @@
             <label for="users" translate>Users</label>
             <div class="term-editor data visible">
                 <div id="users" sd-typeahead items="users" ng-model="users"
-                    search="searchUsers(term)" select="selectUser(item)" term="selectedTerm">
+                    search="searchUsers(term)" select="selectUser(item)" term="selectedTerm" required>
                     <ul>
                         <li typeahead-item="t" ng-repeat="t in users">
                             {{ :: t.display_name }}
@@ -28,16 +35,16 @@
                 </div>
             </div>
 
-            <div ng-if="selectedUsers.length" 
+            <div ng-if="selectedUsers.length>0" 
                  ng-repeat = "user in selectedUsers">
                 {{ user.display_name}}
                 <i class="icon-close-small" ng-click="removeUser(user)"></i>
             </div>
         </fieldset>&nbsp;
     </form>
-
-    <div>
-        <button id="generate_processed_items_report" class="btn btn--primary" ng-click="generate()"
-            ng-disabled="!validForm()" translate>Generate</button>
+</div>
+    <div class="modal-footer">
+        <button class="btn btn--primary" ng-click="save()"
+            ng-disabled="!processedItemsReportForm.$valid && selectedUsers.length<0" translate>Done</button>
     </div>
 </div>

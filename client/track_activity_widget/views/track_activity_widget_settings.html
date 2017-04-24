@@ -1,11 +1,11 @@
 <div ng-controller="TrackActivityWidgetSettingsController"  class="widget-config track-activity">
 
-<div class="modal-header">
-    <a href="" class="close" ng-click="cancel()"><i class="icon-close-small"></i></a>
-    <h3 translate>Track Activity Widget Settings</span></h3>
+<div class="modal__header">
+    <a href="" class="modal__close pull-right" sd-hotkey="esc" ng-click="cancel()"><i class="icon-close-small"></i></a>
+    <h3 class="modal__heading" translate>Track Activity Widget Settings</h3>
 </div>
 
-<div class="modal-body track-activity-settings">
+<div class="modal__body track-activity-settings">
     <form name="trackActivityReportForm">
         <div class="field">
             <label for="days-ago" translate>Starting</label>
@@ -46,8 +46,7 @@
             {{ selectedUser.display_name }}<i class="icon-close-small" ng-click="removeUser()"></i>
         </div>
     </form>
-</div>
 
-<div class="modal-footer">
+<div class="modal__footer">
     <button class="btn btn--primary" ng-click="save()" ng-disabled="!trackActivityReportForm.$valid" translate>Done</button>
 </div>

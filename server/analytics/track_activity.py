@@ -13,8 +13,9 @@ from superdesk.resource import Resource
 from eve.utils import config
 import superdesk
 from superdesk.services import BaseService
-from superdesk.metadata.item import GUID_FIELD
-from datetime import timedelta, datetime
+from superdesk.metadata.item import GUID_FIELD, PUBLISH_STATES, ITEM_STATE,\
+    CONTENT_STATE
+from datetime import timedelta, datetime, timezone
 from superdesk import get_resource_service
 
 
@@ -22,6 +23,8 @@ ENTERED_STAGE = 'entered_stage_at'
 LEFT_STAGE = 'left_stage_at'
 UPDATED = '_updated'
 SENT_BACK = 'sent_back'
+PUBLISHED_ON = 'published_on'
+VERSIONS = 'versions'
 
 
 class TrackActivityResource(Resource):
@@ -65,24 +68,31 @@ class TrackActivityService(BaseService):
         start_time = (datetime.utcnow() - days_ago).replace(hour=0, minute=0, second=0, microsecond=0)
 
         query_for_current_stage = {'$and': [
-            {'task.desk': str(doc['desk'])},
             {'task.stage': str(doc['stage'])},
-            {'_current_version': {'$ne': 0}},
-            {'state': {'$ne': 'spiked'}}]
+            {config.VERSION: {'$ne': 0}},
+            {UPDATED: {'$gte': start_time}}]
+        }
+        archive_service = superdesk.get_resource_service('archive')
+        archive_stage_items = archive_service.get_from_mongo(req=None, lookup=query_for_current_stage)
+        archive_stage_items_ids = [item[config.ID_FIELD] for item in archive_stage_items]
+
+        states = list(PUBLISH_STATES) + [CONTENT_STATE.SPIKED]
+        query_for_current_stage = {'$and': [
+            {'task.stage': str(doc['stage'])},
+            {config.VERSION: {'$ne': 0}},
+            {ITEM_STATE: {'$nin': states}}]
         }
         query_for_other_stages = {'$and': [
-            {'task.desk': str(doc['desk'])},
-            {'task.stage': {'$ne': str(doc['stage'])}},
-            {'_current_version': {'$ne': 0}},
-            {'state': {'$ne': 'spiked'}}]
+            {config.VERSION: {'$ne': 0}},
+            {'task.stage': {'$ne': str(doc['stage'])}}]
+        }
+        query_for_published = {'$and': [
+            {config.VERSION: {'$ne': 0}},
+            {ITEM_STATE: {'$in': list(PUBLISH_STATES)}}]
         }
         if (doc.get('user')):
             query_for_current_stage['$and'].append({'task.user': str(doc['user'])})
             query_for_other_stages['$and'].append({'task.user': str(doc['user'])})
-
-        archive_service = superdesk.get_resource_service('archive')
-        archive_stage_items = archive_service.get_from_mongo(req=None, lookup=query_for_current_stage)
-        archive_stage_items_ids = [item[config.ID_FIELD] for item in archive_stage_items]
 
         query_extra = {'$or': [
             {UPDATED: {'$gte': start_time}},
@@ -90,20 +100,10 @@ class TrackActivityService(BaseService):
         }
         query_for_current_stage['$and'].append(query_extra)
         query_for_other_stages['$and'].append(query_extra)
+        query_for_published['$and'].append(query_extra)
 
-        return self.get_items(query_for_current_stage), self.get_items(query_for_other_stages)
-
-    def get_stages_map(self):
-        """Returns a map of stages grouped by desk
-
-        :return dict
-        """
-        stages = {}
-        for stage in get_resource_service('stages').get(req=None, lookup=None):
-            if not stage['desk'] in stages:
-                stages[stage['desk']] = {}
-            stages[stage['desk']][stage[config.ID_FIELD]] = stage
-        return stages
+        return self.get_items(query_for_current_stage), self.get_items(query_for_other_stages), \
+            self.get_items(query_for_published)
 
     def generate_report(self, doc):
         """Returns a report on elapsed time between started and resolved item.
@@ -112,34 +112,67 @@ class TrackActivityService(BaseService):
         :param dict doc: document used for generating the report
         :return dict: report
         """
-        stages = self.get_stages_map()
-        current_stage_items, other_stage_items = self.get_stage_items(doc)
+        days_ago = timedelta(int(doc['days_ago']) if doc.get('days_ago') else self.daysAgoDefault)
+        start_time = (datetime.now(timezone.utc) - days_ago).replace(hour=0, minute=0, second=0, microsecond=0)
+        stages = {str(stage[config.ID_FIELD]): stage for stage in
+                  get_resource_service('stages').get(req=None, lookup=None)}
+        current_stage_items, other_stage_items, published_items = self.get_stage_items(doc)
 
         results = {}
         for item in current_stage_items:
-            if item[GUID_FIELD] not in results or \
-                    item[config.VERSION] > results[item[GUID_FIELD]]['item'][config.VERSION]:
-                results[item[GUID_FIELD]] = {ENTERED_STAGE: item[UPDATED], 'item': item}
+            if item[GUID_FIELD] not in results:
+                results[item[GUID_FIELD]] = {VERSIONS: []}
+            results[item[GUID_FIELD]][VERSIONS].append(item)
 
         for new_version in other_stage_items:
-            if new_version[GUID_FIELD] not in results:
-                continue
-            orig_version = results[new_version[GUID_FIELD]]
-            if orig_version[ENTERED_STAGE] <= new_version[UPDATED] and \
-                    (LEFT_STAGE not in orig_version or
-                     orig_version[LEFT_STAGE] > new_version[UPDATED]):
-                orig_version[LEFT_STAGE] = new_version[UPDATED]
-                if new_version['task']['desk'] == orig_version['item']['task']['desk']:
-                    desk = new_version['task']['desk']
-                    orig_version_stage = orig_version['item']['task']['stage']
-                    new_version_stage = new_version['task']['stage']
-                    if stages[desk][new_version_stage]['desk_order'] < \
-                            stages[desk][orig_version_stage]['desk_order']:
-                        orig_version[SENT_BACK] = True
-                    elif SENT_BACK in orig_version:
-                        del orig_version[SENT_BACK]
+            if new_version[GUID_FIELD] in results:
+                results[new_version[GUID_FIELD]][VERSIONS].append(new_version)
 
-        return [item for item in results.values()]
+        for new_version in published_items:
+            if new_version[GUID_FIELD] in results:
+                results[new_version[GUID_FIELD]][VERSIONS].append(new_version)
+
+        report_stage = str(doc['stage'])
+        report_stage_order = stages[report_stage]['desk_order']
+        for item in results.values():
+            item[VERSIONS] = sorted(item[VERSIONS], key=lambda item: item[config.VERSION])
+            first_version = last_version = left_version = publish_version = None
+            current_stage = None
+            for version in item[VERSIONS]:
+                if 'task' not in version or 'stage' not in version['task']:
+                    continue
+                version_stage = str(version['task']['stage'])
+                if not current_stage and version_stage != report_stage:
+                    continue
+                if not current_stage:
+                    current_stage = version_stage
+                    first_version = last_version = version
+                if version[ITEM_STATE] in PUBLISH_STATES and version_stage == report_stage:
+                    publish_version = version
+                if current_stage == report_stage:
+                    if current_stage == version_stage:
+                        last_version = version
+                    else:
+                        left_version = version
+                else:
+                    if report_stage == version_stage:
+                        first_version = last_version = version
+                        left_version = publish_version = None
+                current_stage = version_stage
+
+            item[ENTERED_STAGE] = first_version[UPDATED]
+            item['item'] = last_version
+            if publish_version:
+                item[PUBLISHED_ON] = publish_version[UPDATED]
+            elif left_version:
+                item[LEFT_STAGE] = left_version[UPDATED]
+                new_stage_order = stages[str(left_version['task']['stage'])]['desk_order']
+                if (new_stage_order < report_stage_order):
+                    item[SENT_BACK] = True
+            del item[VERSIONS]
+
+        return [item for item in results.values()
+                if PUBLISHED_ON not in item or item[ENTERED_STAGE] >= start_time]
 
     def create(self, docs):
         for doc in docs:
