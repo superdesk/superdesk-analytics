@@ -14,21 +14,15 @@ export function TrackActivityReportView(trackActivityReport, trackActivityChart,
         template: require('../views/track-activity-report-view.html'),
         scope: {},
         link: function(scope, element, attrs, controller) {
-            scope.$on('view:track_activity_report', (event, args) => {
-                scope.trackActivityReport = args;
-                scope.generateChart();
-            });
+            var regenerateInterval = 60000,
+                interval = null;
 
             /**
              * @ngdoc method
-             * @name sdTrackActivityReportView#generateChart
-             * @description Generate the track activity chart
+             * @name sdTrackActivityReportView#regenerateReport
+             * @description Regenerate the report and the chart
              */
-            scope.generateChart = () => {
-                trackActivityChart.createChart(scope.trackActivityReport, 'container', null);
-            };
-
-            $interval(() => {
+            var regenerateReport = function() {
                 if (scope.trackActivityReport) {
                     delete scope.trackActivityReport.report;
                     delete scope.trackActivityReport._id;
@@ -38,7 +32,40 @@ export function TrackActivityReportView(trackActivityReport, trackActivityChart,
                             scope.generateChart();
                         });
                 }
-            }, 60000);
+            };
+
+            /**
+             * @ngdoc method
+             * @name sdTrackActivityReportView#resetInterval
+             * @description Reset the periodic generation of the chart
+             */
+            var resetInterval = function() {
+                if (angular.isDefined(interval)) {
+                    $interval.cancel(interval);
+                }
+                interval = $interval(regenerateReport, regenerateInterval);
+            };
+
+            /**
+             * @ngdoc method
+             * @name sdTrackActivityReportView#generateChart
+             * @description Generate the track activity chart
+             */
+            scope.generateChart = () => {
+                resetInterval();
+                trackActivityChart.createChart(scope.trackActivityReport, 'container', null);
+            };
+
+            scope.$on('view:track_activity_report', (event, args) => {
+                scope.trackActivityReport = args;
+                scope.generateChart();
+            });
+
+            scope.$on('$destroy', () => {
+                if (angular.isDefined(interval)) {
+                    $interval.cancel(interval);
+                }
+            });
         }
     };
 }
