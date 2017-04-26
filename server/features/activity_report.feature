@@ -123,13 +123,13 @@ Feature: Activity report
         {
         	"operation": "publish",
         	"desk": "#desks._id#",
-        	"operation_date_start": "#DATE_FORMATTED#",
-        	"operation_date_end": "#DATE_FORMATTED#"
+        	"operation_date_start": "#ANALYTICS_DATE_FORMATTED#",
+        	"operation_date_end": "#ANALYTICS_DATE_FORMATTED#"
         }
         """
          Then we get existing resource
         """
         {
-        	"report": {"items": 2, "no_items_per_hour": {"#DATE_FORMATTED#": 2}}
+        	"report": {"items": 2, "no_items_per_hour": {"#ANALYTICS_DATE_FORMATTED#": 2}}
         }
         """
