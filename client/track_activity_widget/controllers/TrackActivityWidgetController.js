@@ -18,7 +18,9 @@ TrackActivityWidgetController.$inject = ['$scope', '$rootScope', 'api', 'session
  */
 export function TrackActivityWidgetController($scope, $rootScope, api, session, analyticsWidgetSettings,
     desks, notify, trackActivityChart, $interval) {
-    var widgetType = 'track_activity';
+    var widgetType = 'track_activity',
+        regenerateInterval = 60000,
+        interval = null;
 
     /**
      * @ngdoc method
@@ -66,6 +68,7 @@ export function TrackActivityWidgetController($scope, $rootScope, api, session, 
      */
     var onMove = function(event, data) {
         if (data.from_stage === $scope.widget.stage || data.to_stage === $scope.widget.stage) {
+            resetInterval();
             generateChart();
         }
     };
@@ -82,14 +85,32 @@ export function TrackActivityWidgetController($scope, $rootScope, api, session, 
         });
     };
 
+    /**
+     * @ngdoc method
+     * @name TrackActivityWidgetController#resetInterval
+     * @description Reset the periodic generation of the chart
+     */
+    var resetInterval = function() {
+        if (angular.isDefined(interval)) {
+            $interval.cancel(interval);
+        }
+        interval = $interval(generateChart, regenerateInterval);
+    };
+
+    resetInterval();
     generateChart();
 
     $scope.$on('view:track_activity_widget', (event, args) => {
+        resetInterval();
         generateChart();
     });
 
     $scope.$on('task:stage', onMove);
     $scope.$on('item:move', onMove);
 
-    $interval(generateChart, 60000);
+    $scope.$on('$destroy', () => {
+        if (angular.isDefined(interval)) {
+            $interval.cancel(interval);
+        }
+    });
 }
