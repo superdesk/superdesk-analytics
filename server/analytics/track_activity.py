@@ -17,6 +17,9 @@ from superdesk.metadata.item import GUID_FIELD, PUBLISH_STATES, ITEM_STATE,\
     CONTENT_STATE
 from datetime import timedelta, datetime, timezone
 from superdesk import get_resource_service
+from superdesk.errors import SuperdeskApiError
+from traceback import extract_tb
+import sys
 
 
 ENTERED_STAGE = 'entered_stage_at'
@@ -174,5 +177,13 @@ class TrackActivityService(BaseService):
 
     def create(self, docs):
         for doc in docs:
-            doc['report'] = self.generate_report(doc)
+            try:
+                doc['report'] = self.generate_report(doc)
+            except Exception as e:
+                exc_type, exc_value, exc_traceback = sys.exc_info()
+                last_trace = extract_tb(exc_traceback)[-1]
+                msg = str(exc_type) + ': ' + str(exc_value) + '\n' + \
+                    last_trace.filename + \
+                    '\n' + str(last_trace.lineno) + ': ' + last_trace.line
+                raise SuperdeskApiError.internalError(msg)
         return super().create(docs)
