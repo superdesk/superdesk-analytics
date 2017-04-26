@@ -37,6 +37,7 @@ class ProcessedItemsService(BaseService):
 
     def get_items(self, query):
         """Returns the result of the item search by the given query.
+
         :param dict query: query on users
         :return Cursor: cursor on items list
         """
@@ -44,6 +45,7 @@ class ProcessedItemsService(BaseService):
 
     def get_user(self, id):
         """Returns one user by a given id.
+
         :param ObjectId id: user id
         :return Cursor:cursor on user's details
         """
@@ -51,6 +53,7 @@ class ProcessedItemsService(BaseService):
 
     def count_items(self, items_list, state, start, end):
         """Returns the number of items which were modified in a given time interval and having a certain state.
+
         If 'state' has the value None, the total number of items modified in a given time interval is returned.
         :param list items_list: list of items based on the query
         :param string state: item's state
@@ -72,6 +75,7 @@ class ProcessedItemsService(BaseService):
 
     def search_items_single_user(self, doc, user):
         """Returns a report on processed items by a given user.
+
         The report will contain the total number of items processed by a given user and
         the number of published,spiked,corrected and killed items by a given user.
         :param dict doc: document used for generating the report
@@ -102,6 +106,7 @@ class ProcessedItemsService(BaseService):
 
     def search_items(self, doc):
         """Resturns a report on processed items by all users.
+
         The report will contain all the given users and the number of:published, corrected, spiked and killed items
         processed by each user.
         :param dict doc: document used for generating the report

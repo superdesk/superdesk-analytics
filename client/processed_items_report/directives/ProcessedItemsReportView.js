@@ -6,43 +6,64 @@ ProcessedItemsReportView.$inject = ['processedItemsReport', 'processedItemsChart
  * @name sdProcessedItemsReportView
  * @description A directive that displays the generated processed items report
  */
-/*
-var Highcharts = require('highcharts');
-require('highcharts/modules/data')(Highcharts);
-require('highcharts/modules/exporting')(Highcharts);
-*/
-export function ProcessedItemsReportView(processedItemsReport, processedItemsChart, $interval) {
 
+export function ProcessedItemsReportView(processedItemsReport, processedItemsChart, $interval) {
     return {
-        template: require('../views/processed-items-report-view.html'), 
+        template: require('../views/processed-items-report-view.html'),
         scope: {},
         link: function(scope, element, attrs, controller) {
-            scope.$on('view:processed_items_report', (event, args) => {
-                    scope.processedItemsReport = args;
-                    scope.generateChart();
-                });
-            
+            var regenerateInterval;
+
+            var interval = null;
+
+            var regenerateReport;
+
+            /**
+             * @ngdoc method
+             * @name sdProcessedItemsReportView#regenerateReport
+             * @description Regenerate the report and the chart
+             */
+            regenerateReport = function() {
+                if (scope.processedItemsReport) {
+                    delete scope.processedItemsReport;
+                    processedItemsReport.generate(scope.processedItemsReport)
+                        .then((processedItemsReport) => {
+                            scope.processedItemsReport = processedItemsReport;
+                            scope.generateChart();
+                        });
+                }
+            };
+            /**
+             * @ngdoc method
+             * @name sdProcessedItemsReportView#resetInterval
+             * @description Reset the periodic generation of the chart
+             */
+            scope.resetInterval = function() {
+                regenerateInterval = 60000;
+                if (angular.isDefined(interval)) {
+                    $interval.cancel(interval);
+                }
+                interval = $interval(regenerateReport, regenerateInterval);
+            };
             /**
              * @ngdoc method
              * @name sdProcessedITemsReportView#generateChart
              * @description Generate the processed items chart
              */
             scope.generateChart = () => {
-                processedItemsChart.createChart(scope.processedItemsReport, 'container');
+                processedItemsChart.createChart(scope.processedItemsReport, 'containerp');
             };
 
-            $interval(() => {
-                if (scope.processedItemsReport) {
-                    delete scope.processedItemsReport.report;
-                    delete scope.processedItemsReport._id;
-                    processedItemsReport.generate(scope.processedItemsReport)
-                        .then((report) => {
-                            scope.processedItemsReport = report;
-                            scope.generateChart();
-                        });
-                }
-            }, 60000); 
-         }
-    };
+            scope.$on('view:processed_items_report', (event, args) => {
+                scope.processedItemsReport = args;
+                scope.generateChart();
+            });
 
+            scope.$on('$destroy', () => {
+                if (angular.isDefined(interval)) {
+                    $interval.cancel(interval);
+                }
+            });
+        }
+    };
 }
