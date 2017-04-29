@@ -25,7 +25,7 @@ cacheIncludedTemplates.$inject = ['$templateCache'];
  * @packageName analytics.track-activity-widget
  * @description Superdesk track activity widget.
  */
-export default angular.module('superdesk.analytics.track-activity-widget', [
+export default angular.module('superdesk.analytics.track-activity-report-widget', [
     'superdesk.apps.dashboard.widgets',
     'superdesk.apps.authoring.widgets',
     'superdesk.apps.desks',
