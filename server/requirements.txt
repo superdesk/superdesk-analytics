@@ -3,8 +3,7 @@ nose-timer
 pep8
 flake8
 flake8-docstrings
-pydocstyle<1.1.0
 wooper
 requests
 requests-mock
--e git://github.com/superdesk/superdesk-core.git@350181d#egg=Superdesk_Core
+-e git://github.com/superdesk/superdesk-core.git@1493e6d6d#egg=Superdesk_Core
