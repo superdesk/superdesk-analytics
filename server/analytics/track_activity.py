@@ -139,6 +139,8 @@ class TrackActivityService(BaseService):
             first_version = last_version = left_version = publish_version = None
             current_stage = None
             for version in item[VERSIONS]:
+                if 'task' not in version or 'stage' not in version['task']:
+                    continue
                 version_stage = str(version['task']['stage'])
                 if not current_stage and version_stage != report_stage:
                     continue
