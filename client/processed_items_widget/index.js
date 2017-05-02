@@ -20,10 +20,10 @@ cacheIncludedTemplates.$inject = ['$templateCache'];
 
 /**
  * @ngdoc module
- * @module superdesk.analytics.processed_items_widget
- * @name superdesk.analytics.processed_items_widget
- * @packageName analytics.processed_items_widget
- * @description Superdesk processed items widget.
+ * @module superdesk.analytics.track_activity_widget
+ * @name superdesk.analytics.track_activity_widget
+ * @packageName analytics.track_activity_widget
+ * @description Superdesk track activity widget.
  */
 export default angular.module('superdesk.analytics.processed-items-widget', [
     'superdesk.apps.dashboard.widgets',
@@ -43,7 +43,7 @@ export default angular.module('superdesk.analytics.processed-items-widget', [
             max_sizey: 2,
             sizex: 1,
             sizey: 2,
-            thumbnail: require('./thumbnailp.svg'),
+            thumbnail: require('./thumbnail.svg'),
             template: 'processed_items_widget.html',
             configurationTemplate: 'processed_items_widget_settings.html',
             description: 'This wiget allows you to view the processed items reports',

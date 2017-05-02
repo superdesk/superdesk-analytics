@@ -23,34 +23,34 @@ export function ProcessedItemsChart() {
      */
     this.createChart = function(processedItemsReport, renderTo) {
         var series = [];
-        for (var i = 0; i <= processedItemsReport.report.length-1; i++){
-                series.push({
-                    name: processedItemsReport.report[i].user.display_name,
-                    data: [
+
+        for (var i = 0; i <= processedItemsReport.report.length - 1; i++) {
+            series.push({
+                name: processedItemsReport.report[i].user.display_name,
+                data: [
                     processedItemsReport.report[i].processed_items.published_items,
                     processedItemsReport.report[i].processed_items.corrected_items,
                     processedItemsReport.report[i].processed_items.spiked_items,
                     processedItemsReport.report[i].processed_items.killed_items,
                     processedItemsReport.report[i].processed_items.total_items
-                    ]
-                });
-            }
+                ]
+            });
+        }
+        var options;
 
-        var options = {
-                    chart: {
-                        type: 'column'
-
-                    },  
-                    title:{
-                        text: 'Processed Items Report'
-                    },
-                     xAxis: {
-                        categories: ['Published', 'Corrected', 'Spiked', 'Killed', 'Total' ]
-                    },
-                     series: series
-                };
-            options.chart.renderTo = 'container';
-            print("chaaart");
-            Highcharts.chart(options);
+        options = {
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: 'Processed Items Report'
+            },
+            xAxis: {
+                categories: ['Published', 'Corrected', 'Spiked', 'Killed', 'Total']
+            },
+            series: series
+        };
+        options.chart.renderTo = 'containerp';
+        Highcharts.chart(options);
     };
 }

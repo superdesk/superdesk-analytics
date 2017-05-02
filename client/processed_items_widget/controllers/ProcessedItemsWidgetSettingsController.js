@@ -1,22 +1,26 @@
-ProcessedItemsWidgetSettingsController.$inject = ['$scope', 'api', '$rootScope',
+ProcessedItemsWidgetSettingsController.$inject = ['config', '$scope', 'api', '$rootScope',
     'analyticsWidgetSettings'];
 
 /**
  * @ngdoc controller
  * @module superdesk.apps.analytics.processed-items-widget
  * @name ProcessedItemsWidgetSettingsController
+ * @requires config
  * @requires $scope
  * @requires api
  * @requires $rootScope
  * @requires analyticsWidgetSettings
- * @description Controller for processed_items widget settings dialog
+ * @description Controller for processed items widget settings dialog
  */
-export function ProcessedItemsWidgetSettingsController($scope, api, $rootScope, analyticsWidgetSettings) {
+export function ProcessedItemsWidgetSettingsController(config, $scope, api, $rootScope, analyticsWidgetSettings) {
     var widgetType = 'processed_items';
-    $scope.selectedUsers = [];
-    $scope.widget = {};
-    $scope.widget.users = [$scope.selectedUsers];
 
+
+    $scope.widget = {};
+
+    $scope.selectedUsers = [];
+
+    $scope.widget.users = [$scope.selectedUsers];
 
     /**
      * @ngdoc method
@@ -26,11 +30,7 @@ export function ProcessedItemsWidgetSettingsController($scope, api, $rootScope, 
     var readSettings = function() {
         analyticsWidgetSettings.readSettings(widgetType).then((settings) => {
             $scope.widget = settings;
-            $scope.widget.users = $scope.selectedUsers;
-            $scope.widget.start_time = $scope.start_time;
-            $scope.widget.end_time = $scope.end_time;
         });
-
     };
 
     readSettings();
@@ -63,13 +63,14 @@ export function ProcessedItemsWidgetSettingsController($scope, api, $rootScope, 
      * @description Checks if a user is already selected
     */
     $scope.isSelected = function(user) {
-        for(var i = $scope.selectedUsers.length; i--;){
-            if($scope.selectedUsers[i]._id === user._id){
+        for (var i = $scope.selectedUsers.length; i--;) {
+            if ($scope.selectedUsers[i]._id === user._id) {
                 return true;
             }
         }
         return false;
     };
+
     /**
      * @ngdoc method
      * @name ProcessedItemsWidgetSettingsController#selectUser
@@ -77,11 +78,10 @@ export function ProcessedItemsWidgetSettingsController($scope, api, $rootScope, 
      * @description Sets the selected user
      */
     $scope.selectUser = function(user) {
-        if($scope.isSelected(user) === false){
+        if ($scope.isSelected(user) === false) {
             $scope.selectedUsers.push({
                 display_name: user.display_name,
                 _id: user._id
-
             });
             $scope.widget.users = $scope.selectedUsers;
         }
@@ -90,13 +90,14 @@ export function ProcessedItemsWidgetSettingsController($scope, api, $rootScope, 
     /**
      * @ngdoc method
      * @name ProcessedItemsWidgetSettingsController#removeUser
+     * @param {Object} user
      * @description Removes the selected user
      */
-    $scope.removeUser = function(item) {
+    $scope.removeUser = function(user) {
         for (var i = $scope.selectedUsers.length; i--;) {
-            if ($scope.selectedUsers[i] === item) {
+            if ($scope.selectedUsers[i] === user) {
                 $scope.selectedUsers.splice(i, 1);
-                $scope.widget.users.splice(i,1);
+                $scope.widget.users.splice(i, 1);
             }
         }
     };
@@ -104,7 +105,7 @@ export function ProcessedItemsWidgetSettingsController($scope, api, $rootScope, 
     /**
      * @ngdoc method
      * @name ProcessedItemsWidgetSettingsController#cancel
-     * @description Closes the settings dialog
+     * @description Closes the settings dialo
      */
     $scope.cancel = function() {
         $scope.$close();

@@ -54,8 +54,8 @@ export function ProcessedItemsReportPanel(config, api, session, notify, $rootSco
              * @description Checks if a user is already selected
             */
             scope.isSelected = function(user) {
-                for(var i = scope.selectedUsers.length; i--;){
-                    if(scope.selectedUsers[i]._id === user._id){
+                for (var i = scope.selectedUsers.length; i--;) {
+                    if (scope.selectedUsers[i]._id === user._id) {
                         return true;
                     }
                 }
@@ -68,7 +68,7 @@ export function ProcessedItemsReportPanel(config, api, session, notify, $rootSco
              * @description Sets the selected user
              */
             scope.selectUser = function(user) {
-                if(scope.isSelected(user) === false){
+                if (scope.isSelected(user) === false) {
                     scope.selectedUsers.push({
                         display_name: user.display_name,
                         _id: user._id
@@ -109,8 +109,8 @@ export function ProcessedItemsReportPanel(config, api, session, notify, $rootSco
                 }
                 var query = {start_time: formatDate(scope.start_time), end_time: formatDate(scope.end_time),
                     users: scope.selectedUsers};
-                processedItemsReport.generate(query).then(onSuccess, onFail);
 
+                processedItemsReport.generate(query).then(onSuccess, onFail);
             };
 
             scope.validForm = function() {
