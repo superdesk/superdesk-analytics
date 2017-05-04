@@ -1,39 +1,28 @@
-ProcessedItemsWidgetSettingsController.$inject = ['config', '$scope', 'api', '$rootScope',
-    'analyticsWidgetSettings'];
+ProcessedItemsWidgetSettingsController.$inject = ['$scope', 'api', '$rootScope', 'analyticsWidgetSettings'];
 
 /**
  * @ngdoc controller
  * @module superdesk.apps.analytics.processed-items-widget
  * @name ProcessedItemsWidgetSettingsController
- * @requires config
  * @requires $scope
  * @requires api
  * @requires $rootScope
  * @requires analyticsWidgetSettings
  * @description Controller for processed items widget settings dialog
  */
-export function ProcessedItemsWidgetSettingsController(config, $scope, api, $rootScope, analyticsWidgetSettings) {
-    var widgetType = 'processed_items';
-
-
-    $scope.widget = {};
-
-    $scope.selectedUsers = [];
-
-    $scope.widget.users = [$scope.selectedUsers];
-
+export function ProcessedItemsWidgetSettingsController($scope, api, $rootScope, analyticsWidgetSettings) {
     /**
      * @ngdoc method
-     * @name ProcessedItemsWidgetSettingsController#readSettings
-     * @description Reads widget settings
+     * @name ActivityWidgetSettingsController#setWidget
+     * @param {object} widget
+     * @description Set the widget
      */
-    var readSettings = function() {
-        analyticsWidgetSettings.readSettings(widgetType).then((settings) => {
-            $scope.widget = settings;
-        });
+    this.setWidget = function(widget) {
+        $scope.widget = widget;
+        if (!$scope.widget.configuration) {
+            $scope.widget.configuration = {users: []};
+        }
     };
-
-    readSettings();
 
     /**
      * @ngdoc method
@@ -63,8 +52,8 @@ export function ProcessedItemsWidgetSettingsController(config, $scope, api, $roo
      * @description Checks if a user is already selected
     */
     $scope.isSelected = function(user) {
-        for (var i = $scope.selectedUsers.length; i--;) {
-            if ($scope.selectedUsers[i]._id === user._id) {
+        for (var i = $scope.widget.configuration.users.length; i--;) {
+            if ($scope.widget.configuration.users[i]._id === user._id) {
                 return true;
             }
         }
@@ -79,11 +68,10 @@ export function ProcessedItemsWidgetSettingsController(config, $scope, api, $roo
      */
     $scope.selectUser = function(user) {
         if ($scope.isSelected(user) === false) {
-            $scope.selectedUsers.push({
+            $scope.widget.configuration.users.push({
                 display_name: user.display_name,
                 _id: user._id
             });
-            $scope.widget.users = $scope.selectedUsers;
         }
     };
 
@@ -94,12 +82,16 @@ export function ProcessedItemsWidgetSettingsController(config, $scope, api, $roo
      * @description Removes the selected user
      */
     $scope.removeUser = function(user) {
-        for (var i = $scope.selectedUsers.length; i--;) {
-            if ($scope.selectedUsers[i] === user) {
-                $scope.selectedUsers.splice(i, 1);
-                $scope.widget.users.splice(i, 1);
+        for (var i = $scope.widget.configuration.users.length; i--;) {
+            if ($scope.widget.configuration.users[i] === user) {
+                $scope.widget.configuration.users.splice(i, 1);
             }
         }
+    };
+
+    $scope.validForm = function() {
+        return $scope.processedItemsReportForm.$valid && $scope.widget.configuration &&
+            $scope.widget.configuration.users.length > 0;
     };
 
     /**
@@ -117,10 +109,10 @@ export function ProcessedItemsWidgetSettingsController(config, $scope, api, $roo
      * @description Saves the settings and closes the dialog
      */
     $scope.save = function() {
-        analyticsWidgetSettings.saveSettings(widgetType, $scope.widget)
-            .then(() => {
-                $rootScope.$broadcast('view:processed_items_widget');
-            });
+        analyticsWidgetSettings.saveSettings($scope.widget)
+        .then((settings) => {
+            $rootScope.$broadcast('view:processed_items_widget', $scope.widget);
+        });
         $scope.$close();
     };
 }

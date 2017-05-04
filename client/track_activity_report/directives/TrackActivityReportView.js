@@ -1,4 +1,4 @@
-TrackActivityReportView.$inject = ['trackActivityReport', 'trackActivityChart', '$interval'];
+TrackActivityReportView.$inject = ['trackActivityReport', 'trackActivityChart', '$interval', '$timeout'];
 
 /**
  * @ngdoc directive
@@ -7,15 +7,17 @@ TrackActivityReportView.$inject = ['trackActivityReport', 'trackActivityChart', 
  * @requires trackActivityReport
  * @requires trackActivityChart
  * @requires $interval
+ * @requires $timeout
  * @description A directive that displays the generated track activity report
  */
-export function TrackActivityReportView(trackActivityReport, trackActivityChart, $interval) {
+export function TrackActivityReportView(trackActivityReport, trackActivityChart, $interval, $timeout) {
     return {
         template: require('../views/track-activity-report-view.html'),
         scope: {},
         link: function(scope, element, attrs, controller) {
             var regenerateInterval = 60000,
-                interval = null;
+                interval = null,
+                chart = null;
 
             /**
              * @ngdoc method
@@ -24,13 +26,11 @@ export function TrackActivityReportView(trackActivityReport, trackActivityChart,
              */
             var regenerateReport = function() {
                 if (scope.trackActivityReport) {
-                    delete scope.trackActivityReport.report;
-                    delete scope.trackActivityReport._id;
                     trackActivityReport.generate(scope.trackActivityReport)
-                        .then((report) => {
-                            scope.trackActivityReport = report;
-                            scope.generateChart();
-                        });
+                    .then((report) => {
+                        scope.trackActivityReport = report;
+                        scope.generateChart();
+                    });
                 }
             };
 
@@ -53,17 +53,22 @@ export function TrackActivityReportView(trackActivityReport, trackActivityChart,
              */
             scope.generateChart = () => {
                 resetInterval();
-                trackActivityChart.createChart(scope.trackActivityReport, 'container', null);
+                chart = trackActivityChart.createChart(scope.trackActivityReport, 'track-activity');
             };
 
             scope.$on('view:track_activity_report', (event, args) => {
                 scope.trackActivityReport = args;
-                scope.generateChart();
+                $timeout(scope.generateChart, 0);
             });
 
             scope.$on('$destroy', () => {
                 if (angular.isDefined(interval)) {
                     $interval.cancel(interval);
+                    interval = null;
+                }
+                if (angular.isDefined(chart)) {
+                    chart.destroy();
+                    chart = null;
                 }
             });
         }

@@ -37,7 +37,7 @@ export default angular.module('superdesk.analytics.track-activity-widget', [
     .config(['dashboardWidgetsProvider', function(dashboardWidgets) {
         dashboardWidgets.addWidget('track-activity-report', {
             label: gettext('Track Activity Report'),
-            multiple: false,
+            multiple: true,
             icon: 'archive',
             max_sizex: 2,
             max_sizey: 2,

@@ -1,23 +1,19 @@
 ActivityReportPanel.$inject = [
-    '$location', 'desks', 'asset', 'config', 'metadata', 'api', 'session', 'notify', '$rootScope'
+    'desks', 'metadata', 'notify', '$rootScope', 'activityReport'
 ];
 
 /**
  * @ngdoc directive
  * @module superdesk.apps.analytics.activity-report
  * @name sdActivityReportPanel
- * @requires $location
  * @requires desks
- * @requires asset
- * @requires config
  * @requires metadata
- * @requires api
- * @requires session
  * @requires notify
  * @requires $rootScope
+ * @requires activityReport
  * @description A directive that generates the sidebar containing activity report parameters
  */
-export function ActivityReportPanel($location, desks, asset, config, metadata, api, session, notify, $rootScope) {
+export function ActivityReportPanel(desks, metadata, notify, $rootScope, activityReport) {
     return {
         template: require('../views/activity-report-panel.html'),
         scope: {},
@@ -86,7 +82,7 @@ export function ActivityReportPanel($location, desks, asset, config, metadata, a
 
             /**
              * @ngdoc method
-             * @name sdActivityReportPanel#savedReportsSelected
+             * @name sdActivityReportPanel#changeTab
              * @param {String} tabName - valid values are 'editingActivityReport' and 'savedReports'
              * @description Changes the tab to the given one
              */
@@ -96,7 +92,7 @@ export function ActivityReportPanel($location, desks, asset, config, metadata, a
 
             /**
              * @ngdoc method
-             * @name sdActivityReportPanel#savedReportsSelected
+             * @name sdActivityReportPanel#display
              * @param {String} tabName - valid values are 'parameters' and 'grouping'
              * @description Changes the inner tab to the given one
              */
@@ -106,7 +102,8 @@ export function ActivityReportPanel($location, desks, asset, config, metadata, a
 
             /**
              * @ngdoc method
-             * @name sdActivityReportPanel#savedReportsSelected
+             * @name sdActivityReportPanel#generate
+             * @returns {Promise}
              * @description Generate the report
              */
             scope.generate = function() {
@@ -119,32 +116,12 @@ export function ActivityReportPanel($location, desks, asset, config, metadata, a
                     if (angular.isDefined(error.data._message)) {
                         notify.error(error.data._message);
                     } else {
-                        notify.error(gettext('Error. The activity could not be generated.'));
+                        notify.error(gettext('Error. The activity report could not be generated.'));
                     }
                 }
 
-                var activityReportEdit = _.clone(scope.activityReport);
-                var toDelete = ['_id', '_etag', 'is_global', 'owner', 'name', 'description'];
-
-                activityReportEdit.operation_date_start = formatDate(scope.activityReport.operation_date_start);
-                activityReportEdit.operation_date_end = formatDate(scope.activityReport.operation_date_end);
-                toDelete.forEach((field) => {
-                    delete activityReportEdit[field];
-                });
-
-                api('activity_reports', session.identity).save({}, activityReportEdit)
-                    .then(onSuccess, onFail);
+                return activityReport.generate(scope.activityReport).then(onSuccess, onFail);
             };
-
-            /**
-             * @ngdoc method
-             * @name sdActivityReportPanel#formatDate
-             * @param {String} date
-             * @description Format given date for generate
-             */
-            function formatDate(date) {
-                return date ? moment(date, config.model.dateformat).format('YYYY-MM-DD') : null; // jshint ignore:line
-            }
         }
     };
 }

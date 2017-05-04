@@ -20,10 +20,11 @@ class ProcessedItemsResource(Resource):
                     '_id': metadata_schema['original_creator'],
                     'display_name': {'type': 'string'}
                 }
-            }
+            },
+            'required': True
         },
-        'start_time': {'type': 'datetime'},
-        'end_time': {'type': 'datetime'},
+        'start_time': {'type': 'datetime', 'required': True},
+        'end_time': {'type': 'datetime', 'required': True},
         'report': {'type': 'dict'}
     }
 
@@ -34,7 +35,6 @@ class ProcessedItemsResource(Resource):
 
 
 class ProcessedItemsService(BaseService):
-
     def count_items(self, items_list, state, start, end):
         """Returns the number of items which were modified in a given time interval and having a certain state.
 
@@ -91,8 +91,8 @@ class ProcessedItemsService(BaseService):
     def search_items(self, doc):
         """Resturns a report on processed items by all users.
 
-        The report will contain all the given users and the number of:published, corrected, spiked and killed items
-        processed by each user.
+        The report will contain all the given users and the number of:published, corrected, spiked
+        and killed items processed by each user.
         :param dict doc: document used for generating the report
         :return dict report: report including all the given users
         """

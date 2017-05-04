@@ -1,22 +1,25 @@
-ProcessedItemsWidgetController.$inject = ['$scope', '$rootScope', 'analyticsWidgetSettings',
-    'notify', 'processedItemsChart', '$interval', 'processedItemsReport', '$timeout'];
+ActivityReportWidgetController.$inject = [
+    '$scope', 'analyticsWidgetSettings', 'notify', 'activityChart', '$interval', '$timeout', '$rootScope',
+    'activityReport'
+];
 
 /**
  * @ngdoc controller
- * @module superdesk.apps.analytics.processed-items-widget
- * @name ProcessedItemsWidgetController
+ * @module superdesk.apps.analytics.activity-widget
+ * @name ActivityWidgetController
  * @requires $scope
- * @requires $rootScope
  * @requires analyticsWidgetSettings
+ * @requires desks
  * @requires notify
- * @requires processedItemsChart
+ * @requires activityChart
  * @requires $interval
- * @requires processedItemsReport
  * @requires $timeout
- * @description Controller for processed items widget
+ * @requires $rootScope
+ * @requires activityReport
+ * @description Controller for activity widget
  */
-export function ProcessedItemsWidgetController($scope, $rootScope, analyticsWidgetSettings,
-    notify, processedItemsChart, $interval, processedItemsReport, $timeout) {
+export function ActivityReportWidgetController($scope, analyticsWidgetSettings, notify, activityChart,
+    $interval, $timeout, $rootScope, activityReport) {
     const REGENERATE_INTERVAL = 60000;
 
     var self = this;
@@ -28,7 +31,7 @@ export function ProcessedItemsWidgetController($scope, $rootScope, analyticsWidg
 
     /**
      * @ngdoc method
-     * @name ProcessedItemsWidgetController#resetInterval
+     * @name ActivityWidgetController#resetInterval
      * @description Reset the periodic generation of the chart
      */
     var resetInterval = function() {
@@ -40,18 +43,19 @@ export function ProcessedItemsWidgetController($scope, $rootScope, analyticsWidg
 
     /**
      * @ngdoc method
-     * @name ProcessedItemsWidgetController#setWidget
+     * @name ActivityWidgetController#setWidget
      * @param {object} widget
      * @description Set the widget
      */
     this.setWidget = function(widget) {
         self.widget = widget;
-        $scope.renderTo = 'processed-items' + widget.multiple_id;
+        $scope.renderTo = 'activity' + widget.multiple_id;
     };
 
     /**
      * @ngdoc method
-     * @name ProcessedItemsWidgetController#generateChart
+     * @name ActivityWidgetController#generateChart
+     * @returns {Promise}
      * @description Generate the chart
      */
     $scope.generateChart = function() {
@@ -59,31 +63,32 @@ export function ProcessedItemsWidgetController($scope, $rootScope, analyticsWidg
             if (angular.isDefined(error.data._message)) {
                 notify.error(error.data._message);
             } else {
-                notify.error(gettext('Error. The processed items report could not be generated.'));
+                notify.error(gettext('Error. The activity report could not be generated.'));
             }
         }
 
-        return processedItemsReport.generate(self.widget.configuration)
-        .then((report) => {
+        return activityReport.generate(self.widget.configuration)
+        .then((activityReport) => {
             if (self.chart) {
-                self.chart.destroy();
+                activityChart.updateChartData(activityReport, self.chart);
+            } else {
+                self.chart = activityChart.createChart(activityReport, $scope.renderTo);
             }
-            self.chart = processedItemsChart.createChart(report, $scope.renderTo);
         }, onFail);
     };
 
     $timeout($scope.generateChart, 0);
     resetInterval();
 
-    $rootScope.$on('view:processed_items_widget', (event, widget) => {
+    $rootScope.$on('view:activity_widget', (event, widget) => {
         self.widget = widget;
         $scope.generateChart();
         resetInterval();
     });
 
-    $scope.$on('item:publish', (event, data) => {
-        $scope.generateChart();
+    $scope.$on('item:publish', () => {
         resetInterval();
+        $scope.generateChart();
     });
 
     $scope.$on('$destroy', () => {

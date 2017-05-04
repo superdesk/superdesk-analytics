@@ -1,11 +1,4 @@
-var Highcharts = require('highcharts');
-
-require('highcharts-more')(Highcharts);
-require('highcharts/modules/exporting')(Highcharts);
-require('highcharts/modules/data')(Highcharts);
-
-
-TrackActivityChart.$inject = ['lodash', 'moment', 'desks'];
+TrackActivityChart.$inject = ['lodash', 'moment', 'desks', 'Highcharts'];
 
 /**
  * @ngdoc service
@@ -16,7 +9,7 @@ TrackActivityChart.$inject = ['lodash', 'moment', 'desks'];
  * @requires desks
  * @description Track activity chart generation service
  */
-export function TrackActivityChart(_, moment, desks) {
+export function TrackActivityChart(_, moment, desks, Highcharts) {
     var finisheItemColor = 'green',
         unfinishedItemColor = 'yellow',
         sentBackColor = 'brown',
@@ -38,13 +31,17 @@ export function TrackActivityChart(_, moment, desks) {
      * @param {Object} report
      * @description Creates a chart for the given report
      */
-    this.createChart = function(report, renderTo, title) {
+    this.createChart = function(report, renderTo) {
         var categories = [], data = [],
             currentTime = moment().unix(),
             desk = desks.deskLookup[report.desk],
-            stage = desks.stageLookup[report.stage];
+            stage = desks.stageLookup[report.stage],
+            sortedReport = _.sortBy(report.report, [(item) => item.item.headline]),
+            seriesName = 'Items for stage ' + stage.name + ' (' + desk.name + ')';
 
-        var sortedReport = _.sortBy(report.report, [(item) => item.item.headline]);
+        if (report.user) {
+            seriesName += '<br/>' + desks.userLookup[report.user].display_name;
+        }
 
         _.forEach(sortedReport, (item) => {
             categories.push(item.item.headline);
@@ -63,12 +60,6 @@ export function TrackActivityChart(_, moment, desks) {
             data.push(itemData);
         });
 
-        var seriesName = 'Items for stage ' + stage.name + ' (' + desk.name + ')';
-
-        if (report.user) {
-            seriesName += '<br/>' + desks.userLookup[report.user].display_name;
-        }
-
         var chartData = {
             chart: {
                 type: 'columnrange',
@@ -78,7 +69,7 @@ export function TrackActivityChart(_, moment, desks) {
                 enabled: true
             },
             title: {
-                text: title
+                text: null
             },
             xAxis: {
                 categories: categories
@@ -118,6 +109,6 @@ export function TrackActivityChart(_, moment, desks) {
             }]
         };
 
-        Highcharts.chart(renderTo, chartData);
+        return Highcharts.chart(renderTo, chartData);
     };
 }

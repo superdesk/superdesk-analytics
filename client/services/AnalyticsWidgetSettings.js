@@ -1,47 +1,55 @@
-AnalyticsWidgetSettings.$inject = ['workspaces', 'preferencesService'];
+AnalyticsWidgetSettings.$inject = ['workspaces'];
 
 /**
  * @ngdoc service
  * @module superdesk.apps.analytics
  * @name AnalyticsWidgetSettings
  * @requires workspaces
- * @requires preferencesService
  * @description A service that handles the retrieval of the track activity widget settings
  */
-export function AnalyticsWidgetSettings(workspaces, preferencesService) {
-    var PREFERENCES_KEY = 'agg:view';
-
+export function AnalyticsWidgetSettings(workspaces) {
     /**
      * @ngdoc method
-     * @name AnalyticsWidgetSettings#readSettings
-     * @param {String} widgetType
+     * @name AnalyticsWidgetSettings#getSettings
+     * @param {Integer} widgetId
+     * @param {Integer} widgetMultipleId
+     * @returns {Promise}
      * @description Reads widget settings
      */
-    this.readSettings = function(widgetType) {
-        return workspaces.getActiveId()
-        .then((activeWorkspace) => preferencesService.get(PREFERENCES_KEY)
-            .then((preferences) => {
-                if (preferences[activeWorkspace.id] && preferences[activeWorkspace.id][widgetType]) {
-                    return preferences[activeWorkspace.id][widgetType];
+    this.getSettings = function(widgetId, widgetMultipleId) {
+        return workspaces.getActive()
+        .then((workspace) => {
+            var settings = null;
+
+            _.each(workspace.widgets, (widget) => {
+                if (widgetId === widget._id &&
+                        (typeof widgetMultipleId !== 'number' || widgetMultipleId === widget.multiple_id)) {
+                    settings = angular.copy(widget);
                 }
-            }));
+                return settings;
+            });
+            return settings;
+        });
     };
 
     /**
      * @ngdoc method
      * @name AnalyticsWidgetSettings#saveSettings
-     * @param {String} widgetType
-     * @param {Object} settings
+     * @param {Object} modifiedWidget
+     * @returns {Promise}
      * @description Save widget settings
      */
-    this.saveSettings = function(widgetType, settings) {
-        return workspaces.getActiveId()
-        .then((activeWorkspace) => preferencesService.get(PREFERENCES_KEY)
-            .then((preferences) => {
-                var updates = {[PREFERENCES_KEY]: {[activeWorkspace.id]: {[widgetType]: settings}}};
+    this.saveSettings = function(modifiedWidget) {
+        return workspaces.getActive()
+        .then((workspace) => {
+            var widgets = angular.copy(workspace.widgets);
 
-                return preferencesService.update(updates, PREFERENCES_KEY);
-            })
-        );
+            _.each(widgets, (widget) => {
+                if (modifiedWidget._id === widget._id && modifiedWidget.multiple_id === widget.multiple_id) {
+                    widget.configuration = modifiedWidget.configuration;
+                }
+            });
+            return workspaces.save(workspace, {widgets: widgets});
+        });
     };
 }

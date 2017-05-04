@@ -1,5 +1,5 @@
 TrackActivityWidgetController.$inject = ['$scope', '$rootScope', 'api', 'session', 'analyticsWidgetSettings',
-    'desks', 'notify', 'trackActivityChart', '$interval'];
+    'desks', 'notify', 'trackActivityChart', '$interval', '$timeout', 'trackActivityReport'];
 
 /**
  * @ngdoc controller
@@ -14,49 +14,42 @@ TrackActivityWidgetController.$inject = ['$scope', '$rootScope', 'api', 'session
  * @requires notify
  * @requires trackActivityChart
  * @requires $interval
+ * @requires $timeout
+ * @requires trackActivityReport
  * @description Controller for track activity widget
  */
 export function TrackActivityWidgetController($scope, $rootScope, api, session, analyticsWidgetSettings,
-    desks, notify, trackActivityChart, $interval) {
-    var widgetType = 'track_activity',
-        regenerateInterval = 60000,
-        interval = null;
+    desks, notify, trackActivityChart, $interval, $timeout, trackActivityReport) {
+    const REGENERATE_INTERVAL = 60000;
+
+    var self = this;
+
+    this.widget = null;
+    this.interval = null;
+    this.chart = null;
+    $scope.renderTo = null;
 
     /**
      * @ngdoc method
-     * @name TrackActivityWidgetController#getSettings
-     * @description Read widget settings
+     * @name TrackActivityWidgetController#resetInterval
+     * @description Reset the periodic generation of the chart
      */
-    var getSettings = function() {
-        return analyticsWidgetSettings.readSettings(widgetType).then((preferences) => {
-            $scope.widget = preferences;
-            return $scope.widget;
-        });
+    var resetInterval = function() {
+        if (angular.isDefined(self.interval)) {
+            $interval.cancel(self.interval);
+        }
+        self.interval = $interval($scope.generateChart, REGENERATE_INTERVAL);
     };
 
     /**
      * @ngdoc method
-     * @name TrackActivityWidgetController#generateReport
-     * @description Generate the report
+     * @name TrackActivityWidgetController#setWidget
+     * @param {object} widget
+     * @description Set the widget
      */
-    var generateReport = function() {
-        function onSuccess(trackActivityReport) {
-            $scope.trackActivityReport = trackActivityReport;
-            return $scope.trackActivityReport;
-        }
-
-        function onFail(error) {
-            if (angular.isDefined(error.data._message)) {
-                notify.error(error.data._message);
-            } else {
-                notify.error(gettext('Error. The track activity report could not be generated.'));
-            }
-        }
-
-        return getSettings().then((settings) =>
-            api('track_activity_report', session.identity).save({}, settings)
-                .then(onSuccess, onFail)
-        );
+    this.setWidget = function(widget) {
+        self.widget = widget;
+        $scope.renderTo = 'track-activity' + self.widget.multiple_id;
     };
 
     /**
@@ -67,9 +60,10 @@ export function TrackActivityWidgetController($scope, $rootScope, api, session, 
      * @description Generate the chart
      */
     var onMove = function(event, data) {
-        if (data.from_stage === $scope.widget.stage || data.to_stage === $scope.widget.stage) {
+        if (data.from_stage === $scope.widget.configuration.stage ||
+            data.to_stage === $scope.widget.configuration.stage) {
             resetInterval();
-            generateChart();
+            $scope.generateChart();
         }
     };
 
@@ -78,39 +72,44 @@ export function TrackActivityWidgetController($scope, $rootScope, api, session, 
      * @name TrackActivityWidgetController#generateChart
      * @description Generate the chart
      */
-    var generateChart = function() {
-        generateReport().then((trackActivityReport) => {
-            $scope.trackActivityReport = trackActivityReport;
-            trackActivityChart.createChart(trackActivityReport, 'container', null);
-        });
-    };
-
-    /**
-     * @ngdoc method
-     * @name TrackActivityWidgetController#resetInterval
-     * @description Reset the periodic generation of the chart
-     */
-    var resetInterval = function() {
-        if (angular.isDefined(interval)) {
-            $interval.cancel(interval);
+    $scope.generateChart = function() {
+        function onFail(error) {
+            if (angular.isDefined(error.data._message)) {
+                notify.error(error.data._message);
+            } else {
+                notify.error(gettext('Error. The track activity report could not be generated.'));
+            }
         }
-        interval = $interval(generateChart, regenerateInterval);
+
+        return trackActivityReport.generate($scope.widget.configuration)
+        .then((trackActivityReport) => {
+            self.chart = trackActivityChart.createChart(trackActivityReport, $scope.renderTo);
+        }, onFail);
     };
 
+    $timeout($scope.generateChart, 0);
     resetInterval();
-    generateChart();
 
     $scope.$on('view:track_activity_widget', (event, args) => {
         resetInterval();
-        generateChart();
+        $scope.generateChart();
     });
 
+    $scope.$on('content:update', () => {
+        resetInterval();
+        $scope.generateChart();
+    });
     $scope.$on('task:stage', onMove);
     $scope.$on('item:move', onMove);
 
     $scope.$on('$destroy', () => {
-        if (angular.isDefined(interval)) {
-            $interval.cancel(interval);
+        if (angular.isDefined(self.interval)) {
+            $interval.cancel(self.interval);
+            self.interval = null;
+        }
+        if (self.chart) {
+            self.chart.destroy();
+            self.chart = null;
         }
     });
 }

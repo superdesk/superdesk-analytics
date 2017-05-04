@@ -20,6 +20,7 @@ import * as svc from './services';
  */
 angular.module('superdesk.analytics.processed-items-report', [])
     .service('processedItemsChart', svc.ProcessedItemsChart)
+    .service('processedItemsReport', svc.ProcessedItemsReport)
 
     .directive('sdProcessedItemsReportContainer', directive.ProcessedItemsReportContainer)
     .directive('sdProcessedItemsReportPanel', directive.ProcessedItemsReportPanel)

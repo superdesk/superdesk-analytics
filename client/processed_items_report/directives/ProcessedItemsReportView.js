@@ -1,13 +1,17 @@
-ProcessedItemsReportView.$inject = ['api', 'session', 'processedItemsChart', '$interval'];
+ProcessedItemsReportView.$inject = ['api', 'session', 'processedItemsChart', '$interval', '$timeout'];
 
 /**
  * @ngdoc directive
  * @module superdesk.apps.analytics.processed-items-report
  * @name sdProcessedItemsReportView
+ * @requires api
+ * @requires session
+ * @requires processedItemsChart
+ * @requires $interval
+ * @requires $timeout
  * @description A directive that displays the generated processed items report
  */
-
-export function ProcessedItemsReportView(api, session, processedItemsChart, $interval) {
+export function ProcessedItemsReportView(api, session, processedItemsChart, $interval, $timeout) {
     return {
         template: require('../views/processed-items-report-view.html'),
         scope: {},
@@ -55,7 +59,9 @@ export function ProcessedItemsReportView(api, session, processedItemsChart, $int
              * @description Generate the processed items chart
              */
             scope.generateChart = () => {
-                processedItemsChart.createChart(scope.processedItemsReport, 'containerp');
+                $timeout(() => {
+                    scope.chart = processedItemsChart.createChart(scope.processedItemsReport, 'processed-items');
+                }, 0);
             };
 
             /**

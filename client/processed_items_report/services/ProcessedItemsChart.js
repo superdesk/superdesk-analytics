@@ -1,28 +1,22 @@
-var Highcharts = require('highcharts');
-
-require('highcharts-more')(Highcharts);
-require('highcharts/modules/exporting')(Highcharts);
-require('highcharts/modules/data')(Highcharts);
-
-
-ProcessedItemsChart.$inject = ['lodash'];
+ProcessedItemsChart.$inject = ['Highcharts'];
 
 /**
  * @ngdoc service
  * @module superdesk.apps.analytics.processed-items-report
  * @name ProcessedItemsChart
- * @requires lodash
  * @description Processed items chart generation service
  */
-export function ProcessedItemsChart() {
+export function ProcessedItemsChart(Highcharts) {
     /**
      * @ngdoc method
      * @name ProcessedItemsChart#createChart
-     * @param {Object} report
+     * @param {Object} processedItemsReport
      * @description Creates a chart for the given report
      */
     this.createChart = function(processedItemsReport, renderTo) {
-        var series = [];
+        var startTime = moment(processedItemsReport.start_time),
+            endTime = moment(processedItemsReport.end_time),
+            series = [];
 
         for (var i = 0; i <= processedItemsReport.report.length - 1; i++) {
             series.push({
@@ -36,21 +30,25 @@ export function ProcessedItemsChart() {
                 ]
             });
         }
-        var options;
 
-        options = {
+        var options = {
             chart: {
                 type: 'column'
             },
             title: {
-                text: 'Processed Items Report'
+                text: startTime.calendar() + ' - ' + endTime.calendar()
             },
             xAxis: {
                 categories: ['Published', 'Corrected', 'Spiked', 'Killed', 'Total']
             },
+            yAxis: {
+                title: {
+                    text: 'Items No'
+                }
+            },
             series: series
         };
-        options.chart.renderTo = 'containerp';
-        Highcharts.chart(options);
+
+        return Highcharts.chart(renderTo, options);
     };
 }

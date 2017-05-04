@@ -27,13 +27,13 @@ Feature: Activity report
         """
 	    When we publish "#archive._id#" with "publish" type and "published" state
 	    Then we get OK response
-        When we post to "/activity_reports" with success
+        When we post to "/activity_report" with success
         """
         {
         	"operation": "publish",
         	"desk": "#desks._id#",
-        	"operation_date_start": "#DATE#",
-        	"operation_date_end": "#DATE#",
+        	"operation_start_date": "#DATE#",
+        	"operation_end_date": "#DATE#",
         	"subject":[{"qcode": "05007000", "name": "university"}],
         	"keywords": ["UNIVERSITY"],
         	"priority_start": 2,
@@ -55,15 +55,15 @@ Feature: Activity report
         	"urgency_end": 5,
         	"subscriber": "test",
         	"category": [{"name": "arts, culture and entertainment" , "qcode": "01000000"}],
-        	"report": {"items": 2}
+        	"report": {"total": 2, "items_per_hour": "__any_value__"}
         }
         """
-        When we post to "/activity_reports" with success
+        When we post to "/activity_report" with success
         """
         {
         	"operation": "publish",
-        	"operation_date_start": "#DATE#",
-        	"operation_date_end": "#DATE#",
+        	"operation_start_date": "#DATE#",
+        	"operation_end_date": "#DATE#",
         	"group_by": ["desk"],
         	"subject":[{"qcode": "05007000", "name": "university"}],
         	"keywords": ["UNIVERSITY"],
