@@ -16,6 +16,7 @@ import * as ctrl from './controllers';
 import './activity_reports';
 import './processed_items_report';
 import './track_activity_report';
+import './content_quota_reports';
 import './track_activity_widget';
 
 
@@ -25,6 +26,7 @@ function cacheIncludedTemplates($templateCache) {
         require('./processed_items_report/views/processed-items-report.html'));
     $templateCache.put('track-activity-report.html',
         require('./track_activity_report/views/track-activity-report.html'));
+    $templateCache.put('content-quota-report.html', require('./content_quota_reports/views/content-quota-report.html'));
 }
 cacheIncludedTemplates.$inject = ['$templateCache'];
 
@@ -38,7 +40,8 @@ cacheIncludedTemplates.$inject = ['$templateCache'];
  */
 export default angular.module('superdesk.analytics', [
     'superdesk.analytics.activity-report', 'superdesk.analytics.processed-items-report',
-    'superdesk.analytics.track-activity-report', 'superdesk.analytics.track-activity-widget'
+    'superdesk.analytics.track-activity-report', 'superdesk.analytics.track-activity-widget',
+    'superdesk.analytics.content-quota-report'
 ])
 
     .service('analyticsWidgetSettings', svc.AnalyticsWidgetSettings)
