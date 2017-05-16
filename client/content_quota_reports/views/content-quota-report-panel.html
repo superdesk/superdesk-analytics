@@ -3,52 +3,82 @@
         <fieldset class="report-parameters">
             <div class="field">
                     <label for="parameters-date_start" translate>From</label>
-                    <div sd-datepicker ng-model="contentQuotaReport.date_start"
+                    <div sd-datepicker ng-model="report.date_start"
                          id="parameters-operation_date_start" required></div>
                 </div>
-            <!-- <div class="field">
-                <label for="days-ago" translate>Starting</label>
-                <select id="days-ago" ng-model="report.days_ago"
-                    ng-options="days_ago for days_ago in [1,2,3,4,5,6,7]">
+            <div class="field">
+                <label for="intervals-number" translate>No of intervals</label>
+                <select id="intervals-number" ng-model="report.intervals_number"
+                    ng-options="intervals_number for intervals_number in [1,2,3,4,5,6,7]">
                 </select>
-                <label for="days-ago" translate>days ago</label>
+            </div>
+            <div class="field">
+                <label for="interval-length" translate>Length of the interval</label>
+                <select id="interval-length" ng-model="report.interval_length"
+                    ng-options="interval_length for interval_length in [1,2,3,4,5,6,7]">
+                </select>
+            </div>
+            <div class="field"
+                 sd-validation-error="error.subject">
+                <label for="parameters-subject">{{:: 'Subject' | translate}}</label>
+              <div id="parameters-subject"
+                   sd-meta-terms
+                   class="data"
+                   data-item="report"
+                   data-field="subject"
+                   data-unique="qcode"
+                   data-list="metadata.subjectcodes"
+                   data-header="true"
+                   data-reload-list="true">
+              </div>
+            </div>
+
+            <div class="field"
+                 sd-validation-error="error.category">
+                <label for="parameters-category">{{:: 'Category' | translate}}</label>
+              <div id="parameters-category"
+                   sd-meta-terms
+                   class="data"
+                   data-item="report"
+                   data-field="category"
+                   data-unique="qcode"
+                   data-list="metadata.categories"
+                   data-header="true"
+                   data-reload-list="true">
+              </div>
+            </div>
+
+
+            <div class="field">
+                <label for="parameters-keywords">{{:: 'Keywords' | translate}}</label>
+                <div id="parameters-keywords"
+                     sd-meta-words-list
+                     data-field="keywords"
+                     data-header="true"
+                     data-list="metadata.keywords"
+                     data-item="report"
+                ></div>
+            </div>
+
+            <div class="field">
+                <label for="target" translate>Target Quota</label>
+                <input type="integer" id="target" ng-model="target">
+            </div>
+
+            <!-- <div class="field">
+                <label for="parameters-target">{{:: 'Target Quota' | translate}}</label>
+                <div id="parameters-target"
+                     data-field="target"
+                     data-header="true"
+                     data-item="contentQuotaReport"
+                ></div>
             </div> -->
 
-            <!-- <div class="field">
-                <label for="desk" translate>Desk</label>
-                <select id="desk" name="desk"
-                    ng-options="d._id as d.name for d in desks" ng-model="report.desk">
-                </select>
-            </div>
-
-            <div class="field" ng-if="report.desk">
-                <label for="stage" translate>Stage</label>
-                <select id="stage" name="stage"
-                    ng-options="s._id as s.name for s in stages" ng-model="report.stage">
-                </select>
-            </div> -->
-
-            <label for="user" translate>User</label>
-            <div class="term-editor data visible">
-                <div id="user" sd-typeahead items="users" ng-model="user"
-                    search="searchUsers(term)" select="selectUser(item)" term="selectedTerm"
-                    data-disabled="selectedUser">
-                    <ul>
-                        <li typeahead-item="t" ng-repeat="t in users">
-                            {{ :: t.display_name }}
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <div ng-if="selectedUser">
-                {{ selectedUser.display_name }}<i class="icon-close-small" ng-click="removeUser()"></i>
-            </div>
         </fieldset>&nbsp;
     </form>
 
     <div>
-        <button id="generate_processed_items_report" class="btn btn--primary" ng-click="generate()"
+        <button id="generate_content_quota_reports" class="btn btn--primary" ng-click="generate()"
             ng-disabled="!contentQuotaReportForm.$valid" translate>Generate</button>
     </div>
 </div>

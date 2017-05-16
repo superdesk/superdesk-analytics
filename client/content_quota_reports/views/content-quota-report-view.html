@@ -1,7 +1,33 @@
 <div ng-if="contentQuotaReport">
     <h3 translate>Content Quota Report</h3>
 
-    <div sd-after-render="generateChart">
-        <div id="container" style="min-width: 310px; max-width: 800px; height: 400px; margin: 0 auto"></div>
+    <div>
+    	<h3 translate>Target Quota:  {{contentQuotaReport.target}}
+    	</h3>
+        <table>
+            <tr><th translate>Items</th>
+            	<th translate>Start time</th>
+            	<th translate>End time</th>
+            </tr>
+
+			<tr ng-repeat="i in contentQuotaReport.report">
+				<td>
+					{{i.items_total}}
+				</td>
+				<td>
+					{{i.start_time}}
+				</td>
+				<td>
+					{{i.end_time}}
+				</td>
+		</tr>
+        </table>
     </div>
+
+    <!-- <div sd-after-render="generateChart">
+        <div id="container" style="min-width: 310px; max-width: 800px; height: 400px; margin: 0 auto"></div>
+    </div> -->
 </div>
+
+
+

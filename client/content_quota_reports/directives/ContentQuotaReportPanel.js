@@ -1,5 +1,5 @@
 ContentQuotaReportPanel.$inject = [
-    'config', 'api', 'session', 'notify', '$rootScope', 'desks', 'contentQuotaReport'
+    'config', 'api', 'session', 'metadata', 'notify', '$rootScope', 'desks', 'contentQuotaReport'
 ];
 
 /**
@@ -15,92 +15,26 @@ ContentQuotaReportPanel.$inject = [
  * @requires contentQuotaReport
  * @description A directive that generates the sidebar containing track activity report parameters
  */
-export function ContentQuotaReportPanel(config, api, session, notify, $rootScope, desks, contentQuotaReport) {
+export function ContentQuotaReportPanel(config, api, session, metadata, notify, $rootScope, desks, contentQuotaReport) {
     return {
         template: require('../views/content-quota-report-panel.html'),
         scope: {},
         link: function(scope, element, attrs, controller) {
-            // var daysAgoDefault = 2;
+            var noOfIntervalsDefault = 1;
+            var intervalLengthDefault = 5;
 
-            /**
-             * @ngdoc method
-             * @name sdTrackActivityReportPanel#init
-             * @description Initialises the track activity report object
-             */
-            scope.initalize = function() {
-                var currentDesk = desks.getCurrentDesk();
-
-                scope.desks = desks.desks._items;
-                scope.stages = null;
-                scope.selectedUser = null;
-                // scope.report = {days_ago: daysAgoDefault};
-                if (currentDesk) {
-                    scope.report = {desk: currentDesk._id, stage: currentDesk.working_stage, days_ago: daysAgoDefault};
-                    scope.stages = desks.deskStages[currentDesk._id];
-                }
+            scope.init = function() {
+                console.log('aaaaaa', scope);
+                scope.report = {intervals_number: noOfIntervalsDefault, interval_length: intervalLengthDefault};
             };
 
-            scope.$watch('report.desk', (deskId, oldDeskId) => {
-                if (deskId !== oldDeskId) {
-                    if (deskId) {
-                        scope.stages = desks.deskStages[deskId];
-                    } else {
-                        scope.stages = null;
-                    }
-                    scope.report.stage = null;
-                }
+            metadata.initialize().then(() => {
+                scope.metadata = metadata.values;
             });
 
-            /**
-             * @ngdoc method
-             * @name sdTrackActivityReportPanel#searchUsers
-             * @param {String} text
-             * @description Searches users based on given text
-             */
-            scope.searchUsers = function(text) {
-                var query = {
-                    $or: [
-                        {username: {$regex: text, $options: '-i'}},
-                        {display_name: {$regex: text, $options: '-i'}},
-                        {email: {$regex: text, $options: '-i'}}
-                    ]
-                };
-
-                api.users.query(query).then((users) => {
-                    scope.users = users._items;
-                });
-                return scope.users;
-            };
-
-            /**
-             * @ngdoc method
-             * @name sdContentQuotaReportPanel#selectUser
-             * @param {Object} user
-             * @description Sets the selected user
-             */
-            scope.selectUser = function(user) {
-                scope.selectedUser = user;
-                scope.report.user = user._id;
-            };
-
-            /**
-             * @ngdoc method
-             * @name sdContentQuotaReportPanel#removeUser
-             * @description Removes the selected user
-             */
-            scope.removeUser = function() {
-                scope.selectedUser = null;
-                scope.report.user = null;
-            };
-
-            /**
-             * @ngdoc method
-             * @name sdContentQuotaReportPanel#generate
-             * @description Generate the report
-             */
             scope.generate = function() {
-                function onSuccess(report) {
-                    $rootScope.$broadcast('view:content_quota_report', report);
+                function onSuccess(contentQuotaReport) {
+                    $rootScope.$broadcast('view:content_quota_reports', contentQuotaReport);
                     notify.success(gettext('The report was genereated successfully'));
                 }
 
@@ -112,10 +46,24 @@ export function ContentQuotaReportPanel(config, api, session, notify, $rootScope
                     }
                 }
 
-                contentQuotaReport.generate(scope.report).then(onSuccess, onFail);
-            };
+                var query = {
+                            start_time: formatDate(scope.report.date_start),
+                            intervals_number: scope.report.intervals_number,
+                            interval_length: scope.report.interval_length,
+                            target: scope.target,
+                            keywords: scope.report.keywords,
+                            subject: scope.report.subject,
+                            category: scope.report.category
+                };
 
-            scope.initalize();
+                api('content_quota_reports', session.identity).save({}, query)
+                    .then(onSuccess, onFail);
+            };
+            function formatDate(date) {
+                return date ? moment(date, config.model.dateformat).format('YYYY-MM-DD') : null; // jshint ignore:line
+            }
+
+            scope.init();
         }
     };
 }

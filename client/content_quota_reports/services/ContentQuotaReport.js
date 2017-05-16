@@ -16,7 +16,7 @@ export function ContentQuotaReport(api, session) {
      * @description Generate the report
      */
     this.generate = function(reportParams) {
-        return api('content_quota_report', session.identity).save({}, reportParams)
+        return api('content_quota_reports', session.identity).save({}, reportParams)
             .then((report) => report);
     };
 }

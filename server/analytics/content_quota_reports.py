@@ -86,20 +86,14 @@ class ContentQuotaReportService(BaseService):
         :param dict doc: document used for generating the report
         :return dict: report
         """
-        
-        time_tict = {}
-        start_time = format_date(doc['start_time'])
+
         interval_length = timedelta(int(doc['interval_length'])
                                     if doc.get('interval_length') else self.intervalLengthDefault)
         noOfIntervals = doc['intervals_number'] if doc.get('intervals_number') else self.noOfIntervalsDefault
-        end_time = format_date((doc['start_time'] - interval_length * noOfIntervals)
-                               .replace(hour=0, minute=0, second=0, microsecond=0))
 
+        time_intervals = []
         for i in range(noOfIntervals+1):
-            print('asasasa', i)
-            mytime = format_date((doc['start_time'] - interval_length * i)
-                               .replace(hour=0, minute=0, second=0, microsecond=0))
-
+            time_intervals.append(doc['start_time'] - interval_length * i)
 
         terms = self.set_query_terms(doc)
         query = {
@@ -111,13 +105,23 @@ class ContentQuotaReportService(BaseService):
                 }
             }
         }
+        
+        items = self.get_items(query)
+        if 'aggregations' in items.hits and 'items_over_days' in items.hits['aggregations']:
+            items_over_day_buckets = items.hits['aggregations']['items_over_days']['buckets']
+        i=0
+        result_list = []
+        while i < len(time_intervals)-1:
+            results = {}
+            results['start_time'] = time_intervals[i]
+            results['end_time'] = time_intervals[i+1]
+            for bucket in items_over_day_buckets:
+                if bucket['key_as_string'].rsplit('T', 1)[0]<=str(time_intervals[i]) and bucket['key_as_string'].rsplit('T', 1)[0]>str(time_intervals[i+1]):
+                    results['items_total'] = bucket['doc_count']
+            result_list.append(results)
+            i = i+1
 
-        results = {}
-        for item in self.get_items(query):
-            if item['operation'] == 'publish':
-                results[item['guid']] = {'published_time': item['_updated'], 'item': item}
-        return [item for item in results.values()]
-           
+        return [item for item in result_list]
 
     def create(self, docs):
         for doc in docs:
