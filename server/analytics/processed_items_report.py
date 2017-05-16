@@ -35,22 +35,6 @@ class ProcessedItemsResource(Resource):
 
 class ProcessedItemsService(BaseService):
 
-    def get_items(self, query):
-        """Returns the result of the item search by the given query.
-
-        :param dict query: query on users
-        :return Cursor: cursor on items list
-        """
-        return get_resource_service('archive_versions').get(req=None, lookup=query)
-
-    def get_user(self, id):
-        """Returns one user by a given id.
-
-        :param ObjectId id: user id
-        :return Cursor:cursor on user's details
-        """
-        return get_resource_service('users').find_one(req=None, _id=id)
-
     def count_items(self, items_list, state, start, end):
         """Returns the number of items which were modified in a given time interval and having a certain state.
 
@@ -84,7 +68,7 @@ class ProcessedItemsService(BaseService):
         query = {
             "task.user": str(user)
         }
-        items = list(self.get_items(query))
+        items = list(get_resource_service('archive_versions').get(req=None, lookup=query))
 
         total_items_no = self.count_items(items, None,
                                           doc['start_time'], doc['end_time'])
@@ -115,7 +99,7 @@ class ProcessedItemsService(BaseService):
         report = []
 
         for user in doc['users']:
-                user_details = self.get_user(user['_id'])
+                user_details = get_resource_service('users').find_one(req=None, _id=user['_id'])
                 report.append({
                     'user': {
                         '_id': user_details['_id'],

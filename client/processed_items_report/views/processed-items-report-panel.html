@@ -28,7 +28,7 @@
                 </div>
             </div>
 
-            <div ng-if="selectedUsers.length>0" 
+            <div ng-if="selectedUsers.length" 
                  ng-repeat = "user in selectedUsers">
                 {{ user.display_name}}
                 <i class="icon-close-small" ng-click="removeUser(user)"></i>

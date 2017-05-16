@@ -1,5 +1,5 @@
 ProcessedItemsReportPanel.$inject = [
-    'config', 'api', 'session', 'notify', '$rootScope', 'processedItemsReport'
+    'config', 'api', 'session', 'notify', '$rootScope'
 ];
 
 /**
@@ -13,7 +13,7 @@ ProcessedItemsReportPanel.$inject = [
  * @requires $rootScope
  * @description A directive that generates the sidebar containing processed items report parameters
  */
-export function ProcessedItemsReportPanel(config, api, session, notify, $rootScope, processedItemsReport) {
+export function ProcessedItemsReportPanel(config, api, session, notify, $rootScope) {
     return {
         template: require('../views/processed-items-report-panel.html'),
         scope: {},
@@ -110,7 +110,9 @@ export function ProcessedItemsReportPanel(config, api, session, notify, $rootSco
                 var query = {start_time: formatDate(scope.start_time), end_time: formatDate(scope.end_time),
                     users: scope.selectedUsers};
 
-                processedItemsReport.generate(query).then(onSuccess, onFail);
+                return api('processed_items_report', session.identity).save({}, query)
+                    .then((report) => report)
+                    .then(onSuccess, onFail);
             };
 
             scope.validForm = function() {
