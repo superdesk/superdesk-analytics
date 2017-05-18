@@ -91,4 +91,45 @@ Feature: Activity report
         	"report": [{"desk": "Sports Desk", "items": 2}]
         }
         """
-	
+		@auth
+        Scenario: Activity report hourly
+        Given "desks"
+        """
+        [{"name": "Politic Desk"}]
+        """
+        Given "archive"
+		"""
+		[{
+			"guid": "item2",
+			"type": "text",
+			"headline": "test item2",
+			"_current_version": 1,
+			"state": "fetched",
+		    "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID#"},
+		    "subject":[{"qcode": "05007000", "name": "university"}],
+		    "keywords": ["UNIVERSITY"],
+		    "slugline": "test",
+		    "priority": 6,
+		    "urgency": 3,
+		    "target_subscribers": [{"name":"test-subscriber"}],
+		    "anpa_category": [{"name": "arts, culture and entertainment" , "qcode": "01000000"}],
+		    "body_html": "Test item body"
+		}]
+        """
+        When we publish "#archive._id#" with "publish" type and "published" state
+	    Then we get OK response
+		When we post to "/activity_reports" with success
+        """
+        {
+        	"operation": "publish",
+        	"desk": "#desks._id#",
+        	"operation_date_start": "#ANALYTICS_DATE_FORMATTED#",
+        	"operation_date_end": "#ANALYTICS_DATE_FORMATTED#"
+        }
+        """
+         Then we get existing resource
+        """
+        {
+        	"report": {"items": 2, "no_items_per_hour": {"#ANALYTICS_DATE_FORMATTED#": 2}}
+        }
+        """
