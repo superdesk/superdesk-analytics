@@ -46,6 +46,7 @@
     "rc-time-picker": "^2.1.0",
     "reselect": "^2.5.4",
     "style-loader": "^0.13.1",
+    "twix": "^1.1.5",
     "webpack": "^1.13.2",
     "webpack-dev-server": "1.14.1"
   },

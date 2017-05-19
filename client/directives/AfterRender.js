@@ -12,7 +12,7 @@ export function AfterRender($timeout) {
         restrict: 'A',
         terminal: true,
         transclude: false,
-        link: function(scope, element, attrs, controller) {
+        link: function(scope, element, attrs) {
             $timeout(scope.$eval(attrs.sdAfterRender), 0);
         }
     };

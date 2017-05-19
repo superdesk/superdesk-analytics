@@ -9,7 +9,7 @@
  */
 
 import * as directive from './directives';
-
+import * as svc from './services';
 
 /**
  * @ngdoc module
@@ -19,6 +19,9 @@ import * as directive from './directives';
  * @description Superdesk analytics processed items report.
  */
 angular.module('superdesk.analytics.processed-items-report', [])
+    .service('processedItemsChart', svc.ProcessedItemsChart)
+    .service('processedItemsReport', svc.ProcessedItemsReport)
+
     .directive('sdProcessedItemsReportContainer', directive.ProcessedItemsReportContainer)
     .directive('sdProcessedItemsReportPanel', directive.ProcessedItemsReportPanel)
     .directive('sdProcessedItemsReportView', directive.ProcessedItemsReportView)

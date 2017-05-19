@@ -10,7 +10,7 @@
 
 import superdesk
 
-from analytics.activity_reports import ActivityReportResource, ActivityReportService
+from analytics.activity_report import ActivityReportResource, ActivityReportService
 from analytics.saved_activity_reports import SavedActivityReportResource, \
     SavedActivityReportService
 from analytics.track_activity import TrackActivityResource, TrackActivityService
@@ -19,7 +19,7 @@ from analytics.content_quota_reports import ContentQuotaReportResource, ContentQ
 
 
 def init_app(app):
-    endpoint_name = 'activity_reports'
+    endpoint_name = 'activity_report'
     service = ActivityReportService(endpoint_name, backend=superdesk.get_backend())
     ActivityReportResource(endpoint_name, app=app, service=service)
 
@@ -35,11 +35,11 @@ def init_app(app):
     service = ProcessedItemsService(endpoint_name, backend=superdesk.get_backend())
     ProcessedItemsResource(endpoint_name, app=app, service=service)
 
-    endpoint_name = 'content_quota_reports'
+    endpoint_name = 'content_quota_report'
     service = ContentQuotaReportService(endpoint_name, backend=superdesk.get_backend())
     ContentQuotaReportResource(endpoint_name, app=app, service=service)
 
-    superdesk.privilege(name='activity_reports', label='Activity Report View',
+    superdesk.privilege(name='activity_report', label='Activity Report View',
                         description='User can view activity reports.')
     superdesk.privilege(name='track_activity_report', label='Track Activity Report View')
     superdesk.privilege(name='processed_items_report', label='Processed Items Report View',
