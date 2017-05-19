@@ -1,0 +1,50 @@
+<div ng-controller="ProcessedItemsWidgetSettingsController as pic" ng-init="pic.setWidget(widget)">
+
+    <div class="modal__header">
+        <a href="" class="close" ng-click="cancel()"><i class="icon-close-small"></i></a>
+        <h3 translate>Processed Items Widget Settings</h3>
+    </div>
+
+    <div class="modal__body processed-items-settings">
+        <form name="processedItemsReportForm">
+            <fieldset class="report-parameters">
+                <label translate>Time interval</label>
+                <div class="multiple">
+                    <div class="field">
+                        <label for="start_time" translate>From</label>
+                        <div sd-datepicker ng-model="widget.configuration.start_time"
+                             id="start_time" required></div>
+                    </div>
+
+                    <div class="field">
+                        <label for="end_time" translate>To</label>
+                        <div sd-datepicker ng-model="widget.configuration.end_time" 
+                            id="end_time" required></div>
+                    </div>
+                </div>
+
+                <label for="users" translate>Users</label>
+                <div class="term-editor data visible">
+                    <div id="users" sd-typeahead items="users" ng-model="widget.configuration.users"
+                        search="searchUsers(term)" select="selectUser(item)" term="selectedTerm" required>
+                        <ul>
+                            <li typeahead-item="t" ng-repeat="t in users">
+                                {{ :: t.display_name }}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div ng-if="widget.configuration.users.length>0" 
+                     ng-repeat = "user in widget.configuration.users">
+                    {{ user.display_name}}
+                    <i class="icon-close-small" ng-click="removeUser(user)"></i>
+                </div>
+            </fieldset>&nbsp;
+        </form>
+    </div>
+    <div class="modal__footer">
+        <button class="btn btn--primary" ng-click="save()"
+            ng-disabled="!validForm()" translate>Done</button>
+    </div>
+</div>

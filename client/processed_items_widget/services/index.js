@@ -1,0 +1,1 @@
+export {ProcessedItemsReportWidgetSettings} from './ProcessedItemsReportWidgetSettings';

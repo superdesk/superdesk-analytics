@@ -28,6 +28,8 @@ cacheIncludedTemplates.$inject = ['$templateCache'];
  * @description Superdesk analytics activity report.
  */
 angular.module('superdesk.analytics.activity-report', [])
+    .service('activityChart', svc.ActivityChart)
+    .service('activityReport', svc.ActivityReport)
     .service('savedActivityReports', svc.SavedActivityReports)
 
     .directive('sdActivityReportContainer', directive.ActivityReportContainer)

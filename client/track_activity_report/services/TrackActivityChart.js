@@ -1,11 +1,4 @@
-var Highcharts = require('highcharts');
-
-require('highcharts-more')(Highcharts);
-require('highcharts/modules/exporting')(Highcharts);
-require('highcharts/modules/data')(Highcharts);
-
-
-TrackActivityChart.$inject = ['lodash', 'moment', 'desks'];
+TrackActivityChart.$inject = ['lodash', 'moment', 'desks', 'Highcharts', 'gettext'];
 
 /**
  * @ngdoc service
@@ -16,11 +9,16 @@ TrackActivityChart.$inject = ['lodash', 'moment', 'desks'];
  * @requires desks
  * @description Track activity chart generation service
  */
-export function TrackActivityChart(_, moment, desks) {
+export function TrackActivityChart(_, moment, desks, Highcharts, gettext) {
     var finisheItemColor = 'green',
         unfinishedItemColor = 'yellow',
         sentBackColor = 'brown',
         publishedColor = 'blue';
+
+    gettext('green');
+    gettext('yellow');
+    gettext('brown');
+    gettext('blue');
 
     /**
      * @ngdoc method
@@ -38,13 +36,17 @@ export function TrackActivityChart(_, moment, desks) {
      * @param {Object} report
      * @description Creates a chart for the given report
      */
-    this.createChart = function(report, renderTo, title) {
+    this.createChart = function(report, renderTo) {
         var categories = [], data = [],
             currentTime = moment().unix(),
             desk = desks.deskLookup[report.desk],
-            stage = desks.stageLookup[report.stage];
+            stage = desks.stageLookup[report.stage],
+            sortedReport = _.sortBy(report.report, [(item) => item.item.headline]),
+            seriesName = gettext('Items for stage') + ' ' + stage.name + ' (' + desk.name + ')';
 
-        var sortedReport = _.sortBy(report.report, [(item) => item.item.headline]);
+        if (report.user) {
+            seriesName += '<br/>' + desks.userLookup[report.user].display_name;
+        }
 
         _.forEach(sortedReport, (item) => {
             categories.push(item.item.headline);
@@ -63,12 +65,6 @@ export function TrackActivityChart(_, moment, desks) {
             data.push(itemData);
         });
 
-        var seriesName = 'Items for stage ' + stage.name + ' (' + desk.name + ')';
-
-        if (report.user) {
-            seriesName += '<br/>' + desks.userLookup[report.user].display_name;
-        }
-
         var chartData = {
             chart: {
                 type: 'columnrange',
@@ -78,7 +74,7 @@ export function TrackActivityChart(_, moment, desks) {
                 enabled: true
             },
             title: {
-                text: title
+                text: null
             },
             xAxis: {
                 categories: categories
@@ -86,7 +82,7 @@ export function TrackActivityChart(_, moment, desks) {
             yAxis: {
                 type: 'datetime',
                 title: {
-                    text: 'Time'
+                    text: gettext('Time')
                 },
                 labels: {
                     formatter: function() {
@@ -96,16 +92,16 @@ export function TrackActivityChart(_, moment, desks) {
             },
             tooltip: {
                 pointFormatter: function() {
-                    var span = '<span style="color:' + this.color + '"></span> ',
+                    var span = '<span style="color:' + gettext(this.color) + '"></span> ',
                         low = formatTimestamp(this.low),
                         high = formatTimestamp(this.high),
-                        format = span + '<b>entered: ' + low + '</b>';
+                        format = span + '<b>' + gettext('entered:') + ' ' + low + '</b>';
 
                     if (this.color === finisheItemColor || this.color === sentBackColor) {
-                        format += ' - <b>left: ' + high + '</b>';
+                        format += ' - <b>' + gettext('left:') + ' ' + high + '</b>';
                     }
                     if (this.color === publishedColor) {
-                        format += ' - <b>published: ' + high + '</b>';
+                        format += ' - <b>' + gettext('published:') + ' ' + high + '</b>';
                     }
                     format += '<br/>';
                     return format;
@@ -118,6 +114,6 @@ export function TrackActivityChart(_, moment, desks) {
             }]
         };
 
-        Highcharts.chart(renderTo, chartData);
+        return Highcharts.chart(renderTo, chartData);
     };
 }
