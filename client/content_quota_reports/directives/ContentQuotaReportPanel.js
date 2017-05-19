@@ -24,7 +24,6 @@ export function ContentQuotaReportPanel(config, api, session, metadata, notify, 
             var intervalLengthDefault = 5;
 
             scope.init = function() {
-                console.log('aaaaaa', scope);
                 scope.report = {intervals_number: noOfIntervalsDefault, interval_length: intervalLengthDefault};
             };
 
@@ -55,7 +54,6 @@ export function ContentQuotaReportPanel(config, api, session, metadata, notify, 
                             subject: scope.report.subject,
                             category: scope.report.category
                 };
-
                 api('content_quota_reports', session.identity).save({}, query)
                     .then(onSuccess, onFail);
             };

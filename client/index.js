@@ -15,9 +15,11 @@ import * as ctrl from './controllers';
 
 import './activity_reports';
 import './processed_items_report';
+import './processed_items_widget';
 import './track_activity_report';
 import './content_quota_reports';
 import './track_activity_widget';
+import './content_quota_widget';
 
 
 function cacheIncludedTemplates($templateCache) {
@@ -41,7 +43,7 @@ cacheIncludedTemplates.$inject = ['$templateCache'];
 export default angular.module('superdesk.analytics', [
     'superdesk.analytics.activity-report', 'superdesk.analytics.processed-items-report',
     'superdesk.analytics.track-activity-report', 'superdesk.analytics.track-activity-widget',
-    'superdesk.analytics.content-quota-report'
+    'superdesk.analytics.content-quota-report', 'superdesk.analytics.content-quota-widget'
 ])
 
     .service('analyticsWidgetSettings', svc.AnalyticsWidgetSettings)

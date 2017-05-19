@@ -20,6 +20,7 @@ import * as directive from './directives';
  * @description Superdesk analytics content quota reports.
  */
 angular.module('superdesk.analytics.content-quota-report', [])
+    .service('contentQuotaChart', svc.ContentQuotaChart)
     .service('contentQuotaReport', svc.ContentQuotaReport)
 
     .directive('sdContentQuotaReportContainer', directive.ContentQuotaReportContainer)
