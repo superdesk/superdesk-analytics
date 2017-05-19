@@ -1,4 +1,4 @@
-ContentQuotaReportView.$inject = ['contentQuotaReport', '$interval'];
+ContentQuotaReportView.$inject = ['contentQuotaReport', 'contentQuotaChart', '$interval'];
 
 /**
  * @ngdoc directive
@@ -8,7 +8,7 @@ ContentQuotaReportView.$inject = ['contentQuotaReport', '$interval'];
  * @requires $interval
  * @description A directive that displays the generated track activity report
  */
-export function ContentQuotaReportView(contentQuotaReport, $interval) {
+export function ContentQuotaReportView(contentQuotaReport, contentQuotaChart, $interval) {
     return {
         template: require('../views/content-quota-report-view.html'),
         scope: {},
@@ -50,14 +50,14 @@ export function ContentQuotaReportView(contentQuotaReport, $interval) {
              * @name sdContentQuotaReportView#generateChart
              * @description Generate the track activity chart
              */
-            // scope.generateChart = () => {
-            //     resetInterval();
-            //     trackActivityChart.createChart(scope.trackActivityReport, 'container', null);
-            // };
+            scope.generateChart = () => {
+                // resetInterval();
+                contentQuotaChart.createChart(scope.contentQuotaReport, 'containerq', null);
+            };
 
             scope.$on('view:content_quota_reports', (event, args) => {
                 scope.contentQuotaReport = args;
-                // scope.generateChart();
+                scope.generateChart();
             });
 
             // scope.$on('$destroy', () => {

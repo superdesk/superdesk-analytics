@@ -1,0 +1,1 @@
+export {ProcessedItemsChart} from './ProcessedItemsChart';
