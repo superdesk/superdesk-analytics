@@ -44,7 +44,7 @@ class ContentQuotaReportService(BaseService):
 
     intervalLengthDefault = 5
     noOfIntervalsDefault = 1
-
+    
     def set_query_terms(self, report):
         """Check if some fields are filled out before generating the report and initiate the filter
         """
@@ -120,7 +120,7 @@ class ContentQuotaReportService(BaseService):
                     results['items_total'] = bucket['doc_count']
             result_list.append(results)
             i = i+1
-
+            
         return [item for item in result_list]
 
     def create(self, docs):
