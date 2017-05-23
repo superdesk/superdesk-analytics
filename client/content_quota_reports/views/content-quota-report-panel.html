@@ -3,7 +3,7 @@
         <fieldset class="report-parameters">
             <div class="field">
                     <label for="parameters-date_start" translate>From</label>
-                    <div sd-datepicker ng-model="report.date_start"
+                    <div sd-datepicker ng-model="report.start_time"
                          id="parameters-operation_date_start" required></div>
                 </div>
             <div class="field">
@@ -64,15 +64,6 @@
                 <label for="target" translate>Target Quota</label>
                 <input type="integer" id="target" ng-model="target">
             </div>
-
-            <!-- <div class="field">
-                <label for="parameters-target">{{:: 'Target Quota' | translate}}</label>
-                <div id="parameters-target"
-                     data-field="target"
-                     data-header="true"
-                     data-item="contentQuotaReport"
-                ></div>
-            </div> -->
 
         </fieldset>&nbsp;
     </form>

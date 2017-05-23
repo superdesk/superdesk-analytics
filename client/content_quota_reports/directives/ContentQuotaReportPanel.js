@@ -20,9 +20,10 @@ export function ContentQuotaReportPanel(config, api, session, metadata, notify, 
         template: require('../views/content-quota-report-panel.html'),
         scope: {},
         link: function(scope, element, attrs, controller) {
-            var noOfIntervalsDefault = 1;
-            var intervalLengthDefault = 5;
+            var noOfIntervalsDefault = 1,
+                intervalLengthDefault = 5;
 
+            scope.report = {};
             scope.init = function() {
                 console.log('aaaaaa', scope);
                 scope.report = {intervals_number: noOfIntervalsDefault, interval_length: intervalLengthDefault};
@@ -46,8 +47,10 @@ export function ContentQuotaReportPanel(config, api, session, metadata, notify, 
                     }
                 }
 
+                var req = _.clone(scope.report.start_time)
+
                 var query = {
-                            start_time: formatDate(scope.report.date_start),
+                            start_time: formatDate(req),
                             intervals_number: scope.report.intervals_number,
                             interval_length: scope.report.interval_length,
                             target: scope.target,
