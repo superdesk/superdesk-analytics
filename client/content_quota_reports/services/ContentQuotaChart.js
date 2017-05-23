@@ -5,6 +5,7 @@ require('highcharts/modules/exporting')(Highcharts);
 require('highcharts/modules/data')(Highcharts);
 
 
+
 ContentQuotaChart.$inject = ['lodash', 'moment', 'desks', 'config'];
 
 /**
