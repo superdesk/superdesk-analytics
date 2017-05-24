@@ -2,18 +2,19 @@ ContentQuotaReportView.$inject = ['contentQuotaReport', 'contentQuotaChart', '$i
 
 /**
  * @ngdoc directive
- * @module superdesk.apps.analytics.track-activity-report
+ * @module superdesk.apps.analytics.content-quota-reports
  * @name sdContentQuotaReportView
  * @requires contentQuotaReport
+ * @requires contentQuotaChart
  * @requires $interval
- * @description A directive that displays the generated track activity report
+ * @description A directive that displays the generated content quota report
  */
 export function ContentQuotaReportView(contentQuotaReport, contentQuotaChart, $interval) {
     return {
         template: require('../views/content-quota-report-view.html'),
         scope: {},
         link: function(scope, element, attrs, controller) {
-            var regenerateInterval = 6000,
+            var regenerateInterval = 60000,
                 interval = null;
 
             /**
@@ -22,11 +23,19 @@ export function ContentQuotaReportView(contentQuotaReport, contentQuotaChart, $i
              * @description Regenerate the report and the chart
              */
             var regenerateReport = function() {
-                if ("rrrrrrrrrrrR",scope.contentQuotaReport) {
-                    // delete scope.contentQuotaReport.report;
-                    console.log(scope.contentQuotaReport);
-                    delete scope.contentQuotaReport._id;
-                    contentQuotaReport.generate(scope.report)
+                if (scope.contentQuotaReport) {
+                    var report;
+
+                    report = {
+                        start_time: scope.contentQuotaReport.start_time,
+                        subject: scope.contentQuotaReport.subject,
+                        keywords: scope.contentQuotaReport.keywords,
+                        category: scope.contentQuotaReport.category,
+                        intervals_number: scope.contentQuotaReport.intervals_number,
+                        interval_length: scope.contentQuotaReport.interval_length,
+                        target: scope.contentQuotaReport.target
+                    };
+                    contentQuotaReport.generate(report)
                         .then((report) => {
                             scope.contentQuotaReport = report;
                             scope.generateChart();
@@ -49,7 +58,7 @@ export function ContentQuotaReportView(contentQuotaReport, contentQuotaChart, $i
             /**
              * @ngdoc method
              * @name sdContentQuotaReportView#generateChart
-             * @description Generate the track activity chart
+             * @description Generate the content quota chart
              */
             scope.generateChart = () => {
                 resetInterval();

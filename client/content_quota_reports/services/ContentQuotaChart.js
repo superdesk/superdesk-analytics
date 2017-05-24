@@ -5,7 +5,6 @@ require('highcharts/modules/exporting')(Highcharts);
 require('highcharts/modules/data')(Highcharts);
 
 
-
 ContentQuotaChart.$inject = ['lodash', 'moment', 'desks', 'config'];
 
 /**
@@ -19,9 +18,13 @@ ContentQuotaChart.$inject = ['lodash', 'moment', 'desks', 'config'];
  */
 
 export function ContentQuotaChart(_, moment, desks, config) {
-    var aboveQuota = 'green',
-        underQuota = 'brown';
+    var aboveQuota = '#008000',
+        underQuota = 'brown',
+        formatDate;
 
+    formatDate = function(date) {
+        return date.split('T', 1);
+    };
     /**
      * @ngdoc method
      * @name ContentQuotaChart#createChart
@@ -31,48 +34,37 @@ export function ContentQuotaChart(_, moment, desks, config) {
     this.createChart = function(contentQuotaReport, renderTo, title) {
         var categories = [], data = [];
 
-        for (var i = 0; i <= contentQuotaReport.report.length - 1; i++) {
-
-            if(contentQuotaReport.report[i].items_total >=1){
-                if(contentQuotaReport.target){
-
-                    if(contentQuotaReport.report[i].items_total >= contentQuotaReport.target){
-
+        _.forEach(contentQuotaReport.report, (item) => {
+            if (item.items_total >= 1) {
+                if (contentQuotaReport.target) {
+                    if (item.items_total >= contentQuotaReport.target) {
                         data.push({
-                            y: contentQuotaReport.report[i].items_total,
+                            y: item.items_total,
                             color: aboveQuota,
-                            start: contentQuotaReport.report[i].start_time.split("T", 1),
-                            end: contentQuotaReport.report[i].end_time.split("T", 1)
-                        });
-                    }
-                    else{
+                            start: formatDate(item.start_time),
+                            end: formatDate(item.end_time)});
+                    } else {
                         data.push({
-                            y: contentQuotaReport.report[i].items_total,
+                            y: item.items_total,
                             color: underQuota,
-                            start: contentQuotaReport.report[i].start_time.split("T", 1),
-                            end: contentQuotaReport.report[i].end_time.split("T", 1)
-                        });
+                            start: formatDate(item.start_time),
+                            end: formatDate(item.end_time)});
                     }
-                }
-                else{
+                } else {
                     data.push({
-                            y: contentQuotaReport.report[i].items_total,
-                            color: aboveQuota,
-                            start: contentQuotaReport.report[i].start_time.split("T", 1),
-                            end: contentQuotaReport.report[i].end_time.split("T", 1)
-                        });
+                        y: item.items_total,
+                        color: aboveQuota,
+                        start: formatDate(item.start_time),
+                        end: formatDate(item.end_time)});
                 }
-            }
-            else{
+            } else {
                 data.push({
-                        y: 0,
-                        start: contentQuotaReport.report[i].start_time.split("T", 1),
-                        end: contentQuotaReport.report[i].end_time.split("T", 1)
-                    });
-                }
-            categories.push('Interval ' + (i+1));
-               
-        }
+                    y: 0,
+                    start: formatDate(item.start_time),
+                    end: formatDate(item.end_time)});
+            }
+            categories.push(formatDate(item.end_time) + ' : ' + formatDate(item.start_time));
+        });
 
         var chartData = {
             chart: {
@@ -96,32 +88,33 @@ export function ContentQuotaChart(_, moment, desks, config) {
                     text: 'Number of items'
                 },
                 plotBands: [{
-                    color: 'orange',
-                    dashStyle: 'solid', 
-                    value: contentQuotaReport.target, 
-                    width: 3 ,
-                    label: { 
-                        text: 'Target Quota', 
-                        align: 'left', 
-                        x: +10 
-                      } 
-
-              }]
+                    color: '#8cd9b3',
+                    dashStyle: 'solid',
+                    value: contentQuotaReport.target,
+                    width: 3,
+                    label: {
+                        text: 'Target Quota',
+                        align: 'left',
+                        x: +10
+                    }
+                }]
             },
             tooltip: {
                 pointFormatter: function() {
-                    var span = '<span style="color:' + this.color + '"></span> ',
-                        format = span + '<b>Start:' + this.start+ '  End:'+ this.end+' </b><br/><b>Number of items:' + this.y + '</b>';
+                    var span, format;
+
+                    span = '<span style="color:' + this.color + '"></span> ',
+                        format = span + '<b>Number of items:' + this.y + '</b>';
                     format += '<br/>';
                     return format;
                 }
             },
             series: [{
-                name: "Number of items",
+                name: 'Number of items per intervals',
                 data: data
             }]
         };
-        console.log("cccc", chartData.series);
+
         Highcharts.chart(renderTo, chartData);
     };
 }

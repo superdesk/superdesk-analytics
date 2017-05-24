@@ -28,7 +28,6 @@ export function ContentQuotaWidgetController($scope, $rootScope, api, session, a
      * @description Read widget settings
      */
     var getSettings = function() {
-        console.log('bbbbb', $scope.widget)
         return analyticsWidgetSettings.readSettings(widgetType).then((preferences) => {
             $scope.widget = preferences;
             return $scope.widget;
@@ -89,7 +88,6 @@ export function ContentQuotaWidgetController($scope, $rootScope, api, session, a
     generateChart();
 
 
-    
     $scope.$on('view:content_quota_widget', (event, args) => {
         resetInterval();
         generateChart();
