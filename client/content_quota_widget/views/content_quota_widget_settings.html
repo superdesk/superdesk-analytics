@@ -26,6 +26,10 @@
                     ng-options="interval_length for interval_length in [1,2,3,4,5,6,7]">
                 </select>
             </div>
+            <div class="field">
+                <label for="target" translate>Target Quota</label>
+                <input type="integer" id="target" ng-model="widget.target">
+            </div>
     </form>
 </div>
 
