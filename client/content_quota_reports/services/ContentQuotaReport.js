@@ -6,7 +6,7 @@ ContentQuotaReport.$inject = ['api', 'session'];
  * @name ContentQuotaReport
  * @requires api
  * @requires session
- * @description Content Quota report service
+ * @description Content quota report service
  */
 export function ContentQuotaReport(api, session) {
     /**

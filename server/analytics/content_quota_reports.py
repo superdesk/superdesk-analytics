@@ -92,7 +92,7 @@ class ContentQuotaReportService(BaseService):
         noOfIntervals = doc['intervals_number'] if doc.get('intervals_number') else self.noOfIntervalsDefault
 
         time_intervals = []
-        for i in range(noOfIntervals+1):
+        for i in range(noOfIntervals + 1):
             time_intervals.append(doc['start_time'] - interval_length * i)
 
         terms = self.set_query_terms(doc)
@@ -105,21 +105,22 @@ class ContentQuotaReportService(BaseService):
                 }
             }
         }
-        
+
         items = self.get_items(query)
         if 'aggregations' in items.hits and 'items_over_days' in items.hits['aggregations']:
             items_over_day_buckets = items.hits['aggregations']['items_over_days']['buckets']
-        i=0
+        i = 0
         result_list = []
-        while i < len(time_intervals)-1:
+        while i < len(time_intervals) - 1:
             results = {}
             results['start_time'] = time_intervals[i]
-            results['end_time'] = time_intervals[i+1]
+            results['end_time'] = time_intervals[i + 1]
             for bucket in items_over_day_buckets:
-                if bucket['key_as_string'].rsplit('T', 1)[0]<=str(time_intervals[i]) and bucket['key_as_string'].rsplit('T', 1)[0]>str(time_intervals[i+1]):
+                if bucket['key_as_string'].rsplit('T', 1)[0] <= str(time_intervals[i]) \
+                        and bucket['key_as_string'].rsplit('T', 1)[0] > str(time_intervals[i + 1]):
                     results['items_total'] = bucket['doc_count']
             result_list.append(results)
-            i = i+1
+            i = i + 1
 
         return [item for item in result_list]
 
