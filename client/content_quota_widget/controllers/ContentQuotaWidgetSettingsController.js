@@ -13,9 +13,9 @@ ContentQuotaWidgetSettingsController.$inject = ['$scope', 'desks', 'api', '$root
  * @description Controller for track activity widget settings dialog
  */
 export function ContentQuotaWidgetSettingsController($scope, desks, api, $rootScope, analyticsWidgetSettings) {
-    var widgetType = 'content_quota'
+    var widgetType = 'content_quota';
 
-    $scope.widget = {}
+    $scope.widget = {};
 
 
     /**
