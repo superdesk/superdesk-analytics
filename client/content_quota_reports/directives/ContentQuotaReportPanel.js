@@ -13,7 +13,7 @@ ContentQuotaReportPanel.$inject = [
  * @requires $rootScope
  * @requires desks
  * @requires contentQuotaReport
- * @description A directive that generates the sidebar containing track activity report parameters
+ * @description A directive that generates the sidebar containing content quota reports parameters
  */
 export function ContentQuotaReportPanel(config, api, session, metadata, notify, $rootScope, desks, contentQuotaReport) {
     return {
@@ -23,7 +23,11 @@ export function ContentQuotaReportPanel(config, api, session, metadata, notify, 
             var noOfIntervalsDefault = 1,
                 intervalLengthDefault = 5;
 
-            scope.report = {};
+            /**
+             * @ngdoc method
+             * @name sdContentQuotaReportPanel#init
+             * @description Initialises the content quota report object
+            */
             scope.init = function() {
                 console.log('aaaaaa', scope);
                 scope.report = {intervals_number: noOfIntervalsDefault, interval_length: intervalLengthDefault};
@@ -33,6 +37,11 @@ export function ContentQuotaReportPanel(config, api, session, metadata, notify, 
                 scope.metadata = metadata.values;
             });
 
+            /**
+             * @ngdoc method
+             * @name sdContentQuotaReportPanel#generate
+             * @description Generate the report
+             */
             scope.generate = function() {
                 function onSuccess(contentQuotaReport) {
                     $rootScope.$broadcast('view:content_quota_reports', contentQuotaReport);
@@ -46,22 +55,22 @@ export function ContentQuotaReportPanel(config, api, session, metadata, notify, 
                         notify.error(gettext('Error. The report could not be generated.'));
                     }
                 }
+                var query;
 
-                var req = _.clone(scope.report.start_time)
-
-                var query = {
-                            start_time: formatDate(req),
-                            intervals_number: scope.report.intervals_number,
-                            interval_length: scope.report.interval_length,
-                            target: scope.target,
-                            keywords: scope.report.keywords,
-                            subject: scope.report.subject,
-                            category: scope.report.category
+                query = {
+                    start_time: formatDate(scope.report.start_time),
+                    intervals_number: scope.report.intervals_number,
+                    interval_length: scope.report.interval_length,
+                    target: scope.target,
+                    keywords: scope.report.keywords,
+                    subject: scope.report.subject,
+                    category: scope.report.category
                 };
 
                 api('content_quota_reports', session.identity).save({}, query)
                     .then(onSuccess, onFail);
             };
+
             function formatDate(date) {
                 return date ? moment(date, config.model.dateformat).format('YYYY-MM-DD') : null; // jshint ignore:line
             }
