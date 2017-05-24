@@ -1,4 +1,4 @@
-ContentQuotaWidgetController.$inject = ['$scope', '$rootScope', 'api', 'session', 'analyticsWidgetSettings',
+ContentQuotaWidgetController.$inject = ['config', '$scope', '$rootScope', 'api', 'session', 'analyticsWidgetSettings',
     'desks', 'notify', 'contentQuotaChart', '$interval'];
 
 /**
@@ -16,7 +16,7 @@ ContentQuotaWidgetController.$inject = ['$scope', '$rootScope', 'api', 'session'
  * @requires $interval
  * @description Controller for track activity widget
  */
-export function ContentQuotaWidgetController($scope, $rootScope, api, session, analyticsWidgetSettings,
+export function ContentQuotaWidgetController(config, $scope, $rootScope, api, session, analyticsWidgetSettings,
     desks, notify, contentQuotaChart, $interval) {
     var widgetType = 'content_quota',
         regenerateInterval = 60000,
@@ -33,7 +33,9 @@ export function ContentQuotaWidgetController($scope, $rootScope, api, session, a
             return $scope.widget;
         });
     };
-
+    var formatDate = function(date) {
+        return date ? moment(date, config.model.dateformat).format('YYYY-MM-DD') : null; // jshint ignore:line
+    };
     /**
      * @ngdoc method
      * @name ContentQuotaWidgetController#generateReport
@@ -53,10 +55,14 @@ export function ContentQuotaWidgetController($scope, $rootScope, api, session, a
             }
         }
 
-        return getSettings().then((settings) =>
-            api('content_quota_reports', session.identity).save({}, settings)
-                .then(onSuccess, onFail)
-        );
+        return getSettings().then((settings) => {
+            var req;
+
+            req = _.clone(settings);
+            req.start_time = formatDate(req.start_time);
+            return api('content_quota_reports', session.identity).save({}, req)
+                    .then(onSuccess, onFail);
+        });
     };
 
     /**
