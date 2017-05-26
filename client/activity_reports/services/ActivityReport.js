@@ -13,6 +13,8 @@ ActivityReport.$inject = ['api', 'session', 'config', '$q'];
 export function ActivityReport(api, session, config, $q) {
     var toDelete = ['_id', '_etag', 'is_global', 'owner', 'name', 'description'];
 
+    this.config = null;
+
     /**
      * @ngdoc method
      * @name ActivityReport#generate

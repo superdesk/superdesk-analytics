@@ -1,5 +1,5 @@
 ActivityWidgetSettingsController.$inject = ['$scope', 'desks', '$rootScope', 'analyticsWidgetSettings', 'metadata',
-    'WizardHandler'];
+    'WizardHandler', 'activityReport'];
 
 /**
  * @ngdoc controller
@@ -13,7 +13,7 @@ ActivityWidgetSettingsController.$inject = ['$scope', 'desks', '$rootScope', 'an
  * @description Controller for activity widget settings dialog
  */
 export function ActivityWidgetSettingsController($scope, desks, $rootScope, analyticsWidgetSettings, metadata,
-    WizardHandler) {
+    WizardHandler, activityReport) {
     $scope.currentDesk = desks.getCurrentDesk();
 
     desks.initialize().then(() => {
@@ -50,7 +50,7 @@ export function ActivityWidgetSettingsController($scope, desks, $rootScope, anal
      * @description Set the widget
      */
     this.setWidget = function(widget) {
-        $scope.widget = widget;
+        $scope.widget = activityReport.config || widget;
     };
 
     /**
@@ -70,6 +70,7 @@ export function ActivityWidgetSettingsController($scope, desks, $rootScope, anal
     $scope.save = function() {
         analyticsWidgetSettings.saveSettings($scope.widget)
         .then((settings) => {
+            activityReport.config = $scope.widget;
             $rootScope.$broadcast('view:activity_widget', $scope.widget);
         });
         $scope.$close();

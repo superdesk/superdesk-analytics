@@ -43,6 +43,7 @@ export default angular.module('superdesk.analytics.activity-report-widget', [
             max_sizey: 2,
             sizex: 1,
             sizey: 2,
+            classes: 'tabs modal--nested-fix',
             thumbnail: require('./thumbnail.svg'),
             template: 'activity-widget.html',
             configurationTemplate: 'activity-widget-settings.html',
