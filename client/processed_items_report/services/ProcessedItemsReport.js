@@ -21,6 +21,10 @@ export function ProcessedItemsReport(api, session, config, $q) {
      * @description Generate the report
      */
     this.generate = function(reportParams) {
+        if (!reportParams) {
+            return $q.reject('Invalid report parameters');
+        }
+
         var query = _.clone(reportParams);
 
         try {

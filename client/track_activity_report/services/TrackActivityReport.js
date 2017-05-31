@@ -1,4 +1,4 @@
-TrackActivityReport.$inject = ['api', 'session'];
+TrackActivityReport.$inject = ['api', 'session', '$q'];
 
 /**
  * @ngdoc service
@@ -8,7 +8,7 @@ TrackActivityReport.$inject = ['api', 'session'];
  * @requires session
  * @description Track activity report service
  */
-export function TrackActivityReport(api, session) {
+export function TrackActivityReport(api, session, $q) {
     var toDelete = ['_id', '_etag', 'report'];
 
     /**
@@ -18,6 +18,9 @@ export function TrackActivityReport(api, session) {
      * @description Generate the report
      */
     this.generate = function(reportParams) {
+        if (!reportParams) {
+            return $q.reject('Invalid report parameters');
+        }
         toDelete.forEach((field) => {
             delete reportParams[field];
         });

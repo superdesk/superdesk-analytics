@@ -2,7 +2,7 @@ language: python
 
 python: 3.5
 
-sudo: false
+sudo: required
 
 services:
     - mongodb
@@ -22,6 +22,11 @@ cache:
     - $HOME/.npm
 
 before_install:
+    - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+    - sudo apt-get update
+    - sudo apt-get install g++-4.8 --allow-unauthenticated
+    - export CXX="g++-4.8" CC="gcc-4.8"
+    - $CXX --version
     - nvm install node
     - nvm use node
     - node --version
@@ -31,7 +36,7 @@ before_install:
 node_js:
     - '6'
 install:
-    - npm install --python=python2.7
+    - npm install
     - cd server && pip install -q -r requirements.txt && cd ..
 before_script:
     - export DISPLAY=:99.0

@@ -1,6 +1,6 @@
 ActivityReportWidgetController.$inject = [
     '$scope', 'analyticsWidgetSettings', 'notify', 'activityChart', '$interval', '$timeout', '$rootScope',
-    'activityReport'
+    'activityReport', 'activityReportWidgetSettings'
 ];
 
 /**
@@ -16,10 +16,11 @@ ActivityReportWidgetController.$inject = [
  * @requires $timeout
  * @requires $rootScope
  * @requires activityReport
+ * @requires activityReportWidgetSettings
  * @description Controller for activity widget
  */
 export function ActivityReportWidgetController($scope, analyticsWidgetSettings, notify, activityChart,
-    $interval, $timeout, $rootScope, activityReport) {
+    $interval, $timeout, $rootScope, activityReport, activityReportWidgetSettings) {
     const REGENERATE_INTERVAL = 60000;
 
     var self = this;
@@ -48,7 +49,10 @@ export function ActivityReportWidgetController($scope, analyticsWidgetSettings, 
      * @description Set the widget
      */
     this.setWidget = function(widget) {
-        self.widget = widget;
+        self.widget = activityReportWidgetSettings.getSettings(widget.multiple_id);
+        if (!self.widget) {
+            self.widget = widget;
+        }
         $scope.renderTo = 'activity' + widget.multiple_id;
     };
 
@@ -80,7 +84,7 @@ export function ActivityReportWidgetController($scope, analyticsWidgetSettings, 
     $timeout($scope.generateChart, 0);
     resetInterval();
 
-    $rootScope.$on('view:activity_widget', (event, widget) => {
+    this.viewEventCleanup = $rootScope.$on('view:activity_widget', (event, widget) => {
         self.widget = widget;
         $scope.generateChart();
         resetInterval();
@@ -99,6 +103,10 @@ export function ActivityReportWidgetController($scope, analyticsWidgetSettings, 
         if (self.chart) {
             self.chart.destroy();
             self.chart = null;
+        }
+        if (self.viewEventCleanup) {
+            self.viewEventCleanup();
+            self.viewEventCleanup = null;
         }
     });
 }

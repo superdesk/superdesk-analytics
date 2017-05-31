@@ -1,4 +1,4 @@
-TrackActivityChart.$inject = ['lodash', 'moment', 'desks', 'Highcharts'];
+TrackActivityChart.$inject = ['lodash', 'moment', 'desks', 'Highcharts', 'gettext'];
 
 /**
  * @ngdoc service
@@ -9,11 +9,16 @@ TrackActivityChart.$inject = ['lodash', 'moment', 'desks', 'Highcharts'];
  * @requires desks
  * @description Track activity chart generation service
  */
-export function TrackActivityChart(_, moment, desks, Highcharts) {
+export function TrackActivityChart(_, moment, desks, Highcharts, gettext) {
     var finisheItemColor = 'green',
         unfinishedItemColor = 'yellow',
         sentBackColor = 'brown',
         publishedColor = 'blue';
+
+    gettext('green');
+    gettext('yellow');
+    gettext('brown');
+    gettext('blue');
 
     /**
      * @ngdoc method
@@ -37,7 +42,7 @@ export function TrackActivityChart(_, moment, desks, Highcharts) {
             desk = desks.deskLookup[report.desk],
             stage = desks.stageLookup[report.stage],
             sortedReport = _.sortBy(report.report, [(item) => item.item.headline]),
-            seriesName = 'Items for stage ' + stage.name + ' (' + desk.name + ')';
+            seriesName = gettext('Items for stage') + ' ' + stage.name + ' (' + desk.name + ')';
 
         if (report.user) {
             seriesName += '<br/>' + desks.userLookup[report.user].display_name;
@@ -77,7 +82,7 @@ export function TrackActivityChart(_, moment, desks, Highcharts) {
             yAxis: {
                 type: 'datetime',
                 title: {
-                    text: 'Time'
+                    text: gettext('Time')
                 },
                 labels: {
                     formatter: function() {
@@ -87,16 +92,16 @@ export function TrackActivityChart(_, moment, desks, Highcharts) {
             },
             tooltip: {
                 pointFormatter: function() {
-                    var span = '<span style="color:' + this.color + '"></span> ',
+                    var span = '<span style="color:' + gettext(this.color) + '"></span> ',
                         low = formatTimestamp(this.low),
                         high = formatTimestamp(this.high),
-                        format = span + '<b>entered: ' + low + '</b>';
+                        format = span + '<b>' + gettext('entered:') + ' ' + low + '</b>';
 
                     if (this.color === finisheItemColor || this.color === sentBackColor) {
-                        format += ' - <b>left: ' + high + '</b>';
+                        format += ' - <b>' + gettext('left:') + ' ' + high + '</b>';
                     }
                     if (this.color === publishedColor) {
-                        format += ' - <b>published: ' + high + '</b>';
+                        format += ' - <b>' + gettext('published:') + ' ' + high + '</b>';
                     }
                     format += '<br/>';
                     return format;

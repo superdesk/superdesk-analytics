@@ -27,7 +27,7 @@ export function ActivityChart(_, Highcharts) {
             endTime = moment(report.operation_end_date),
             timestampFormat = _.has(report.report, 'items_per_day') ? dateFormat : timeFormat;
 
-        return 'Published items on ' + startTime.format(timestampFormat) + ' - ' +
+        return gettext('Published items on') + ' ' + startTime.format(timestampFormat) + ' - ' +
             endTime.format(timestampFormat) + ' (' + report.report.total + ' total)';
     };
 
@@ -75,7 +75,7 @@ export function ActivityChart(_, Highcharts) {
      * @description Creates a chart for the given report
      */
     this.createChart = function(report, renderTo) {
-        var operation = report.operation === 'publish' ? 'Published' : 'Corrected',
+        var operation = report.operation === 'publish' ? gettext('Published') : gettext('Corrected'),
             reportData = getReportData(report);
 
         var chartData = {
@@ -93,13 +93,13 @@ export function ActivityChart(_, Highcharts) {
             },
             yAxis: {
                 title: {
-                    text: operation + ' Items'
+                    text: operation + ' ' + gettext('Items')
                 }
             },
             tooltip: {
                 pointFormatter: function() {
                     return '<span style="color:' + this.color + '"></span> ' +
-                        '<b>Published items: ' + this.y + '</b>';
+                        '<b>' + gettext('Published items:') + ' ' + this.y + '</b>';
                 }
             },
             series: [{

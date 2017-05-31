@@ -1,5 +1,6 @@
 TrackActivityWidgetController.$inject = ['$scope', '$rootScope', 'api', 'session', 'analyticsWidgetSettings',
-    'desks', 'notify', 'trackActivityChart', '$interval', '$timeout', 'trackActivityReport'];
+    'desks', 'notify', 'trackActivityChart', '$interval', '$timeout', 'trackActivityReport',
+    'trackActivityReportWidgetSettings'];
 
 /**
  * @ngdoc controller
@@ -16,10 +17,11 @@ TrackActivityWidgetController.$inject = ['$scope', '$rootScope', 'api', 'session
  * @requires $interval
  * @requires $timeout
  * @requires trackActivityReport
+ * @requires trackActivityReportWidgetSettings
  * @description Controller for track activity widget
  */
 export function TrackActivityWidgetController($scope, $rootScope, api, session, analyticsWidgetSettings,
-    desks, notify, trackActivityChart, $interval, $timeout, trackActivityReport) {
+    desks, notify, trackActivityChart, $interval, $timeout, trackActivityReport, trackActivityReportWidgetSettings) {
     const REGENERATE_INTERVAL = 60000;
 
     var self = this;
@@ -48,7 +50,10 @@ export function TrackActivityWidgetController($scope, $rootScope, api, session, 
      * @description Set the widget
      */
     this.setWidget = function(widget) {
-        self.widget = widget;
+        self.widget = trackActivityReportWidgetSettings.getSettings(widget.multiple_id);
+        if (!self.widget) {
+            self.widget = widget;
+        }
         $scope.renderTo = 'track-activity' + self.widget.multiple_id;
     };
 
@@ -60,8 +65,8 @@ export function TrackActivityWidgetController($scope, $rootScope, api, session, 
      * @description Generate the chart
      */
     var onMove = function(event, data) {
-        if (data.from_stage === $scope.widget.configuration.stage ||
-            data.to_stage === $scope.widget.configuration.stage) {
+        if (data.from_stage === self.widget.configuration.stage ||
+            data.to_stage === self.widget.configuration.stage) {
             resetInterval();
             $scope.generateChart();
         }
@@ -81,7 +86,7 @@ export function TrackActivityWidgetController($scope, $rootScope, api, session, 
             }
         }
 
-        return trackActivityReport.generate($scope.widget.configuration)
+        return trackActivityReport.generate(self.widget.configuration)
         .then((trackActivityReport) => {
             self.chart = trackActivityChart.createChart(trackActivityReport, $scope.renderTo);
         }, onFail);

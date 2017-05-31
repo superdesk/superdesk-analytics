@@ -8,6 +8,7 @@
  * at https://www.sourcefabric.org/superdesk/license
  */
 
+import * as svc from './services';
 import * as ctrl from './controllers';
 
 
@@ -50,6 +51,8 @@ export default angular.module('superdesk.analytics.processed-items-widget', [
             custom: true
         });
     }])
+
+    .service('processedItemsReportWidgetSettings', svc.ProcessedItemsReportWidgetSettings)
 
     .controller('ProcessedItemsWidgetController', ctrl.ProcessedItemsWidgetController)
     .controller('ProcessedItemsWidgetSettingsController', ctrl.ProcessedItemsWidgetSettingsController);

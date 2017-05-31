@@ -1,4 +1,4 @@
-ProcessedItemsChart.$inject = ['Highcharts'];
+ProcessedItemsChart.$inject = ['Highcharts', 'gettext'];
 
 /**
  * @ngdoc service
@@ -6,7 +6,7 @@ ProcessedItemsChart.$inject = ['Highcharts'];
  * @name ProcessedItemsChart
  * @description Processed items chart generation service
  */
-export function ProcessedItemsChart(Highcharts) {
+export function ProcessedItemsChart(Highcharts, gettext) {
     /**
      * @ngdoc method
      * @name ProcessedItemsChart#createChart
@@ -39,11 +39,12 @@ export function ProcessedItemsChart(Highcharts) {
                 text: startTime.calendar() + ' - ' + endTime.calendar()
             },
             xAxis: {
-                categories: ['Published', 'Corrected', 'Spiked', 'Killed', 'Total']
+                categories: [gettext('Published'), gettext('Corrected'), gettext('Spiked'),
+                    gettext('Killed'), gettext('Total')]
             },
             yAxis: {
                 title: {
-                    text: 'Items No'
+                    text: gettext('Items No')
                 }
             },
             series: series

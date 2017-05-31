@@ -1,5 +1,5 @@
 ActivityWidgetSettingsController.$inject = ['$scope', 'desks', '$rootScope', 'analyticsWidgetSettings', 'metadata',
-    'WizardHandler', 'activityReport'];
+    'WizardHandler', 'activityReportWidgetSettings'];
 
 /**
  * @ngdoc controller
@@ -10,10 +10,12 @@ ActivityWidgetSettingsController.$inject = ['$scope', 'desks', '$rootScope', 'an
  * @requires $rootScope
  * @requires analyticsWidgetSettings
  * @requires metadata
+ * @requires WizardHandler
+ * @requires activityReportWidgetSettings
  * @description Controller for activity widget settings dialog
  */
 export function ActivityWidgetSettingsController($scope, desks, $rootScope, analyticsWidgetSettings, metadata,
-    WizardHandler, activityReport) {
+    WizardHandler, activityReportWidgetSettings) {
     $scope.currentDesk = desks.getCurrentDesk();
 
     desks.initialize().then(() => {
@@ -35,10 +37,20 @@ export function ActivityWidgetSettingsController($scope, desks, $rootScope, anal
         };
     };
 
+    /**
+     * @ngdoc method
+     * @name ActivityWidgetSettingsController#previous
+     * @description Sets previous step in wizard.
+     */
     $scope.previous = function() {
         WizardHandler.wizard('activity-report').previous();
     };
 
+    /**
+     * @ngdoc method
+     * @name ActivityWidgetSettingsController#next
+     * @description Sets next step in wizard.
+     */
     $scope.next = function() {
         WizardHandler.wizard('activity-report').next();
     };
@@ -50,7 +62,14 @@ export function ActivityWidgetSettingsController($scope, desks, $rootScope, anal
      * @description Set the widget
      */
     this.setWidget = function(widget) {
-        $scope.widget = activityReport.config || widget;
+        $scope.widget = activityReportWidgetSettings.getSettings($scope.widget.multiple_id);
+        if (!$scope.widget) {
+            $scope.widget = widget;
+            activityReportWidgetSettings.saveSettings($scope.widget);
+        }
+        if (!$scope.widget.configuration) {
+            $scope.widget.configuration = {};
+        }
     };
 
     /**
@@ -70,7 +89,7 @@ export function ActivityWidgetSettingsController($scope, desks, $rootScope, anal
     $scope.save = function() {
         analyticsWidgetSettings.saveSettings($scope.widget)
         .then((settings) => {
-            activityReport.config = $scope.widget;
+            activityReportWidgetSettings.saveSettings($scope.widget);
             $rootScope.$broadcast('view:activity_widget', $scope.widget);
         });
         $scope.$close();

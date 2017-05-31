@@ -1,4 +1,5 @@
-ProcessedItemsWidgetSettingsController.$inject = ['$scope', 'api', '$rootScope', 'analyticsWidgetSettings'];
+ProcessedItemsWidgetSettingsController.$inject = ['$scope', 'api', '$rootScope', 'analyticsWidgetSettings',
+    'processedItemsReportWidgetSettings'];
 
 /**
  * @ngdoc controller
@@ -8,9 +9,11 @@ ProcessedItemsWidgetSettingsController.$inject = ['$scope', 'api', '$rootScope',
  * @requires api
  * @requires $rootScope
  * @requires analyticsWidgetSettings
+ * @requires processedItemsReportWidgetSettings
  * @description Controller for processed items widget settings dialog
  */
-export function ProcessedItemsWidgetSettingsController($scope, api, $rootScope, analyticsWidgetSettings) {
+export function ProcessedItemsWidgetSettingsController($scope, api, $rootScope, analyticsWidgetSettings,
+    processedItemsReportWidgetSettings) {
     /**
      * @ngdoc method
      * @name ActivityWidgetSettingsController#setWidget
@@ -18,7 +21,11 @@ export function ProcessedItemsWidgetSettingsController($scope, api, $rootScope, 
      * @description Set the widget
      */
     this.setWidget = function(widget) {
-        $scope.widget = widget;
+        $scope.widget = processedItemsReportWidgetSettings.getSettings($scope.widget.multiple_id);
+        if (!$scope.widget) {
+            $scope.widget = widget;
+            processedItemsReportWidgetSettings.saveSettings($scope.widget);
+        }
         if (!$scope.widget.configuration) {
             $scope.widget.configuration = {users: []};
         }
@@ -111,6 +118,7 @@ export function ProcessedItemsWidgetSettingsController($scope, api, $rootScope, 
     $scope.save = function() {
         analyticsWidgetSettings.saveSettings($scope.widget)
         .then((settings) => {
+            processedItemsReportWidgetSettings.saveSettings($scope.widget);
             $rootScope.$broadcast('view:processed_items_widget', $scope.widget);
         });
         $scope.$close();

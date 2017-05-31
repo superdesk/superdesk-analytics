@@ -8,6 +8,7 @@
  * at https://www.sourcefabric.org/superdesk/license
  */
 
+import * as svc from './services';
 import * as ctrl from './controllers';
 
 
@@ -51,6 +52,8 @@ export default angular.module('superdesk.analytics.activity-report-widget', [
             custom: true
         });
     }])
+
+    .service('activityReportWidgetSettings', svc.ActivityReportWidgetSettings)
 
     .controller('ActivityReportWidgetController', ctrl.ActivityReportWidgetController)
     .controller('ActivityWidgetSettingsController', ctrl.ActivityWidgetSettingsController);

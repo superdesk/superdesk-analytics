@@ -8,6 +8,7 @@
  * at https://www.sourcefabric.org/superdesk/license
  */
 
+import * as svc from './services';
 import * as ctrl from './controllers';
 
 
@@ -50,6 +51,8 @@ export default angular.module('superdesk.analytics.track-activity-widget', [
             custom: true
         });
     }])
+
+    .service('trackActivityReportWidgetSettings', svc.TrackActivityReportWidgetSettings)
 
     .controller('TrackActivityWidgetController', ctrl.TrackActivityWidgetController)
     .controller('TrackActivityWidgetSettingsController', ctrl.TrackActivityWidgetSettingsController);

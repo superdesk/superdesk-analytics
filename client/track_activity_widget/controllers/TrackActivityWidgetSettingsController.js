@@ -1,5 +1,5 @@
 TrackActivityWidgetSettingsController.$inject = ['$scope', 'desks', 'api', '$rootScope',
-    'analyticsWidgetSettings'];
+    'analyticsWidgetSettings', 'trackActivityReportWidgetSettings'];
 
 /**
  * @ngdoc controller
@@ -10,9 +10,11 @@ TrackActivityWidgetSettingsController.$inject = ['$scope', 'desks', 'api', '$roo
  * @requires api
  * @requires $rootScope
  * @requires analyticsWidgetSettings
+ * @requires trackActivityReportWidgetSettings
  * @description Controller for track activity widget settings dialog
  */
-export function TrackActivityWidgetSettingsController($scope, desks, api, $rootScope, analyticsWidgetSettings) {
+export function TrackActivityWidgetSettingsController($scope, desks, api, $rootScope, analyticsWidgetSettings,
+    trackActivityReportWidgetSettings) {
     desks.initialize().then(() => {
         $scope.currentDesk = desks.getCurrentDesk();
         $scope.desks = desks.desks._items;
@@ -27,7 +29,11 @@ export function TrackActivityWidgetSettingsController($scope, desks, api, $rootS
      * @description Set the widget
      */
     this.setWidget = function(widget) {
-        $scope.widget = widget;
+        $scope.widget = trackActivityReportWidgetSettings.getSettings($scope.widget.multiple_id);
+        if (!$scope.widget) {
+            $scope.widget = widget;
+            trackActivityReportWidgetSettings.saveSettings($scope.widget);
+        }
         if ($scope.widget.configuration && $scope.widget.configuration.desk) {
             $scope.stages = $scope.widget.configuration.desk ?
                 desks.deskStages[$scope.widget.configuration.desk] : null;
@@ -95,6 +101,7 @@ export function TrackActivityWidgetSettingsController($scope, desks, api, $rootS
     $scope.save = function() {
         analyticsWidgetSettings.saveSettings($scope.widget)
         .then((settings) => {
+            trackActivityReportWidgetSettings.saveSettings($scope.widget);
             $rootScope.$broadcast('view:track_activity_widget', $scope.widget);
         });
         $scope.$close();

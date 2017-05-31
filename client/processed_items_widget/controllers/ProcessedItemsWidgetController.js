@@ -1,5 +1,5 @@
-ProcessedItemsWidgetController.$inject = ['$scope', '$rootScope', 'analyticsWidgetSettings',
-    'notify', 'processedItemsChart', '$interval', 'processedItemsReport', '$timeout'];
+ProcessedItemsWidgetController.$inject = ['$scope', '$rootScope', 'analyticsWidgetSettings', 'notify',
+    'processedItemsChart', '$interval', 'processedItemsReport', '$timeout', 'processedItemsReportWidgetSettings'];
 
 /**
  * @ngdoc controller
@@ -13,10 +13,11 @@ ProcessedItemsWidgetController.$inject = ['$scope', '$rootScope', 'analyticsWidg
  * @requires $interval
  * @requires processedItemsReport
  * @requires $timeout
+ * @requires processedItemsReportWidgetSettings
  * @description Controller for processed items widget
  */
-export function ProcessedItemsWidgetController($scope, $rootScope, analyticsWidgetSettings,
-    notify, processedItemsChart, $interval, processedItemsReport, $timeout) {
+export function ProcessedItemsWidgetController($scope, $rootScope, analyticsWidgetSettings, notify,
+    processedItemsChart, $interval, processedItemsReport, $timeout, processedItemsReportWidgetSettings) {
     const REGENERATE_INTERVAL = 60000;
 
     var self = this;
@@ -45,7 +46,10 @@ export function ProcessedItemsWidgetController($scope, $rootScope, analyticsWidg
      * @description Set the widget
      */
     this.setWidget = function(widget) {
-        self.widget = widget;
+        self.widget = processedItemsReportWidgetSettings.getSettings(widget.multiple_id);
+        if (!self.widget) {
+            self.widget = widget;
+        }
         $scope.renderTo = 'processed-items' + widget.multiple_id;
     };
 
@@ -75,7 +79,7 @@ export function ProcessedItemsWidgetController($scope, $rootScope, analyticsWidg
     $timeout($scope.generateChart, 0);
     resetInterval();
 
-    $rootScope.$on('view:processed_items_widget', (event, widget) => {
+    this.viewEventCleanup = $rootScope.$on('view:processed_items_widget', (event, widget) => {
         self.widget = widget;
         $scope.generateChart();
         resetInterval();
@@ -94,6 +98,10 @@ export function ProcessedItemsWidgetController($scope, $rootScope, analyticsWidg
         if (self.chart) {
             self.chart.destroy();
             self.chart = null;
+        }
+        if (self.viewEventCleanup) {
+            self.viewEventCleanup();
+            self.viewEventCleanup = null;
         }
     });
 }

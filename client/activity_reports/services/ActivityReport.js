@@ -13,8 +13,6 @@ ActivityReport.$inject = ['api', 'session', 'config', '$q'];
 export function ActivityReport(api, session, config, $q) {
     var toDelete = ['_id', '_etag', 'is_global', 'owner', 'name', 'description'];
 
-    this.config = null;
-
     /**
      * @ngdoc method
      * @name ActivityReport#generate
@@ -23,6 +21,10 @@ export function ActivityReport(api, session, config, $q) {
      * @description Generate the report
      */
     this.generate = function(activityReport) {
+        if (!activityReport) {
+            return $q.reject('Invalid report parameters');
+        }
+
         var query = _.clone(activityReport);
 
         try {
