@@ -4,7 +4,7 @@
             <div class="field">
                 <label for="days-ago" translate>Starting</label>
                 <select id="days-ago" ng-model="report.days_ago"
-                    ng-options="days_ago for days_ago in [1,2,3,4,5,6,7]">
+                    ng-options="days_ago for days_ago in [1,2,3,4,5,6,7]" required>
                 </select>
                 <label for="days-ago" translate>days ago</label>
             </div>
@@ -12,14 +12,14 @@
             <div class="field">
                 <label for="desk" translate>Desk</label>
                 <select id="desk" name="desk"
-                    ng-options="d._id as d.name for d in desks" ng-model="report.desk">
+                    ng-options="d._id as d.name for d in desks" ng-model="report.desk" required>
                 </select>
             </div>
 
             <div class="field" ng-if="report.desk">
                 <label for="stage" translate>Stage</label>
                 <select id="stage" name="stage"
-                    ng-options="s._id as s.name for s in stages" ng-model="report.stage">
+                    ng-options="s._id as s.name for s in stages" ng-model="report.stage" required>
                 </select>
             </div>
 

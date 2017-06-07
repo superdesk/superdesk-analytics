@@ -1,5 +1,5 @@
 TrackActivityWidgetSettingsController.$inject = ['$scope', 'desks', 'api', '$rootScope',
-    'analyticsWidgetSettings'];
+    'analyticsWidgetSettings', 'trackActivityReportWidgetSettings'];
 
 /**
  * @ngdoc controller
@@ -10,41 +10,38 @@ TrackActivityWidgetSettingsController.$inject = ['$scope', 'desks', 'api', '$roo
  * @requires api
  * @requires $rootScope
  * @requires analyticsWidgetSettings
+ * @requires trackActivityReportWidgetSettings
  * @description Controller for track activity widget settings dialog
  */
-export function TrackActivityWidgetSettingsController($scope, desks, api, $rootScope, analyticsWidgetSettings) {
-    var widgetType = 'track_activity',
-        daysAgoDefault = 2;
-
-    $scope.currentDesk = desks.getCurrentDesk();
-
-    $scope.desks = desks.desks._items;
+export function TrackActivityWidgetSettingsController($scope, desks, api, $rootScope, analyticsWidgetSettings,
+    trackActivityReportWidgetSettings) {
+    desks.initialize().then(() => {
+        $scope.currentDesk = desks.getCurrentDesk();
+        $scope.desks = desks.desks._items;
+    });
 
     $scope.users = [];
 
-    $scope.widget = {days_ago: daysAgoDefault};
-
     /**
      * @ngdoc method
-     * @name TrackActivityWidgetSettingsController#readSettings
-     * @description Reads widget settings
+     * @name TrackActivityWidgetSettingsController#setWidget
+     * @param {object} widget
+     * @description Set the widget
      */
-    var readSettings = function() {
-        analyticsWidgetSettings.readSettings(widgetType).then((settings) => {
-            $scope.widget = settings;
-            $scope.stages = desks.deskStages[$scope.widget.desk];
-            $scope.selectedUser = desks.userLookup[$scope.widget.user];
-        });
-    };
-
-    readSettings();
-
-    $scope.$watch('widget.desk', (deskId, oldDeskId) => {
-        if (deskId !== oldDeskId) {
-            $scope.stages = deskId ? desks.deskStages[deskId] : null;
-            $scope.widget.stage = null;
+    this.setWidget = function(widget) {
+        $scope.widget = trackActivityReportWidgetSettings.getSettings($scope.widget.multiple_id);
+        if (!$scope.widget) {
+            $scope.widget = widget;
+            trackActivityReportWidgetSettings.saveSettings($scope.widget);
         }
-    });
+        if ($scope.widget.configuration && $scope.widget.configuration.desk) {
+            $scope.stages = $scope.widget.configuration.desk ?
+                desks.deskStages[$scope.widget.configuration.desk] : null;
+        }
+        if ($scope.widget.configuration && $scope.widget.configuration.user) {
+            $scope.selectedUser = desks.userLookup[$scope.widget.configuration.user];
+        }
+    };
 
     /**
      * @ngdoc method
@@ -64,7 +61,6 @@ export function TrackActivityWidgetSettingsController($scope, desks, api, $rootS
         api.users.query(query).then((users) => {
             $scope.users = users._items;
         });
-        return $scope.users;
     };
 
     /**
@@ -75,7 +71,7 @@ export function TrackActivityWidgetSettingsController($scope, desks, api, $rootS
      */
     $scope.selectUser = function(user) {
         $scope.selectedUser = user;
-        $scope.widget.user = user._id;
+        $scope.widget.configuration.user = user._id;
     };
 
     /**
@@ -85,7 +81,7 @@ export function TrackActivityWidgetSettingsController($scope, desks, api, $rootS
      */
     $scope.removeUser = function() {
         $scope.selectedUser = null;
-        $scope.widget.user = null;
+        $scope.widget.configuration.user = null;
     };
 
     /**
@@ -103,10 +99,18 @@ export function TrackActivityWidgetSettingsController($scope, desks, api, $rootS
      * @description Saves the settings and closes the dialog
      */
     $scope.save = function() {
-        analyticsWidgetSettings.saveSettings(widgetType, $scope.widget)
-            .then(() => {
-                $rootScope.$broadcast('view:track_activity_widget');
-            });
+        analyticsWidgetSettings.saveSettings($scope.widget)
+        .then((settings) => {
+            trackActivityReportWidgetSettings.saveSettings($scope.widget);
+            $rootScope.$broadcast('view:track_activity_widget', $scope.widget);
+        });
         $scope.$close();
     };
+
+    $scope.$watch('widget.configuration.desk', (deskId, oldDeskId) => {
+        if (deskId !== oldDeskId) {
+            $scope.stages = deskId ? desks.deskStages[deskId] : null;
+            $scope.widget.configuration.stage = null;
+        }
+    });
 }

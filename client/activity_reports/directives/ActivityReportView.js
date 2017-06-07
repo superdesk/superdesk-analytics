@@ -1,4 +1,4 @@
-ActivityReportView.$inject = ['$location', 'asset'];
+ActivityReportView.$inject = ['$location', 'asset', 'activityChart', '$timeout'];
 
 /**
  * @ngdoc directive
@@ -8,32 +8,20 @@ ActivityReportView.$inject = ['$location', 'asset'];
  * @requires asset
  * @description A directive that displays the generated activity report
  */
-export function ActivityReportView($location, asset) {
+export function ActivityReportView($location, asset, activityChart, $timeout) {
     return {
         template: require('../views/activity-report-view.html'),
         scope: {},
         link: function(scope, element, attrs, controller) {
-            scope.showActivityReport = false;
-            scope.activityReport = null;
-            scope.reportType = null;
-
-            scope.$on('view:activity_report', (event, args) => {
-                scope.activityReport = args;
-                initActivityReport();
-            });
-
-            /**
-             * @ngdoc method
-             * @name sdActivityReportView#initActivityReport
-             * @description Initialises the activity report object
-             */
-            function initActivityReport() {
-                if (scope.activityReport.group_by instanceof Array && scope.activityReport.group_by[0] === 'desk') {
-                    scope.reportType = 'groupByDesk';
-                } else {
-                    scope.reportType = 'simple';
+            scope.$on('view:activity_report', (event, activityReport) => {
+                scope.activityReport = activityReport;
+                if (scope.chart) {
+                    scope.chart.destroy();
                 }
-            }
+                $timeout(() => {
+                    scope.chart = activityChart.createChart(activityReport, 'activity-report');
+                }, 0);
+            });
         }
     };
 }

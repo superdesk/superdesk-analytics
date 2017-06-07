@@ -45,8 +45,8 @@ export function SaveActivityReport($location, asset, api, session, notify, confi
                     originalActivityReport = activityReportEdit;
                 }
                 activityReportEdit.owner = session.identity._id;
-                activityReportEdit.operation_date_start = formatDate(activityReport.operation_date_start);
-                activityReportEdit.operation_date_end = formatDate(activityReport.operation_date_end);
+                activityReportEdit.operation_start_date = formatDate(activityReport.operation_start_date);
+                activityReportEdit.operation_end_date = formatDate(activityReport.operation_end_date);
                 $rootScope.$broadcast('savedactivityreport:update');
 
                 api('saved_activity_reports', session.identity).save(originalActivityReport, activityReportEdit)

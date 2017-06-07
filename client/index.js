@@ -14,11 +14,18 @@ import * as directive from './directives';
 import * as ctrl from './controllers';
 
 import './activity_reports';
+import './activity-widget';
 import './processed_items_report';
 import './processed_items_widget';
 import './track_activity_report';
 import './track_activity_widget';
 
+
+var Highcharts = require('highcharts');
+
+require('highcharts-more')(Highcharts);
+require('highcharts/modules/exporting')(Highcharts);
+require('highcharts/modules/data')(Highcharts);
 
 function cacheIncludedTemplates($templateCache) {
     $templateCache.put('activity-report.html', require('./activity_reports/views/activity-report.html'));
@@ -40,8 +47,9 @@ cacheIncludedTemplates.$inject = ['$templateCache'];
 export default angular.module('superdesk.analytics', [
     'superdesk.analytics.activity-report', 'superdesk.analytics.processed-items-report',
     'superdesk.analytics.processed-items-widget', 'superdesk.analytics.track-activity-report',
-    'superdesk.analytics.track-activity-widget'
+    'superdesk.analytics.track-activity-widget', 'superdesk.analytics.activity-report-widget'
 ])
+    .value('Highcharts', Highcharts)
 
     .service('analyticsWidgetSettings', svc.AnalyticsWidgetSettings)
 

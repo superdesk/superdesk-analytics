@@ -18,6 +18,7 @@ from superdesk.metadata.item import metadata_schema
 from superdesk.resource import Resource
 from superdesk.utils import format_date
 from eve.default_settings import ID_FIELD
+from superdesk.errors import SuperdeskApiError
 
 
 class ActivityReportResource(Resource):
@@ -25,10 +26,10 @@ class ActivityReportResource(Resource):
     """
 
     schema = {
-        'desk': Resource.rel('desks', nullable=True),
-        'operation': {'type': 'string'},
-        'operation_date_start': {'type': 'datetime'},
-        'operation_date_end': {'type': 'datetime'},
+        'operation': {'type': 'string', 'required': True},
+        'desk': Resource.rel('desks'),
+        'operation_start_date': {'type': 'datetime', 'required': True},
+        'operation_end_date': {'type': 'datetime', 'required': True},
         'subject': metadata_schema['subject'],
         'keywords': metadata_schema['keywords'],
         'category': metadata_schema['anpa_category'],
@@ -45,10 +46,12 @@ class ActivityReportResource(Resource):
     item_methods = ['GET', 'DELETE']
     resource_methods = ['POST']
 
-    privileges = {'POST': 'activity_reports', 'DELETE': 'activity_reports', 'GET': 'activity_reports'}
+    privileges = {'POST': 'activity_report', 'DELETE': 'activity_report', 'GET': 'activity_report'}
 
 
 class ActivityReportService(BaseService):
+    hourly_treshold = 2
+
     def set_query_terms(self, report):
         """Check if some fields are filled out before generating the report and initiate the filter
         """
@@ -61,9 +64,9 @@ class ActivityReportService(BaseService):
         if report.get('keywords'):
             key = [x.lower() for x in report['keywords']]
             terms.append({'terms': {'keywords': key}})
-        if report.get('operation_date_start') and report.get('operation_date_end'):
-            op_date_start = format_date(report['operation_date_start'])
-            op_date_end = format_date(report['operation_date_end'])
+        if report.get('operation_start_date') and report.get('operation_end_date'):
+            op_date_start = format_date(report['operation_start_date'])
+            op_date_end = format_date(report['operation_end_date'])
             terms.append({'range': {'versioncreated': {'gte': op_date_start, 'lte': op_date_end}}})
         if report.get('category'):
             categories = [category['qcode'] for category in report['category']]
@@ -103,7 +106,40 @@ class ActivityReportService(BaseService):
                 }
             }
         }
-        return {'items': self.get_items(query).count()}
+
+        items = self.get_items(query)
+
+        diff_days = report['operation_end_date'] - report['operation_start_date']
+        if diff_days.days < self.hourly_treshold:
+            report = {'total': items.count(), 'items_per_hour': self.get_items_hourly(items)}
+        else:
+            report = {'total': items.count(), 'items_per_day': self.get_items_daily(items)}
+
+        return report
+
+    def get_items_daily(self, items):
+        new_format = "%Y-%m-%d"
+        dict_of_days = {}
+
+        if 'aggregations' in items.hits and 'items_over_days' in items.hits['aggregations']:
+            days_buckets = items.hits['aggregations']['items_over_days']['buckets']
+
+            for d in days_buckets:
+                days = datetime.strptime(d['key_as_string'], "%Y-%m-%dT%H:%M:%S.%fZ")
+                dict_of_days[days.strftime(new_format)] = d['doc_count']
+        return dict_of_days
+
+    def get_items_hourly(self, items):
+        new_format = "%Y-%m-%d %H:00"
+        dict_of_hours = {}
+
+        if 'aggregations' in items.hits and 'items_over_hours' in items.hits['aggregations']:
+            hours_buckets = items.hits['aggregations']['items_over_hours']['buckets']
+
+            for hour in hours_buckets:
+                hours = datetime.strptime(hour['key_as_string'], "%Y-%m-%dT%H:%M:%S.%fZ")
+                dict_of_hours[hours.strftime(new_format)] = hour['doc_count']
+            return dict_of_hours
 
     def search_items_with_groupping(self, report):
         """Return the report without grouping by desk
@@ -135,7 +171,20 @@ class ActivityReportService(BaseService):
                 return desk_stats['doc_count']
         return 0
 
+    def _validate_start_end_dates(self, doc):
+        try:
+            if doc['operation_start_date'] > doc['operation_end_date']:
+                raise SuperdeskApiError.badRequestError('Operation end date must be '
+                                                        'greater than the operation start date')
+        except TypeError:
+            raise SuperdeskApiError.badRequestError("Dates must be in ISO 8601 format without timezone")
+
     def create(self, docs):
+        for doc in docs:
+            self._validate_start_end_dates(doc)
+            if 'group_by' not in doc and 'desk' not in doc:
+                raise SuperdeskApiError.badRequestError('The desk is required')
+
         for doc in docs:
             doc['timestamp'] = datetime.now()
             if doc.get('group_by'):

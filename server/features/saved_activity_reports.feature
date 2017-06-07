@@ -13,8 +13,8 @@ Feature: Saved Activity Reports
         {
         	"operation": "publish",
         	"desk": "#desks._id#",
-        	"operation_date_start": "2016-02-13",
-        	"operation_date_end": "2016-02-13",
+        	"operation_start_date": "2016-02-13",
+        	"operation_end_date": "2016-02-13",
         	"name": "report1",
         	"description": "activity report",
         	"is_global": true
@@ -25,8 +25,8 @@ Feature: Saved Activity Reports
         {
         	"operation": "publish",
         	"desk": "#desks._id#",
-        	"operation_date_start": "2016-02-13T00:00:00+0000",
-        	"operation_date_end": "2016-02-13T00:00:00+0000",
+        	"operation_start_date": "2016-02-13T00:00:00+0000",
+        	"operation_end_date": "2016-02-13T00:00:00+0000",
         	"name": "report1",
         	"description": "activity report",
         	"is_global": true

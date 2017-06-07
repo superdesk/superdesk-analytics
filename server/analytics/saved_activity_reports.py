@@ -38,11 +38,11 @@ class SavedActivityReportResource(Resource):
             'required': True
         },
         'desk': Resource.rel('desks', nullable=True),
-        'operation_date_start': {
+        'operation_start_date': {
             'type': 'datetime',
             'required': True
         },
-        'operation_date_end': {
+        'operation_end_date': {
             'type': 'datetime',
             'required': True
         },
@@ -60,8 +60,8 @@ class SavedActivityReportResource(Resource):
     }
     item_methods = ['GET', 'PATCH', 'PUT', 'DELETE']
     resource_methods = ['GET', 'POST']
-    privileges = {'POST': 'activity_reports', 'PATCH': 'activity_reports',
-                  'PUT': 'activity_reports', 'DELETE': 'activity_reports'}
+    privileges = {'POST': 'activity_report', 'PATCH': 'activity_report',
+                  'PUT': 'activity_report', 'DELETE': 'activity_report'}
 
 
 class SavedActivityReportService(BaseService):
