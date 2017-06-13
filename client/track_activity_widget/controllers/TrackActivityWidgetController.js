@@ -53,6 +53,7 @@ export function TrackActivityWidgetController($scope, $rootScope, api, session, 
         self.widget = trackActivityReportWidgetSettings.getSettings(widget.multiple_id);
         if (!self.widget) {
             self.widget = widget;
+        }
         $scope.renderTo = 'track-activity' + self.widget.multiple_id;
     };
 

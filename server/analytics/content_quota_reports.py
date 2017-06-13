@@ -25,7 +25,7 @@ class ContentQuotaReportResource(Resource):
     """
 
     schema = {
-        'start_time': {'type': 'datetime'},
+        'start_time': {'type': 'datetime', 'required': False, 'nullable': True},
         'subject': metadata_schema['subject'],
         'keywords': metadata_schema['keywords'],
         'category': metadata_schema['anpa_category'],
@@ -37,27 +37,30 @@ class ContentQuotaReportResource(Resource):
     item_methods = ['GET', 'DELETE']
     resource_methods = ['POST']
 
-    privileges = {'POST': 'content_quota_reports', 'DELETE': 'content_quota_reports', 'GET': 'content_quota_reports'}
+    privileges = {'POST': 'content_quota_report', 'DELETE': 'content_quota_report',
+                  'GET': 'content_quota_report'}
 
 
 class ContentQuotaReportService(BaseService):
 
-    intervalLengthDefault = 5
-    noOfIntervalsDefault = 1
+    interval_length_default = 5
+    no_of_intervals_default = 1
 
     def set_query_terms(self, report):
         """Check if some fields are filled out before generating the report and initiate the filter
         """
-
-        start_time = format_date(report['start_time'])
+        start_time = report['start_time'] if 'start_time' in report else datetime.now()
         interval_length = timedelta(int(report['interval_length'])
-                                    if report.get('interval_length') else self.intervalLengthDefault)
-        noOfIntervals = report['intervals_number'] if report.get('intervals_number') else self.noOfIntervalsDefault
-        end_time = format_date((report['start_time'] - interval_length * noOfIntervals)
+                                    if report.get('interval_length') else self.interval_length_default)
+        no_of_intervals = report['intervals_number'] if report.get('intervals_number') \
+            else self.no_of_intervals_default
+        end_time = format_date((start_time - interval_length * no_of_intervals)
                                .replace(hour=0, minute=0, second=0, microsecond=0))
 
         terms = [
-            {'range': {'_updated': {'lte': start_time, 'gte': end_time}}}
+            {'range': {'_updated': {'lte': format_date(start_time), 'gte': end_time}}},
+            {'term': {'operation': 'publish'}},
+            {'not': {'term': {'package_type': 'takes'}}}
         ]
 
         if report.get('subject'):
@@ -76,7 +79,7 @@ class ContentQuotaReportService(BaseService):
         """Return the result of the item search by the given query
         """
         request = ParsedRequest()
-        request.args = {'source': json.dumps(query), 'repo': 'archive,published,archived,ingest'}
+        request.args = {'source': json.dumps(query), 'repo': 'published'}
         return get_resource_service('search').get(req=request, lookup=None)
 
     def generate_report(self, doc):
@@ -88,12 +91,14 @@ class ContentQuotaReportService(BaseService):
         """
 
         interval_length = timedelta(int(doc['interval_length'])
-                                    if doc.get('interval_length') else self.intervalLengthDefault)
-        noOfIntervals = doc['intervals_number'] if doc.get('intervals_number') else self.noOfIntervalsDefault
+                                    if doc.get('interval_length') else self.interval_length_default)
+        no_of_intervals = doc['intervals_number'] if doc.get('intervals_number') \
+            else self.no_of_intervals_default
 
+        start_time = doc['start_time'] if 'start_time' in doc else datetime.now()
         time_intervals = []
-        for i in range(noOfIntervals + 1):
-            time_intervals.append(doc['start_time'] - interval_length * i)
+        for i in range(no_of_intervals + 1):
+            time_intervals.append(start_time - interval_length * i)
 
         terms = self.set_query_terms(doc)
         query = {

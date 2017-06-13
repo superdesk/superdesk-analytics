@@ -24,10 +24,9 @@ Feature: Content Quota
         """
 	    When we publish "#archive._id#" with "publish" type and "published" state
 	    Then we get OK response
-        When we post to "/content_quota_reports" with success
+        When we post to "/content_quota_report" with success
         """
         {
-        	"start_time": "2017-06-20T09:03:26+0000",
         	"subject":[{"qcode": "05007000", "name": "university"}],
         	"keywords": ["UNIVERSITY"],
         	"category": [{"name": "arts, culture and entertainment" , "qcode": "01000000"}],
@@ -39,15 +38,14 @@ Feature: Content Quota
         Then we get existing resource
         """
         {
-        	"start_time": "2017-06-20T09:03:26+0000",
         	"subject":[{"qcode": "05007000", "name": "university"}],
         	"keywords": ["UNIVERSITY"],
         	"category": [{"name": "arts, culture and entertainment" , "qcode": "01000000"}],
         	"intervals_number": 2,
         	"interval_length": 15,
         	"target": 1,
-        	"report": [{"end_time": "2017-06-05T09:03:26+0000", "start_time": "2017-06-20T09:03:26+0000" },
-        		{"end_time": "2017-05-21T09:03:26+0000", "start_time": "2017-06-05T09:03:26+0000", "items_total": 2}
+        	"report": [{"end_time": "__any_value__", "start_time": "__any_value__" },
+        		{"end_time": "__any_value__", "start_time": "__any_value__", "items_total": 1}
         	]
         }
         """

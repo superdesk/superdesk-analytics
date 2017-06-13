@@ -1,6 +1,6 @@
 /**
  * @ngdoc directive
- * @module superdesk.apps.analytics.content-quota-reports
+ * @module superdesk.apps.analytics.content-quota-report
  * @name sdContentQuotaReportContainer
  * @description Container directive
  */

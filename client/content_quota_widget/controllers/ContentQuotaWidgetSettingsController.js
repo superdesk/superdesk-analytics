@@ -1,5 +1,5 @@
-ContentQuotaWidgetSettingsController.$inject = ['$scope', 'desks', 'api', '$rootScope',
-    'analyticsWidgetSettings'];
+ContentQuotaWidgetSettingsController.$inject = ['$scope', 'desks', 'api', '$rootScope', 'analyticsWidgetSettings',
+    'contentQuotaReportWidgetSettings'];
 
 /**
  * @ngdoc controller
@@ -10,26 +10,27 @@ ContentQuotaWidgetSettingsController.$inject = ['$scope', 'desks', 'api', '$root
  * @requires api
  * @requires $rootScope
  * @requires analyticsWidgetSettings
+ * @requires contentQuotaReportWidgetSettings
  * @description Controller for track activity widget settings dialog
  */
-export function ContentQuotaWidgetSettingsController($scope, desks, api, $rootScope, analyticsWidgetSettings) {
-    var widgetType = 'content_quota';
-
-    $scope.widget = {};
-
-
+export function ContentQuotaWidgetSettingsController($scope, desks, api, $rootScope, analyticsWidgetSettings,
+    contentQuotaReportWidgetSettings) {
     /**
      * @ngdoc method
-     * @name ContentQuotaWidgetSettingsController#readSettings
-     * @description Reads widget settings
+     * @name ContentQuotaWidgetSettingsController#setWidget
+     * @param {object} widget
+     * @description Set the widget
      */
-    var readSettings = function() {
-        analyticsWidgetSettings.readSettings(widgetType).then((settings) => {
-            $scope.widget = settings;
-        });
+    this.setWidget = function(widget) {
+        $scope.widget = contentQuotaReportWidgetSettings.getSettings($scope.widget.multiple_id);
+        if (!$scope.widget) {
+            $scope.widget = widget;
+            contentQuotaReportWidgetSettings.saveSettings($scope.widget);
+        }
+        if (!$scope.widget.configuration) {
+            $scope.widget.configuration = {};
+        }
     };
-
-    readSettings();
 
     /**
      * @ngdoc method
@@ -46,10 +47,11 @@ export function ContentQuotaWidgetSettingsController($scope, desks, api, $rootSc
      * @description Saves the settings and closes the dialog
      */
     $scope.save = function() {
-        analyticsWidgetSettings.saveSettings(widgetType, $scope.widget)
-            .then(() => {
-                $rootScope.$broadcast('view:content_quota_widget');
-            });
+        analyticsWidgetSettings.saveSettings($scope.widget)
+        .then((settings) => {
+            contentQuotaReportWidgetSettings.saveSettings($scope.widget);
+            $rootScope.$broadcast('view:content_quota_widget', $scope.widget);
+        });
         $scope.$close();
     };
 }

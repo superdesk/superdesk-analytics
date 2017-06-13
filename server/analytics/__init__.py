@@ -44,5 +44,5 @@ def init_app(app):
     superdesk.privilege(name='track_activity_report', label='Track Activity Report View')
     superdesk.privilege(name='processed_items_report', label='Processed Items Report View',
                         description='User can view activity reports.')
-    superdesk.privilege(name='content_quota_reports', label='Content Quota Report View',
+    superdesk.privilege(name='content_quota_report', label='Content Quota Report View',
                         description='User can view content v quota reports.')

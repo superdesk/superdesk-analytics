@@ -47,11 +47,6 @@ export function ProcessedItemsChart(Highcharts, gettext) {
                     text: gettext('Items No')
                 }
             },
-            yAxis: {
-                title: {
-                    text: 'Items No'
-                }
-            },
             series: series
         };
 

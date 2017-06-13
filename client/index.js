@@ -18,8 +18,9 @@ import './activity-widget';
 import './processed_items_report';
 import './processed_items_widget';
 import './track_activity_report';
-import './content_quota_reports';
 import './track_activity_widget';
+import './content_quota_report';
+import './content_quota_widget';
 
 
 var Highcharts = require('highcharts');
@@ -34,7 +35,7 @@ function cacheIncludedTemplates($templateCache) {
         require('./processed_items_report/views/processed-items-report.html'));
     $templateCache.put('track-activity-report.html',
         require('./track_activity_report/views/track-activity-report.html'));
-    $templateCache.put('content-quota-report.html', require('./content_quota_reports/views/content-quota-report.html'));
+    $templateCache.put('content-quota-report.html', require('./content_quota_report/views/content-quota-report.html'));
 }
 cacheIncludedTemplates.$inject = ['$templateCache'];
 
@@ -50,7 +51,7 @@ export default angular.module('superdesk.analytics', [
     'superdesk.analytics.activity-report', 'superdesk.analytics.processed-items-report',
     'superdesk.analytics.processed-items-widget', 'superdesk.analytics.track-activity-report',
     'superdesk.analytics.track-activity-widget', 'superdesk.analytics.activity-report-widget',
-    'superdesk.analytics.content-quota-report'
+    'superdesk.analytics.content-quota-report', 'superdesk.analytics.content-quota-widget'
 ])
     .value('Highcharts', Highcharts)
 

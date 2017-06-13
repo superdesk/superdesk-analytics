@@ -1,82 +1,30 @@
-ContentQuotaWidgetController.$inject = ['config', '$scope', '$rootScope', 'api', 'session', 'analyticsWidgetSettings',
-    'desks', 'notify', 'contentQuotaChart', '$interval'];
+ContentQuotaWidgetController.$inject = ['$scope', '$rootScope', 'notify', '$interval', '$timeout',
+    'contentQuotaReport', 'contentQuotaChart', 'contentQuotaReportWidgetSettings'];
 
 /**
  * @ngdoc controller
- * @module superdesk.apps.analytics.track-activity-widget
- * @name TrackActivityWidgetController
+ * @module superdesk.apps.analytics.content-quota-widget
+ * @name ContentQuotaWidgetController
  * @requires $scope
  * @requires $rootScope
- * @requires api
- * @requires session
- * @requires analyticsWidgetSettings
- * @requires desks
  * @requires notify
- * @requires trackActivityChart
  * @requires $interval
- * @description Controller for track activity widget
+ * @requires $timeout
+ * @requires contentQuotaReport
+ * @requires contentQuotaChart
+ * @requires contentQuotaReportWidgetSettings
+ * @description Controller for content quota widget
  */
-export function ContentQuotaWidgetController(config, $scope, $rootScope, api, session, analyticsWidgetSettings,
-    desks, notify, contentQuotaChart, $interval) {
-    var widgetType = 'content_quota',
-        regenerateInterval = 60000,
-        interval = null;
+export function ContentQuotaWidgetController($scope, $rootScope, notify, $interval, $timeout,
+    contentQuotaReport, contentQuotaChart, contentQuotaReportWidgetSettings) {
+    const REGENERATE_INTERVAL = 60000;
 
-    /**
-     * @ngdoc method
-     * @name ContentQuotaWidgetController#getSettings
-     * @description Read widget settings
-     */
-    var getSettings = function() {
-        return analyticsWidgetSettings.readSettings(widgetType).then((preferences) => {
-            $scope.widget = preferences;
-            return $scope.widget;
-        });
-    };
-    var formatDate = function(date) {
-        return date ? moment(date, config.model.dateformat).format('YYYY-MM-DD') : null; // jshint ignore:line
-    };
-    /**
-     * @ngdoc method
-     * @name ContentQuotaWidgetController#generateReport
-     * @description Generate the report
-     */
-    var generateReport = function() {
-        function onSuccess(contentQuotaReport) {
-            $scope.contentQuotaReport = contentQuotaReport;
-            return $scope.contentQuotaReport;
-        }
+    var self = this;
 
-        function onFail(error) {
-            if (angular.isDefined(error.data._message)) {
-                notify.error(error.data._message);
-            } else {
-                notify.error(gettext('Error. The report could not be generated.'));
-            }
-        }
-
-        return getSettings().then((settings) => {
-            var req;
-
-            req = _.clone(settings);
-            req.start_time = formatDate(req.start_time);
-            return api('content_quota_reports', session.identity).save({}, req)
-                    .then(onSuccess, onFail);
-        });
-    };
-
-    /**
-     * @ngdoc method
-     * @name ContentQuotaWidgetController#generateChart
-     * @description Generate the chart
-     */
-    var generateChart = function() {
-        generateReport().then((contentQuotaReport) => {
-            $scope.contentQuotaReport = contentQuotaReport;
-            contentQuotaChart.createChart(contentQuotaReport, 'containerq');
-        });
-    };
-
+    this.widget = null;
+    this.interval = null;
+    this.chart = null;
+    $scope.renderTo = null;
 
     /**
      * @ngdoc method
@@ -84,24 +32,71 @@ export function ContentQuotaWidgetController(config, $scope, $rootScope, api, se
      * @description Reset the periodic generation of the chart
      */
     var resetInterval = function() {
-        if (angular.isDefined(interval)) {
-            $interval.cancel(interval);
+        if (angular.isDefined(self.interval)) {
+            $interval.cancel(self.interval);
         }
-        interval = $interval(generateChart, regenerateInterval);
+        self.interval = $interval($scope.generateChart, REGENERATE_INTERVAL);
     };
 
-    resetInterval();
-    generateChart();
+    /**
+     * @ngdoc method
+     * @name ContentQuotaWidgetController#resetChart
+     * @description Reset the chart variable
+     */
+    var resetChart = function(newChart) {
+        if (self.chart) {
+            self.chart.destroy();
+        }
+        self.chart = newChart;
+    };
 
+    /**
+     * @ngdoc method
+     * @name ContentQuotaWidgetController#setWidget
+     * @param {object} widget
+     * @description Set the widget
+     */
+    this.setWidget = function(widget) {
+        self.widget = contentQuotaReportWidgetSettings.getSettings(widget.multiple_id);
+        if (!self.widget) {
+            self.widget = widget;
+        }
+        $scope.renderTo = 'content-quota' + self.widget.multiple_id;
+    };
+
+    /**
+     * @ngdoc method
+     * @name ContentQuotaWidgetController#generateChart
+     * @description Generate the chart
+     */
+    $scope.generateChart = function() {
+        function onFail(error) {
+            if (angular.isDefined(error.data._message)) {
+                notify.error(error.data._message);
+            } else {
+                notify.error(gettext('Error. The content quota report could not be generated.'));
+            }
+        }
+
+        return contentQuotaReport.generate(self.widget.configuration)
+        .then((contentQuotaReport) => {
+            resetChart(contentQuotaChart.createChart(contentQuotaReport, $scope.renderTo));
+        }, onFail);
+    };
+
+    $timeout($scope.generateChart, 0);
+    resetInterval();
 
     $scope.$on('view:content_quota_widget', (event, args) => {
         resetInterval();
-        generateChart();
+        $scope.generateChart();
     });
 
     $scope.$on('$destroy', () => {
-        if (angular.isDefined(interval)) {
-            $interval.cancel(interval);
+        if (angular.isDefined(self.interval)) {
+            $interval.cancel(self.interval);
+            self.interval = null;
         }
+        resetChart(null);
     });
 }

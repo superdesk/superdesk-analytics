@@ -2,10 +2,10 @@
     <form name="contentQuotaReportForm">
         <fieldset class="report-parameters">
             <div class="field">
-                    <label for="parameters-date_start" translate>From</label>
-                    <div sd-datepicker ng-model="report.start_time"
-                         id="parameters-operation_date_start" required></div>
-                </div>
+                <label for="parameters-date_start" translate>From</label>
+                <div sd-datepicker ng-model="report.start_time"
+                     id="parameters-operation_date_start"></div>
+            </div>
             <div class="field">
                 <label for="intervals-number" translate>No of intervals</label>
                 <select id="intervals-number" ng-model="report.intervals_number"
@@ -21,33 +21,32 @@
             <div class="field"
                  sd-validation-error="error.subject">
                 <label for="parameters-subject">{{:: 'Subject' | translate}}</label>
-              <div id="parameters-subject"
-                   sd-meta-terms
-                   class="data"
-                   data-item="report"
-                   data-field="subject"
-                   data-unique="qcode"
-                   data-list="metadata.subjectcodes"
-                   data-header="true"
-                   data-reload-list="true">
-              </div>
+                <div id="parameters-subject"
+                     sd-meta-terms
+                     class="data"
+                     data-item="report"
+                     data-field="subject"
+                     data-unique="qcode"
+                     data-list="metadata.subjectcodes"
+                     data-header="true"
+                     data-reload-list="true">
+                </div>
             </div>
 
             <div class="field"
                  sd-validation-error="error.category">
                 <label for="parameters-category">{{:: 'Category' | translate}}</label>
-              <div id="parameters-category"
-                   sd-meta-terms
-                   class="data"
-                   data-item="report"
-                   data-field="category"
-                   data-unique="qcode"
-                   data-list="metadata.categories"
-                   data-header="true"
-                   data-reload-list="true">
-              </div>
+                <div id="parameters-category"
+                     sd-meta-terms
+                     class="data"
+                     data-item="report"
+                     data-field="category"
+                     data-unique="qcode"
+                     data-list="metadata.categories"
+                     data-header="true"
+                     data-reload-list="true">
+                </div>
             </div>
-
 
             <div class="field">
                 <label for="parameters-keywords">{{:: 'Keywords' | translate}}</label>
@@ -62,14 +61,14 @@
 
             <div class="field">
                 <label for="target" translate>Target Quota</label>
-                <input type="integer" id="target" ng-model="target">
+                <input type="integer" id="target" ng-model="report.target" required>
             </div>
 
         </fieldset>&nbsp;
     </form>
 
     <div>
-        <button id="generate_content_quota_reports" class="btn btn--primary" ng-click="generate()"
+        <button id="generate_content_quota_report" class="btn btn--primary" ng-click="generate()"
             ng-disabled="!contentQuotaReportForm.$valid" translate>Generate</button>
     </div>
 </div>

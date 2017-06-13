@@ -41,6 +41,7 @@ export function ProcessedItemsReportView(api, session, processedItemsChart, $int
                         });
                 }
             };
+
             /**
              * @ngdoc method
              * @name sdProcessedItemsReportView#resetInterval
