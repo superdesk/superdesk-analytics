@@ -69,6 +69,6 @@
     "node-sass": "^3.10.1",
     "sass-loader": "^4.0.2",
     "sinon": "^2.0.0-pre.2",
-    "superdesk-core": "superdesk/superdesk-client-core#bdd61cbc3"
+    "superdesk-core": "superdesk/superdesk-client-core#6c679fd"
   }
 }
