@@ -64,14 +64,16 @@ export default angular.module('superdesk.analytics', [
     .run(cacheIncludedTemplates)
 
     .config(['superdeskProvider', function(superdesk) {
-        superdesk.activity('analytics', {
+        superdesk.activity('/analytics', {
             label: gettext('Analytics'),
+            description: gettext('View analytics reports'),
             when: '/analytics',
             controller: 'AnalyticsController',
             template: require('./views/analytics.html'),
-            topTemplateUrl: 'scripts/apps/dashboard/views/workspace-topnav.html',
             sideTemplateUrl: 'scripts/apps/workspace/views/workspace-sidenav.html',
-            category: 'analytics',
-            priority: -800
+            category: superdesk.MENU_MAIN,
+            priority: 100,
+            adminTools: false,
+            filters: []
         });
     }]);
