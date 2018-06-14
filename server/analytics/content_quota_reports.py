@@ -112,6 +112,7 @@ class ContentQuotaReportService(BaseService):
         }
 
         items = self.get_items(query)
+        items_over_day_buckets = []
         if 'aggregations' in items.hits and 'items_over_days' in items.hits['aggregations']:
             items_over_day_buckets = items.hits['aggregations']['items_over_days']['buckets']
         i = 0
