@@ -1,4 +1,4 @@
-ContentQuotaReportPanel.$inject = [
+ContentQuotaReportForm.$inject = [
     'config', 'api', 'session', 'metadata', 'notify', '$rootScope', 'desks', 'contentQuotaReport'
 ];
 
@@ -15,10 +15,14 @@ ContentQuotaReportPanel.$inject = [
  * @requires contentQuotaReport
  * @description A directive that generates the sidebar containing content quota reports parameters
  */
-export function ContentQuotaReportPanel(config, api, session, metadata, notify, $rootScope, desks, contentQuotaReport) {
+export function ContentQuotaReportForm(config, api, session, metadata, notify, $rootScope, desks, contentQuotaReport) {
     return {
-        template: require('../views/content-quota-report-panel.html'),
-        scope: {},
+        template: require('../views/content-quota-report-form.html'),
+        scope: {
+            form: '=',
+            report: '=',
+            showFilters: '@'
+        },
         link: function(scope, element, attrs, controller) {
             var noOfIntervalsDefault = 7,
                 intervalLengthDefault = 1;
@@ -29,7 +33,16 @@ export function ContentQuotaReportPanel(config, api, session, metadata, notify, 
              * @description Initialises the content quota report object
             */
             scope.init = function() {
-                scope.report = {intervals_number: noOfIntervalsDefault, interval_length: intervalLengthDefault};
+                if (!scope.report) {
+                    scope.report = {};
+                }
+                if (!scope.report.intervals_number) {
+                    scope.report.intervals_number = noOfIntervalsDefault;
+                }
+                if (!scope.report.interval_length) {
+                    scope.report.interval_length = intervalLengthDefault;
+                }
+                scope.form = scope.contentQuotaReportForm;
             };
 
             metadata.initialize().then(() => {

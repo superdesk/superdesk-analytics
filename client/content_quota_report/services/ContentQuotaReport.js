@@ -25,8 +25,8 @@ export function ContentQuotaReport(api, session, config, $q) {
         }
         var query = angular.copy(reportParams);
 
-        if (query.start_time) {
-            query.start_time = formatDate(query.start_time);
+        if (query.end_date) {
+            query.end_date = formatDate(query.end_date);
         }
         toDelete.forEach((field) => {
             delete query[field];
@@ -42,20 +42,14 @@ export function ContentQuotaReport(api, session, config, $q) {
      * @returns {String}|null
      * @description Format given date for generate
      */
-    function formatDate(date, addDays) {
+    function formatDate(date) {
         if (date) {
             var timestamp = moment(date, config.model.dateformat, true);
 
             if (!timestamp.isValid()) {
                 timestamp = moment(date);
             }
-            timestamp = moment(timestamp)
-            .subtract(moment().utcOffset(), 'minutes');
-
-            if (addDays) {
-                timestamp.add(addDays, 'days').subtract(1, 'seconds');
-            }
-            return timestamp.format('YYYY-MM-DDTHH:mm:ss');
+            return timestamp.format('YYYY-MM-DD');
         }
         return null;
     }

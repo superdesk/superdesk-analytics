@@ -54,7 +54,7 @@ export function ContentQuotaChart(_, Highcharts) {
                     start: formatDate(item.start_time),
                     end: formatDate(item.end_time)});
             }
-            categories.push(formatDate(item.end_time) + ' : ' + formatDate(item.start_time));
+            categories.push(formatDate(item.start_time) + ' : ' + formatDate(item.end_time));
         });
 
         var chartData = {
