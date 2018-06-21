@@ -14,6 +14,14 @@ ProcessedItemsWidgetSettingsController.$inject = ['$scope', 'api', '$rootScope',
  */
 export function ProcessedItemsWidgetSettingsController($scope, api, $rootScope, analyticsWidgetSettings,
     processedItemsReportWidgetSettings) {
+    let defaultReport = {time_interval: {measure: 'days', count: 1}, users: []};
+
+    $scope.validForm = false;
+
+    function isConfigurationInitialized(widget) {
+        return widget && widget.configuration && widget.configuration.users && widget.configuration.time_interval;
+    }
+
     /**
      * @ngdoc method
      * @name ActivityWidgetSettingsController#setWidget
@@ -22,6 +30,9 @@ export function ProcessedItemsWidgetSettingsController($scope, api, $rootScope, 
      */
     this.setWidget = function(widget) {
         $scope.widget = processedItemsReportWidgetSettings.getSettings($scope.widget.multiple_id);
+        if ($scope.widget && !isConfigurationInitialized($scope.widget)) {
+            $scope.widget.configuration = defaultReport;
+        }
         if (!$scope.widget) {
             $scope.widget = widget;
             processedItemsReportWidgetSettings.saveSettings($scope.widget);
@@ -94,11 +105,6 @@ export function ProcessedItemsWidgetSettingsController($scope, api, $rootScope, 
                 $scope.widget.configuration.users.splice(i, 1);
             }
         }
-    };
-
-    $scope.validForm = function() {
-        return $scope.processedItemsReportForm.$valid && $scope.widget.configuration &&
-            $scope.widget.configuration.users.length > 0;
     };
 
     /**

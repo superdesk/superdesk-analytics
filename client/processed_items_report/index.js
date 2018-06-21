@@ -23,6 +23,7 @@ angular.module('superdesk.analytics.processed-items-report', [])
     .service('processedItemsReport', svc.ProcessedItemsReport)
 
     .directive('sdProcessedItemsReportContainer', directive.ProcessedItemsReportContainer)
+    .directive('sdProcessedItemsReportForm', directive.ProcessedItemsReportForm)
     .directive('sdProcessedItemsReportPanel', directive.ProcessedItemsReportPanel)
     .directive('sdProcessedItemsReportView', directive.ProcessedItemsReportView)
 

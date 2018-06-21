@@ -46,8 +46,10 @@ Feature: Processed published items
 	        		"_id": "#users._id#",
 	        		"display_name": "#users.display_name#"
         	}],
-        	"start_time": "2017-01-02T09:03:26+0000",
-        	"end_time": "2018-02-22T09:03:26+0000"
+        	"time_interval": {
+        		"count": 2,
+        		"measure": "days"
+        	}
         }
         """
         Then we get existing resource
@@ -59,8 +61,10 @@ Feature: Processed published items
         	{"_id": "#users._id#",
         	"display_name": "#users.display_name#"
         }],
-        "start_time": "2017-01-02T09:03:26+0000",
-        "end_time": "2018-02-22T09:03:26+0000",
+        "time_interval": {
+            "count": 2,
+            "measure": "days"
+        },
         "report": [{
         	"user": 
 	        	{
@@ -125,8 +129,10 @@ Feature: Processed published items
 	        	{"_id": "#users._id#",
 	        	"display_name": "#users.display_name#"
         	}],
-        	"start_time": "2017-01-02T09:03:26+0000",
-        	"end_time": "2018-02-22T09:03:26+0000"
+	        "time_interval": {
+	            "count": 2,
+	            "measure": "days"
+	        }
         }
         """
         Then we get existing resource
@@ -138,8 +144,10 @@ Feature: Processed published items
 	        	{"_id": "#users._id#",
 	        	"display_name": "#users.display_name#"
         	}],
-        "start_time": "2017-01-02T09:03:26+0000",
-        "end_time": "2018-02-22T09:03:26+0000",
+        "time_interval": {
+            "count": 2,
+            "measure": "days"
+        },
         "report": [{
         	"user": 
 	        	{
@@ -212,8 +220,10 @@ Feature: Processed published items
 	        	{"_id": "#users._id#",
 	        	"display_name": "#users.display_name#"
         	}],
-        	"start_time": "2017-01-02T09:03:26+0000",
-        	"end_time": "2018-02-22T09:03:26+0000"
+	        "time_interval": {
+	            "count": 2,
+	            "measure": "days"
+	        }
         }
         """
         Then we get existing resource
@@ -225,8 +235,10 @@ Feature: Processed published items
 	        	{"_id": "#users._id#",
 	        	"display_name": "#users.display_name#"
         	}],
-        "start_time": "2017-01-02T09:03:26+0000",
-        "end_time": "2018-02-22T09:03:26+0000",
+        "time_interval": {
+            "count": 2,
+            "measure": "days"
+        },
         "report": [{
         	"user": 
 	        	{
@@ -300,8 +312,10 @@ Feature: Processed published items
 	        	{"_id": "#users._id#",
 	        	"display_name": "#users.display_name#"
         	}],
-        	"start_time": "2017-01-02T09:03:26+0000",
-        	"end_time": "2018-02-22T09:03:26+0000"
+	        "time_interval": {
+	            "count": 2,
+	            "measure": "days"
+	        }
         }
         """
         Then we get existing resource
@@ -313,8 +327,10 @@ Feature: Processed published items
 	        	{"_id": "#users._id#",
 	        	"display_name": "#users.display_name#"
         	}],
-        "start_time": "2017-01-02T09:03:26+0000",
-        "end_time": "2018-02-22T09:03:26+0000",
+        "time_interval": {
+            "count": 2,
+            "measure": "days"
+        },
         "report": [{
         	"user": 
 	        	{

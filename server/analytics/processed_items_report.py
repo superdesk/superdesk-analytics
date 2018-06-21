@@ -1,9 +1,8 @@
-from datetime import timezone
+from datetime import timezone, datetime, timedelta
 
 from superdesk import get_resource_service
 from superdesk.services import BaseService
 
-from superdesk.metadata.item import metadata_schema
 from superdesk.resource import Resource
 
 
@@ -17,15 +16,21 @@ class ProcessedItemsResource(Resource):
             'schema': {
                 'type': 'dict',
                 'schema': {
-                    '_id': metadata_schema['original_creator'],
+                    '_id': Resource.rel('users', required=True),
                     'display_name': {'type': 'string'}
                 }
             },
             'required': True
         },
-        'start_time': {'type': 'datetime', 'required': True},
-        'end_time': {'type': 'datetime', 'required': True},
-        'report': {'type': 'dict'}
+        'time_interval': {
+            'type': 'dict',
+            'required': True,
+            'schema': {
+                'count': {'type': 'integer', 'required': True},
+                'measure': {'type': 'string', 'required': True, 'allowed': ['days', 'hours']}
+            }
+        },
+        'report': {'type': 'dict', 'readonly': 'true'}
     }
 
     item_methods = ['GET', 'DELETE']
@@ -69,17 +74,17 @@ class ProcessedItemsService(BaseService):
             "task.user": str(user)
         }
         items = list(get_resource_service('archive_versions').get(req=None, lookup=query))
+        end_time = datetime.utcnow()
+        if doc['time_interval']['measure'] == 'days':
+            start_time = end_time - timedelta(days=int(doc['time_interval']['count']))
+        else:
+            start_time = end_time - timedelta(hours=int(doc['time_interval']['count']))
 
-        total_items_no = self.count_items(items, None,
-                                          doc['start_time'], doc['end_time'])
-        published_items_no = self.count_items(items, 'published',
-                                              doc['start_time'], doc['end_time'])
-        spiked_items_no = self.count_items(items, 'spiked',
-                                           doc['start_time'], doc['end_time'])
-        killed_items_no = self.count_items(items, 'killed',
-                                           doc['start_time'], doc['end_time'])
-        corrected_items_no = self.count_items(items, 'corrected',
-                                              doc['start_time'], doc['end_time'])
+        total_items_no = self.count_items(items, None, start_time, end_time)
+        published_items_no = self.count_items(items, 'published', start_time, end_time)
+        spiked_items_no = self.count_items(items, 'spiked', start_time, end_time)
+        killed_items_no = self.count_items(items, 'killed', start_time, end_time)
+        corrected_items_no = self.count_items(items, 'corrected', start_time, end_time)
 
         single_user_report = {'total_items': total_items_no,
                               'published_items': published_items_no,

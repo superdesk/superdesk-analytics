@@ -14,9 +14,10 @@ export function ProcessedItemsChart(Highcharts, gettext) {
      * @description Creates a chart for the given report
      */
     this.createChart = function(processedItemsReport, renderTo) {
-        var startTime = moment(processedItemsReport.start_time),
-            endTime = moment(processedItemsReport.end_time),
-            series = [];
+        var endTime = moment();
+        var startTime = moment().subtract(processedItemsReport.time_interval.count,
+            processedItemsReport.time_interval.measure);
+        var series = [];
 
         for (var i = 0; i <= processedItemsReport.report.length - 1; i++) {
             series.push({
