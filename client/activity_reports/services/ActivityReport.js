@@ -1,4 +1,6 @@
-ActivityReport.$inject = ['api', 'session', 'config', '$q'];
+import {formatDateForServer} from '../../utils';
+
+ActivityReport.$inject = ['api', 'session', 'config', '$q', 'moment'];
 
 /**
  * @ngdoc service
@@ -10,7 +12,7 @@ ActivityReport.$inject = ['api', 'session', 'config', '$q'];
  * @requires $q
  * @description Activity report service
  */
-export function ActivityReport(api, session, config, $q) {
+export function ActivityReport(api, session, config, $q, moment) {
     var toDelete = ['_id', '_etag', 'is_global', 'owner', 'name', 'description'];
 
     /**
@@ -28,8 +30,8 @@ export function ActivityReport(api, session, config, $q) {
         var query = _.clone(activityReport);
 
         try {
-            query.operation_start_date = formatDate(activityReport.operation_start_date);
-            query.operation_end_date = formatDate(activityReport.operation_end_date, 1);
+            query.operation_start_date = formatDateForServer(moment, config, activityReport.operation_start_date);
+            query.operation_end_date = formatDateForServer(moment, config, activityReport.operation_end_date, 1);
         } catch (e) {
             return $q.reject();
         }
@@ -39,24 +41,4 @@ export function ActivityReport(api, session, config, $q) {
 
         return api('activity_report', session.identity).save({}, query);
     };
-
-    /**
-     * @ngdoc method
-     * @name ActivityReport#formatDate
-     * @param {String} date
-     * @returns {String}|null
-     * @description Format given date for generate
-     */
-    function formatDate(date, addDays) {
-        if (date) {
-            var timestamp = moment(moment(date, config.model.dateformat))
-            .subtract(moment().utcOffset(), 'minutes');
-
-            if (addDays) {
-                timestamp.add(addDays, 'days').subtract(1, 'seconds');
-            }
-            return timestamp.format('YYYY-MM-DDTHH:mm:ss');
-        }
-        return null;
-    }
 }

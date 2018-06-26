@@ -1,0 +1,52 @@
+<div class="content-no-header pull pull-higher">
+    <form name="sourceCategoryReportForm">
+        <fieldset class="report-parameters">
+
+            <label translate>Date Range:</label>
+            <div class="multiple">
+                <div class="field">
+                    <label
+                            for="parameters-start_date"
+                            translate
+                    >
+                        From
+                    </label>
+                    <div
+                            sd-datepicker
+                            ng-model="report.start_date"
+                            id="parameters-start_date"
+                            required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label
+                            for="parameters-operation_end_date"
+                            translate
+                    >
+                        To
+                    </label>
+                    <div
+                            sd-datepicker
+                            ng-model="report.end_date"
+                            id="parameters-end_date"
+                            required
+                    ></div>
+                </div>
+
+            </div>
+        </fieldset>&nbsp;
+    </form>
+
+    <div>
+        <button
+                id="generate_processed_items_report"
+                class="btn btn--primary"
+                ng-click="generate()"
+                ng-disabled="!sourceCategoryReportForm.$valid"
+                translate
+        >
+            Generate
+        </button>
+    </div>
+</div>
