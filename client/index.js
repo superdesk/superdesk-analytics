@@ -21,13 +21,15 @@ import './track_activity_report';
 import './track_activity_widget';
 import './content_quota_report';
 import './content_quota_widget';
-
+import './source_category_report';
 
 var Highcharts = require('highcharts');
 
-require('highcharts-more')(Highcharts);
 require('highcharts/modules/exporting')(Highcharts);
 require('highcharts/modules/data')(Highcharts);
+require('highcharts/modules/export-data')(Highcharts);
+require('highcharts/modules/offline-exporting')(Highcharts);
+require('highcharts/modules/no-data-to-display')(Highcharts);
 
 function cacheIncludedTemplates($templateCache) {
     $templateCache.put('activity-report.html', require('./activity_reports/views/activity-report.html'));
@@ -36,6 +38,10 @@ function cacheIncludedTemplates($templateCache) {
     $templateCache.put('track-activity-report.html',
         require('./track_activity_report/views/track-activity-report.html'));
     $templateCache.put('content-quota-report.html', require('./content_quota_report/views/content-quota-report.html'));
+    $templateCache.put(
+        'source-category-report.html',
+        require('./source_category_report/views/source-category-report.html')
+    );
 }
 cacheIncludedTemplates.$inject = ['$templateCache'];
 
@@ -51,7 +57,8 @@ export default angular.module('superdesk.analytics', [
     'superdesk.analytics.activity-report', 'superdesk.analytics.processed-items-report',
     'superdesk.analytics.processed-items-widget', 'superdesk.analytics.track-activity-report',
     'superdesk.analytics.track-activity-widget', 'superdesk.analytics.activity-report-widget',
-    'superdesk.analytics.content-quota-report', 'superdesk.analytics.content-quota-widget'
+    'superdesk.analytics.content-quota-report', 'superdesk.analytics.content-quota-widget',
+    'superdesk.analytics.source-category-report'
 ])
     .value('Highcharts', Highcharts)
 

@@ -1,9 +1,7 @@
-var moment = require('moment');
-
 require('twix');
 
 
-ActivityChart.$inject = ['lodash', 'Highcharts'];
+ActivityChart.$inject = ['lodash', 'Highcharts', 'moment'];
 
 /**
  * @ngdoc service
@@ -12,7 +10,7 @@ ActivityChart.$inject = ['lodash', 'Highcharts'];
  * @requires lodash
  * @description Activity chart generation service
  */
-export function ActivityChart(_, Highcharts) {
+export function ActivityChart(_, Highcharts, moment) {
     var dateFormat = 'YYYY-MM-DD',
         timeFormat = 'YYYY-MM-DD HH:mm';
 

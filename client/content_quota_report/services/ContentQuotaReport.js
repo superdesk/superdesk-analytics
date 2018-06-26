@@ -1,4 +1,6 @@
-ContentQuotaReport.$inject = ['api', 'session', 'config', '$q'];
+import {formatDateForServer} from '../../utils';
+
+ContentQuotaReport.$inject = ['api', 'session', 'config', '$q', 'moment'];
 
 /**
  * @ngdoc service
@@ -10,7 +12,7 @@ ContentQuotaReport.$inject = ['api', 'session', 'config', '$q'];
  * @requires $q
  * @description Content quota report service
  */
-export function ContentQuotaReport(api, session, config, $q) {
+export function ContentQuotaReport(api, session, config, $q, moment) {
     var toDelete = ['_id', '_etag', '_created', '_status', '_updated', '_links', 'report', 'timestamp'];
 
     /**
@@ -26,7 +28,7 @@ export function ContentQuotaReport(api, session, config, $q) {
         var query = angular.copy(reportParams);
 
         if (query.end_date) {
-            query.end_date = formatDate(query.end_date);
+            query.end_date = formatDateForServer(moment, config, query.end_date);
         }
         toDelete.forEach((field) => {
             delete query[field];
@@ -34,23 +36,4 @@ export function ContentQuotaReport(api, session, config, $q) {
         return api('content_quota_report', session.identity).save({}, query)
             .then((report) => report);
     };
-
-    /**
-     * @ngdoc method
-     * @name ContentQuotaReport#formatDate
-     * @param {String} date
-     * @returns {String}|null
-     * @description Format given date for generate
-     */
-    function formatDate(date) {
-        if (date) {
-            var timestamp = moment(date, config.model.dateformat, true);
-
-            if (!timestamp.isValid()) {
-                timestamp = moment(date);
-            }
-            return timestamp.format('YYYY-MM-DD');
-        }
-        return null;
-    }
 }
