@@ -21,11 +21,30 @@ export function ContentQuotaReportForm(config, api, session, metadata, notify, $
         scope: {
             form: '=',
             report: '=',
-            showFilters: '@'
+            forWidget: '@'
         },
         link: function(scope, element, attrs, controller) {
+            scope.generalTab = 'general';
+            scope.filtersTab = 'filters';
+            const defaultTab = scope.generalTab;
             var noOfIntervalsDefault = 7,
-                intervalLengthDefault = 1;
+                intervalLengthDefault = 1,
+                currentTab = null;
+
+            scope.currentTab = () => {
+                if (!currentTab) {
+                    return defaultTab;
+                }
+                return currentTab;
+            };
+
+            scope.activateGeneralTab = () => {
+                currentTab = scope.generalTab;
+            };
+
+            scope.activateFiltersTab = () => {
+                currentTab = scope.filtersTab;
+            };
 
             /**
              * @ngdoc method
