@@ -21,6 +21,8 @@ from superdesk.resource import Resource
 from superdesk.utils import format_time
 from datetime import timedelta
 from superdesk.default_settings import ELASTIC_DATETIME_FORMAT
+from analytics.aggregations import ITEMS_OVER_DAYS, items_over_days_aggregation
+from superdesk.metadata.utils import aggregations_manager
 
 
 class ContentQuotaReportResource(Resource):
@@ -83,7 +85,17 @@ class ContentQuotaReportService(BaseService):
         """
         request = ParsedRequest()
         request.args = {'source': json.dumps(query), 'repo': 'published'}
-        return get_resource_service('search').get(req=request, lookup=None)
+        with aggregations_manager([items_over_days_aggregation]):
+            return get_resource_service('search').get(req=request, lookup=None)
+
+    def _get_end_date(self, doc):
+        end_date = doc['end_date'] if 'end_date' in doc else datetime.now()
+        return end_date.replace(hour=23, minute=59, second=59, tzinfo=get_localzone()).astimezone(utc)
+
+    def _get_bucket_time(self, time_string):
+        time_string = time_string.rsplit('.', 1)[0]
+        bucket_time = datetime.strptime(time_string, ELASTIC_DATETIME_FORMAT)
+        return bucket_time.replace(tzinfo=utc)
 
     def _get_end_date(self, doc):
         end_date = doc['end_date'] if 'end_date' in doc else datetime.now()
@@ -125,8 +137,8 @@ class ContentQuotaReportService(BaseService):
 
         items = self.get_items(query)
         items_over_day_buckets = []
-        if 'aggregations' in items.hits and 'items_over_days' in items.hits['aggregations']:
-            items_over_day_buckets = items.hits['aggregations']['items_over_days']['buckets']
+        if 'aggregations' in items.hits and ITEMS_OVER_DAYS in items.hits['aggregations']:
+            items_over_day_buckets = items.hits['aggregations'][ITEMS_OVER_DAYS]['buckets']
         i = 0
         result_list = []
         while i < len(time_intervals) - 1:
