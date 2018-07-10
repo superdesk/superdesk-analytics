@@ -55,7 +55,7 @@ Feature: Activity report
         	"urgency_end": 5,
         	"subscriber": "test",
         	"category": [{"name": "arts, culture and entertainment" , "qcode": "01000000"}],
-        	"report": {"total": 2, "items_per_hour": "__any_value__"}
+        	"report": {"total": 1, "items_per_hour": "__any_value__"}
         }
         """
         When we post to "/activity_report" with success
@@ -88,7 +88,7 @@ Feature: Activity report
         	"urgency_end": 5,
         	"category": [{"name": "arts, culture and entertainment" , "qcode": "01000000"}],
         	"subscriber": "test",
-        	"report": [{"desk": "Sports Desk", "items": 2}]
+        	"report": [{"desk": "Sports Desk", "items": 1}]
         }
         """
 	

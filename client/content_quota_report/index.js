@@ -24,6 +24,7 @@ angular.module('superdesk.analytics.content-quota-report', [])
     .service('contentQuotaReport', svc.ContentQuotaReport)
 
     .directive('sdContentQuotaReportContainer', directive.ContentQuotaReportContainer)
+    .directive('sdContentQuotaReportForm', directive.ContentQuotaReportForm)
     .directive('sdContentQuotaReportPanel', directive.ContentQuotaReportPanel)
     .directive('sdContentQuotaReportView', directive.ContentQuotaReportView)
 

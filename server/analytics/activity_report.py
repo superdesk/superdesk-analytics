@@ -19,6 +19,9 @@ from superdesk.resource import Resource
 from superdesk.utils import format_date
 from eve.default_settings import ID_FIELD
 from superdesk.errors import SuperdeskApiError
+from analytics.aggregations import ITEMS_OVER_DAYS, ITEMS_OVER_HOURS, \
+    items_over_days_aggregation, items_over_hours_aggregation
+from superdesk.metadata.utils import aggregations_manager
 
 
 class ActivityReportResource(Resource):
@@ -90,7 +93,8 @@ class ActivityReportService(BaseService):
         """
         request = ParsedRequest()
         request.args = {'source': json.dumps(query), 'repo': 'archive,published,archived,ingest'}
-        return get_resource_service('search').get(req=request, lookup=None)
+        with aggregations_manager([items_over_days_aggregation, items_over_hours_aggregation]):
+            return get_resource_service('search').get(req=request, lookup=None)
 
     def search_items_without_groupping(self, report):
         """Return the report without grouping by desk
@@ -121,8 +125,8 @@ class ActivityReportService(BaseService):
         new_format = "%Y-%m-%d"
         dict_of_days = {}
 
-        if 'aggregations' in items.hits and 'items_over_days' in items.hits['aggregations']:
-            days_buckets = items.hits['aggregations']['items_over_days']['buckets']
+        if 'aggregations' in items.hits and ITEMS_OVER_DAYS in items.hits['aggregations']:
+            days_buckets = items.hits['aggregations'][ITEMS_OVER_DAYS]['buckets']
 
             for d in days_buckets:
                 days = datetime.strptime(d['key_as_string'], "%Y-%m-%dT%H:%M:%S.%fZ")
@@ -133,8 +137,8 @@ class ActivityReportService(BaseService):
         new_format = "%Y-%m-%d %H:00"
         dict_of_hours = {}
 
-        if 'aggregations' in items.hits and 'items_over_hours' in items.hits['aggregations']:
-            hours_buckets = items.hits['aggregations']['items_over_hours']['buckets']
+        if 'aggregations' in items.hits and ITEMS_OVER_HOURS in items.hits['aggregations']:
+            hours_buckets = items.hits['aggregations'][ITEMS_OVER_HOURS]['buckets']
 
             for hour in hours_buckets:
                 hours = datetime.strptime(hour['key_as_string'], "%Y-%m-%dT%H:%M:%S.%fZ")

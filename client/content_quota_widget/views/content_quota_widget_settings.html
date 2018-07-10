@@ -5,31 +5,10 @@
     <h3 translate>Content Quota Widget Settings</span></h3>
 </div>
 
-<div class="modal__body content-quota-settings">
-    <form name="contentQuotaReportForm">
-        <div class="field">
-            <label for="start_time" translate>From</label>
-            <div sd-datepicker ng-model="widget.configuration.start_time" id="start_time"></div>
-        </div>
-        <div class="field">
-            <label for="intervals-number" translate>No of intervals</label>
-            <select id="intervals-number" ng-model="widget.configuration.intervals_number"
-                ng-options="intervals_number for intervals_number in [1,2,3,4,5,6,7]">
-            </select>
-        </div>
-        <div class="field">
-            <label for="interval-length" translate>Length of the interval</label>
-            <select id="interval-length" ng-model="widget.configuration.interval_length"
-                ng-options="interval_length for interval_length in [1,2,3,4,5,6,7]">
-            </select>
-        </div>
-        <div class="field">
-            <label for="target" translate>Target Quota</label>
-            <input type="integer" id="target" ng-model="widget.configuration.target">
-        </div>
-    </form>
+<div class="modal__body aggregate-settings">
+    <div sd-content-quota-report-form data-form="form" for-widget="true" report="widget.configuration"></div>
 </div>
 
 <div class="modal__footer">
-    <button class="btn btn--primary" ng-click="save()" ng-disabled="!contentQuotaReportForm.$valid" translate>Done</button>
+    <button class="btn btn--primary" ng-click="save()" ng-disabled="!form.$valid" translate>Done</button>
 </div>

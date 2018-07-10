@@ -75,8 +75,8 @@ Feature: Processed published items
         	 	{
         	 		"corrected_items": 0,
         	 		"killed_items": 0,
-        	 		"total_items": 2,
-        	 		"published_items": 2, 
+        	 		"total_items": 1,
+        	 		"published_items": 1, 
         	 		"spiked_items": 0
         	 	}},
         	{
@@ -86,8 +86,8 @@ Feature: Processed published items
         		"processed_items":{
         			"corrected_items": 0,
         			"killed_items": 0,
-        			"total_items": 2,
-        			"published_items": 2, 
+        			"total_items": 1,
+        			"published_items": 1, 
         			"spiked_items": 0
         		}}]
         }
@@ -247,9 +247,9 @@ Feature: Processed published items
 	        	 	},
         	 "processed_items": 
         	 	{
-        	 		"corrected_items": 2,
+        	 		"corrected_items": 1,
         	 		"killed_items": 0,
-        	 		"total_items": 2,
+        	 		"total_items": 1,
         	 		"published_items": 0, 
         	 		"spiked_items": 0
         	 	}},
@@ -258,9 +258,9 @@ Feature: Processed published items
         			"_id":"#users._id#",
         			"display_name": "#users.display_name#"}, 
         		"processed_items":{
-        			"corrected_items": 2,
+        			"corrected_items": 1,
         			"killed_items": 0,
-        			"total_items": 2,
+        			"total_items": 1,
         			"published_items": 0, 
         			"spiked_items": 0
         		}}]
@@ -340,8 +340,8 @@ Feature: Processed published items
         	 "processed_items": 
         	 	{
         	 		"corrected_items": 0,
-        	 		"killed_items": 2,
-        	 		"total_items": 2,
+        	 		"killed_items": 1,
+        	 		"total_items": 1,
         	 		"published_items": 0, 
         	 		"spiked_items": 0
         	 	}},
@@ -351,8 +351,8 @@ Feature: Processed published items
         			"display_name": "#users.display_name#"}, 
         		"processed_items":{
         			"corrected_items": 0,
-        			"killed_items": 2,
-        			"total_items": 2,
+        			"killed_items": 1,
+        			"total_items": 1,
         			"published_items": 0, 
         			"spiked_items": 0
         		}}]

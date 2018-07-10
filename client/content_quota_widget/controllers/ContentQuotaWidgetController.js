@@ -44,9 +44,6 @@ export function ContentQuotaWidgetController($scope, $rootScope, notify, $interv
      * @description Reset the chart variable
      */
     var resetChart = function(newChart) {
-        if (self.chart) {
-            self.chart.destroy();
-        }
         self.chart = newChart;
     };
 
