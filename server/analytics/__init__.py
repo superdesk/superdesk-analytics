@@ -16,13 +16,9 @@ from analytics.saved_activity_reports import SavedActivityReportResource, \
 from analytics.track_activity import TrackActivityResource, TrackActivityService
 from analytics.processed_items_report import ProcessedItemsResource, ProcessedItemsService
 from analytics.content_quota_reports import ContentQuotaReportResource, ContentQuotaReportService
-from superdesk.metadata.utils import add_aggregation
 
 
 def init_app(app):
-    add_aggregation('items_over_days', {'date_histogram': {'field': '_updated', 'interval': 'day'}})
-    add_aggregation('items_over_hours', {'date_histogram': {'field': '_updated', 'interval': 'hour'}})
-
     endpoint_name = 'activity_report'
     service = ActivityReportService(endpoint_name, backend=superdesk.get_backend())
     ActivityReportResource(endpoint_name, app=app, service=service)
