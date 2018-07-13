@@ -76,7 +76,7 @@ Feature: Processed published items
         	 		"corrected_items": 0,
         	 		"killed_items": 0,
         	 		"total_items": 1,
-        	 		"published_items": 1, 
+        	 		"published_items": 1,
         	 		"spiked_items": 0
         	 	}},
         	{
@@ -87,7 +87,7 @@ Feature: Processed published items
         			"corrected_items": 0,
         			"killed_items": 0,
         			"total_items": 1,
-        			"published_items": 1, 
+        			"published_items": 1,
         			"spiked_items": 0
         		}}]
         }

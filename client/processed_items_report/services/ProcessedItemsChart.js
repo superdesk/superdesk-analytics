@@ -1,4 +1,4 @@
-ProcessedItemsChart.$inject = ['Highcharts', 'gettext'];
+ProcessedItemsChart.$inject = ['Highcharts', 'gettext', 'moment'];
 
 /**
  * @ngdoc service
@@ -6,7 +6,7 @@ ProcessedItemsChart.$inject = ['Highcharts', 'gettext'];
  * @name ProcessedItemsChart
  * @description Processed items chart generation service
  */
-export function ProcessedItemsChart(Highcharts, gettext) {
+export function ProcessedItemsChart(Highcharts, gettext, moment) {
     /**
      * @ngdoc method
      * @name ProcessedItemsChart#createChart
