@@ -11,20 +11,17 @@
 */
 export function formatDateForServer(moment, config, date, addDays = 0) {
     if (date) {
-        var timestamp = moment(date, config.model.dateformat, true);
+        const timeSuffix = addDays ? 'T23:59:59' : 'T00:00:00';
+        let local = moment(date, config.model.dateformat).format('YYYY-MM-DD') + timeSuffix;
 
-        if (!timestamp.isValid()) {
-            timestamp = moment(date);
+        if (config.search && config.search.useDefaultTimezone) {
+            // use the default timezone of the server
+            local += moment.tz(config.defaultTimezone).format('ZZ');
+        } else {
+            local += moment().format('ZZ');
         }
 
-        timestamp = moment(timestamp)
-            .subtract(moment().utcOffset(), 'minutes');
-
-        if (addDays) {
-            timestamp.add(addDays, 'days').subtract(1, 'seconds');
-        }
-
-        return timestamp.format('YYYY-MM-DDTHH:mm:ss');
+        return local;
     }
 
     return null;

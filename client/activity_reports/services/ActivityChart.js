@@ -1,7 +1,7 @@
 require('twix');
 
 
-ActivityChart.$inject = ['lodash', 'Highcharts', 'moment'];
+ActivityChart.$inject = ['lodash', 'chartManager', 'moment'];
 
 /**
  * @ngdoc service
@@ -10,7 +10,7 @@ ActivityChart.$inject = ['lodash', 'Highcharts', 'moment'];
  * @requires lodash
  * @description Activity chart generation service
  */
-export function ActivityChart(_, Highcharts, moment) {
+export function ActivityChart(_, chartManager, moment) {
     var dateFormat = 'YYYY-MM-DD',
         timeFormat = 'YYYY-MM-DD HH:mm';
 
@@ -77,6 +77,7 @@ export function ActivityChart(_, Highcharts, moment) {
             reportData = getReportData(report);
 
         var chartData = {
+            id: 'activity',
             chart: {
                 type: 'column'
             },
@@ -106,7 +107,7 @@ export function ActivityChart(_, Highcharts, moment) {
             }]
         };
 
-        return Highcharts.chart(renderTo, chartData);
+        return chartManager.create(renderTo, chartData);
     };
 
     /**

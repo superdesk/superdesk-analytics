@@ -1,0 +1,38 @@
+<div ng-if="config.type === 'table'" class="sd-chart__table sd-shadow--z2">
+    <div class="sd-chart__table-header">
+        <h1>{{config.title}}</h1>
+        <h3>{{config.subtitle}}</h3>
+
+        <div class="dropdown dropdown--allign-right sd-chart__table-header-options" dropdown>
+            <button
+                    class="dropdown__toggle dropdown-toggle icn-btn pull-right"
+                    dropdown__toggle
+            >
+              <i class="icon-collapse icon--gray"></i>
+            </button>
+            <ul class="dropdown__menu">
+                <li>
+                    <div class="dropdown__menu-label">Export Chart As...</div>
+                </li>
+                <li class="dropdown__menu-divider"></li>
+                <li><button ng-click="downloadAsCSV()">CSV File</button></li>
+            </ul>
+        </div>
+    </div>
+    <div class="sd-chart__table-content">
+        <table>
+            <thead>
+                <tr>
+                    <th ng-repeat="header in config.headers">{{header}}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="row in config.rows">
+                    <td ng-repeat="val in row track by $index">{{val}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div ng-show="config.type !== 'table'" class="sd-chart__highchart sd-shadow--z2"></div>

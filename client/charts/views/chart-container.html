@@ -1,0 +1,9 @@
+<div class="sd-chart__container">
+    <div ng-repeat="chart in configs track by chart.id"
+         sd-chart
+         class="sd-chart__chart"
+         ng-class="{'sd-chart__chart--multi-chart': configs.length > 1}"
+         data-config="chart"
+    >
+    </div>
+</div>

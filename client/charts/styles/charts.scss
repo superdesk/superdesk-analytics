@@ -1,0 +1,49 @@
+.sd-chart__container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    padding: 2rem;
+}
+
+.sd-chart__chart {
+    width: 100%;
+    height: 100%;
+
+    &--multi-chart {
+        width: 50%;
+        height: 85%;
+    }
+
+    .sd-chart__highchart {
+        width: 100%;
+        height: 100%;
+    }
+}
+
+.sd-chart__table {
+    display: block;
+    background-color: white;
+    overflow: hidden;
+
+    .sd-chart__table-header {
+        position: relative;
+        text-align: center;
+        padding: 1rem 0 2rem 0;
+    }
+
+    .sd-chart__table-header-options {
+        position: absolute !important;
+        right: 1rem;
+        top: 1rem;
+    }
+
+    .sd-chart__table-content {
+        display: block;
+        overflow: auto;
+
+        th {
+            text-transform: uppercase;
+        }
+    }
+}

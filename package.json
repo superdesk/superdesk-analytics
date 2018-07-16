@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "hint": "eslint client --ext=jsx --ext=js",
-    "test": "npm run hint"
+    "test": "npm run hint && npm run unit_test",
+    "unit_test": "karma start karma.conf.js --log-level debug --display-error-details --single-run",
+    "karma": "karma start karma.conf.js --log-level debug --display-error-details"
   },
   "repository": {
     "type": "git",
@@ -24,11 +26,22 @@
     "babel-preset-react": "^6.24.1",
     "eslint": "^3.7.1",
     "eslint-plugin-jasmine": "^1.8.1",
-    "eslint-plugin-angular": "^1.6.1"
-  },
-  "peerDependencies": {
+    "eslint-plugin-angular": "^1.6.1",
+    "jasmine-core": "^2.99.1",
+    "jasmine-reporters": "^2.3.0",
+    "karma": "^2.0.0",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-jasmine": "^1.1.1",
+    "karma-ng-html2js-preprocessor": "^1.0.0",
+    "karma-sourcemap-loader": "^0.3.7",
+    "karma-webpack": "^2.0.13",
     "lodash": "^4.17.5",
     "moment-timezone": "^0.5.14",
-    "superdesk-core": "^1.21.0"
+    "superdesk-core": "^1.21.0",
+    "angular-embed": "superdesk/angular-embed#d75968e",
+    "angular-embedly": "Urigo/angular-embedly#0.0.8",
+    "jquery": "3.3.1",
+    "jquery.gridster": "dustmoo/gridster.js#c306335397816beceb74e4a176067baef34a0359",
+    "rangy": "1.3.0"
   }
 }

@@ -22,6 +22,22 @@ module.exports = function(grunt) {
             },
             DEFAULT_SCHEDULE: {minutes: 5, seconds: 0},
             DEFAULT_IDLE_TIME: {hours: 0, minutes: 0},
-        }
+        },
+        search: {useDefaultTimezone: 1},
+
+        // default timezone for the app
+        defaultTimezone: 'Europe/London',
+
+        // model date and time formats
+        model: {
+            dateformat: 'DD/MM/YYYY',
+            timeformat: 'HH:mm:ss',
+        },
+
+        // view formats for datepickers/timepickers
+        view: {
+            dateformat: 'DD/MM/YYYY',
+            timeformat: 'HH:mm',
+        },
     };
 };

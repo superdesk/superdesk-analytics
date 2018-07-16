@@ -13,6 +13,7 @@ import * as svc from './services';
 import * as directive from './directives';
 import * as ctrl from './controllers';
 
+import './charts';
 import './activity_reports';
 import './activity-widget';
 import './processed_items_report';
@@ -22,14 +23,6 @@ import './track_activity_widget';
 import './content_quota_report';
 import './content_quota_widget';
 import './source_category_report';
-
-var Highcharts = require('highcharts');
-
-require('highcharts/modules/exporting')(Highcharts);
-require('highcharts/modules/data')(Highcharts);
-require('highcharts/modules/export-data')(Highcharts);
-require('highcharts/modules/offline-exporting')(Highcharts);
-require('highcharts/modules/no-data-to-display')(Highcharts);
 
 function cacheIncludedTemplates($templateCache) {
     $templateCache.put('activity-report.html', require('./activity_reports/views/activity-report.html'));
@@ -54,17 +47,17 @@ cacheIncludedTemplates.$inject = ['$templateCache'];
  * @description Superdesk analytics module.
  */
 export default angular.module('superdesk.analytics', [
+    'superdesk.analytics.charts',
     'superdesk.analytics.activity-report', 'superdesk.analytics.processed-items-report',
     'superdesk.analytics.processed-items-widget', 'superdesk.analytics.track-activity-report',
     'superdesk.analytics.track-activity-widget', 'superdesk.analytics.activity-report-widget',
     'superdesk.analytics.content-quota-report', 'superdesk.analytics.content-quota-widget',
     'superdesk.analytics.source-category-report'
 ])
-    .value('Highcharts', Highcharts)
-
     .service('analyticsWidgetSettings', svc.AnalyticsWidgetSettings)
 
     .directive('sdAfterRender', directive.AfterRender)
+    .directive('sdReportDropdown', directive.ReportDropdown)
 
     .controller('AnalyticsController', ctrl.AnalyticsController)
 

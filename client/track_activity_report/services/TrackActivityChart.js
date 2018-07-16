@@ -1,4 +1,4 @@
-TrackActivityChart.$inject = ['lodash', 'moment', 'desks', 'Highcharts', 'gettext'];
+TrackActivityChart.$inject = ['lodash', 'moment', 'desks', 'chartManager', 'gettext'];
 
 /**
  * @ngdoc service
@@ -9,7 +9,7 @@ TrackActivityChart.$inject = ['lodash', 'moment', 'desks', 'Highcharts', 'gettex
  * @requires desks
  * @description Track activity chart generation service
  */
-export function TrackActivityChart(_, moment, desks, Highcharts, gettext) {
+export function TrackActivityChart(_, moment, desks, chartManager, gettext) {
     var finisheItemColor = 'green',
         unfinishedItemColor = 'yellow',
         sentBackColor = 'brown',
@@ -66,6 +66,7 @@ export function TrackActivityChart(_, moment, desks, Highcharts, gettext) {
         });
 
         var chartData = {
+            id: 'track_activity',
             chart: {
                 type: 'columnrange',
                 inverted: true
@@ -114,6 +115,6 @@ export function TrackActivityChart(_, moment, desks, Highcharts, gettext) {
             }]
         };
 
-        return Highcharts.chart(renderTo, chartData);
+        return chartManager.create(renderTo, chartData);
     };
 }

@@ -1,17 +1,44 @@
-<div class="sd-page">
-    <header>
-        <h3 class="sd-page__header" translate>Select report</h3>
-    </header>
+<div class="sd-page-grid--basic sd-analytics">
+    <div class="sd-content sd-page-content--slide-in sd-content--margin-b30">
+        <div class="sd-page-content__content-block sd-page-content__content-block--main"
+             ng-class="{'open-filters': filtersOpen}"
+        >
+            <div class="subnav">
+                <button class="navbtn navbtn--left navbtn--darker"
+                        ng-click="toggleFilters()"
+                        ng-class="{'navbtn--active': filtersOpen}"
+                >
+                    <i class="icon-filter-large"></i>
+                </button>
+                <div sd-report-dropdown
+                     data-reports="reports"
+                     data-current-report="currentReport"
+                     data-change-report="changeReport(report)"
+                     class="subnav__stretch-bar"
+                >
+                </div>
+            </div>
 
-    <div class="report-selector">
-        <select id="reports" ng-options="r as r.name for r in reports" ng-model="report">
-        </select>
+            <div ng-include="'activity-report.html'"
+                 ng-if="currentReport.id === 'activity-report'"
+                 class="sd-column-box--2"
+            ></div>
+            <div ng-include="'processed-items-report.html'"
+                 ng-if="currentReport.id === 'processed-items-report'"
+                 class="sd-column-box--2"
+            ></div>
+            <div ng-include="'track-activity-report.html'"
+                 ng-if="currentReport.id === 'track-activity-report'"
+                 class="sd-column-box--2"
+            ></div>
+            <div ng-include="'content-quota-report.html'"
+                 ng-if="currentReport.id === 'content-quota-report'"
+                 class="sd-column-box--2"
+            ></div>
+            <div ng-include="'source-category-report.html'"
+                 ng-if="currentReport.id === 'source-category-report'"
+                 class="sd-column-box--2"
+            ></div>
+        </div>
     </div>
 </div>
-
-
-<div ng-include="'activity-report.html'" ng-if="report.id === 'activity-report'"></div>
-<div ng-include="'processed-items-report.html'" ng-if="report.id === 'processed-items-report'"></div>
-<div ng-include="'track-activity-report.html'" ng-if="report.id === 'track-activity-report'"></div>
-<div ng-include="'content-quota-report.html'" ng-if="report.id === 'content-quota-report'"></div>
-<div ng-include="'source-category-report.html'" ng-if="report.id === 'source-category-report'"></div>
