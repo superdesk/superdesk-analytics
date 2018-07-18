@@ -30,7 +30,9 @@ export function SourceCategoryReport(_, api, session, $q, moment, config) {
             _.map(params.excluded_states, (value, state) => value && state)
         );
 
-        mustNot.push({terms: {state: excludedStates}});
+        if (_.get(excludedStates, 'length', 0) > 0) {
+            mustNot.push({terms: {state: excludedStates}});
+        }
 
         switch (params.dateFilter) {
         case 'range':

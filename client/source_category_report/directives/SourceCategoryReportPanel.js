@@ -18,7 +18,7 @@ SourceCategoryReportPanel.$inject = [
 export function SourceCategoryReportPanel(notify, $rootScope, sourceCategoryReport, config, moment, gettext) {
     return {
         template: require('../views/source-category-report-panel.html'),
-        scope: {},
+        scope: {toggleFilters: '&'},
         link: function(scope, element, attrs, controller) {
             /**
              * @ngdoc method
@@ -117,8 +117,14 @@ export function SourceCategoryReportPanel(notify, $rootScope, sourceCategoryRepo
                     qcode: 'column',
                     name: gettext('Column'),
                 }, {
+                    qcode: 'pie',
+                    name: gettext('Pie'),
+                }, {
                     qcode: 'scatter',
                     name: gettext('Scatter'),
+                }, {
+                    qcode: 'table',
+                    name: gettext('Table'),
                 }];
 
                 scope.report = {

@@ -1,53 +1,61 @@
-// Karma configuration
-// Generated on Mon Sep 26 2016 12:33:25 GMT+0200 (CEST)
-var webpackConfig = require('./webpack.config.js');
+
+var grunt = require('grunt');
+var makeConfig = require('./webpack.config.js');
 
 module.exports = function(config) {
-    // in karma, entry is read from files prop
-    // webpackConfig.entry = {}
-    // webpackConfig.devtool = 'inline-source-map'
-    config.set({
+    var webpackConfig = makeConfig(grunt);
 
-        // base path that will be used to resolve all patterns (eg. files, exclude)
-        basePath: 'client',
-        // frameworks to use
-        // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
+    // in karma, entry is read from files prop
+    webpackConfig.entry = null;
+    webpackConfig.devtool = 'inline-source-map';
+
+    config.set({
         frameworks: ['jasmine'],
-        // list of files / patterns to load in the browser
+
         files: [
-            'tests.js',
+            'client/tests.js',
+            'client/**/*.html',
         ],
-        // list of files to exclude
-        exclude: [
+
+        plugins: [
+            'karma-jasmine',
+            'karma-chrome-launcher',
+            'karma-ng-html2js-preprocessor',
+            'karma-sourcemap-loader',
+            'karma-webpack',
         ],
-        // preprocess matching files before serving them to the browser
-        // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
+
         preprocessors: {
-            'tests.js': ['webpack', 'sourcemap']
+            'client/**/*.html': ['ng-html2js'],
+            'client/tests.js': ['webpack', 'sourcemap'],
         },
+
+        webpack: webpackConfig,
+
+        ngHtml2JsPreprocessor: {
+            stripPrefix: __dirname,
+            moduleName: 'superdesk.templates-cache',
+        },
+
         // test results reporter to use
-        // possible values: 'dots', 'progress'
-        // available reporters: https://npmjs.org/browse/keyword/karma-reporter
         reporters: ['dots'],
+
         // web server port
-        port: 9876,
-        // enable / disable colors in the output (reporters and logs)
-        colors: true,
-        // level of logging
-        // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN ||
-        //                  config.LOG_INFO || config.LOG_DEBUG
-        logLevel: config.LOG_INFO,
+        port: 8080,
+
+        // cli runner port
+        runnerPort: 9100,
+
         // enable / disable watching file and executing tests whenever any file changes
         autoWatch: true,
-        // start these browsers
-        // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-        browsers: ['Firefox'],
+
+        // Start these browsers, currently available:
+        browsers: ['ChromeHeadless'],
+
         // Continuous Integration mode
-        // if true, Karma captures browsers, runs the tests and exits
         singleRun: false,
-        // Concurrency level
-        // how many browser should be started simultaneous
-        concurrency: Infinity,
-        webpack: webpackConfig
+
+        // Seams default 10s is not enough for CI sometime, so let's try 30s
+        browserNoActivityTimeout: 30000,
     });
 };

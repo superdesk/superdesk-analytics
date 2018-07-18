@@ -22,6 +22,7 @@
         bottom: 0;
         overflow-y: auto;
         padding: 18px;
+        background-color: #F8F8F8;
     }
 }
 
@@ -239,8 +240,24 @@
             }
         }
     }
+}
+
+.sd-analytics {
+    .sd-column-box__main-column__items {
+        height: calc(100vh - (4.8rem + 4.8rem + 30px)) !important;
+    }
 
     textarea {
         height: unset !important;
     }
+}
+
+.report-view {
+    width: 100%;
+    height: 100%;
+}
+
+// Hack so that content is not rendered underneath the workqueue
+.sd-page-grid--basic .sd-content--margin-b30 {
+    margin-bottom: 30px;
 }

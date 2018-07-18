@@ -1,19 +1,19 @@
 import {generateSubtitle} from '../../utils';
 
-SourceCategoryChart.$inject = ['lodash', 'Highcharts', 'gettext', 'moment', 'config'];
+SourceCategoryChart.$inject = ['lodash', 'chartManager', 'gettext', 'moment', 'config'];
 
 /**
  * @ngdoc service
  * @module superdesk.apps.analytics.source-category-report
  * @name SourceCategoryChart
  * @requires lodash
- * @requires Highcharts
+ * @requires chartManager
  * @requires gettext
  * @requires moment
  * @requires config
  * @description Source/Category chart generation service
  */
-export function SourceCategoryChart(_, Highcharts, gettext, moment, config) {
+export function SourceCategoryChart(_, chartManager, gettext, moment, config) {
     /**
      * @ngdoc method
      * @name SourceCategoryChart#getCategories
@@ -79,43 +79,48 @@ export function SourceCategoryChart(_, Highcharts, gettext, moment, config) {
 
     /**
      * @ngdoc method
-     * @name SourceCategoryChart#createChart
-     * @param {Object} report
-     * @param {Object} renderTo
-     * @returns {Highcharts.Chart}
-     * @description Create a chart based on the given report parameters
+     * @name SourceCategoryChart#generateConfig
+     * @param {Object} report - The report data
+     * @return {Array}
+     * @description Returns a generic config with the provided report data
      */
-    this.createChart = function(report, renderTo) {
+    const generateConfig = function(report) {
         const categories = getCategories(report);
         const chartType = report.chartType || 'bar';
 
-        const chartData = {
+        return [{
+            id: 'generic',
+            type: chartType,
             chart: {
                 type: chartType,
-                shadow: true,
                 zoomType: chartType === 'bar' ? 'y' : 'x',
+                backgroundColor: '#FFFFFF',
             },
             title: getTitle(report),
             subtitle: getSubtitle(report),
             xAxis: {
                 title: {text: gettext('Category')},
                 categories: categories,
-                scrollbar: {enabled: true},
             },
             yAxis: {
                 title: {text: gettext('Stories')},
-                stackLabels: {enabled: true},
-                scrollbar: {enabled: true},
+                stackLabels: {
+                    enabled: true,
+                    style: {fontWeight: 100},
+                },
             },
-            legend: {enabled: true},
+            legend: {
+                enabled: true,
+                style: {fontWeight: 100},
+            },
             tooltip: {
                 // Show the tooltip on the one line
-                headerFormat: '<b>{series.name}/{point.x}:</b> {point.y}',
+                headerFormat: '{series.name}/{point.x}: {point.y}',
                 pointFormat: '',
             },
             plotOptions: {
-                bar: {stacking: 'normal'},
-                column: {stacking: 'normal'},
+                bar: {stacking: 'normal', size: null},
+                column: {stacking: 'normal', size: null},
             },
             series: getSeriesData(report, categories),
             credits: {enabled: false},
@@ -137,8 +142,187 @@ export function SourceCategoryChart(_, Highcharts, gettext, moment, config) {
                     },
                 },
             },
-        };
+        }];
+    };
 
-        return Highcharts.chart(renderTo, chartData);
+    /**
+     * @ngdoc method
+     * @name SourceCategoryChart#getBasePieConfig
+     * @param {String} category - The name of the category
+     * @param {number} count - The number of stores in this category
+     * @return {Object}
+     * @description Returns a generic Pie Chart Highchart config for the provided Category
+     */
+    const getBasePieConfig = function(category, count) {
+        return {
+            id: category,
+            type: 'pie',
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie',
+                backgroundColor: '#FFFFFF',
+            },
+            title: {text: category},
+            subtitle: {text: count + ' Stories'},
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.percentage:.1f}% ({point.y})</b>',
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        format: '{point.name}: {point.percentage:.1f}% ({point.y})',
+                        style: {fontWeight: 100},
+                    },
+                    size: 300,
+                },
+            },
+            series: [{
+                name: category,
+                colorByPoint: true,
+                data: [],
+            }],
+            credits: {enabled: false},
+            exporting: {
+                fallbackToExportServer: false,
+                error: (options, error) => {
+                    console.error('Failed to export the chart\n', options, '\n', error);
+                },
+                buttons: {
+                    contextButton: {
+                        menuItems: [
+                            'printChart',
+                            'downloadPNG',
+                            'downloadJPEG',
+                            'downloadSVG',
+                            'downloadPDF',
+                            'downloadCSV',
+                        ],
+                    },
+                },
+            },
+        };
+    };
+
+    /**
+     * @ngdoc method
+     * @name SourceCategoryChart#generatePieConfig
+     * @param {Object} report - The report data
+     * @return {Array}
+     * @description Returns an Array of Pie Chart Highcharts configs, one for each category in the report data
+     */
+    const generatePieConfig = function(report) {
+        const categories = getCategories(report);
+        const sources = report.report.sources;
+
+        const configs = {};
+        const colours = [
+            '#7cb5ec',
+            '#434348',
+            '#90ed7d',
+            '#f7a35c',
+            '#8085e9',
+            '#f15c80',
+            '#e4d354',
+            '#2b908f',
+            '#f45b5b',
+            '#91e8e1',
+        ];
+
+        categories.forEach((category) => {
+            configs[category] = getBasePieConfig(category, report.report.categories[category]);
+        });
+
+        let i = 0;
+
+        Object.keys(sources).forEach((source) => {
+            Object.keys(sources[source]).forEach((category) => {
+                configs[category].series[0].data.push({
+                    name: source,
+                    y: sources[source][category],
+                    color: colours[i],
+                });
+            });
+
+            i += 1;
+        });
+
+        const charts = [];
+
+        categories.forEach((category) => {
+            charts.push(configs[category]);
+        });
+
+        return charts;
+    };
+
+    /**
+     * @ngdoc method
+     * @name SourceCategoryChart#generateTableConfig
+     * @param {Object} report - The report data
+     * @return {Array}
+     * @description Returns a Table Config for the provided report data
+     */
+    const generateTableConfig = function(report) {
+        const categories = getCategories(report);
+        const seriesData = getSeriesData(report, categories);
+        const tableRows = [];
+
+        seriesData.forEach((series) => {
+            tableRows.push([series.name].concat(series.data, _.sum(series.data)));
+        });
+
+        return [{
+            id: 'table',
+            type: 'table',
+            chart: {type: 'column'},
+            xAxis: {categories: categories},
+            series: seriesData,
+            headers: [].concat(
+                gettext('Category'),
+                categories,
+                gettext('Total Stories')
+            ),
+            rows: tableRows,
+            title: getTitle(report).text,
+            subtitle: getSubtitle(report).text,
+        }];
+    };
+
+    /**
+     * @ngdoc method
+     * @name SourceCategoryChart#createChart
+     * @param {Object} report
+     * @returns {Object}
+     * @description Create an of Highchart configs based on the given report parameters
+     */
+    this.createChart = function(report) {
+        switch (report.chartType) {
+        case 'pie':
+            return {
+                charts: generatePieConfig(report),
+                wrapCharts: true,
+                height500: true,
+                fullWidth: false,
+            };
+        case 'table':
+            return {
+                charts: generateTableConfig(report),
+                wrapCharts: true,
+                height500: false,
+                fullWidth: true,
+            };
+        default:
+            return {
+                charts: generateConfig(report),
+                wrapCharts: false,
+                height500: false,
+                fullWidth: true,
+            };
+        }
     };
 }

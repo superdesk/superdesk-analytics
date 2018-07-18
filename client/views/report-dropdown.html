@@ -1,0 +1,11 @@
+<div id="report-dropdown" class="dropdown" dropdown>
+    <button class="dropdown__toggle navbtn navbtn--text-only" dropdown__toggle>
+        {{currentReport.name}}
+        <span class="dropdown__caret"></span>
+    </button>
+    <ul class="dropdown__menu">
+        <li ng-repeat="report in reports" ng-class="{active: isActive(report)}">
+            <button ng-click="changeReport(report)">{{report.name}}</button>
+        </li>
+    </ul>
+</div>

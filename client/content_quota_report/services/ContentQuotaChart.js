@@ -1,4 +1,4 @@
-ContentQuotaChart.$inject = ['lodash', 'Highcharts'];
+ContentQuotaChart.$inject = ['lodash', 'chartManager'];
 
 /**
  * @ngdoc service
@@ -8,7 +8,7 @@ ContentQuotaChart.$inject = ['lodash', 'Highcharts'];
  * @description Content quota chart generation service
  */
 
-export function ContentQuotaChart(_, Highcharts) {
+export function ContentQuotaChart(_, chartManager) {
     var aboveQuota = '#008000',
         underQuota = 'brown',
         formatDate;
@@ -58,6 +58,7 @@ export function ContentQuotaChart(_, Highcharts) {
         });
 
         var chartData = {
+            id: 'content_quota',
             chart: {
                 type: 'column'
             },
@@ -106,6 +107,6 @@ export function ContentQuotaChart(_, Highcharts) {
             }]
         };
 
-        return Highcharts.chart(renderTo, chartData);
+        return chartManager.create(renderTo, chartData);
     };
 }

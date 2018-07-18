@@ -13,8 +13,8 @@ export function SourceCategoryReportView(sourceCategoryReport, sourceCategoryCha
     return {
         template: require('../views/source-category-report-view.html'),
         scope: {},
-        link: function(scope, element, attrs, controller) {
-            var chart = null;
+        link: function(scope, element, attrs) {
+            scope.config = [];
 
             /**
              * @ngdoc method
@@ -22,21 +22,12 @@ export function SourceCategoryReportView(sourceCategoryReport, sourceCategoryCha
              * @description Generate the Source/Cateogry chart
              */
             scope.generateChart = () => {
-                chart = sourceCategoryChart.createChart(scope.report, 'source-category');
+                scope.config = sourceCategoryChart.createChart(scope.report);
             };
 
             scope.$on('view:source_category_report', (event, args) => {
                 scope.report = args;
-                $timeout(scope.generateChart, 0);
-            });
-
-            scope.$on('$destroy', () => {
-                if (angular.isDefined(chart)) {
-                    if (angular.isDefined(chart.destroy)) {
-                        chart.destroy();
-                    }
-                    chart = null;
-                }
+                scope.generateChart();
             });
         },
     };

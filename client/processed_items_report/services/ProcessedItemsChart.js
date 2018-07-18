@@ -1,4 +1,4 @@
-ProcessedItemsChart.$inject = ['Highcharts', 'gettext', 'moment'];
+ProcessedItemsChart.$inject = ['chartManager', 'gettext', 'moment'];
 
 /**
  * @ngdoc service
@@ -6,7 +6,7 @@ ProcessedItemsChart.$inject = ['Highcharts', 'gettext', 'moment'];
  * @name ProcessedItemsChart
  * @description Processed items chart generation service
  */
-export function ProcessedItemsChart(Highcharts, gettext, moment) {
+export function ProcessedItemsChart(chartManager, gettext, moment) {
     /**
      * @ngdoc method
      * @name ProcessedItemsChart#createChart
@@ -33,6 +33,7 @@ export function ProcessedItemsChart(Highcharts, gettext, moment) {
         }
 
         var options = {
+            id: 'processed-items',
             chart: {
                 type: 'column'
             },
@@ -51,6 +52,6 @@ export function ProcessedItemsChart(Highcharts, gettext, moment) {
             series: series
         };
 
-        return Highcharts.chart(renderTo, options);
+        return chartManager.create(renderTo, options);
     };
 }
