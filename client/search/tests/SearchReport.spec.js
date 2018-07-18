@@ -1,40 +1,31 @@
-describe('sourceCategoryReport', () => {
-    let mocks;
-    let sourceCategoryReport;
-    let session;
+describe('searchReport', () => {
+    let searchReport;
+    let api;
+    let $q;
 
-    beforeEach(window.module('superdesk.core.auth.session'));
+    beforeEach(window.module(($provide) => {
+        // Use the superdesk.config.js/webpack.config.js application config
+        // eslint-disable-next-line no-undef
+        $provide.constant('config', {...__SUPERDESK_CONFIG__, server: {url: ''}});
+    }));
+
     beforeEach(window.module('superdesk.core.activity'));
     beforeEach(window.module('angularMoment'));
+    beforeEach(window.module('superdesk.analytics.search'));
 
-    beforeEach(window.module('superdesk.analytics.source-category-report'));
+    beforeEach(inject((_searchReport_, _api_, _$q_) => {
+        searchReport = _searchReport_;
+        api = _api_;
+        $q = _$q_;
 
-    beforeEach(() => {
-        mocks = {
-            endpoint: {save: jasmine.createSpy('api_save')},
-        };
-        mocks.api = jasmine.createSpy('api').and.returnValue(mocks.endpoint);
-
-        window.module(($provide) => {
-            $provide.service('api', () => mocks.api);
-
-            // User the superdesk.config.js/webpack.config.js application config
-            // eslint-disable-next-line no-undef
-            $provide.constant('config', __SUPERDESK_CONFIG__);
-        });
-    });
-
-    beforeEach(inject((_sourceCategoryReport_, _session_) => {
-        sourceCategoryReport = _sourceCategoryReport_;
-        session = _session_;
+        spyOn(api, 'query').and.returnValue($q.when({_items: []}));
     }));
 
     it('can call api save for source_category_report endpoint', () => {
-        sourceCategoryReport.generate({});
+        searchReport.query('source_category_report', {});
 
-        expect(mocks.api).toHaveBeenCalledWith('source_category_report', session.identity);
-        expect(mocks.endpoint.save).toHaveBeenCalledWith({}, {
-            query: {
+        expect(api.query).toHaveBeenCalledWith('source_category_report', {
+            source: {
                 query: {
                     filtered: {
                         filter: {
@@ -45,14 +36,15 @@ describe('sourceCategoryReport', () => {
                         },
                     },
                 },
+                sort: [{versioncreated: 'desc'}],
                 size: 0,
             },
-            repos: [],
+            repo: '',
         });
     });
 
     it('can generate list of excluded states', () => {
-        sourceCategoryReport.generate({
+        searchReport.query('source_category_report', {
             excluded_states: {
                 published: false,
                 killed: true,
@@ -62,8 +54,8 @@ describe('sourceCategoryReport', () => {
             },
         });
 
-        expect(mocks.endpoint.save).toHaveBeenCalledWith({}, {
-            query: {
+        expect(api.query).toHaveBeenCalledWith('source_category_report', {
+            source: {
                 query: {
                     filtered: {
                         filter: {
@@ -76,14 +68,15 @@ describe('sourceCategoryReport', () => {
                         },
                     },
                 },
+                sort: [{versioncreated: 'desc'}],
                 size: 0,
             },
-            repos: [],
+            repo: '',
         });
     });
 
     it('can generate the list of repos to search', () => {
-        sourceCategoryReport.generate({
+        searchReport.query('source_category_report', {
             repos: {
                 ingest: false,
                 archive: false,
@@ -92,8 +85,8 @@ describe('sourceCategoryReport', () => {
             },
         });
 
-        expect(mocks.endpoint.save).toHaveBeenCalledWith({}, {
-            query: {
+        expect(api.query).toHaveBeenCalledWith('source_category_report', {
+            source: {
                 query: {
                     filtered: {
                         filter: {
@@ -104,21 +97,22 @@ describe('sourceCategoryReport', () => {
                         },
                     },
                 },
+                sort: [{versioncreated: 'desc'}],
                 size: 0,
             },
-            repos: ['published', 'archived'],
+            repo: 'published,archived',
         });
     });
 
     it('can generate the date filters', () => {
         // Range
-        sourceCategoryReport.generate({
+        searchReport.query('source_category_report', {
             dateFilter: 'range',
             start_date: '01/06/2018',
             end_date: '30/06/2018',
         });
-        expect(mocks.endpoint.save).toHaveBeenCalledWith({}, {
-            query: {
+        expect(api.query).toHaveBeenCalledWith('source_category_report', {
+            source: {
                 query: {
                     filtered: {
                         filter: {
@@ -128,6 +122,7 @@ describe('sourceCategoryReport', () => {
                                         versioncreated: {
                                             lt: '2018-06-30T23:59:59+0100',
                                             gte: '2018-06-01T00:00:00+0100',
+                                            time_zone: '+01:00',
                                         },
                                     },
                                 }],
@@ -136,15 +131,16 @@ describe('sourceCategoryReport', () => {
                         },
                     },
                 },
+                sort: [{versioncreated: 'desc'}],
                 size: 0,
             },
-            repos: [],
+            repo: '',
         });
 
         // Yesterday
-        sourceCategoryReport.generate({dateFilter: 'yesterday'});
-        expect(mocks.endpoint.save).toHaveBeenCalledWith({}, {
-            query: {
+        searchReport.query('source_category_report', {dateFilter: 'yesterday'});
+        expect(api.query).toHaveBeenCalledWith('source_category_report', {
+            source: {
                 query: {
                     filtered: {
                         filter: {
@@ -154,6 +150,7 @@ describe('sourceCategoryReport', () => {
                                         versioncreated: {
                                             lt: 'now/d',
                                             gte: 'now-1d/d',
+                                            time_zone: '+01:00',
                                         },
                                     },
                                 }],
@@ -162,15 +159,16 @@ describe('sourceCategoryReport', () => {
                         },
                     },
                 },
+                sort: [{versioncreated: 'desc'}],
                 size: 0,
             },
-            repos: [],
+            repo: '',
         });
 
         // Last Week
-        sourceCategoryReport.generate({dateFilter: 'last_week'});
-        expect(mocks.endpoint.save).toHaveBeenCalledWith({}, {
-            query: {
+        searchReport.query('source_category_report', {dateFilter: 'last_week'});
+        expect(api.query).toHaveBeenCalledWith('source_category_report', {
+            source: {
                 query: {
                     filtered: {
                         filter: {
@@ -180,6 +178,7 @@ describe('sourceCategoryReport', () => {
                                         versioncreated: {
                                             lt: 'now/w',
                                             gte: 'now-1w/w',
+                                            time_zone: '+01:00',
                                         },
                                     },
                                 }],
@@ -188,15 +187,16 @@ describe('sourceCategoryReport', () => {
                         },
                     },
                 },
+                sort: [{versioncreated: 'desc'}],
                 size: 0,
             },
-            repos: [],
+            repo: '',
         });
 
         // Last Month
-        sourceCategoryReport.generate({dateFilter: 'last_month'});
-        expect(mocks.endpoint.save).toHaveBeenCalledWith({}, {
-            query: {
+        searchReport.query('source_category_report', {dateFilter: 'last_month'});
+        expect(api.query).toHaveBeenCalledWith('source_category_report', {
+            source: {
                 query: {
                     filtered: {
                         filter: {
@@ -206,6 +206,7 @@ describe('sourceCategoryReport', () => {
                                         versioncreated: {
                                             lt: 'now/M',
                                             gte: 'now-1M/M',
+                                            time_zone: '+01:00',
                                         },
                                     },
                                 }],
@@ -214,9 +215,10 @@ describe('sourceCategoryReport', () => {
                         },
                     },
                 },
+                sort: [{versioncreated: 'desc'}],
                 size: 0,
             },
-            repos: [],
+            repo: '',
         });
     });
 });

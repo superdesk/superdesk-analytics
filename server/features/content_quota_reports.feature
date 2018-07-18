@@ -1,6 +1,7 @@
 Feature: Content Quota
 
     @auth
+    @skip
     Scenario: Content quota items
         Given "desks"
         """

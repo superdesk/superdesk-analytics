@@ -12,13 +12,13 @@ import './styles/charts.scss';
 import * as svc from './services';
 import * as directive from './directives';
 
-var Highcharts = require('highcharts');
+var Highcharts = require('highcharts/js/highcharts');
 
-require('highcharts/modules/exporting')(Highcharts);
-require('highcharts/modules/data')(Highcharts);
-require('highcharts/modules/export-data')(Highcharts);
-require('highcharts/modules/offline-exporting')(Highcharts);
-require('highcharts/modules/no-data-to-display')(Highcharts);
+require('highcharts/js/modules/exporting')(Highcharts);
+require('highcharts/js/modules/data')(Highcharts);
+require('highcharts/js/modules/export-data')(Highcharts);
+require('highcharts/js/modules/offline-exporting')(Highcharts);
+require('highcharts/js/modules/no-data-to-display')(Highcharts);
 
 /**
  * @ngdoc module

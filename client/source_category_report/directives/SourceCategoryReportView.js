@@ -1,15 +1,13 @@
-SourceCategoryReportView.$inject = ['sourceCategoryReport', 'sourceCategoryChart', '$timeout'];
+SourceCategoryReportView.$inject = ['sourceCategoryChart'];
 
 /**
  * @ngdoc directive
  * @module superdesk.apps.analytics.source-category-report
  * @name sdSourceCategoryReportView
- * @requires sourceCategoryReport
  * @requires sourceCategoryChart
- * @requires $timeout
  * @description A directive that displays the generated source/category report
  */
-export function SourceCategoryReportView(sourceCategoryReport, sourceCategoryChart, $timeout) {
+export function SourceCategoryReportView(sourceCategoryChart) {
     return {
         template: require('../views/source-category-report-view.html'),
         scope: {},

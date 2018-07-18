@@ -3,6 +3,7 @@ describe('chartManager', () => {
     let chartManager;
     let config;
 
+    beforeEach(window.module('superdesk.core.notify'));
     beforeEach(window.module('superdesk.analytics.charts'));
 
     beforeEach(() => {
@@ -51,7 +52,10 @@ describe('chartManager', () => {
         chartManager.create('target', config, config.id);
         expect(mocks.chart.destroy.calls.count()).toBe(0);
         expect(mocks.highcharts.chart.calls.count()).toBe(1);
-        expect(mocks.highcharts.chart).toHaveBeenCalledWith('target', config);
+        expect(mocks.highcharts.chart).toHaveBeenCalledWith(
+            'target',
+            Object.assign({}, config, chartManager.defaultConfig)
+        );
         expect(Object.keys(chartManager.charts)).toEqual([config.id]);
 
         mocks.highcharts.chart.calls.reset();
@@ -60,7 +64,10 @@ describe('chartManager', () => {
         chartManager.create('target', config, config.id);
         expect(mocks.chart.destroy.calls.count()).toBe(1);
         expect(mocks.highcharts.chart.calls.count()).toBe(1);
-        expect(mocks.highcharts.chart).toHaveBeenCalledWith('target', config);
+        expect(mocks.highcharts.chart).toHaveBeenCalledWith(
+            'target',
+            Object.assign({}, config, chartManager.defaultConfig)
+        );
         expect(Object.keys(chartManager.charts)).toEqual([config.id]);
 
         mocks.chart.destroy.calls.reset();

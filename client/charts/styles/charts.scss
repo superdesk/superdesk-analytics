@@ -1,3 +1,7 @@
+@import '~highcharts/css/highcharts.scss';
+@import '~superdesk-ui-framework/app/styles/_reboot.scss';
+@import '~superdesk-ui-framework/app/styles/variables/_colors.scss';
+
 .sd-chart__container {
     width: 100%;
     height: 100%;
@@ -46,4 +50,76 @@
             text-transform: uppercase;
         }
     }
+}
+
+.highcharts-container {
+    font-family: $baseFontFamily;
+    font-size: $baseFontSize;
+    line-height: $baseLineHeight;
+}
+
+.highcharts-background {
+    fill: $white;
+}
+
+.highcharts-plot-background {
+    fill: none;
+}
+
+.highcharts-plot-border {
+    border-width: 0;
+}
+
+.highcharts-title, .sd-chart__table-header-title {
+    text-transform: uppercase;
+    font-size: 2.0rem;
+    letter-spacing: 0.04em;
+    color: $grayDark;
+}
+
+.sd-chart__table-header-title {
+    margin-bottom: 1rem;
+}
+
+.highcharts-subtitle, .sd-chart__table-header-subtitle {
+    font-size: 1.4rem;
+    letter-spacing: 0.04em;
+    color: $gray;
+    fill: $gray;
+}
+
+.highcharts-legend-item text {
+    font-weight: normal;
+}
+
+.highcharts-axis-title, .highcharts-axis-labels {
+    font-size: 1.4rem;
+    letter-spacing: 0.04rem;
+}
+
+.highcharts-contextbutton {
+    fill: none;
+}
+
+.highcharts-stack-labels text {
+    font-weight: 100;
+}
+
+.highcharts-legend-item text {
+    font-weight: 100;
+    fill: $gray;
+
+    &:hover {
+        font-weight: 400;
+        fill: $grayDark;
+    }
+}
+
+.highcharts-data-label text {
+    font-weight: 100;
+    fill: $gray;
+}
+
+.highcharts-pie-series .highcharts-point {
+    cursor: pointer;
 }
