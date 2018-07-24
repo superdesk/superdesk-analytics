@@ -36,9 +36,13 @@ export function Chart(chartManager, $timeout) {
             };
 
             scope.$on('analytics:toggle-filters', () => {
-                scope.$applyAsync(() => {
-                    chartManager.reflow(scope.config.id);
-                });
+                // Wait for the filter panel to finish its hide/show animation
+                // before resizing this chart
+                $timeout(() => {
+                    scope.$applyAsync(() => {
+                        chartManager.reflow(scope.config.id);
+                    });
+                }, 500);
             });
 
             /**

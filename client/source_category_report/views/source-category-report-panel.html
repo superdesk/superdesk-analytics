@@ -9,7 +9,7 @@
 
 <div class="side-panel__content">
     <div class="side-panel__content-block">
-        <div class="sd-alert sd-alert--hollow">
+        <div class="sd-alert sd-alert--hollow" translate>
             Generate a report showing the number of published stories per category with a breakdown on source.
         </div>
         <form name="sourceCategoryReportForm">
@@ -18,17 +18,21 @@
                     <label class="sd-line-input__label" translate>Title</label>
                     <textarea
                             class="sd-line-input__input"
-                            placeholder="Published Stories per Category with Source Breakdown"
+                            placeholder="{{'Published Stories per Category with Source Breakdown'|translate}}"
                             ng-model="report.title"
                             rows="2"
-                    />
+                    ></textarea>
                 </div>
             </div>
 
             <div class="form__row">
                 <div class="sd-line-input">
                     <label class="sd-line-input__label" translate>Subtitle</label>
-                    <input class="sd-line-input__input" placeholder="{{ generateSubtitlePlaceholder() }}" ng-model="report.subtitle" type="text" />
+                    <input
+                            class="sd-line-input__input"
+                            placeholder="{{ generateSubtitlePlaceholder() | translate }}"
+                            ng-model="report.subtitle" type="text"
+                    />
                 </div>
             </div>
 
@@ -42,28 +46,28 @@
                                 ng-value="yesterday"
                                 data-label-position="inside"
                                 ng-click="onDateFilterChange()"
-                        >Yesterday</button>
+                        >{{ 'Yesterday' | translate }}</button>
                         <button sd-check
                                 data-type="radio"
                                 ng-model="report.dateFilter"
                                 ng-value="last_week"
                                 data-label-position="inside"
                                 ng-click="onDateFilterChange()"
-                        >Last Week</button>
+                        >{{ 'Last Week' | translate }}</button>
                         <button sd-check
                                 data-type="radio"
                                 ng-model="report.dateFilter"
                                 ng-value="last_month"
                                 data-label-position="inside"
                                 ng-click="onDateFilterChange()"
-                        >Last Month</button>
+                        >{{ 'Last Month' | translate }}</button>
                         <button sd-check
                                 data-type="radio"
                                 ng-model="report.dateFilter"
                                 ng-value="range"
                                 data-label-position="inside"
                                 ng-click="onDateFilterChange()"
-                        >Range</button>
+                        >{{ 'Range' | translate }}</button>
                     </div>
                 </div>
             </div>
@@ -114,7 +118,7 @@
                                     sd-check
                                     data-label-position="inside"
                             >
-                                {{state.name}}
+                                {{state.name | translate}}
                             </button>
                         </div>
                     </div>
@@ -131,7 +135,9 @@
                     </div>
                     <div class="form__row-item">
                         <div class="sd-line-input sd-line-input--label-left-auto">
-                            <label class="sd-line-input__label" translate>Stories</label>
+                            <label class="sd-line-input__label" translate>
+                                Stories
+                            </label>
                         </div>
                     </div>
                 </div>
@@ -145,7 +151,9 @@
                     </div>
                     <div class="form__row-item">
                         <div class="sd-line-input sd-line-input--label-left-auto">
-                            <label class="sd-line-input__label" translate>Stories</label>
+                            <label class="sd-line-input__label" translate>
+                                Stories
+                            </label>
                         </div>
                     </div>
                 </div>
@@ -163,7 +171,7 @@
                                     ng-value="{{type.qcode}}"
                                     data-label-position="inside"
                             >
-                                {{type.name}}
+                                {{type.name | translate}}
                             </button>
                         </div>
                     </div>
@@ -173,8 +181,8 @@
                     <div class="sd-line-input sd-line-input--is-select">
                         <label class="sd-line-input__label" translate>Order Categories In:</label>
                         <select class="sd-line-input__select" ng-model="report.sort_order">
-                            <option value="desc">Descending Order of Stories</option>
-                            <option value="asc">Ascending Order of Stores</option>
+                            <option value="desc" translate>Descending Order of Stories</option>
+                            <option value="asc" translate>Ascending Order of Stores</option>
                         </select>
                     </div>
                 </div>

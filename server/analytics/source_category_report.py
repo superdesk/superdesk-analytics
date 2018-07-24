@@ -10,57 +10,56 @@
 
 from superdesk import get_resource_service
 from superdesk.resource import Resource
-from superdesk.services import BaseService
-from analytics.aggregations import get_aggregations, SOURCE_CATEGORY, source_category_aggregation
 
-from flask import json
-from eve.utils import ParsedRequest
+from analytics.base_report import BaseReportService
 
 
 class SourceCategoryReportResource(Resource):
     """Categories per source report schema
     """
 
-    schema = {
-        'query': {'type': 'dict', 'required': True},
-        'repos': {'type': 'list', 'default': ['published', 'archived']}
+    item_methods = ['GET']
+    resource_methods = ['GET']
+    privileges = {'GET': 'source_category_report'}
+
+
+class SourceCategoryReportService(BaseReportService):
+    aggregations = {
+        'source_category': {
+            'terms': {
+                'field': 'source',
+                'size': 0
+            },
+            'aggs': {
+                'category': {
+                    'terms': {
+                        'field': 'anpa_category.qcode',
+                        'size': 0
+                    }
+                }
+            }
+        }
     }
 
-    item_methods = ['GET', 'DELETE']
-    resource_methods = ['POST']
-
-    privileges = {
-        'POST': 'source_category_report',
-        'DELETE': 'source_category_report',
-        'GET': 'source_category_report'
-    }
-
-
-class SourceCategoryReportService(BaseService):
-    def generate_report(self, doc):
+    def generate_report(self, docs, params):
         """Returns the category count and categories per source counts.
 
-        :param dict doc: document used for generating the report
+        :param docs: document used for generating the report
         :return dict: report
         """
-        repos = doc.get('repos') or ['published', 'archived']
-        request = ParsedRequest()
-        request.args = {
-            'source': json.dumps(doc.get('query') or {}),
-            'repo': ','.join(repos),
-            'aggregations': 1
-        }
-
-        agg_buckets = get_aggregations([source_category_aggregation], request)
-
+        agg_buckets = self.get_aggregation_buckets(docs.hits)
         cv = get_resource_service('vocabularies').find_one(req=None, _id='categories')
 
+        categories_by_qcode = {
+            category.get('qcode'): category for category in cv['items'] if category.get('is_active', True)
+        }
+
         report = {
-            'categories': {category.get('name'): 0 for category in cv['items'] if category.get('is_active')},
+            'categories': {category.get('name'): 0 for category in cv['items'] if category.get('is_active', True)},
             'sources': {}
         }
 
-        for source in (agg_buckets.get(SOURCE_CATEGORY) or {}).get('buckets') or []:
+        for source in agg_buckets.get('source_category') or []:
             source_key = source.get('key')
 
             # If for some reason we don't find a source key, then skip this entry
@@ -70,7 +69,8 @@ class SourceCategoryReportService(BaseService):
             report['sources'][source_key] = {}
 
             for category in (source.get('category') or {}).get('buckets') or []:
-                category_key = category.get('key')
+                qcode = category.get('key')
+                category_key = (categories_by_qcode.get(qcode) or {}).get('name')
 
                 # If for some reason we don't find a category key, then skip this entry
                 if not category_key:
@@ -83,9 +83,3 @@ class SourceCategoryReportService(BaseService):
                 report['categories'][category_key] += report['sources'][source_key][category_key]
 
         return report
-
-    def create(self, docs):
-        """Generate the reports based on the query/repo provided"""
-        for doc in docs:
-            doc['report'] = self.generate_report(doc)
-        return super().create(docs)

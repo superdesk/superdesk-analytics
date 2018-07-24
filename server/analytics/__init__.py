@@ -17,6 +17,7 @@ from analytics.track_activity import TrackActivityResource, TrackActivityService
 from analytics.processed_items_report import ProcessedItemsResource, ProcessedItemsService
 from analytics.content_quota_reports import ContentQuotaReportResource, ContentQuotaReportService
 from analytics.source_category_report import SourceCategoryReportResource, SourceCategoryReportService
+from analytics.base_report import BaseReportService
 
 
 def init_app(app):
@@ -56,3 +57,20 @@ def init_app(app):
         label='Source Category Report View',
         description='User can view source v category reports.'
     )
+
+    # If this app is for testing, then create an endpoint for the base reporting service
+    # so the core searching/aggregation functionality can be tested
+    if app.testing:
+        class TestReportService(BaseReportService):
+            aggregations = {
+                'category': {'terms': {'field': 'anpa_category.qcode', 'size': 0}},
+                'source': {'terms': {'field': 'source', 'size': 0}}
+            }
+
+        class BaseReportResource(superdesk.resource.Resource):
+            item_methods = ['GET']
+            resource_methods = ['GET']
+
+        endpoint_name = 'analytics_test_report'
+        service = TestReportService(endpoint_name, backend=superdesk.get_backend())
+        BaseReportResource(endpoint_name, app=app, service=service)

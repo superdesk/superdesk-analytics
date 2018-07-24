@@ -21,7 +21,6 @@ import * as directive from './directives';
  */
 angular.module('superdesk.analytics.source-category-report', [])
     .service('sourceCategoryChart', svc.SourceCategoryChart)
-    .service('sourceCategoryReport', svc.SourceCategoryReport)
 
     .directive('sdSourceCategoryReportContainer', directive.SourceCategoryReportContainer)
     .directive('sdSourceCategoryReportPanel', directive.SourceCategoryReportPanel)
