@@ -13,7 +13,7 @@ import * as directive from './directives';
 
 
 function cacheIncludedTemplates($templateCache) {
-    $templateCache.put('activity-report-parameters.html', require('./views/activity-report-parameters.html'));
+    $templateCache.put('activity-report-settings.html', require('./views/activity-report-settings.html'));
     $templateCache.put('activity-report-grouping.html', require('./views/activity-report-grouping.html'));
     $templateCache.put('save-activity-report-dialog.html', require('./views/save-activity-report-dialog.html'));
 }
@@ -34,6 +34,7 @@ angular.module('superdesk.analytics.activity-report', [])
 
     .directive('sdActivityReportContainer', directive.ActivityReportContainer)
     .directive('sdActivityReportPanel', directive.ActivityReportPanel)
+    .directive('sdActivityReportSettings', directive.ActivityReportSettings)
     .directive('sdActivityReportView', directive.ActivityReportView)
     .directive('sdSaveActivityReport', directive.SaveActivityReport)
     .directive('sdSavedActivityReports', directive.SavedActivityReports)

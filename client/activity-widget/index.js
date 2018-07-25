@@ -49,7 +49,8 @@ export default angular.module('superdesk.analytics.activity-report-widget', [
             template: 'activity-widget.html',
             configurationTemplate: 'activity-widget-settings.html',
             description: 'This wiget allows you to view the activity report',
-            custom: true
+            custom: true,
+            removeHeader: true,
         });
     }])
 

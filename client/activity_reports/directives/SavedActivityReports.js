@@ -52,7 +52,6 @@ export function SavedActivityReports($rootScope, api, session, modal, notify, ge
                     scope.globalSavedActivityReports = [];
                     scope.activityReports = activityReports;
                     _.forEach(scope.activityReports, (savedActivityReport) => {
-                        savedActivityReport.operation_start_date = formatDate(savedActivityReport.operation_start_date);
                         savedActivityReport.operation_end_date = formatDate(savedActivityReport.operation_end_date);
                         if (savedActivityReport.owner === session.identity._id) {
                             scope.userSavedActivityReports.push(savedActivityReport);
@@ -75,7 +74,7 @@ export function SavedActivityReports($rootScope, api, session, modal, notify, ge
              * @description Broadcasts the edit:activity_report event
              */
             scope.edit = function(activityReport) {
-                $rootScope.$broadcast('edit:activity_report', activityReport);
+                $rootScope.$broadcast('activity-report:edit', activityReport);
             };
 
             /**

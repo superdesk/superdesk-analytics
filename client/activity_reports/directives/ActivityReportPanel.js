@@ -1,63 +1,39 @@
-ActivityReportPanel.$inject = [
-    'desks', 'metadata', 'notify', '$rootScope', 'activityReport'
-];
+ActivityReportPanel.$inject = ['desks', 'notify', '$rootScope', 'activityReport'];
 
 /**
  * @ngdoc directive
  * @module superdesk.apps.analytics.activity-report
  * @name sdActivityReportPanel
  * @requires desks
- * @requires metadata
  * @requires notify
  * @requires $rootScope
  * @requires activityReport
  * @description A directive that generates the sidebar containing activity report parameters
  */
-export function ActivityReportPanel(desks, metadata, notify, $rootScope, activityReport) {
+export function ActivityReportPanel(desks, notify, $rootScope, activityReport) {
     return {
         template: require('../views/activity-report-panel.html'),
         scope: {},
         link: function(scope, element, attrs, controller) {
             scope.panelTab = 'editingActivityReport';
-            scope.innerTab = 'parameters';
-            scope.showActivityReport = false;
 
             desks.initialize().then(() => {
                 scope.desks = desks.desks._items;
-                scope.initActivityReport();
-            });
-
-            metadata.initialize().then(() => {
-                scope.metadata = metadata.values;
-            });
-
-            scope.$on('edit:activity_report', (event, args) => {
-                scope.panelTab = 'editingActivityReport';
-                scope.innerTab = 'parameters';
-                scope.activityReport = args;
-                scope.group_by = {desk: args.hasOwnProperty('group_by') && args.group_by.indexOf('desk') >= 0};
-            });
-
-            scope.$watch('group_by.desk', (groupByDesk) => {
-                if (scope.activityReport) {
-                    if (groupByDesk === true) {
-                        scope.activityReport.group_by = ['desk'];
-                        delete scope.activityReport.desk;
-                    } else if (scope.activityReport.hasOwnProperty('group_by')) {
-                        delete scope.activityReport.group_by;
-                        scope.activityReport.desk = desks.activeDeskId;
-                    }
-                }
+                scope.initReport();
             });
 
             /**
              * @ngdoc method
-             * @name sdActivityReportPanel#initActivityReport
-             * @description Initialises the activity report object
+             * @name ActivityReportPanel#initReport
+             * @description Initialises the activity report settings
              */
-            scope.initActivityReport = function() {
-                scope.activityReport = {operation: 'publish', desk: desks.activeDeskId};
-                scope.group_by = {desk: false};
+            scope.initReport = function() {
+                scope.report = {
+                    operation: 'publish',
+                    desk: desks.activeDeskId,
+                    days: 1,
+                    group_by: {desk: false}
+                };
             };
 
             /**
@@ -92,21 +68,11 @@ export function ActivityReportPanel(desks, metadata, notify, $rootScope, activit
 
             /**
              * @ngdoc method
-             * @name sdActivityReportPanel#display
-             * @param {String} tabName - valid values are 'parameters' and 'grouping'
-             * @description Changes the inner tab to the given one
-             */
-            scope.display = function(tabName) {
-                scope.innerTab = tabName;
-            };
-
-            /**
-             * @ngdoc method
              * @name sdActivityReportPanel#generate
              * @returns {Promise}
              * @description Generate the report
              */
-            scope.generate = function() {
+            scope.generate = function(report) {
                 function onSuccess(activityReport) {
                     $rootScope.$broadcast('view:activity_report', activityReport);
                     notify.success(gettext('The activity report was genereated successfully'));
@@ -120,8 +86,22 @@ export function ActivityReportPanel(desks, metadata, notify, $rootScope, activit
                     }
                 }
 
-                return activityReport.generate(scope.activityReport).then(onSuccess, onFail);
+                return activityReport.generate(report).then(onSuccess, onFail);
             };
+
+            scope.$on('activity-report:edit', (event, args) => {
+                scope.panelTab = 'editingActivityReport';
+                scope.report = args;
+            });
+
+            scope.$on('activity-report:saved', (event) => {
+                scope.panelTab = 'savedActivityReport';
+                scope.initReport();
+            });
+
+            scope.$on('activity-report:clear', (event) => {
+                scope.initReport();
+            });
         }
     };
 }

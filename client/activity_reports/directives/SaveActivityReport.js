@@ -1,4 +1,7 @@
-SaveActivityReport.$inject = ['$location', 'asset', 'api', 'session', 'notify', 'config', '$rootScope', 'lodash'];
+import {formatDateForServer} from '../../utils';
+
+SaveActivityReport.$inject = ['$location', 'asset', 'api', 'session', 'notify', 'config',
+    '$rootScope', 'moment'];
 
 /**
  * @ngdoc directive
@@ -10,12 +13,18 @@ SaveActivityReport.$inject = ['$location', 'asset', 'api', 'session', 'notify', 
  * @requires session
  * @requires notify
  * @requires config
- * @requires $rootScope, _
+ * @requires $rootScope
+ * @requires moment
  * @description A directive that generates the activity report save dialog
  */
-export function SaveActivityReport($location, asset, api, session, notify, config, $rootScope, _) {
+export function SaveActivityReport($location, asset, api, session, notify, config, $rootScope,
+        moment) {
     return {
         template: require('../views/save-activity-report.html'),
+        scope: {
+            form: '=',
+            report: '='
+        },
         link: function(scope, element, attrs, controller) {
             /**
              * @ngdoc method
@@ -23,11 +32,10 @@ export function SaveActivityReport($location, asset, api, session, notify, confi
              * @param {Object} activityReport
              * @description Patches or posts the given activity report
              */
-            scope.save = function(activityReport) {
+            scope.save = function() {
                 function onSuccess() {
                     notify.success(gettext('The activity report was saved successfully'));
-                    scope.clear();
-                    scope.changeTab('savedReports');
+                    $rootScope.$broadcast('activity-report:saved');
                 }
 
                 function onFail(error) {
@@ -39,14 +47,16 @@ export function SaveActivityReport($location, asset, api, session, notify, confi
                 }
 
                 var originalActivityReport = {};
-                var activityReportEdit = _.clone(activityReport);
+                var activityReportEdit = _.clone(scope.report);
 
                 if (activityReportEdit._id) {
                     originalActivityReport = activityReportEdit;
                 }
                 activityReportEdit.owner = session.identity._id;
-                activityReportEdit.operation_start_date = formatDate(activityReport.operation_start_date);
-                activityReportEdit.operation_end_date = formatDate(activityReport.operation_end_date);
+                if (scope.report.operation_end_date) {
+                    activityReportEdit.operation_end_date = formatDateForServer(moment, config,
+                        scope.report.operation_end_date, 1);
+                }
                 $rootScope.$broadcast('savedactivityreport:update');
 
                 api('saved_activity_reports', session.identity).save(originalActivityReport, activityReportEdit)
@@ -59,20 +69,9 @@ export function SaveActivityReport($location, asset, api, session, notify, confi
              * @description Clears the activity report form
              */
             scope.clear = function() {
-                scope.initActivityReport();
+                $rootScope.$broadcast('activity-report:clear');
                 $location.url($location.path());
             };
-
-            /**
-             * @ngdoc method
-             * @name sdSaveActivityReport#formatDate
-             * @param {String} date
-             * @returns {String}
-             * @description Format given date for save
-             */
-            function formatDate(date) {
-                return date ? moment(date, config.model.dateformat).format('YYYY-MM-DD') : null; // jshint ignore:line
-            }
         }
     };
 }

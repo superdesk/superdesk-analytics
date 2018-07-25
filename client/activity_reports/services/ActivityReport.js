@@ -30,7 +30,6 @@ export function ActivityReport(api, session, config, $q, moment) {
         var query = _.clone(activityReport);
 
         try {
-            query.operation_start_date = formatDateForServer(moment, config, activityReport.operation_start_date);
             query.operation_end_date = formatDateForServer(moment, config, activityReport.operation_end_date, 1);
         } catch (e) {
             return $q.reject();

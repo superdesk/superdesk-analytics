@@ -1,36 +1,38 @@
-<div>
-    <div class="header">
-        <ul>
-            <li id="activity-report-edit" ng-click="changeTab('editingActivityReport')"
-                ng-class="{active: panelTab === 'editingActivityReport'}" translate>Edit Report
-            </li>
-            <li id="saved-activity-reports" 
-                ng-class="{active: panelTab === 'savedReports'}" 
-                ng-click="changeTab('savedReports')" translate>Saved
-            </li>
-        </ul>
+<div class="side-panel__header side-panel__header--border-b">
+    <div class="side-panel__tools">
+        <a class="icn-btn" data-flow="left" ng-click="toggleFilters()">
+            <i class="icon-close-small"></i>
+        </a>
     </div>
+    <h3 class="side-panel__heading" translate>Report Parameters</h3>
+</div>
 
-    <div class="content" ng-class="{pull: innerTab==='parameters', 'pull-heigher': innerTab==='parameters' && editReportSelected()}" ng-if="editReportSelected()">
-        <div class="tab-box">
-            <button id="parameters-tab" type="button" class="tab-box__item" ng-class="{'tab-box__item--active': innerTab==='parameters'}" ng-click="display('parameters')" translate>Parameters</button>
-            <button id="grouping-tab" type="button" class="tab-box__item" ng-class="{'tab-box__item--active': innerTab==='grouping'}" ng-click="display('grouping')" translate>Grouping</button>
-        </div>
+<div class="side-panel__content">
+    <ul class="nav-tabs">
+        <li id="activity-report-edit" class="nav-tabs__tab side-panel__content-tab-nav"
+            ng-class="{'nav-tabs__tab-active': editReportSelected()}"
+            ng-click="changeTab('editingActivityReport')" translate>Edit Report
+        </li>
+        <li id="saved-activity-reports" class="nav-tabs__tab side-panel__content-tab-nav"
+            ng-class="{'nav-tabs__tab-active': savedReportsSelected()}" 
+            ng-click="changeTab('savedReports')" translate>Saved
+        </li>
+    </ul>
 
-        <form name="editReportForm">
-            <div ng-include="'activity-report-parameters.html'" ng-show="innerTab==='parameters'"></div>
-            <div ng-include="'activity-report-grouping.html'" ng-show="innerTab==='grouping'"></div>
+    <ng-form name="activityReportForm">
+        <form name="editReportForm" ng-if="editReportSelected()">
+            <div sd-activity-report-settings data-settings="report" />
+            <div class="side-panel__content-block">
+                <button id="generate_activity_report" class="btn btn--primary"
+                    ng-click="generate(report)" ng-disabled="!editReportForm.$valid && false" translate>Generate</button>
+            </div>
         </form>
 
-        <div>
-            <button id="generate_activity_report" class="btn btn--primary"
-                ng-click="generate()" ng-disabled="!editReportForm.$valid" translate>Generate</button>
+        <div class="side-panel__footer side-panel__footer--button-box" ng-if="editReportSelected()">
+            <div sd-save-activity-report data-form="activityReportForm" data-report="report" />
         </div>
+    </ng-form>
 
-        <div sd-save-activity-report></div>
-    </div>
-
-    <div class="content views" ng-if="panelTab==='savedReports'">
-        <div sd-saved-activity-reports></div>
-    </div>
+    <div sd-saved-activity-reports ng-if="savedReportsSelected()"></div>
 </div>
+
