@@ -57,8 +57,9 @@ export function ContentQuotaChart(_, chartManager) {
             categories.push(formatDate(item.start_time) + ' : ' + formatDate(item.end_time));
         });
 
-        var chartData = {
+        return [{
             id: 'content_quota',
+            type: 'column',
             chart: {
                 type: 'column'
             },
@@ -105,8 +106,6 @@ export function ContentQuotaChart(_, chartManager) {
                 name: gettext('Number of items per interval'),
                 data: data
             }]
-        };
-
-        return chartManager.create(renderTo, chartData);
+        }];
     };
 }

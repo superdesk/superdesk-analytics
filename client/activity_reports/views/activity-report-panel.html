@@ -1,29 +1,34 @@
 <div class="side-panel__header side-panel__header--border-b">
     <div class="side-panel__tools">
-        <a class="icn-btn" data-flow="left" ng-click="toggleFilters()">
+        <a class="icn-btn" data-flow="left" ng-click="toggleSidePanel()">
             <i class="icon-close-small"></i>
         </a>
     </div>
-    <h3 class="side-panel__heading" translate>Report Parameters</h3>
+
+    <ul class="nav-tabs">
+        <li class="nav-tabs__tab"
+            id="activity-report-edit"
+            ng-class="{'nav-tabs__tab--active': editReportSelected()}"
+        >
+            <button class="nav-tabs__link"
+                    ng-click="changeTab('editingActivityReport')"
+                    translate
+            >Advanced</button>
+        </li>
+        <li class="nav-tabs__tab"
+            id="saved-activity-reports"
+            ng-class="{'nav-tabs__tab--active': savedReportsSelected()}"
+        >
+            <button class="nav-tabs__link"
+                    ng-click="changeTab('savedReports')"
+                    translate
+            >Saved</button>
+        </li>
+    </ul>
 </div>
 
 <div class="side-panel__content">
-    <ul class="nav-tabs">
-        <li id="activity-report-edit" class="nav-tabs__tab side-panel__content-tab-nav"
-            ng-class="{'nav-tabs__tab--active': editReportSelected()}">
-            <button class="nav-tabs__link" 
-                ng-click="changeTab('editingActivityReport')" translate>Edit Report
-            </button>
-        </li>
-        <li id="saved-activity-reports" class="nav-tabs__tab side-panel__content-tab-nav"
-            ng-class="{'nav-tabs__tab--active': savedReportsSelected()}">
-            <button class="nav-tabs__link"
-                ng-click="changeTab('savedReports')" translate>Saved
-            </button>
-        </li>
-    </ul>
-
-    <ng-form name="activityReportForm">
+   <ng-form name="activityReportForm">
         <form name="editReportForm" ng-if="editReportSelected()">
             <div sd-activity-report-settings data-settings="report" class="report-settings"></div>
             <div class="side-panel__content-block">
@@ -39,4 +44,3 @@
 
     <div sd-saved-activity-reports ng-if="savedReportsSelected()"></div>
 </div>
-

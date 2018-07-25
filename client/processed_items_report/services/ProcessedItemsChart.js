@@ -32,8 +32,9 @@ export function ProcessedItemsChart(chartManager, gettext, moment) {
             });
         }
 
-        var options = {
+        return [{
             id: 'processed-items',
+            type: 'column',
             chart: {
                 type: 'column'
             },
@@ -50,8 +51,6 @@ export function ProcessedItemsChart(chartManager, gettext, moment) {
                 }
             },
             series: series
-        };
-
-        return chartManager.create(renderTo, options);
+        }];
     };
 }

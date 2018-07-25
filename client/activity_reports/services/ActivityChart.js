@@ -99,8 +99,9 @@ export function ActivityChart(_, chartManager) {
             gettext('Corrected items');
         var reportData = report.group_by && report.group_by.desk ? getGroupData(report) : getTimeData(report);
 
-        var chartData = {
-            id: 'activity-report',
+        return [{
+            id: 'activity',
+            type: 'column',
             chart: {
                 type: 'column'
             },
@@ -128,8 +129,6 @@ export function ActivityChart(_, chartManager) {
                 name: getSeriesName(report),
                 data: reportData.data
             }]
-        };
-
-        return chartManager.create(renderTo, chartData, reportId);
+        }];
     };
 }

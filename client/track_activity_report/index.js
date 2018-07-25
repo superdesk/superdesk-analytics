@@ -11,6 +11,14 @@
 import * as svc from './services';
 import * as directive from './directives';
 
+function cacheIncludedTemplates($templateCache) {
+    $templateCache.put(
+        'track-activity-report-side-panel.html',
+        require('./views/track-activity-report-side-panel.html')
+    );
+}
+cacheIncludedTemplates.$inject = ['$templateCache'];
+
 
 /**
  * @ngdoc module
@@ -27,13 +35,14 @@ angular.module('superdesk.analytics.track-activity-report', [])
     .directive('sdTrackActivityReportPanel', directive.TrackActivityReportPanel)
     .directive('sdTrackActivityReportView', directive.TrackActivityReportView)
 
-    .config(['superdeskProvider', function(superdesk) {
-        superdesk.activity('track-activity-report', {
+    .run(cacheIncludedTemplates)
+
+    .config(['reportsProvider', 'gettext', function(reportsProvider, gettext) {
+        reportsProvider.addReport({
+            id: 'track_activity_report',
             label: gettext('Track Activity Report'),
-            template: require('./views/track-activity-report.html'),
-            topTemplateUrl: 'scripts/apps/dashboard/views/workspace-topnav.html',
-            sideTemplateUrl: 'scripts/apps/workspace/views/workspace-sidenav.html',
-            category: 'analytics',
-            priority: -800
+            sidePanelTemplate: 'track-activity-report-side-panel.html',
+            priority: 300,
+            privileges: {track_activity_report: 1},
         });
     }]);

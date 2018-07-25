@@ -9,8 +9,27 @@
  */
 
 import * as svc from './services';
-import * as directive from './directives';
+import * as ctrl from './controllers';
 
+function cacheIncludedTemplates($templateCache) {
+    $templateCache.put(
+        'source-category-report-panel.html',
+        require('./views/source-category-report-panel.html')
+    );
+    $templateCache.put(
+        'source-category-report-parameters.html',
+        require('./views/source-category-report-parameters.html')
+    );
+    $templateCache.put(
+        'source-category-report-filters.html',
+        require('./views/source-category-report-filters.html')
+    );
+    $templateCache.put(
+        'source-category-report-chart-options.html',
+        require('./views/source-category-report-chart-options.html')
+    );
+}
+cacheIncludedTemplates.$inject = ['$templateCache'];
 
 /**
  * @ngdoc module
@@ -22,17 +41,17 @@ import * as directive from './directives';
 angular.module('superdesk.analytics.source-category-report', [])
     .service('sourceCategoryChart', svc.SourceCategoryChart)
 
-    .directive('sdSourceCategoryReportContainer', directive.SourceCategoryReportContainer)
-    .directive('sdSourceCategoryReportPanel', directive.SourceCategoryReportPanel)
-    .directive('sdSourceCategoryReportView', directive.SourceCategoryReportView)
+    .controller('SourceCategoryController', ctrl.SourceCategoryController)
 
-    .config(['superdeskProvider', function(superdesk) {
-        superdesk.activity('source-category-report', {
-            label: gettext('Source Category Report'),
-            template: require('./views/source-category-report.html'),
-            topTemplateUrl: 'scripts/apps/dashboard/views/workspace-topnav.html',
-            sideTemplateUrl: 'scripts/apps/workspace/views/workspace-sidenav.html',
-            category: 'analytics',
-            priority: -800,
+    .run(cacheIncludedTemplates)
+
+    .config(['reportsProvider', 'gettext', function(reportsProvider, gettext) {
+        reportsProvider.addReport({
+            id: 'source_category_report',
+            label: gettext('Source Category'),
+            sidePanelTemplate: 'source-category-report-panel.html',
+            controller: ctrl.SourceCategoryController,
+            priority: 500,
+            privileges: {source_category_report: 1},
         });
     }]);

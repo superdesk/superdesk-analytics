@@ -1,5 +1,12 @@
 TrackActivityReportPanel.$inject = [
-    'config', 'api', 'session', 'notify', '$rootScope', 'desks', 'trackActivityReport'
+    'config',
+    'api',
+    'session',
+    'notify',
+    '$rootScope',
+    'desks',
+    'trackActivityReport',
+    'trackActivityChart',
 ];
 
 /**
@@ -13,13 +20,23 @@ TrackActivityReportPanel.$inject = [
  * @requires $rootScope
  * @requires desks
  * @requires trackActivityReport
+ * @requires trackActivityChart
  * @description A directive that generates the sidebar containing track activity report parameters
  */
-export function TrackActivityReportPanel(config, api, session, notify, $rootScope, desks, trackActivityReport) {
+export function TrackActivityReportPanel(
+    config,
+    api,
+    session,
+    notify,
+    $rootScope,
+    desks,
+    trackActivityReport,
+    trackActivityChart
+) {
     return {
+        require: '^sdAnalyticsContainer',
         template: require('../views/track-activity-report-panel.html'),
-        scope: {},
-        link: function(scope, element, attrs, controller) {
+        link: function(scope, element, attrs) {
             var daysAgoDefault = 2;
 
             /**
@@ -28,16 +45,24 @@ export function TrackActivityReportPanel(config, api, session, notify, $rootScop
              * @description Initialises the track activity report object
              */
             scope.initalize = function() {
-                var currentDesk = desks.getCurrentDesk();
-
-                scope.desks = desks.desks._items;
                 scope.stages = null;
                 scope.selectedUser = null;
                 scope.report = {days_ago: daysAgoDefault};
-                if (currentDesk) {
-                    scope.report = {desk: currentDesk._id, stage: currentDesk.working_stage, days_ago: daysAgoDefault};
-                    scope.stages = desks.deskStages[currentDesk._id];
-                }
+
+                desks.initialize().then(() => {
+                    let currentDesk = desks.getCurrentDesk();
+
+                    scope.desks = desks.desks._items;
+
+                    if (currentDesk) {
+                        scope.report = {
+                            desk: currentDesk._id,
+                            stage: currentDesk.working_stage,
+                            days_ago: daysAgoDefault,
+                        };
+                        scope.stages = desks.deskStages[currentDesk._id];
+                    }
+                });
             };
 
             scope.$watch('report.desk', (deskId, oldDeskId) => {
@@ -100,7 +125,9 @@ export function TrackActivityReportPanel(config, api, session, notify, $rootScop
              */
             scope.generate = function() {
                 function onSuccess(report) {
-                    $rootScope.$broadcast('view:track_activity_report', report);
+                    scope.changeReportParams({
+                        charts: trackActivityChart.createChart(report),
+                    });
                     notify.success(gettext('The track activity report was genereated successfully'));
                 }
 

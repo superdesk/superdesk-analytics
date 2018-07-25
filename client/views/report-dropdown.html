@@ -1,11 +1,11 @@
 <div id="report-dropdown" class="dropdown" dropdown>
     <button class="dropdown__toggle navbtn navbtn--text-only" dropdown__toggle>
-        {{currentReport.name | translate}}
+        {{currentReport.label || 'Select A Report' | translate}}
         <span class="dropdown__caret"></span>
     </button>
     <ul class="dropdown__menu">
-        <li ng-repeat="report in reports" ng-class="{active: isActive(report)}">
-            <button ng-click="changeReport(report)">{{report.name | translate}}</button>
+        <li ng-repeat="report in reports" class="dropdown__menu-item" ng-class="{'dropdown__menu-item--active': report.id === currentReport.id}">
+            <button ng-click="changeReport(report)">{{report.label | translate}}</button>
         </li>
     </ul>
 </div>

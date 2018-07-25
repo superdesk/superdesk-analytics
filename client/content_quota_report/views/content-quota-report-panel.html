@@ -1,10 +1,14 @@
 <div class="side-panel__header side-panel__header--border-b">
     <div class="side-panel__tools">
-        <a class="icn-btn" data-flow="left" ng-click="toggleFilters()">
+        <a class="icn-btn" data-flow="left" ng-click="toggleSidePanel()">
             <i class="icon-close-small"></i>
         </a>
     </div>
-    <h3 class="side-panel__heading" translate>Report Parameters</h3>
+    <ul class="nav-tabs">
+        <li class="nav-tabs__tab nav-tabs__tab--active">
+            <button class="nav-tabs__link" translate>Advanced</button>
+        </li>
+    </ul>
 </div>
 
 <div class="side-panel__content">

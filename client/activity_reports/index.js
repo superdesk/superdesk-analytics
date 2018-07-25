@@ -16,6 +16,7 @@ function cacheIncludedTemplates($templateCache) {
     $templateCache.put('activity-report-settings.html', require('./views/activity-report-settings.html'));
     $templateCache.put('activity-report-grouping.html', require('./views/activity-report-grouping.html'));
     $templateCache.put('save-activity-report-dialog.html', require('./views/save-activity-report-dialog.html'));
+    $templateCache.put('activity-report-side-panel.html', require('./views/activity-report-side-panel.html'));
 }
 cacheIncludedTemplates.$inject = ['$templateCache'];
 
@@ -41,14 +42,12 @@ angular.module('superdesk.analytics.activity-report', [])
 
     .run(cacheIncludedTemplates)
 
-    .config(['superdeskProvider', function(superdesk) {
-        superdesk.activity('activity-report', {
+    .config(['reportsProvider', 'gettext', function(reportsProvider, gettext) {
+        reportsProvider.addReport({
+            id: 'activity_report',
             label: gettext('Activity Report'),
-            when: '/analytics/activity-report',
-            template: require('./views/activity-report.html'),
-            topTemplateUrl: 'scripts/apps/dashboard/views/workspace-topnav.html',
-            sideTemplateUrl: 'scripts/apps/workspace/views/workspace-sidenav.html',
-            category: 'analytics',
-            priority: -800
+            sidePanelTemplate: 'activity-report-side-panel.html',
+            priority: 100,
+            privileges: {activity_report: 1},
         });
     }]);

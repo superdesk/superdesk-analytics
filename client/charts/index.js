@@ -10,10 +10,11 @@
 
 import './styles/charts.scss';
 import * as svc from './services';
-import * as directive from './directives';
+import * as directives from './directives';
 
 var Highcharts = require('highcharts/js/highcharts');
 
+require('highcharts/highcharts-more')(Highcharts);
 require('highcharts/js/modules/exporting')(Highcharts);
 require('highcharts/js/modules/data')(Highcharts);
 require('highcharts/js/modules/export-data')(Highcharts);
@@ -32,5 +33,5 @@ angular.module('superdesk.analytics.charts', [])
 
     .service('chartManager', svc.ChartManager)
 
-    .directive('sdChart', directive.Chart)
-    .directive('sdChartContainer', directive.ChartContainer);
+    .directive('sdChart', directives.Chart)
+    .directive('sdChartContainer', directives.ChartContainer);

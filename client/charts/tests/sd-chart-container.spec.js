@@ -3,11 +3,11 @@ describe('sd-chart-container', () => {
     let $rootScope;
     let $timeout;
     let scope;
-    let iscope;
     let configs;
 
     beforeEach(window.module('superdesk.templates-cache'));
     beforeEach(window.module('superdesk.core.activity'));
+    beforeEach(window.module('superdesk.core.services.pageTitle'));
     beforeEach(window.module('superdesk.analytics'));
 
     beforeEach(inject((_$compile_, _$rootScope_, _$timeout_) => {
@@ -19,6 +19,7 @@ describe('sd-chart-container', () => {
     beforeEach(() => {
         configs = [{
             id: 'test-chart-1',
+            type: 'bar',
             chart: {type: 'bar'},
             title: {text: 'Fruit Consumption'},
             xAxis: {categories: ['Apples', 'Bananas', 'Oranges']},
@@ -29,6 +30,7 @@ describe('sd-chart-container', () => {
             ],
         }, {
             id: 'test-chart-2',
+            type: 'bar',
             chart: {type: 'bar'},
             title: {text: 'Fruit Consumption'},
             xAxis: {categories: ['Apples', 'Bananas', 'Oranges']},
@@ -42,16 +44,12 @@ describe('sd-chart-container', () => {
 
     const getElement = (configs) => {
         scope = $rootScope.$new();
-        scope.configs = configs;
+        scope.reportConfigs = {charts: configs};
 
-        const element = $compile(`<div
-            sd-chart-container
-            data-configs="configs"
-        ></div>`)(scope);
+        // Use double div here as sd-chart-container replaces the element, and requires a root element
+        const element = $compile('<div><div sd-chart-container></div></div>')(scope);
 
         $rootScope.$digest();
-        iscope = element.isolateScope();
-
         $timeout.flush(5000);
 
         return element;
@@ -77,7 +75,7 @@ describe('sd-chart-container', () => {
         expect(element.html()).toContain('sd-chart__container');
         expect(element.find('svg').length).toBe(1);
 
-        iscope.configs = [configs[0], configs[1]];
+        scope.reportConfigs = {charts: [configs[0], configs[1]]};
 
         $rootScope.$digest();
         $timeout.flush(5000);

@@ -1,4 +1,4 @@
-ProcessedItemsReportPanel.$inject = ['api', 'notify', '$rootScope', 'processedItemsReport'];
+ProcessedItemsReportPanel.$inject = ['api', 'notify', '$rootScope', 'processedItemsReport', 'processedItemsChart'];
 
 /**
  * @ngdoc directive
@@ -8,11 +8,11 @@ ProcessedItemsReportPanel.$inject = ['api', 'notify', '$rootScope', 'processedIt
  * @requires $rootScope
  * @description A directive that generates the sidebar containing processed items report parameters
  */
-export function ProcessedItemsReportPanel(api, notify, $rootScope, processedItemsReport) {
+export function ProcessedItemsReportPanel(api, notify, $rootScope, processedItemsReport, processedItemsChart) {
     return {
+        require: '^sdAnalyticsContainer',
         template: require('../views/processed-items-report-panel.html'),
-        scope: {},
-        link: function(scope, element, attrs, controller) {
+        link: function(scope, element, attrs) {
             scope.validForm = false;
             scope.report = {time_interval: {measure: 'days', count: 1}, users: []};
 
@@ -24,7 +24,9 @@ export function ProcessedItemsReportPanel(api, notify, $rootScope, processedItem
              */
             scope.generate = function() {
                 function onSuccess(processedItemsReport) {
-                    $rootScope.$broadcast('view:processed_items_report', processedItemsReport);
+                    scope.changeReportParams({
+                        charts: processedItemsChart.createChart(processedItemsReport),
+                    });
                     notify.success(gettext('The processed items report was genereated successfully'));
                 }
 

@@ -1,5 +1,13 @@
 ContentQuotaReportPanel.$inject = [
-    'config', 'api', 'session', 'metadata', 'notify', '$rootScope', 'desks', 'contentQuotaReport'
+    'config',
+    'api',
+    'session',
+    'metadata',
+    'notify',
+    '$rootScope',
+    'desks',
+    'contentQuotaReport',
+    'contentQuotaChart',
 ];
 
 /**
@@ -13,13 +21,24 @@ ContentQuotaReportPanel.$inject = [
  * @requires $rootScope
  * @requires desks
  * @requires contentQuotaReport
+ * @requires contentQuotaChart
  * @description A directive that generates the sidebar containing content quota reports parameters
  */
-export function ContentQuotaReportPanel(config, api, session, metadata, notify, $rootScope, desks, contentQuotaReport) {
+export function ContentQuotaReportPanel(
+    config,
+    api,
+    session,
+    metadata,
+    notify,
+    $rootScope,
+    desks,
+    contentQuotaReport,
+    contentQuotaChart
+) {
     return {
+        require: '^sdAnalyticsContainer',
         template: require('../views/content-quota-report-panel.html'),
-        scope: {},
-        link: function(scope, element, attrs, controller) {
+        link: function(scope, element, attrs) {
             var noOfIntervalsDefault = 7,
                 intervalLengthDefault = 1;
 
@@ -43,7 +62,9 @@ export function ContentQuotaReportPanel(config, api, session, metadata, notify, 
              */
             scope.generate = function() {
                 function onSuccess(contentQuotaReport) {
-                    $rootScope.$broadcast('view:content_quota_report', contentQuotaReport);
+                    scope.changeReportParams({
+                        charts: contentQuotaChart.createChart(contentQuotaReport),
+                    });
                     notify.success(gettext('The report was genereated successfully'));
                 }
 
