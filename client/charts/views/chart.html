@@ -1,7 +1,11 @@
 <div ng-if="config.type === 'table'" class="sd-chart__table sd-shadow--z2">
     <div class="sd-chart__table-header">
-        <h1>{{config.title}}</h1>
-        <h3>{{config.subtitle}}</h3>
+        <div class="sd-chart__table-header-title">
+            <span>{{config.title | translate}}</span>
+        </div>
+        <div class="sd-chart__table-header-subtitle">
+            <span>{{config.subtitle | translate}}</span>
+        </div>
 
         <div class="dropdown dropdown--allign-right sd-chart__table-header-options" dropdown>
             <button
@@ -12,10 +16,10 @@
             </button>
             <ul class="dropdown__menu">
                 <li>
-                    <div class="dropdown__menu-label">Export Chart As...</div>
+                    <div class="dropdown__menu-label" translate>Export Chart As...</div>
                 </li>
                 <li class="dropdown__menu-divider"></li>
-                <li><button ng-click="downloadAsCSV()">CSV File</button></li>
+                <li><button ng-click="downloadAsCSV()" translate>CSV File</button></li>
             </ul>
         </div>
     </div>

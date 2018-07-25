@@ -14,6 +14,7 @@ import * as directive from './directives';
 import * as ctrl from './controllers';
 
 import './charts';
+import './search';
 import './activity_reports';
 import './activity-widget';
 import './processed_items_report';
@@ -47,7 +48,7 @@ cacheIncludedTemplates.$inject = ['$templateCache'];
  * @description Superdesk analytics module.
  */
 export default angular.module('superdesk.analytics', [
-    'superdesk.analytics.charts',
+    'superdesk.analytics.charts', 'superdesk.analytics.search',
     'superdesk.analytics.activity-report', 'superdesk.analytics.processed-items-report',
     'superdesk.analytics.processed-items-widget', 'superdesk.analytics.track-activity-report',
     'superdesk.analytics.track-activity-widget', 'superdesk.analytics.activity-report-widget',

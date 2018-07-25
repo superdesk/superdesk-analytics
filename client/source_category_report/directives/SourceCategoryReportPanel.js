@@ -1,7 +1,7 @@
 import {generateSubtitle} from '../../utils';
 
 SourceCategoryReportPanel.$inject = [
-    'notify', '$rootScope', 'sourceCategoryReport', 'config', 'moment', 'gettext',
+    'notify', '$rootScope', 'config', 'moment', 'gettext', 'searchReport',
 ];
 
 /**
@@ -10,12 +10,12 @@ SourceCategoryReportPanel.$inject = [
  * @name sdSourceCategoryReportPanel
  * @requires notify
  * @requires $rootScope
- * @requires sourceCategoryReport
  * @requires config
  * @requires moment
+ * @requires searchReport
  * @description A directive that generates the sidebar containing report parameters
  */
-export function SourceCategoryReportPanel(notify, $rootScope, sourceCategoryReport, config, moment, gettext) {
+export function SourceCategoryReportPanel(notify, $rootScope, config, moment, gettext, searchReport) {
     return {
         template: require('../views/source-category-report-panel.html'),
         scope: {toggleFilters: '&'},
@@ -27,7 +27,7 @@ export function SourceCategoryReportPanel(notify, $rootScope, sourceCategoryRepo
              * @description Generate the report
              */
             scope.generate = function() {
-                return sourceCategoryReport.generate(scope.report).then(
+                return searchReport.query('source_category_report', scope.report).then(
                     (data) => {
                         $rootScope.$broadcast('view:source_category_report', Object.assign({}, data, {
                             chartType: scope.report.chartType,

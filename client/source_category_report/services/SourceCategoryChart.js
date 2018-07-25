@@ -1,6 +1,6 @@
 import {generateSubtitle} from '../../utils';
 
-SourceCategoryChart.$inject = ['lodash', 'chartManager', 'gettext', 'moment', 'config'];
+SourceCategoryChart.$inject = ['lodash', 'chartManager', 'gettext', 'moment', 'config', '$interpolate', 'notify'];
 
 /**
  * @ngdoc service
@@ -11,9 +11,11 @@ SourceCategoryChart.$inject = ['lodash', 'chartManager', 'gettext', 'moment', 'c
  * @requires gettext
  * @requires moment
  * @requires config
+ * @requires $interpolate
+ * @requires notify
  * @description Source/Category chart generation service
  */
-export function SourceCategoryChart(_, chartManager, gettext, moment, config) {
+export function SourceCategoryChart(_, chartManager, gettext, moment, config, $interpolate, notify) {
     /**
      * @ngdoc method
      * @name SourceCategoryChart#getCategories
@@ -27,7 +29,7 @@ export function SourceCategoryChart(_, chartManager, gettext, moment, config) {
         const sortOrder = report.sort_order || 'desc';
 
         let categories = _.pickBy(
-            report.report.categories,
+            report.categories,
             (category) => (!min || category >= min) && (!max || category <= max)
         );
 
@@ -43,7 +45,7 @@ export function SourceCategoryChart(_, chartManager, gettext, moment, config) {
      * @description Returns the series data to be used by Highcharts api
      */
     const getSeriesData = function(report, categories) {
-        const sources = report.report.sources;
+        const sources = report.sources;
 
         return _.map(sources, (totals, source) => ({
             name: source,
@@ -94,7 +96,6 @@ export function SourceCategoryChart(_, chartManager, gettext, moment, config) {
             chart: {
                 type: chartType,
                 zoomType: chartType === 'bar' ? 'y' : 'x',
-                backgroundColor: '#FFFFFF',
             },
             title: getTitle(report),
             subtitle: getSubtitle(report),
@@ -104,15 +105,9 @@ export function SourceCategoryChart(_, chartManager, gettext, moment, config) {
             },
             yAxis: {
                 title: {text: gettext('Stories')},
-                stackLabels: {
-                    enabled: true,
-                    style: {fontWeight: 100},
-                },
+                stackLabels: {enabled: true},
             },
-            legend: {
-                enabled: true,
-                style: {fontWeight: 100},
-            },
+            legend: {enabled: true},
             tooltip: {
                 // Show the tooltip on the one line
                 headerFormat: '{series.name}/{point.x}: {point.y}',
@@ -123,25 +118,6 @@ export function SourceCategoryChart(_, chartManager, gettext, moment, config) {
                 column: {stacking: 'normal', size: null},
             },
             series: getSeriesData(report, categories),
-            credits: {enabled: false},
-            exporting: {
-                fallbackToExportServer: false,
-                error: (options, error) => {
-                    console.error('Failed to export the chart\n', options, '\n', error);
-                },
-                buttons: {
-                    contextButton: {
-                        menuItems: [
-                            'printChart',
-                            'downloadPNG',
-                            'downloadJPEG',
-                            'downloadSVG',
-                            'downloadPDF',
-                            'downloadCSV',
-                        ],
-                    },
-                },
-            },
         }];
     };
 
@@ -157,26 +133,22 @@ export function SourceCategoryChart(_, chartManager, gettext, moment, config) {
         return {
             id: category,
             type: 'pie',
-            chart: {
-                plotBackgroundColor: null,
-                plotBorderWidth: null,
-                plotShadow: false,
-                type: 'pie',
-                backgroundColor: '#FFFFFF',
-            },
+            chart: {type: 'pie'},
             title: {text: category},
-            subtitle: {text: count + ' Stories'},
+            subtitle: {
+                text: $interpolate(
+                    gettext('{{ count }} Stories')
+                )({count}),
+            },
             tooltip: {
-                pointFormat: '{series.name}: <b>{point.percentage:.1f}% ({point.y})</b>',
+                pointFormat: '{series.name}: {point.percentage:.1f}% ({point.y})',
             },
             plotOptions: {
                 pie: {
                     allowPointSelect: true,
-                    cursor: 'pointer',
                     dataLabels: {
                         enabled: true,
                         format: '{point.name}: {point.percentage:.1f}% ({point.y})',
-                        style: {fontWeight: 100},
                     },
                     size: 300,
                 },
@@ -186,25 +158,6 @@ export function SourceCategoryChart(_, chartManager, gettext, moment, config) {
                 colorByPoint: true,
                 data: [],
             }],
-            credits: {enabled: false},
-            exporting: {
-                fallbackToExportServer: false,
-                error: (options, error) => {
-                    console.error('Failed to export the chart\n', options, '\n', error);
-                },
-                buttons: {
-                    contextButton: {
-                        menuItems: [
-                            'printChart',
-                            'downloadPNG',
-                            'downloadJPEG',
-                            'downloadSVG',
-                            'downloadPDF',
-                            'downloadCSV',
-                        ],
-                    },
-                },
-            },
         };
     };
 
@@ -217,7 +170,7 @@ export function SourceCategoryChart(_, chartManager, gettext, moment, config) {
      */
     const generatePieConfig = function(report) {
         const categories = getCategories(report);
-        const sources = report.report.sources;
+        const sources = report.sources;
 
         const configs = {};
         const colours = [
@@ -234,7 +187,7 @@ export function SourceCategoryChart(_, chartManager, gettext, moment, config) {
         ];
 
         categories.forEach((category) => {
-            configs[category] = getBasePieConfig(category, report.report.categories[category]);
+            configs[category] = getBasePieConfig(category, report.categories[category]);
         });
 
         let i = 0;

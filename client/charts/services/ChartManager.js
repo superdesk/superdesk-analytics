@@ -1,14 +1,16 @@
-ChartManager.$inject = ['lodash', 'Highcharts'];
+ChartManager.$inject = ['lodash', 'Highcharts', 'notify'];
 
 /**
  * @ngdoc service
  * @module superdesk.apps.analytics
  * @name ChartManager
  * @requires lodash
+ * @requires notify
  * @description Highchart instance manager
  */
-export function ChartManager(_, Highcharts) {
+export function ChartManager(_, Highcharts, notify) {
     this.charts = null;
+    this.defaultConfig = null;
 
     /**
      * @ngdoc method
@@ -18,6 +20,27 @@ export function ChartManager(_, Highcharts) {
     const init = () => {
         Highcharts.setOptions({lang: {thousandsSep: ','}});
         this.charts = {};
+        this.defaultConfig = {
+            credits: {enabled: false},
+            exporting: {
+                fallbackToExportServer: false,
+                error: () => {
+                    notify.error(gettext('Failed to export the chart;'));
+                },
+                buttons: {
+                    contextButton: {
+                        menuItems: [
+                            'printChart',
+                            'downloadPNG',
+                            'downloadJPEG',
+                            'downloadSVG',
+                            'downloadPDF',
+                            'downloadCSV',
+                        ],
+                    },
+                },
+            },
+        };
     };
 
     /**
@@ -31,7 +54,10 @@ export function ChartManager(_, Highcharts) {
      */
     this.create = function(target, config, id) {
         this.destroy(id);
-        this.charts[id] = Highcharts.chart(target, config);
+        this.charts[id] = Highcharts.chart(
+            target,
+            Object.assign({}, this.defaultConfig, config)
+        );
         return this.charts[id];
     };
 
