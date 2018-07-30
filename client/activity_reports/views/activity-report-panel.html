@@ -10,18 +10,22 @@
 <div class="side-panel__content">
     <ul class="nav-tabs">
         <li id="activity-report-edit" class="nav-tabs__tab side-panel__content-tab-nav"
-            ng-class="{'nav-tabs__tab-active': editReportSelected()}"
-            ng-click="changeTab('editingActivityReport')" translate>Edit Report
+            ng-class="{'nav-tabs__tab--active': editReportSelected()}">
+            <button class="nav-tabs__link" 
+                ng-click="changeTab('editingActivityReport')" translate>Edit Report
+            </button>
         </li>
         <li id="saved-activity-reports" class="nav-tabs__tab side-panel__content-tab-nav"
-            ng-class="{'nav-tabs__tab-active': savedReportsSelected()}" 
-            ng-click="changeTab('savedReports')" translate>Saved
+            ng-class="{'nav-tabs__tab--active': savedReportsSelected()}">
+            <button class="nav-tabs__link"
+                ng-click="changeTab('savedReports')" translate>Saved
+            </button>
         </li>
     </ul>
 
     <ng-form name="activityReportForm">
         <form name="editReportForm" ng-if="editReportSelected()">
-            <div sd-activity-report-settings data-settings="report" />
+            <div sd-activity-report-settings data-settings="report" class="report-settings"></div>
             <div class="side-panel__content-block">
                 <button id="generate_activity_report" class="btn btn--primary"
                     ng-click="generate(report)" ng-disabled="!editReportForm.$valid && false" translate>Generate</button>
