@@ -1,3 +1,6 @@
 <div class="widget-container" ng-controller="ActivityReportWidgetController as ac" ng-init="ac.setWidget(widget)">
+    <div class="widget-header" style="margin-top: 3px;">
+        <div class="widget-title">{{ widget.configuration.label || widget.label | translate}}</div>
+    </div>
     <div id="{{renderTo}}" style="min-width: 310px; max-width: 800px; height: 400px; margin: 0 auto"></div>
 </div>

@@ -13,7 +13,7 @@ Feature: Saved Activity Reports
         {
         	"operation": "publish",
         	"desk": "#desks._id#",
-        	"operation_start_date": "2016-02-13",
+        	"days": 1,
         	"operation_end_date": "2016-02-13",
         	"name": "report1",
         	"description": "activity report",
@@ -25,7 +25,7 @@ Feature: Saved Activity Reports
         {
         	"operation": "publish",
         	"desk": "#desks._id#",
-        	"operation_start_date": "2016-02-13T00:00:00+0000",
+        	"days": 1,
         	"operation_end_date": "2016-02-13T00:00:00+0000",
         	"name": "report1",
         	"description": "activity report",

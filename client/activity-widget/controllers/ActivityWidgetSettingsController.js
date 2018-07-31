@@ -68,7 +68,10 @@ export function ActivityWidgetSettingsController($scope, desks, $rootScope, anal
             activityReportWidgetSettings.saveSettings($scope.widget);
         }
         if (!$scope.widget.configuration) {
-            $scope.widget.configuration = {};
+            $scope.widget.configuration = {operation: 'publish', days: 1};
+            if ($scope.currentDesk) {
+                $scope.widget.configuration.desk = $scope.currentDesk._id;
+            }
         }
     };
 
@@ -94,4 +97,6 @@ export function ActivityWidgetSettingsController($scope, desks, $rootScope, anal
         });
         $scope.$close();
     };
+
+    $scope.setCurrentStep();
 }

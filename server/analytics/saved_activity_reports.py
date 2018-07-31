@@ -38,13 +38,10 @@ class SavedActivityReportResource(Resource):
             'required': True
         },
         'desk': Resource.rel('desks', nullable=True),
-        'operation_start_date': {
-            'type': 'datetime',
-            'required': True
-        },
+        'days': {'type': 'integer', 'required': True},
         'operation_end_date': {
             'type': 'datetime',
-            'required': True
+            'nullable': True
         },
         'subject': metadata_schema['subject'],
         'category': metadata_schema['anpa_category'],
@@ -55,7 +52,7 @@ class SavedActivityReportResource(Resource):
         'priority_end': metadata_schema['priority'],
         'subscriber': {'type': 'string'},
         'group_by': {
-            'type': 'list'
+            'type': 'dict'
         }
     }
     item_methods = ['GET', 'PATCH', 'PUT', 'DELETE']
@@ -70,8 +67,8 @@ class SavedActivityReportService(BaseService):
 
     def create(self, docs, **kwargs):
         for doc in docs:
-            if doc.get('group_by') and doc.get('desk'):
+            if doc.get('group_by', {}).get('desk') and doc.get('desk'):
                 raise SuperdeskApiError.badRequestError('The desk must not be defined when group by is defined.')
-            if not doc.get('group_by', False) and not doc.get('desk'):
+            if not doc.get('group_by', {}).get('desk') and not doc.get('desk'):
                 raise SuperdeskApiError.badRequestError('The desk is required when group by desk is false')
         return super().create(docs, **kwargs)

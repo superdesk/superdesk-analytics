@@ -5,9 +5,11 @@
             <div ng-include="'save-activity-report-dialog.html'"></div>
         </form>
     </div>
-    <div class="pull-right">
-        <button class="btn" ng-click="cancel()" translate>Cancel</button>
+    <div class="side-panel__content-block">
+        <button class="btn" ng-click="clear()" translate>Cancel</button>
         <button id="activity_report_save" class="btn btn--primary"
-            ng-click="save(activityReport)" ng-disabled="!saveReportForm.$valid || !editReportForm.$valid" translate>Save</button>
+            ng-click="save()"
+            ng-disabled="!saveReportForm.$valid || !form.editReportForm.$valid || (saveReportForm.$pristine && form.editReportForm.$pristine)"
+            translate>Save</button>
     </div>
 </div>

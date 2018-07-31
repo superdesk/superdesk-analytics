@@ -32,7 +32,7 @@ Feature: Activity report
         {
         	"operation": "publish",
         	"desk": "#desks._id#",
-        	"operation_start_date": "#DATE#",
+        	"days": "1",
         	"operation_end_date": "#DATE#",
         	"subject":[{"qcode": "05007000", "name": "university"}],
         	"keywords": ["UNIVERSITY"],
@@ -62,9 +62,9 @@ Feature: Activity report
         """
         {
         	"operation": "publish",
-        	"operation_start_date": "#DATE#",
+        	"days": "1",
         	"operation_end_date": "#DATE#",
-        	"group_by": ["desk"],
+        	"group_by": {"desk": true},
         	"subject":[{"qcode": "05007000", "name": "university"}],
         	"keywords": ["UNIVERSITY"],
         	"priority_start": 2,
@@ -88,7 +88,7 @@ Feature: Activity report
         	"urgency_end": 5,
         	"category": [{"name": "arts, culture and entertainment" , "qcode": "01000000"}],
         	"subscriber": "test",
-        	"report": [{"desk": "Sports Desk", "items": 1}]
+        	"report": {"desks": [{"desk": "Sports Desk", "items": 1}], "total": 1}
         }
         """
 	

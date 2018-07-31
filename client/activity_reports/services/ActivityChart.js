@@ -1,7 +1,9 @@
+var moment = require('moment');
+
 require('twix');
 
 
-ActivityChart.$inject = ['lodash', 'chartManager', 'moment'];
+ActivityChart.$inject = ['lodash', 'chartManager'];
 
 /**
  * @ngdoc service
@@ -10,7 +12,7 @@ ActivityChart.$inject = ['lodash', 'chartManager', 'moment'];
  * @requires lodash
  * @description Activity chart generation service
  */
-export function ActivityChart(_, chartManager, moment) {
+export function ActivityChart(_, chartManager) {
     var dateFormat = 'YYYY-MM-DD',
         timeFormat = 'YYYY-MM-DD HH:mm';
 
@@ -21,9 +23,9 @@ export function ActivityChart(_, chartManager, moment) {
      * @description Return the series name
      */
     var getSeriesName = function(report) {
-        var startTime = moment(report.operation_start_date),
-            endTime = moment(report.operation_end_date),
-            timestampFormat = _.has(report.report, 'items_per_day') ? dateFormat : timeFormat;
+        var startTime = moment(report.operation_start_date).local();
+        var endTime = moment(report.operation_end_date).local();
+        var timestampFormat = _.has(report.report, 'items_per_day') ? dateFormat : timeFormat;
 
         return gettext('Published items on') + ' ' + startTime.format(timestampFormat) + ' - ' +
             endTime.format(timestampFormat) + ' (' + report.report.total + ' total)';
@@ -31,14 +33,14 @@ export function ActivityChart(_, chartManager, moment) {
 
     /**
      * @ngdoc method
-     * @name ActivityChart#getReportData
+     * @name ActivityChart#getTimeData
      * @param {Object} report
-     * @description Return the report data
+     * @description Return the time data
      */
-    var getReportData = function(report) {
-        var startTime = moment(report.operation_start_date),
-            endTime = moment(report.operation_end_date),
-            timestamps, valueField, timestampFormat;
+    var getTimeData = function(report) {
+        var startTime = moment(report.operation_start_date).utc();
+        var endTime = moment(report.operation_end_date).utc();
+        var timestamps, valueField, timestampFormat;
 
         if (_.has(report.report, 'items_per_day')) {
             timestamps = moment.twix(startTime, endTime).toArray('days'),
@@ -59,6 +61,9 @@ export function ActivityChart(_, chartManager, moment) {
             return 0;
         });
 
+        timestamps = _.map(timestamps, (value) => moment.utc(value).local()
+                        .format(timestampFormat));
+
         return {
             categories: timestamps,
             data: data
@@ -67,17 +72,35 @@ export function ActivityChart(_, chartManager, moment) {
 
     /**
      * @ngdoc method
+     * @name ActivityChart#getGroupData
+     * @param {Object} report
+     * @description Return the group data
+     */
+    var getGroupData = function(report) {
+        var categories = _.map(report.report.desks, (value) => value.desk);
+        var data = _.map(report.report.desks, (value) => value.items);
+
+        return {
+            categories,
+            data
+        };
+    };
+
+    /**
+     * @ngdoc method
      * @name ActivityChart#createChart
      * @param {Object} report
-     * @param {Object} renderTo
+     * @param {String} renderTo
+     * @param {String} reportId
      * @description Creates a chart for the given report
      */
-    this.createChart = function(report, renderTo) {
-        var operation = report.operation === 'publish' ? gettext('Published') : gettext('Corrected'),
-            reportData = getReportData(report);
+    this.createChart = function(report, renderTo, reportId) {
+        var operation = report.operation === 'publish' ? gettext('Published items') :
+            gettext('Corrected items');
+        var reportData = report.group_by && report.group_by.desk ? getGroupData(report) : getTimeData(report);
 
         var chartData = {
-            id: 'activity',
+            id: 'activity-report',
             chart: {
                 type: 'column'
             },
@@ -92,13 +115,13 @@ export function ActivityChart(_, chartManager, moment) {
             },
             yAxis: {
                 title: {
-                    text: operation + ' ' + gettext('Items')
+                    text: operation
                 }
             },
             tooltip: {
                 pointFormatter: function() {
                     return '<span style="color:' + this.color + '"></span> ' +
-                        '<b>' + gettext('Published items:') + ' ' + this.y + '</b>';
+                        '<b>' + operation + ' ' + this.y + '</b>';
                 }
             },
             series: [{
@@ -107,18 +130,6 @@ export function ActivityChart(_, chartManager, moment) {
             }]
         };
 
-        return chartManager.create(renderTo, chartData);
-    };
-
-    /**
-     * @ngdoc method
-     * @name ActivityChart#updateChartData
-     * @param {Object} report
-     * @param {Object} chart
-     * @description Updates a chart for the given report
-     */
-    this.updateChartData = function(report, chart) {
-        chart.series[0].setData(getReportData(report).data);
-        return chart;
+        return chartManager.create(renderTo, chartData, reportId);
     };
 }

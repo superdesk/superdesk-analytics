@@ -5,141 +5,15 @@
         <h3 class="modal__heading" translate>Activity Report Widget Settings</h3>
     </div>
 
-    <div class="modal__body" sd-wizard data-name="activity-report"
-         data-current-step="step.current" ng-init="setCurrentStep()" data-finish="cancel()">
-        <div sd-wizard-step data-title="{{ :: 'Operation/Desk' | translate }}" data-code="operation"
-             data-hide="shouldHideStep('operation')">
-            <fieldset class="report-parameters">
-                <div class="field">
-                    <label for="parameters-operation" translate>Operation</label>
-                    <select id="parameters-operation" ng-model="widget.configuration.operation"
-                            selected="publish" required>
-                        <option label="Publish" value="publish" translate>Publish</option>
-                        <option label="Correct" value="correct" translate>Correct</option>
-                    </select>
-                </div>
-                <div class="field" ng-if="!group_by.desk">
-                    <label for="parameters-desk" translate>Desk</label>
-                    <select id="parameters-desk" name="desk"
-                            ng-options="d._id as d.name for d in desks"
-                            ng-model="widget.configuration.desk" ng-required="!group_by.desk">
-                    </select>
-                </div>
-                <label translate>Operation date</label>
-                <div class="multiple">
-                    <div class="field">
-                        <label for="parameters-operation_start_date" translate>From</label>
-                        <div sd-datepicker ng-model="widget.configuration.operation_start_date"
-                             id="parameters-operation_start_date" required></div>
-                    </div>
-
-                    <div class="field">
-                        <label for="parameters-operation_end_date" translate>To</label>
-                        <div sd-datepicker ng-model="widget.configuration.operation_end_date"
-                             id="parameters-operation_end_date" required></div>
-                    </div>
-                </div>
-            </fieldset>
-        </div>
-
-        <div sd-wizard-step data-title="{{ :: 'Optional Filters' | translate }}" data-code="optional1"
-             data-hide="shouldHideStep('optional1')">
-            <fieldset class="report-parameters">
-                <div class="field" sd-validation-error="error.subject">
-                    <label for="parameters-subject">{{:: 'Subject' | translate}}</label>
-                    <div id="parameters-subject"
-                         sd-meta-terms
-                         class="data"
-                         data-item="widget.configuration"
-                         data-field="subject"
-                         data-unique="qcode"
-                         data-list="metadata.subjectcodes"
-                         data-header="true"
-                         data-reload-list="true">
-                    </div>
-                </div>
-
-                <div class="field"
-                     sd-validation-error="error.category">
-                    <label for="parameters-category">{{:: 'Category' | translate}}</label>
-                    <div id="parameters-category"
-                         sd-meta-terms
-                         class="data"
-                         data-item="widget.configuration"
-                         data-field="category"
-                         data-unique="qcode"
-                         data-list="metadata.categories"
-                         data-header="true"
-                         data-reload-list="true">
-                    </div>
-                </div>
-
-                <div class="field">
-                    <label for="parameters-keywords">{{:: 'Keywords' | translate}}</label>
-                    <div id="parameters-keywords"
-                         sd-meta-words-list
-                         data-field="keywords"
-                         data-header="true"
-                         data-list="metadata.keywords"
-                         data-item="widget.configuration">
-                    </div>
-                </div>
-
-                <div class="field">
-                    <label for="parameters-subscriber" translate>Subscriber</label>
-                    <select id="parameters-subscriber" name="subscriber"
-                            ng-options="s._id as s.name for s in metadata.customSubscribers"
-                            ng-model="widget.configuration.subscriber" selected=none>
-                    </select>
-                </div>
-            </fieldset>
-        </div>
-
-        <div sd-wizard-step data-title="{{ :: 'Other Optional Filters' | translate }}" data-code="optional2"
-             data-hide="shouldHideStep('optional2')">
-            <fieldset class="report-parameters">
-                <div class="multiple">
-                    <div class="field">
-                        <label for="parameters-urgency_start" translate>From urgency</label>
-                        <select id="parameters-urgency_start" ng-model="widget.configuration.urgency_start"
-                                ng-options="i for i in [1, 2, 3, 4, 5]">
-                        </select>
-                    </div>
-
-                    <div class="field">
-                        <label for="parameters-urgency_end" translate>To urgency</label>
-                        <select id="parameters-urgency_end" ng-model="widget.configuration.urgency_end"
-                                ng-options="i for i in [1, 2, 3, 4, 5]">
-                        </select>
-                    </div>
-                </div>
-
-                <div class="multiple">
-                    <div class="field">
-                        <label for="parameters-priority_start" translate>From priority</label>
-                        <select id="parameters-priority_start" ng-model="widget.configuration.priority_start"
-                                ng-options="i for i in [1, 2, 3, 4, 5, 6]">
-                        </select>
-                    </div>
-
-                    <div class="field">
-                        <label for="parameters-priority_end" translate>To priority</label>
-                        <select id="parameters-priority_end" ng-model="widget.configuration.priority_end"
-                                ng-options="i for i in [1, 2, 3, 4, 5, 6]">
-                        </select> 
-                    </div>
-                </div>
-            </fieldset>
-        </div>
-    </div>
+    <div sd-activity-report-settings data-settings="widget.configuration" data-widget="true" data-step="step" />
 
     <div class="modal__footer">
-        <button id="previousBtn" class="btn pull-left" ng-if="step.current !== 'operation' && !displayOnlyCurrentStep"
+        <button id="previousBtn" class="btn btn--hollow pull-left" ng-if="step.current !== 'operation' && !displayOnlyCurrentStep"
                 ng-click="previous()" translate>Previous</button>
         <button class="btn" ng-click="cancel()" translate>Cancel</button>
-        <button id="nextBtn" class="btn" ng-if="step.current !== 'optional2' && !displayOnlyCurrentStep"
-                ng-click="next()" translate>Next</button>
         <button class="btn btn--primary" ng-click="save()" translate>Done</button>
+        <button id="nextBtn" class="btn btn--hollow" ng-if="step.current !== 'optional2' && !displayOnlyCurrentStep"
+                ng-click="next()" translate>Next</button>
     </div>
 
 </div>

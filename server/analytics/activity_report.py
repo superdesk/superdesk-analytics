@@ -8,7 +8,7 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 from superdesk import get_resource_service
 from superdesk.services import BaseService
@@ -16,12 +16,13 @@ from superdesk.services import BaseService
 from eve.utils import ParsedRequest
 from superdesk.metadata.item import metadata_schema
 from superdesk.resource import Resource
-from superdesk.utils import format_date
+from superdesk.utils import format_time
 from eve.default_settings import ID_FIELD
 from superdesk.errors import SuperdeskApiError
 from analytics.aggregations import ITEMS_OVER_DAYS, ITEMS_OVER_HOURS, \
     items_over_days_aggregation, items_over_hours_aggregation
 from superdesk.metadata.utils import aggregations_manager
+import pytz
 
 
 class ActivityReportResource(Resource):
@@ -31,8 +32,9 @@ class ActivityReportResource(Resource):
     schema = {
         'operation': {'type': 'string', 'required': True},
         'desk': Resource.rel('desks'),
-        'operation_start_date': {'type': 'datetime', 'required': True},
-        'operation_end_date': {'type': 'datetime', 'required': True},
+        'days': {'type': 'integer', 'required': True},
+        'operation_start_date': {'type': 'datetime', 'readonly': True},
+        'operation_end_date': {'type': 'datetime', 'nullable': True},
         'subject': metadata_schema['subject'],
         'keywords': metadata_schema['keywords'],
         'category': metadata_schema['anpa_category'],
@@ -41,7 +43,7 @@ class ActivityReportResource(Resource):
         'priority_start': metadata_schema['priority'],
         'priority_end': metadata_schema['priority'],
         'subscriber': {'type': 'string'},
-        'group_by': {'type': 'list'},
+        'group_by': {'type': 'dict'},
         'report': {'type': 'dict'},
         'timestamp': {'type': 'datetime'},
         'force_regenerate': {'type': 'boolean', 'default': False}
@@ -53,6 +55,7 @@ class ActivityReportResource(Resource):
 
 
 class ActivityReportService(BaseService):
+    default_days_interval = 1
     hourly_treshold = 2
 
     def set_query_terms(self, report):
@@ -67,10 +70,13 @@ class ActivityReportService(BaseService):
         if report.get('keywords'):
             key = [x.lower() for x in report['keywords']]
             terms.append({'terms': {'keywords': key}})
-        if report.get('operation_start_date') and report.get('operation_end_date'):
-            op_date_start = format_date(report['operation_start_date'])
-            op_date_end = format_date(report['operation_end_date'])
-            terms.append({'range': {'versioncreated': {'gte': op_date_start, 'lte': op_date_end}}})
+        end_date = report['operation_end_date'] if report.get('operation_end_date') else datetime.utcnow()
+        days_interval = report['days'] if report.get('days') else self.default_days_interval
+        start_date = end_date - timedelta(days=days_interval)
+        terms.append({'range': {'versioncreated': {'gte': format_time(start_date),
+                                                   'lte': format_time(end_date)}}})
+        report['operation_start_date'] = start_date.replace(tzinfo=pytz.UTC)
+        report['operation_end_date'] = end_date.replace(tzinfo=pytz.UTC)
         if report.get('category'):
             categories = [category['qcode'] for category in report['category']]
             terms.append({'terms': {'anpa_category.qcode': categories}})
@@ -113,8 +119,7 @@ class ActivityReportService(BaseService):
 
         items = self.get_items(query)
 
-        diff_days = report['operation_end_date'] - report['operation_start_date']
-        if diff_days.days < self.hourly_treshold:
+        if report['days'] < self.hourly_treshold:
             report = {'total': items.count(), 'items_per_hour': self.get_items_hourly(items)}
         else:
             report = {'total': items.count(), 'items_per_day': self.get_items_daily(items)}
@@ -163,11 +168,13 @@ class ActivityReportService(BaseService):
             desk_buckets = items.hits['aggregations']['desk']['buckets']
         else:
             desk_buckets = []
+        total = 0
         result_list = []
         for desk in get_resource_service('desks').get(req=None, lookup={}):
             desk_item_count = self._desk_item_count(desk_buckets, desk[ID_FIELD])
             result_list.append({'desk': desk['name'], 'items': desk_item_count})
-        return result_list
+            total += desk_item_count
+        return {'total': total, 'desks': result_list}
 
     def _desk_item_count(self, bucket, desk_id):
         for desk_stats in bucket:
@@ -175,23 +182,14 @@ class ActivityReportService(BaseService):
                 return desk_stats['doc_count']
         return 0
 
-    def _validate_start_end_dates(self, doc):
-        try:
-            if doc['operation_start_date'] > doc['operation_end_date']:
-                raise SuperdeskApiError.badRequestError('Operation end date must be '
-                                                        'greater than the operation start date')
-        except TypeError:
-            raise SuperdeskApiError.badRequestError("Dates must be in ISO 8601 format without timezone")
-
     def create(self, docs):
         for doc in docs:
-            self._validate_start_end_dates(doc)
             if 'group_by' not in doc and 'desk' not in doc:
                 raise SuperdeskApiError.badRequestError('The desk is required')
 
         for doc in docs:
             doc['timestamp'] = datetime.now()
-            if doc.get('group_by'):
+            if doc.get('group_by', {}).get('desk'):
                 doc['report'] = self.search_items_with_groupping(doc)
             else:
                 doc['report'] = self.search_items_without_groupping(doc)

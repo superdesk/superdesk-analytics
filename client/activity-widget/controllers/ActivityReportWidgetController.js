@@ -71,13 +71,14 @@ export function ActivityReportWidgetController($scope, analyticsWidgetSettings, 
             }
         }
 
-        return activityReport.generate(self.widget.configuration)
+        let reportConfig = Object.assign({}, self.widget.configuration);
+
+        if (_.has(reportConfig, 'label')) {
+            delete reportConfig.label;
+        }
+        return activityReport.generate(reportConfig)
         .then((activityReport) => {
-            if (self.chart) {
-                activityChart.updateChartData(activityReport, self.chart);
-            } else {
-                self.chart = activityChart.createChart(activityReport, $scope.renderTo);
-            }
+            self.chart = activityChart.createChart(activityReport, $scope.renderTo, $scope.renderTo);
         }, onFail);
     };
 
@@ -99,10 +100,6 @@ export function ActivityReportWidgetController($scope, analyticsWidgetSettings, 
         if (angular.isDefined(self.interval)) {
             $interval.cancel(self.interval);
             self.interval = null;
-        }
-        if (self.chart) {
-            self.chart.destroy();
-            self.chart = null;
         }
         if (self.viewEventCleanup) {
             self.viewEventCleanup();
