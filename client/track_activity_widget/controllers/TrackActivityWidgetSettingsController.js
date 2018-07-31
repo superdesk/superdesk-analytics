@@ -15,10 +15,8 @@ TrackActivityWidgetSettingsController.$inject = ['$scope', 'desks', 'api', '$roo
  */
 export function TrackActivityWidgetSettingsController($scope, desks, api, $rootScope, analyticsWidgetSettings,
     trackActivityReportWidgetSettings) {
-    desks.initialize().then(() => {
-        $scope.currentDesk = desks.getCurrentDesk();
-        $scope.desks = desks.desks._items;
-    });
+    $scope.currentDesk = desks.getCurrentDesk();
+    $scope.desks = desks.desks._items;
 
     $scope.users = [];
 
@@ -33,6 +31,13 @@ export function TrackActivityWidgetSettingsController($scope, desks, api, $rootS
         if (!$scope.widget) {
             $scope.widget = widget;
             trackActivityReportWidgetSettings.saveSettings($scope.widget);
+        }
+        if (!$scope.widget.configuration) {
+            $scope.widget.configuration = {days_ago: 1};
+            if ($scope.currentDesk) {
+                $scope.widget.configuration.desk = $scope.currentDesk._id;
+                $scope.widget.configuration.stage = $scope.currentDesk.working_stage;
+            }
         }
         if ($scope.widget.configuration && $scope.widget.configuration.desk) {
             $scope.stages = $scope.widget.configuration.desk ?

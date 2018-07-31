@@ -97,15 +97,6 @@ class ContentQuotaReportService(BaseService):
         bucket_time = datetime.strptime(time_string, ELASTIC_DATETIME_FORMAT)
         return bucket_time.replace(tzinfo=utc)
 
-    def _get_end_date(self, doc):
-        end_date = doc['end_date'] if 'end_date' in doc else datetime.now()
-        return end_date.replace(hour=23, minute=59, second=59, tzinfo=get_localzone()).astimezone(utc)
-
-    def _get_bucket_time(self, time_string):
-        time_string = time_string.rsplit('.', 1)[0]
-        bucket_time = datetime.strptime(time_string, ELASTIC_DATETIME_FORMAT)
-        return bucket_time.replace(tzinfo=utc)
-
     def generate_report(self, doc):
         """Returns a report on how many items were created against a quota.
 

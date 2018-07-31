@@ -109,6 +109,7 @@ export function TrackActivityChart(_, moment, desks, chartManager, gettext) {
                 }
             },
             series: [{
+                type: 'columnrange',
                 name: seriesName,
                 lineWidth: 1,
                 data: data

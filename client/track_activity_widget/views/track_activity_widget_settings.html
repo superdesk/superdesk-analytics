@@ -8,26 +8,25 @@
 
 <div class="modal__body track-activity-settings">
     <form name="trackActivityReportForm">
-        <fieldset class="report-parameters">
-            <div class="field">
-                <label for="days-ago" translate>Starting</label>
-                <select id="days-ago" ng-model="widget.configuration.days_ago"
-                    ng-options="days_ago for days_ago in [1,2,3,4,5,6,7]" required>
-                </select>
-                <label for="days-ago" translate>days ago</label>
+        <div class="groups">
+            <div class="box-items-count sd-line-input sd-line-input--boxed">
+                <label for="days-ago" class="sd-line-input__label" translate>Time interval (days)</label>
+                <input type="number" min="1" class="sd-line-input__input"
+                    ng-model="widget.configuration.days_ago" id="days-ago" required />
             </div>
 
-            <div class="field">
-                <label for="desk" translate>Desk</label>
-                <select id="desk" name="desk"
+            <div class="sd-line-input sd-line-input--is-select">
+                <label class="sd-line-input__label" for="desk" translate>Desk</label>
+                <select id="desk" name="desk" class="sd-line-input__select"
                     ng-options="d._id as d.name for d in desks" ng-model="widget.configuration.desk" required>
                 </select>
             </div>
 
-            <div class="field">
-                <label for="stage" translate>Stage</label>
+            <div class="sd-line-input sd-line-input--is-select">
+                <label class="sd-line-input__label" for="stage" translate>Stage</label>
                 <select id="stage" name="stage" ng-options="s._id as s.name for s in stages"
-                    ng-model="widget.configuration.stage" ng-disabled="!widget.configuration.desk" required>
+                    class="sd-line-input__select" ng-model="widget.configuration.stage"
+                    ng-disabled="!widget.configuration.desk" required>
                 </select>
             </div>
 

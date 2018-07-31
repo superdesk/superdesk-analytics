@@ -1,8 +1,17 @@
-<div class="content-no-header pull pull-higher">
-    <div sd-processed-items-report-form data-valid-form="validForm" report="report"></div>
+<div class="side-panel__header side-panel__header--border-b">
+    <div class="side-panel__tools">
+        <a class="icn-btn" data-flow="left" ng-click="toggleFilters()">
+            <i class="icon-close-small"></i>
+        </a>
+    </div>
+    <h3 class="side-panel__heading" translate>Report Parameters</h3>
+</div>
 
-    <div>
+<div class="side-panel__content">
+    <div sd-processed-items-report-form data-valid-form="validForm" report="report" class="report-settings"></div>
+
+    <div class="side-panel__content-block">
         <button id="generate_processed_items_report" class="btn btn--primary" ng-click="generate()"
-            ng-disabled="!validForm" translate>Generate (p)</button>
+            ng-disabled="!validForm" translate>Generate</button>
     </div>
 </div>

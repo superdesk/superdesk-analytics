@@ -1,15 +1,19 @@
 <form name="processedItemsReportForm">
-    <fieldset class="report-parameters">
-        <label translate>Time interval</label>
-        <div class="field">
-            <input type="number" ng-model="report.time_interval.count" id="count" ng-change="validateForm()" required />
-            <select ng-model="report.time_interval.measure" ng-change="validateForm()">
+    <div class="groups">
+        <div class="box-items-count sd-line-input sd-line-input--boxed">
+            <label class="sd-line-input__label" translate>Time interval</label>
+            <input type="number" min="1" class="sd-line-input__input"
+                ng-model="report.time_interval.count" id="count" ng-change="validateForm()" required />
+        </div>
+        <div class="sd-line-input sd-line-input--is-select">
+            <select ng-model="report.time_interval.measure" ng-change="validateForm()"
+                    class="sd-line-input__select">
                 <option ng-repeat="measure in measures" value="{{measure}}">{{ :: measure | translate }}</option>
             </select>
         </div>
 
-        <label for="users" translate>Users</label>
-        <div class="term-editor data visible">
+        <div class="sd-line-input sd-line-input--boxed">
+            <label class="sd-line-input__label" for="users" translate>Users</label>
             <div id="users" sd-typeahead items="users" ng-model="users"
                 search="searchUsers(term)" select="selectUser(item)" term="selectedTerm">
                 <ul>
@@ -25,5 +29,5 @@
             {{ user.display_name}}
             <i class="icon-close-small" ng-click="removeUser(user)"></i>
         </div>
-    </fieldset>
+    </div>
 </form>
