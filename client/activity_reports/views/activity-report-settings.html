@@ -24,7 +24,7 @@
             </div>
             <div class="box-items-count sd-line-input sd-line-input--boxed">
                 <label class="sd-line-input__label" translate>Time interval (days)</label>
-                <input type="number" class="sd-line-input__input" ng-model="settings.days" id="count" required />
+                <input type="number" min="1" class="sd-line-input__input" ng-model="settings.days" id="count" required />
             </div>
             <div class="sd-line-input sd-line-input--boxed">
                 <label for="parameters-operation_end_date" class="sd-line-input__label" translate>End date</label>

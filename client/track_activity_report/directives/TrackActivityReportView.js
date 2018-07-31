@@ -16,8 +16,7 @@ export function TrackActivityReportView(trackActivityReport, trackActivityChart,
         scope: {},
         link: function(scope, element, attrs, controller) {
             var regenerateInterval = 60000,
-                interval = null,
-                chart = null;
+                interval = null;
 
             /**
              * @ngdoc method
@@ -53,7 +52,7 @@ export function TrackActivityReportView(trackActivityReport, trackActivityChart,
              */
             scope.generateChart = () => {
                 resetInterval();
-                chart = trackActivityChart.createChart(scope.trackActivityReport, 'track-activity');
+                trackActivityChart.createChart(scope.trackActivityReport, 'track-activity');
             };
 
             scope.$on('view:track_activity_report', (event, args) => {
@@ -65,10 +64,6 @@ export function TrackActivityReportView(trackActivityReport, trackActivityChart,
                 if (angular.isDefined(interval)) {
                     $interval.cancel(interval);
                     interval = null;
-                }
-                if (angular.isDefined(chart)) {
-                    chart.destroy();
-                    chart = null;
                 }
             });
         }

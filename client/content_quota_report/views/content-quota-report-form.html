@@ -1,41 +1,38 @@
-<ul class="nav nav-tabs">
-    <li ng-class="{active: currentTab() === generalTab}">
+<ul class="nav-tabs">
+    <li ng-class="{active: currentTab() === generalTab}"
+            class="nav-tabs__tab side-panel__content-tab-nav">
         <button ng-click="activateGeneralTab()" translate>General</button>
     </li>
-    <li ng-class="{active: currentTab() === filtersTab}">
+    <li ng-class="{active: currentTab() === filtersTab}"
+            class="nav-tabs__tab side-panel__content-tab-nav">
         <button ng-click="activateFiltersTab()" translate>Filters</button>
     </li>
 </ul>
-<p></p>
 <form name="contentQuotaReportForm">
-    <fieldset class="report-parameters">
+    <div class="groups">
         <div ng-show="currentTab() === generalTab">
-            <div class="field" ng-if="!forWidget">
-                <label for="parameters-date_start" translate>End date</label>
+            <div class="box-items-count sd-line-input sd-line-input--boxed">
+                <label class="sd-line-input__label" for="intervals-number" translate>No. of time intervals</label>
+                <input type="number" min="1" class="sd-line-input__input" ng-model="report.intervals_number" id="intervals-number" required />
+            </div>
+            <div class="box-items-count sd-line-input sd-line-input--boxed">
+                <label class="sd-line-input__label" for="interval-length" translate>Length of the interval (days)</label>
+                <input type="number" min="1" class="sd-line-input__input" ng-model="report.interval_length" id="interval-length" required />
+            </div>
+            <div class="sd-line-input">
+                <label class="sd-line-input__label" for="target" translate>Target Quota</label>
+                <input type="integer" class="sd-line-input__input" id="target" ng-model="report.target" required>
+            </div>
+            <div class="sd-line-input" ng-if="!forWidget">
+                <label class="sd-line-input__label" for="parameters-date_start" translate>End date</label>
                 <div sd-datepicker tooltip="cucubas" ng-model="report.end_date"
                      id="parameters-operation_date_start"></div>
-            </div>
-            <div class="field">
-                <label for="intervals-number" translate>No. of time intervals</label>
-                <select id="intervals-number" ng-model="report.intervals_number"
-                    ng-options="intervals_number for intervals_number in [1,2,3,4,5,6,7,8,9,10]">
-                </select>
-            </div>
-            <div class="field">
-                <label for="interval-length" translate>Length of the interval (days)</label>
-                <select id="interval-length" ng-model="report.interval_length"
-                    ng-options="interval_length for interval_length in [1,2,3,4,5,6,7]">
-                </select>
-            </div>
-            <div class="field">
-                <label for="target" translate>Target Quota</label>
-                <input type="integer" id="target" ng-model="report.target" required>
             </div>
         </div>
 
         <div ng-show="currentTab() === filtersTab">
-            <div class="field" sd-validation-error="error.subject">
-                <label for="parameters-subject">{{:: 'Subject' | translate}}</label>
+            <div class="sd-line-input" sd-validation-error="error.subject">
+                <label class="sd-line-input__label" for="parameters-subject">{{:: 'Subject' | translate}}</label>
                 <div id="parameters-subject"
                      sd-meta-terms
                      class="data"
@@ -48,8 +45,8 @@
                 </div>
             </div>
 
-            <div class="field" sd-validation-error="error.category">
-                <label for="parameters-category">{{:: 'Category' | translate}}</label>
+            <div class="sd-line-input" sd-validation-error="error.category">
+                <label class="sd-line-input__label" for="parameters-category">{{:: 'Category' | translate}}</label>
                 <div id="parameters-category"
                      sd-meta-terms
                      class="data"
@@ -62,8 +59,8 @@
                 </div>
             </div>
 
-            <div class="field">
-                <label for="parameters-keywords">{{:: 'Keywords' | translate}}</label>
+            <div class="sd-line-input">
+                <label class="sd-line-input__label" for="parameters-keywords">{{:: 'Keywords' | translate}}</label>
                 <div id="parameters-keywords"
                      sd-meta-words-list
                      data-field="keywords"

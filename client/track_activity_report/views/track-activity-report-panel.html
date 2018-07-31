@@ -1,24 +1,31 @@
-<div class="content-no-header pull pull-higher">
+<div class="side-panel__header side-panel__header--border-b">
+    <div class="side-panel__tools">
+        <a class="icn-btn" data-flow="left" ng-click="toggleFilters()">
+            <i class="icon-close-small"></i>
+        </a>
+    </div>
+    <h3 class="side-panel__heading" translate>Report Parameters</h3>
+</div>
+
+<div class="side-panel__content">
     <form name="trackActivityReportForm">
-        <fieldset class="report-parameters">
-            <div class="field">
-                <label for="days-ago" translate>Starting</label>
-                <select id="days-ago" ng-model="report.days_ago"
-                    ng-options="days_ago for days_ago in [1,2,3,4,5,6,7]" required>
-                </select>
-                <label for="days-ago" translate>days ago</label>
+        <div class="groups">
+            <div class="box-items-count sd-line-input sd-line-input--boxed">
+                <label class="sd-line-input__label" for="days-ago" translate>Time interval (days)</label>
+                <input type="number" min="1" class="sd-line-input__input" ng-model="report.days_ago"
+                    id="days-ago" required />
             </div>
 
-            <div class="field">
-                <label for="desk" translate>Desk</label>
-                <select id="desk" name="desk"
+            <div class="sd-line-input sd-line-input--is-select">
+                <label class="sd-line-input__label" for="desk" translate>Desk</label>
+                <select id="desk" name="desk" class="sd-line-input__select"
                     ng-options="d._id as d.name for d in desks" ng-model="report.desk" required>
                 </select>
             </div>
 
-            <div class="field" ng-if="report.desk">
-                <label for="stage" translate>Stage</label>
-                <select id="stage" name="stage"
+            <div class="sd-line-input sd-line-input--is-select" ng-if="report.desk">
+                <label class="sd-line-input__label" for="stage" translate>Stage</label>
+                <select id="stage" name="stage" class="sd-line-input__select"
                     ng-options="s._id as s.name for s in stages" ng-model="report.stage" required>
                 </select>
             </div>
@@ -39,10 +46,10 @@
             <div ng-if="selectedUser">
                 {{ selectedUser.display_name }}<i class="icon-close-small" ng-click="removeUser()"></i>
             </div>
-        </fieldset>&nbsp;
+        </div>
     </form>
 
-    <div>
+    <div class="side-panel__content-block">
         <button id="generate_processed_items_report" class="btn btn--primary" ng-click="generate()"
             ng-disabled="!trackActivityReportForm.$valid" translate>Generate</button>
     </div>
