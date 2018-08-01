@@ -11,7 +11,6 @@
 import './styles/analytics.scss';
 import * as svc from './services';
 import * as directive from './directives';
-import * as ctrl from './controllers';
 
 import './charts';
 import './search';
@@ -25,17 +24,11 @@ import './content_quota_report';
 import './content_quota_widget';
 import './source_category_report';
 
+angular.module('superdesk.analytics.reports', [])
+    .provider('reports', svc.ReportsProvider);
+
 function cacheIncludedTemplates($templateCache) {
-    $templateCache.put('activity-report.html', require('./activity_reports/views/activity-report.html'));
-    $templateCache.put('processed-items-report.html',
-        require('./processed_items_report/views/processed-items-report.html'));
-    $templateCache.put('track-activity-report.html',
-        require('./track_activity_report/views/track-activity-report.html'));
-    $templateCache.put('content-quota-report.html', require('./content_quota_report/views/content-quota-report.html'));
-    $templateCache.put(
-        'source-category-report.html',
-        require('./source_category_report/views/source-category-report.html')
-    );
+    $templateCache.put('analytics-report-basic.html', require('./views/analytics-report-basic.html'));
 }
 cacheIncludedTemplates.$inject = ['$templateCache'];
 
@@ -48,6 +41,7 @@ cacheIncludedTemplates.$inject = ['$templateCache'];
  * @description Superdesk analytics module.
  */
 export default angular.module('superdesk.analytics', [
+    'superdesk.analytics.reports',
     'superdesk.analytics.charts', 'superdesk.analytics.search',
     'superdesk.analytics.activity-report', 'superdesk.analytics.processed-items-report',
     'superdesk.analytics.processed-items-widget', 'superdesk.analytics.track-activity-report',
@@ -57,10 +51,9 @@ export default angular.module('superdesk.analytics', [
 ])
     .service('analyticsWidgetSettings', svc.AnalyticsWidgetSettings)
 
+    .directive('sdAnalyticsContainer', directive.AnalyticsContainer)
     .directive('sdAfterRender', directive.AfterRender)
     .directive('sdReportDropdown', directive.ReportDropdown)
-
-    .controller('AnalyticsController', ctrl.AnalyticsController)
 
     .run(cacheIncludedTemplates)
 
@@ -69,12 +62,11 @@ export default angular.module('superdesk.analytics', [
             label: gettext('Analytics'),
             description: gettext('View analytics reports'),
             when: '/analytics',
-            controller: 'AnalyticsController',
             template: require('./views/analytics.html'),
             sideTemplateUrl: 'scripts/apps/workspace/views/workspace-sidenav.html',
             category: superdesk.MENU_MAIN,
             priority: 100,
             adminTools: false,
-            filters: []
+            filters: [],
         });
     }]);

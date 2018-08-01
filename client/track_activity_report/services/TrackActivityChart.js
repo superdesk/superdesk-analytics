@@ -65,8 +65,9 @@ export function TrackActivityChart(_, moment, desks, chartManager, gettext) {
             data.push(itemData);
         });
 
-        var chartData = {
+        return [{
             id: 'track_activity',
+            type: 'columnrange',
             chart: {
                 type: 'columnrange',
                 inverted: true
@@ -114,8 +115,6 @@ export function TrackActivityChart(_, moment, desks, chartManager, gettext) {
                 lineWidth: 1,
                 data: data
             }]
-        };
-
-        return chartManager.create(renderTo, chartData);
+        }];
     };
 }

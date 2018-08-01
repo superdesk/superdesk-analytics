@@ -1,204 +1,62 @@
-<div class="side-panel__header side-panel__header--border-b">
-    <div class="side-panel__tools">
-        <a class="icn-btn" data-flow="left" ng-click="toggleFilters()">
-            <i class="icon-close-small"></i>
-        </a>
-    </div>
-    <h3 class="side-panel__heading" translate>Report Parameters</h3>
-</div>
-
-<div class="side-panel__content">
-    <div class="side-panel__content-block">
-        <div class="sd-alert sd-alert--hollow" translate>
-            Generate a report showing the number of published stories per category with a breakdown on source.
+<div class="side-panel side-panel--transparent side-panel--shadow-left">
+    <div class="side-panel__header side-panel__header--border-b">
+        <div class="side-panel__tools">
+            <a class="icn-btn" data-flow="left" ng-click="toggleSidePanel()">
+                <i class="icon-close-small"></i>
+            </a>
         </div>
-        <form name="sourceCategoryReportForm">
-            <div class="form__row form__row--no-padding">
-                <div class="sd-line-input">
-                    <label class="sd-line-input__label" translate>Title</label>
-                    <textarea
-                            class="sd-line-input__input"
-                            placeholder="{{'Published Stories per Category with Source Breakdown'|translate}}"
-                            ng-model="report.title"
-                            rows="2"
-                    ></textarea>
-                </div>
-            </div>
-
-            <div class="form__row">
-                <div class="sd-line-input">
-                    <label class="sd-line-input__label" translate>Subtitle</label>
-                    <input
-                            class="sd-line-input__input"
-                            placeholder="{{ generateSubtitlePlaceholder() | translate }}"
-                            ng-model="report.subtitle" type="text"
-                    />
-                </div>
-            </div>
-
-            <div class="form__row">
-                <div class="sd-line-input sd-line-input--no-margin">
-                    <label class="sd-line-input__label" translate>Date Filters</label>
-                    <div class="flex-grid flex-grid--boxed-small flex-grid--wrap-items flex-grid--small-2">
-                        <button sd-check
-                                data-type="radio"
-                                ng-model="report.dateFilter"
-                                ng-value="yesterday"
-                                data-label-position="inside"
-                                ng-click="onDateFilterChange()"
-                        >{{ 'Yesterday' | translate }}</button>
-                        <button sd-check
-                                data-type="radio"
-                                ng-model="report.dateFilter"
-                                ng-value="last_week"
-                                data-label-position="inside"
-                                ng-click="onDateFilterChange()"
-                        >{{ 'Last Week' | translate }}</button>
-                        <button sd-check
-                                data-type="radio"
-                                ng-model="report.dateFilter"
-                                ng-value="last_month"
-                                data-label-position="inside"
-                                ng-click="onDateFilterChange()"
-                        >{{ 'Last Month' | translate }}</button>
-                        <button sd-check
-                                data-type="radio"
-                                ng-model="report.dateFilter"
-                                ng-value="range"
-                                data-label-position="inside"
-                                ng-click="onDateFilterChange()"
-                        >{{ 'Range' | translate }}</button>
-                    </div>
-                </div>
-            </div>
-            <div class="form__row">
-                <fieldset class="report-parameters">
-                    <div class="multiple">
-                        <div class="field">
-                            <label
-                                    for="parameters-start_date"
-                                    translate
-                            >
-                                From
-                            </label>
-                            <div
-                                    sd-datepicker
-                                    ng-model="report.start_date"
-                                    id="parameters-start_date"
-                                    data-on-change="onDateChange()"
-                            ></div>
-                        </div>
-
-                        <div class="field">
-                            <label
-                                    for="parameters-operation_end_date"
-                                    translate
-                            >
-                                To
-                            </label>
-                            <div
-                                    sd-datepicker
-                                    ng-model="report.end_date"
-                                    id="parameters-end_date"
-                                    data-on-change="onDateChange()"
-                            ></div>
-                        </div>
-
-                    </div>
-                </fieldset>
-            </div>
-
-            <div sd-toggle-box data-title="Data Source" data-open="false">
-                <div class="form__row">
-                    <div class="sd-line-input sd-line-input--no-margin">
-                        <label class="sd-line-input__label" translate>Excluded States</label>
-                        <div class="flex-grid flex-grid--boxed-small flex-grid--wrap-items flex-grid--small-2">
-                            <button ng-repeat="state in item_states"
-                                    ng-model="report.excluded_states[state.qcode]"
-                                    sd-check
-                                    data-label-position="inside"
-                            >
-                                {{state.name | translate}}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <label class="form-label" translate>Exclude Categories With:</label>
-
-                <div class="form__row form__row--flex">
-                    <div class="form__row-item">
-                        <div class="sd-line-input sd-line-input--label-left">
-                            <label class="sd-line-input__label" translate>Less then</label>
-                            <input type="text" class="sd-line-input__input" ng-model="report.min" />
-                        </div>
-                    </div>
-                    <div class="form__row-item">
-                        <div class="sd-line-input sd-line-input--label-left-auto">
-                            <label class="sd-line-input__label" translate>
-                                Stories
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form__row form__row--flex">
-                    <div class="form__row-item">
-                        <div class="sd-line-input sd-line-input--label-left">
-                            <label class="sd-line-input__label" translate>More then</label>
-                            <input type="text" class="sd-line-input__input" ng-model="report.max" />
-                        </div>
-                    </div>
-                    <div class="form__row-item">
-                        <div class="sd-line-input sd-line-input--label-left-auto">
-                            <label class="sd-line-input__label" translate>
-                                Stories
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div sd-toggle-box data-title="Chart Options">
-                <div class="form__row">
-                    <div class="sd-line-input sd-line-input--no-margin">
-                        <label class="sd-line-input__label" translate>Chart Type</label>
-                        <div class="flex-grid flex-grid--boxed-small flex-grid--wrap-items flex-grid--small-2">
-                            <button ng-repeat="type in chart_types"
-                                    ng-model="report.chartType"
-                                    sd-check
-                                    type="radio"
-                                    ng-value="{{type.qcode}}"
-                                    data-label-position="inside"
-                            >
-                                {{type.name | translate}}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form__row">
-                    <div class="sd-line-input sd-line-input--is-select">
-                        <label class="sd-line-input__label" translate>Order Categories In:</label>
-                        <select class="sd-line-input__select" ng-model="report.sort_order">
-                            <option value="desc" translate>Descending Order of Stories</option>
-                            <option value="asc" translate>Ascending Order of Stores</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </form>
+        <ul class="nav-tabs">
+            <li class="nav-tabs__tab nav-tabs__tab--active">
+                <button class="nav-tabs__link" translate>Advanced</button>
+            </li>
+        </ul>
     </div>
-</div>
 
-<div class="side-panel__footer side-panel__footer--button-box">
-    <div class="flex-grid flex-grid--boxed-small flex-grid--wrap-items flex-grid--small-1">
-        <button
-                id="generate_source_category_report"
-                class="btn btn--primary"
-                ng-click="generate()"
-                ng-disabled="!sourceCategoryReportForm.$valid"
-                translate
-        >Generate</button>
+    <div class="side-panel__content">
+        <div class="tab-box tab-box--no-padding">
+            <button class="tab-box__item"
+                    id="parameters-tab"
+                    type="button"
+                    ng-class="{'tab-box__item--active': currentTab==='parameters'}"
+                    ng-click="changeTab('parameters')"
+                    translate
+            >Parameters</button>
+            <button class="tab-box__item"
+                    id="filters-tab"
+                    type="button"
+                    ng-class="{'tab-box__item--active': currentTab==='filters'}"
+                    ng-click="changeTab('filters')"
+                    translate
+            >Filters</button>
+            <button class="tab-box__item"
+                    id="filters-tab"
+                    type="button"
+                    ng-class="{'tab-box__item--active': currentTab==='chartOptions'}"
+                    ng-click="changeTab('chartOptions')"
+                    translate
+            >Chart</button>
+        </div>
+
+        <div class="side-panel__content-block">
+            <form name="sourceCategoryReportForm">
+                <div ng-include="'source-category-report-parameters.html'" ng-show="currentTab==='parameters'"></div>
+                <div ng-include="'source-category-report-filters.html'" ng-show="currentTab==='filters'"></div>
+                <div ng-include="'source-category-report-chart-options.html'" ng-show="currentTab==='chartOptions'"></div>
+            </form>
+        </div>
+
     </div>
+
+    <div class="side-panel__footer side-panel__footer--button-box">
+        <div class="flex-grid flex-grid--boxed-small flex-grid--wrap-items flex-grid--small-1">
+            <button
+                    id="generate_source_category_report"
+                    class="btn btn--primary"
+                    ng-click="generate()"
+                    ng-disabled="!sourceCategoryReportForm.$valid"
+                    translate
+            >Generate</button>
+        </div>
+    </div>
+
 </div>

@@ -24,7 +24,7 @@
             </div>
         </div>
 
-        <div ng-if="report.users.length" 
+        <div ng-if="report.users.length"
              ng-repeat = "user in report.users">
             {{ user.display_name}}
             <i class="icon-close-small" ng-click="removeUser(user)"></i>

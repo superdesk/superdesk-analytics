@@ -11,6 +11,10 @@
 import * as svc from './services';
 import * as directive from './directives';
 
+function cacheIncludedTemplates($templateCache) {
+    $templateCache.put('content-quota-report-side-panel.html', require('./views/content-quota-report-side-panel.html'));
+}
+cacheIncludedTemplates.$inject = ['$templateCache'];
 
 /**
  * @ngdoc module
@@ -28,13 +32,14 @@ angular.module('superdesk.analytics.content-quota-report', [])
     .directive('sdContentQuotaReportPanel', directive.ContentQuotaReportPanel)
     .directive('sdContentQuotaReportView', directive.ContentQuotaReportView)
 
-    .config(['superdeskProvider', function(superdesk) {
-        superdesk.activity('content-quota-report', {
+    .run(cacheIncludedTemplates)
+
+    .config(['reportsProvider', 'gettext', function(reportsProvider, gettext) {
+        reportsProvider.addReport({
+            id: 'content_quota_report',
             label: gettext('Content Quota Report'),
-            template: require('./views/content-quota-report.html'),
-            topTemplateUrl: 'scripts/apps/dashboard/views/workspace-topnav.html',
-            sideTemplateUrl: 'scripts/apps/workspace/views/workspace-sidenav.html',
-            category: 'analytics',
-            priority: -800
+            sidePanelTemplate: 'content-quota-report-side-panel.html',
+            priority: 400,
+            privileges: {content_quota_report: 1},
         });
     }]);

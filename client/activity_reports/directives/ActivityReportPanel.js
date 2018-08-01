@@ -1,4 +1,6 @@
-ActivityReportPanel.$inject = ['desks', 'notify', '$rootScope', 'activityReport'];
+ActivityReportPanel.$inject = [
+    'desks', 'notify', '$rootScope', 'activityReport', 'activityChart'
+];
 
 /**
  * @ngdoc directive
@@ -10,11 +12,11 @@ ActivityReportPanel.$inject = ['desks', 'notify', '$rootScope', 'activityReport'
  * @requires activityReport
  * @description A directive that generates the sidebar containing activity report parameters
  */
-export function ActivityReportPanel(desks, notify, $rootScope, activityReport) {
+export function ActivityReportPanel(desks, notify, $rootScope, activityReport, activityChart) {
     return {
+        require: '^sdAnalyticsContainer',
         template: require('../views/activity-report-panel.html'),
-        scope: {},
-        link: function(scope, element, attrs, controller) {
+        link: function(scope, element, attrs) {
             scope.panelTab = 'editingActivityReport';
 
             desks.initialize().then(() => {
@@ -74,7 +76,9 @@ export function ActivityReportPanel(desks, notify, $rootScope, activityReport) {
              */
             scope.generate = function(report) {
                 function onSuccess(activityReport) {
-                    $rootScope.$broadcast('view:activity_report', activityReport);
+                    scope.changeReportParams({
+                        charts: activityChart.createChart(activityReport),
+                    });
                     notify.success(gettext('The activity report was genereated successfully'));
                 }
 

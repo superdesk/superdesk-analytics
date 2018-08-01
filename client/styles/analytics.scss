@@ -5,14 +5,6 @@
 @import '~variables.scss';
 @import '~animation.scss';
 
-.report-selector {
-    position: absolute;
-    left: 140px;
-    top: 10px;
-    width: 180px;
-    background-color: $sd-background;
-}
-
 .report-page-container {
     .report-content {
         position: absolute;
@@ -250,11 +242,23 @@
     textarea {
         height: unset !important;
     }
-}
 
-.report-view {
-    width: 100%;
-    height: 100%;
+    // Required to make the SelectMetaTermsInput the same as the
+    // UI prototype
+    .select__meta-terms {
+        div.sd-line-input__input {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+            height: auto;
+            min-height: 3rem;
+            padding-left: unset !important;
+        }
+
+        &--disabled {
+            div.sd-line-input__input {
+                padding-left: 0;
+            }
+        }
+    }
 }
 
 // Hack so that content is not rendered underneath the workqueue
@@ -269,4 +273,10 @@
 
 .report-settings {
     margin-top: 2rem;
+}
+
+.tab-box {
+    &--no-padding {
+        padding-bottom: 0;
+    }
 }

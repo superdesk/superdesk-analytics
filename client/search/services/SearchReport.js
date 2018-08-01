@@ -132,9 +132,48 @@ export function SearchReport(_, config, moment, api, $q) {
             ).join(',');
         };
 
+        const filterCategories = function() {
+            if (!_.get(_params, 'categories')) {
+                return;
+            }
+
+            const categories = _.filter(
+                Object.keys(_params.categories),
+                (category) => !!_params.categories[category]
+            );
+
+            if (!_.isEmpty(categories)) {
+                params.must.push({terms: {'anpa_category.name': categories}});
+            }
+        };
+
+        const filterSources = function() {
+            if (!_.get(_params, 'sources')) {
+                return;
+            }
+
+            const sources = _.filter(
+                Object.keys(_params.sources),
+                (source) => !!_params.sources[source]
+            );
+
+            if (!_.isEmpty(sources)) {
+                params.must.push({terms: {source: sources}});
+            }
+        };
+
+        const filterRewrites = function() {
+            if (_.get(_params, 'exclude_rewrites')) {
+                params.must_not.push({exists: {field: 'rewrite_of'}});
+            }
+        };
+
         filterDates();
         excludeStates();
         setRepos();
+        filterCategories();
+        filterSources();
+        filterRewrites();
 
         return {
             source: {

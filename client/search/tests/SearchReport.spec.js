@@ -50,7 +50,6 @@ describe('searchReport', () => {
                 killed: true,
                 corrected: true,
                 recalled: true,
-                rewrite_of: true,
             },
         });
 
@@ -62,7 +61,7 @@ describe('searchReport', () => {
                             bool: {
                                 must: [],
                                 must_not: [
-                                    {terms: {state: ['killed', 'corrected', 'recalled', 'rewrite_of']}},
+                                    {terms: {state: ['killed', 'corrected', 'recalled']}},
                                 ],
                             },
                         },
@@ -210,6 +209,104 @@ describe('searchReport', () => {
                                         },
                                     },
                                 }],
+                                must_not: [],
+                            },
+                        },
+                    },
+                },
+                sort: [{versioncreated: 'desc'}],
+                size: 0,
+            },
+            repo: '',
+        });
+    });
+
+    it('can generate category filters', () => {
+        searchReport.query('source_category_report', {
+            categories: {
+                Finance: true,
+                Sport: false,
+                Advisories: true,
+            },
+        });
+
+        expect(api.query).toHaveBeenCalledWith('source_category_report', {
+            source: {
+                query: {
+                    filtered: {
+                        filter: {
+                            bool: {
+                                must: [{terms: {'anpa_category.name': ['Finance', 'Advisories']}}],
+                                must_not: [],
+                            },
+                        },
+                    },
+                },
+                sort: [{versioncreated: 'desc'}],
+                size: 0,
+            },
+            repo: '',
+        });
+    });
+
+    it('can generate source filters', () => {
+        searchReport.query('source_category_report', {
+            sources: {
+                AAP: true,
+                Reuters: false,
+                AP: true,
+            },
+        });
+
+        expect(api.query).toHaveBeenCalledWith('source_category_report', {
+            source: {
+                query: {
+                    filtered: {
+                        filter: {
+                            bool: {
+                                must: [{terms: {source: ['AAP', 'AP']}}],
+                                must_not: [],
+                            },
+                        },
+                    },
+                },
+                sort: [{versioncreated: 'desc'}],
+                size: 0,
+            },
+            repo: '',
+        });
+    });
+
+    it('can generate exclude rewrite filters', () => {
+        searchReport.query('source_category_report', {exclude_rewrites: true});
+
+        expect(api.query).toHaveBeenCalledWith('source_category_report', {
+            source: {
+                query: {
+                    filtered: {
+                        filter: {
+                            bool: {
+                                must: [],
+                                must_not: [{exists: {field: 'rewrite_of'}}],
+                            },
+                        },
+                    },
+                },
+                sort: [{versioncreated: 'desc'}],
+                size: 0,
+            },
+            repo: '',
+        });
+
+        searchReport.query('source_category_report', {exclude_rewrites: false});
+
+        expect(api.query).toHaveBeenCalledWith('source_category_report', {
+            source: {
+                query: {
+                    filtered: {
+                        filter: {
+                            bool: {
+                                must: [],
                                 must_not: [],
                             },
                         },

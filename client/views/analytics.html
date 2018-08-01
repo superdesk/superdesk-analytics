@@ -1,44 +1,44 @@
-<div class="sd-page-grid--basic sd-analytics">
+<div sd-analytics-container class="sd-page-grid--basic sd-analytics">
     <div class="sd-content sd-page-content--slide-in sd-content--margin-b30">
         <div class="sd-page-content__content-block sd-page-content__content-block--main"
-             ng-class="{'open-filters': filtersOpen}"
+             ng-class="{'open-filters': flags.showSidePanel}"
         >
             <div class="subnav">
                 <button class="navbtn navbtn--left navbtn--darker"
-                        ng-click="toggleFilters()"
-                        ng-class="{'navbtn--active': filtersOpen}"
+                        ng-click="toggleSidePanel()"
+                        ng-class="{'navbtn--active': flags.showSidePanel}"
+                        ng-if="currentReport.id"
                 >
                     <i class="icon-filter-large"></i>
                 </button>
                 <div sd-report-dropdown
-                     data-reports="reports"
-                     data-current-report="currentReport"
-                     data-change-report="changeReport(report)"
                      class="subnav__stretch-bar"
                 >
                 </div>
             </div>
 
-            <div ng-include="'activity-report.html'"
-                 ng-if="currentReport.id === 'activity-report'"
-                 class="sd-column-box--2"
-            ></div>
-            <div ng-include="'processed-items-report.html'"
-                 ng-if="currentReport.id === 'processed-items-report'"
-                 class="sd-column-box--2"
-            ></div>
-            <div ng-include="'track-activity-report.html'"
-                 ng-if="currentReport.id === 'track-activity-report'"
-                 class="sd-column-box--2"
-            ></div>
-            <div ng-include="'content-quota-report.html'"
-                 ng-if="currentReport.id === 'content-quota-report'"
-                 class="sd-column-box--2"
-            ></div>
-            <div ng-include="'source-category-report.html'"
-                 ng-if="currentReport.id === 'source-category-report'"
-                 class="sd-column-box--2"
-            ></div>
+            <div class="sd-column-box--2">
+                <!-- Side Panel With a Controller -->
+                <div class="sd-filters-panel"
+                     ng-if="currentReport.id && currentReport.controller"
+                     ng-include="currentReport.sidePanelTemplate"
+                     ng-controller="currentReport.controller"
+                ></div>
+
+                <!-- Side Panel Without a Controller -->
+                <div class="sd-filters-panel"
+                     ng-if="currentReport.id && !currentReport.controller"
+                     ng-include="currentReport.sidePanelTemplate"
+                ></div>
+
+                <!-- Chart Content View -->
+                <div class="sd-column-box__main-column sd-column-box__main-column__listpanel">
+                    <div class="sd-column-box__main-column__items"
+                         ng-if="currentReport.id"
+                         ng-include="currentReport.contentTemplate || 'analytics-report-basic.html'"
+                     ></div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

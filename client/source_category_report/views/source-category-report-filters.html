@@ -1,0 +1,75 @@
+<div sd-toggle-box data-title="Categories" data-open="true" ng-if="categories.length">
+    <div class="form__row" ng-repeat="category in categories">
+        <button sd-check
+                ng-model="params.categories[category]"
+        >{{category | translate}}
+        </button>
+    </div>
+</div>
+
+<div sd-toggle-box data-title="Sources" data-open="true" ng-if="sources.length">
+    <div class="form__row" ng-repeat="source in sources">
+        <button sd-check
+                ng-model="params.sources[source]"
+        >{{source | translate}}
+        </button>
+    </div>
+</div>
+
+<div class="form__row">
+    <div class="sd-line-input sd-line-input--no-margin">
+        <label class="sd-line-input__label" translate>Excluded States</label>
+        <div class="flex-grid flex-grid--boxed-small flex-grid--wrap-items flex-grid--small-2">
+            <button ng-repeat="state in item_states"
+                    ng-model="params.excluded_states[state.qcode]"
+                    sd-check
+                    data-label-position="inside"
+            >
+                {{state.name | translate}}
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="form__row">
+    <div class="sd-line-input">
+        <button sd-check
+                ng-model="params.exclude_rewrites"
+                data-label-position="inside"
+        >{{'Exclude Rewrites' | translate}}</button>
+    </div>
+</div>
+
+<label class="form-label" translate>Exclude Categories With:</label>
+
+<div class="form__row form__row--flex">
+    <div class="form__row-item">
+        <div class="sd-line-input sd-line-input--label-left">
+            <label class="sd-line-input__label" translate>Less then</label>
+            <input type="text" class="sd-line-input__input" ng-model="params.min" />
+        </div>
+    </div>
+    <div class="form__row-item">
+        <div class="sd-line-input sd-line-input--label-left-auto">
+            <label class="sd-line-input__label" translate>
+                Stories
+            </label>
+        </div>
+    </div>
+</div>
+
+<div class="form__row form__row--flex">
+    <div class="form__row-item">
+        <div class="sd-line-input sd-line-input--label-left">
+            <label class="sd-line-input__label" translate>More then</label>
+            <input type="text" class="sd-line-input__input" ng-model="params.max" />
+        </div>
+    </div>
+    <div class="form__row-item">
+        <div class="sd-line-input sd-line-input--label-left-auto">
+            <label class="sd-line-input__label" translate>
+                Stories
+            </label>
+        </div>
+    </div>
+</div>

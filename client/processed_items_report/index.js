@@ -11,6 +11,14 @@
 import * as directive from './directives';
 import * as svc from './services';
 
+function cacheIncludedTemplates($templateCache) {
+    $templateCache.put(
+        'processed-items-report-side-panel.html',
+        require('./views/processed-items-report-side-panel.html')
+    );
+}
+cacheIncludedTemplates.$inject = ['$templateCache'];
+
 /**
  * @ngdoc module
  * @module superdesk.analytics.processed-items-report
@@ -27,13 +35,14 @@ angular.module('superdesk.analytics.processed-items-report', [])
     .directive('sdProcessedItemsReportPanel', directive.ProcessedItemsReportPanel)
     .directive('sdProcessedItemsReportView', directive.ProcessedItemsReportView)
 
-    .config(['superdeskProvider', function(superdesk) {
-        superdesk.activity('processed-items-report', {
+    .run(cacheIncludedTemplates)
+
+    .config(['reportsProvider', 'gettext', function(reportsProvider, gettext) {
+        reportsProvider.addReport({
+            id: 'processed_items_report',
             label: gettext('Processed Items Report'),
-            template: require('./views/processed-items-report.html'),
-            topTemplateUrl: 'scripts/apps/dashboard/views/workspace-topnav.html',
-            sideTemplateUrl: 'scripts/apps/workspace/views/workspace-sidenav.html',
-            category: 'analytics',
-            priority: -800
+            sidePanelTemplate: 'processed-items-report-side-panel.html',
+            priority: 200,
+            privileges: {processed_items_report: 1},
         });
     }]);
