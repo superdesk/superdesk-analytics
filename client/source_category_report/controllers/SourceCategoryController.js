@@ -1,4 +1,4 @@
-import {generateSubtitle} from '../../utils';
+import {generateSubtitle, getErrorMessage} from '../../utils';
 
 SourceCategoryController.$inject = [
     '$scope',
@@ -9,13 +9,16 @@ SourceCategoryController.$inject = [
     'searchReport',
     'notify',
     'sourceCategoryChart',
+    'savedReports',
+    '$rootScope',
+    'session',
+    '$location',
 ];
 
 /**
  * @ngdoc controller
  * @module superdesk.apps.analytics.source-category-report
  * @name SourceCategoryController
- * @requires $scope
  * @requires gettext
  * @requires moment
  * @requires config
@@ -23,6 +26,10 @@ SourceCategoryController.$inject = [
  * @requires searchReport
  * @requires notify
  * @requires sourceCategoryChart
+ * @requires savedReports
+ * @requires $rootScope
+ * @requires session
+ * @requires $location
  * @description Controller for Source/Category reports
  */
 export function SourceCategoryController(
@@ -33,7 +40,11 @@ export function SourceCategoryController(
     _,
     searchReport,
     notify,
-    sourceCategoryChart
+    sourceCategoryChart,
+    savedReports,
+    $rootScope,
+    session,
+    $location
 ) {
     /**
      * @ngdoc method
@@ -43,10 +54,24 @@ export function SourceCategoryController(
     this.init = () => {
         $scope.categories = [];
         $scope.sources = [];
-        $scope.params = {};
-        $scope.reportData = {};
         $scope.currentTab = 'parameters';
+        $scope.currentPanel = 'advanced';
 
+        this.initDefaultParams();
+
+        this.deregisterReportsUpdate = $rootScope.$on(
+            'savedreports:update',
+            angular.bind(this, this.onSavedReportUpdated)
+        );
+        $scope.$on('$destroy', angular.bind(this, this.onDestroy));
+    };
+
+    /**
+     * @ngdoc method
+     * @name SourceCategoryController#initDefaultParams
+     * @description Sets the default report parameters
+     */
+    this.initDefaultParams = () => {
         $scope.item_states = [{
             qcode: 'published',
             name: gettext('Published'),
@@ -82,7 +107,14 @@ export function SourceCategoryController(
             name: gettext('Table'),
         }];
 
-        $scope.params = {
+        $scope.currentTemplate = {};
+
+        $scope.currentParams = {
+            params: {},
+            report: 'source_category_report',
+        };
+
+        $scope.currentParams.params = {
             start_date: moment()
                 .subtract(30, 'days')
                 .format(config.view.dateformat),
@@ -104,10 +136,154 @@ export function SourceCategoryController(
         };
 
         // Set the default values for excluded_states for the form
-        $scope.params.excluded_states = _.mapValues(
+        $scope.currentParams.params.excluded_states = _.mapValues(
             _.keyBy($scope.item_states, 'qcode'),
             (state) => state.default_exclude
         );
+
+        $scope.defaultReportParams = _.cloneDeep($scope.currentParams);
+
+        // If a savedReport (template) is in the url, then load and apply its values
+        if ($location.search().template) {
+            savedReports.fetchById($location.search().template)
+                .then((savedReport) => {
+                    $scope.selectReport(savedReport);
+                }, (error) => {
+                    if (_.get(error, 'status') === 404) {
+                        notify.error(gettext('Saved report not found!'));
+                    } else {
+                        notify.error(
+                            getErrorMessage(error, gettext('Failed to load the saved report!'))
+                        );
+                    }
+                });
+        }
+    };
+
+    /**
+     * @ngdoc method
+     * @name SourceCategoryController#isDirty
+     * @returns {boolean}
+     * @description Returns true if the report parameters are not equal to the default parameters
+     */
+    $scope.isDirty = () => !_.isEqual($scope.currentParams, $scope.defaultReportParams);
+
+    /**
+     * @ngdoc method
+     * @name SourceCategoryController#clearFilters
+     * @description Sets the current report parameters to the default values, and clears the currently
+     * selected saved report/template
+     */
+    $scope.clearFilters = () => {
+        $scope.currentParams = _.cloneDeep($scope.defaultReportParams);
+        $scope.currentTemplate = {};
+        $location.search('template', null);
+    };
+
+    /**
+     * @ngdoc method
+     * @name SourceCategoryController#selectReport
+     * @param {object} selectedReport - The saved report/template to select
+     * @description Selects the provided saved report/template and sets the form values
+     */
+    $scope.selectReport = (selectedReport) => {
+        $scope.currentTemplate = _.cloneDeep(selectedReport);
+        $scope.currentParams = _.cloneDeep(selectedReport);
+        $scope.changePanel('advanced');
+        $location.search('template', _.get(selectedReport, '_id'));
+    };
+
+    /**
+     * @ngdoc method
+     * @name SourceCategoryController#onReportSaved
+     * @param {Promise<object>} response - Promise with the API save response
+     * @description If the save is successful, select that report and notify the user, otherwise notify the
+     * user if the save fails
+     */
+    $scope.onReportSaved = (response) => (
+        response.then((savedReport) => {
+            $scope.selectReport(savedReport);
+            notify.success(gettext('Report saved!'));
+        }, (error) => {
+            notify.error(
+                getErrorMessage(error, gettext('Failed to delete the saved report!'))
+            );
+        })
+    );
+
+    /**
+     * @ngdoc method
+     * @name SourceCategoryController#onReportDeleted
+     * @param {Promise<object>} response - Promise with the API remove response
+     * @description Notify the user of the result when deleting a saved report
+     */
+    $scope.onReportDeleted = (response) => (
+        response.then(() => {
+            notify.success(gettext('Report deleted!'));
+        }, (error) => {
+            notify.error(
+                getErrorMessage(error, gettext('Failed to delete the saved report!'))
+            );
+        })
+    );
+
+    /**
+     * @ngdoc method
+     * @name SourceCategoryController#onDestroy
+     * @description Make sure to reset the defaultReportParams to empty object on controller destruction
+     */
+    this.onDestroy = () => {
+        $scope.defaultReportParams = {};
+        this.deregisterReportsUpdate();
+    };
+
+    /**
+     * @ngdoc method
+     * @name SourceCategoryController#onSavedReportUpdated
+     * @param {object} event - The websocket event object
+     * @param {object} data - The websocket data (saved report details)
+     * @description Respond when a saved report is created/updated/deleted
+     * (from a websocket notification from the server)
+     */
+    this.onSavedReportUpdated = (event, data) => {
+        const reportType = _.get(data, 'report_type');
+        const operation = _.get(data, 'operation');
+        const reportId = _.get(data, 'report_id');
+        const userId = _.get(data, 'user_id');
+        const sessionId = _.get(data, 'session_id');
+
+        const currentUserId = _.get(session, 'identity._id');
+        const currentSessionId = _.get(session, 'sessionId');
+
+        // Disregard if this update is not the same type as this report
+        if (reportType !== 'source_category_report') {
+            return;
+        }
+
+        // Disregard if this update is not for the currently used template
+        if (reportId !== _.get($scope.currentTemplate, '_id')) {
+            return;
+        }
+
+        if (operation === 'delete') {
+            // If the saved report was deleted, then unset the currentTemplate
+            $scope.$applyAsync(() => {
+                $scope.currentTemplate = {};
+
+                // Remove the saved report ID from the url parameters
+                $location.search('template', null);
+
+                if (sessionId !== currentSessionId) {
+                    notify.warning(gettext('The Saved Report you are using was deleted!'));
+                }
+            });
+        } else if (operation === 'update' && userId !== currentUserId) {
+            // Otherwise if this report was updated in a different session,
+            // then notify the current user
+            $scope.$applyAsync(() => {
+                notify.warning(gettext('The Saved Report you are using was updated!'));
+            });
+        }
     };
 
     /**
@@ -116,7 +292,7 @@ export function SourceCategoryController(
      * @returns {Promise<Object>} - Search API query response
      * @description Sends the current form parameters to the search API
      */
-    this.runQuery = () => searchReport.query('source_category_report', $scope.params);
+    this.runQuery = () => searchReport.query('source_category_report', $scope.currentParams.params);
 
     /**
      * @ngdoc method
@@ -130,12 +306,12 @@ export function SourceCategoryController(
             Object.keys(data.sources);
 
         $scope.sources.forEach((source) => {
-            $scope.params.sources[source] = $scope.params.sources[source] || false;
+            $scope.currentParams.params.sources[source] = $scope.currentParams.params.sources[source] || false;
         });
 
-        Object.keys($scope.params.sources).forEach((source) => {
+        Object.keys($scope.currentParams.params.sources).forEach((source) => {
             if (!_.get(data.sources, source)) {
-                delete $scope.params.sources[source];
+                delete $scope.currentParams.params.sources[source];
             }
         });
     };
@@ -149,7 +325,7 @@ export function SourceCategoryController(
     this.updateCategories = (data) => {
         let categories = _.filter(
             Object.keys(data.categories),
-            (category) => data.categories[category] >= $scope.params.min
+            (category) => data.categories[category] >= $scope.currentParams.params.min
         );
 
         $scope.categories = _.isEmpty(categories) ?
@@ -157,12 +333,13 @@ export function SourceCategoryController(
             categories;
 
         $scope.categories.forEach((category) => {
-            $scope.params.categories[category] = $scope.params.categories[category] || false;
+            $scope.currentParams.params.categories[category] =
+                $scope.currentParams.params.categories[category] || false;
         });
 
-        Object.keys($scope.params.categories).forEach((category) => {
+        Object.keys($scope.currentParams.params.categories).forEach((category) => {
             if (!_.get(data.categories, category)) {
-                delete $scope.params.categories[category];
+                delete $scope.currentParams.params.categories[category];
             }
         });
     };
@@ -174,21 +351,20 @@ export function SourceCategoryController(
      */
     $scope.generate = () => {
         this.runQuery().then((data) => {
-            $scope.reportData = data;
-            $scope.reportData = Object.assign({}, data, {
-                chartType: $scope.params.chartType,
-                title: $scope.params.title,
-                subtitle: $scope.params.subtitle,
-                min: $scope.params.min,
-                max: $scope.params.max,
-                dateFilter: $scope.params.dateFilter,
-                start_date: $scope.params.start_date,
-                end_date: $scope.params.end_date,
-                sort_order: $scope.params.sort_order,
+            const reportData = Object.assign({}, data, {
+                chartType: $scope.currentParams.params.chartType,
+                title: $scope.currentParams.params.title,
+                subtitle: $scope.currentParams.params.subtitle,
+                min: $scope.currentParams.params.min,
+                max: $scope.currentParams.params.max,
+                dateFilter: $scope.currentParams.params.dateFilter,
+                start_date: $scope.currentParams.params.start_date,
+                end_date: $scope.currentParams.params.end_date,
+                sort_order: $scope.currentParams.params.sort_order,
             });
 
             $scope.changeReportParams(
-                sourceCategoryChart.createChart($scope.reportData)
+                sourceCategoryChart.createChart(reportData)
             );
         }, (error) => {
             notify.error(angular.isDefined(error.data._message) ?
@@ -204,7 +380,7 @@ export function SourceCategoryController(
      * @return {String}
      * @description Based on the date filters, returns the placeholder to use for the subtitle
      */
-    $scope.generateSubtitlePlaceholder = () => generateSubtitle(moment, config, $scope.params);
+    $scope.generateSubtitlePlaceholder = () => generateSubtitle(moment, config, $scope.currentParams.params);
 
     /**
      * @ngdoc method
@@ -212,9 +388,9 @@ export function SourceCategoryController(
      * @description When the date filter changes, clear the date input fields if the filter is not 'range'
      */
     $scope.onDateFilterChange = () => {
-        if ($scope.params.dateFilter !== 'range') {
-            $scope.params.start_date = null;
-            $scope.params.end_date = null;
+        if ($scope.currentParams.params.dateFilter !== 'range') {
+            $scope.currentParams.params.start_date = null;
+            $scope.currentParams.params.end_date = null;
         }
     };
 
@@ -224,8 +400,8 @@ export function SourceCategoryController(
      * @description Auto-selects 'range' as the date filter if the user inputs a date
      */
     $scope.onDateChange = function() {
-        if ($scope.params.dateFilter !== 'range') {
-            $scope.params.dateFilter = 'range';
+        if ($scope.currentParams.params.dateFilter !== 'range') {
+            $scope.currentParams.params.dateFilter = 'range';
         }
     };
 
@@ -247,6 +423,16 @@ export function SourceCategoryController(
                 this.updateCategories(data);
             });
         }
+    };
+
+    /**
+     * @ngdoc method
+     * @name SourceCategoryController#changePanel
+     * @param {String} panelName - The name of the panel to change to
+     * @description Changes the current outter tab (panel) to use in the side panel
+     */
+    $scope.changePanel = (panelName) => {
+        $scope.currentPanel = panelName;
     };
 
     this.init();

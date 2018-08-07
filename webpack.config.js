@@ -3,6 +3,10 @@ var webpack = require('webpack');
 var lodash = require('lodash');
 
 module.exports = function makeConfig(grunt) {
+    grunt.option = grunt.option || function() {
+        return undefined;
+    };
+
     var appConfigPath = path.join(process.cwd(), 'superdesk.config.js');
 
     if (process.env.SUPERDESK_CONFIG) {
@@ -131,7 +135,7 @@ function getDefaults(grunt) {
 
     return {
         // application version
-        version: version || grunt.file.readJSON(path.join(__dirname, 'package.json')).version,
+        version: version || grunt.file && grunt.file.readJSON(path.join(__dirname, 'package.json')).version,
 
         // raven settings
         raven: {

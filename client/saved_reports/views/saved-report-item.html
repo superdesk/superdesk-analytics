@@ -1,0 +1,39 @@
+<div class="sd-list-item sd-shadow--z1 saved-reports__item"
+     ng-click="select()"
+     ng-class="{
+        'sd-list-item--activated': isReportSelected(),
+        'sd-list-item--selected': isReportSelected(),
+        'sd-list-item--no-bg': !isReportSelected()
+     }"
+>
+    <div class="sd-list-item__border"></div>
+    <div class="sd-list-item__column sd-list-item__column--grow sd-list-item__column--no-border">
+        <div class="sd-list-item__row">
+            <span class="sd-overflow-ellipsis sd-list-item__strong">
+                {{:: report.name }}
+            </span>
+            <span ng-if="report.is_global && forCurrentUser()" class="label label--hollow" translate>Global</span>
+        </div>
+        <div class="sd-list-item__row">
+            <span class="sd-overflow-ellipsis sd-list-item__normal">
+                {{:: report.description }}
+            </span>
+        </div>
+        <div class="sd-list-item__row"
+             ng-if="report.is_global && !forCurrentUser()"
+        >
+            <span class="sd-overflow-ellipsis sd-list-item__text-label">
+                Owner: {{:: ownerName }}
+            </span>
+        </div>
+    </div>
+    <div class="sd-list-item__action-menu sd-list-item__action-menu--direction-row">
+        <button class="icn-btn"
+                ng-click="remove($event)"
+                title="{{:: 'Delete Saved Report' | translate }}"
+                ng-if="(forCurrentUser() && localPrivilege) || (!forCurrentUser() && globalPrivilege)"
+        >
+            <i class="icon-trash"></i>
+        </button>
+    </div>
+</div>

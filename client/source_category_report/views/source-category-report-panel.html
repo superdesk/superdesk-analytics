@@ -6,13 +6,35 @@
             </a>
         </div>
         <ul class="nav-tabs">
-            <li class="nav-tabs__tab nav-tabs__tab--active">
-                <button class="nav-tabs__link" translate>Advanced</button>
+            <li class="nav-tabs__tab"
+                ng-class="{'nav-tabs__tab--active': currentPanel === 'advanced'}"
+            >
+                <button class="nav-tabs__link"
+                        ng-click="changePanel('advanced')"
+                        translate
+                >Advanced</button>
+            </li>
+            <li class="nav-tabs__tab"
+                ng-class="{'nav-tabs__tab--active': currentPanel === 'saved'}"
+            >
+                <button class="nav-tabs__link"
+                        ng-click="changePanel('saved')"
+                        translate
+                >Saved</button>
             </li>
         </ul>
     </div>
 
-    <div class="side-panel__content">
+    <div sd-saved-report-list
+         ng-if="currentPanel === 'saved'"
+         data-report-type="source_category_report"
+         data-select-report="selectReport"
+         data-current-report="currentTemplate"
+         data-on-report-deleted="onReportDeleted"
+         class="side-panel__content"
+    ></div>
+
+    <div class="side-panel__content" ng-if="currentPanel === 'advanced'">
         <div class="tab-box tab-box--no-padding">
             <button class="tab-box__item"
                     id="parameters-tab"
@@ -29,7 +51,7 @@
                     translate
             >Filters</button>
             <button class="tab-box__item"
-                    id="filters-tab"
+                    id="chart-tab"
                     type="button"
                     ng-class="{'tab-box__item--active': currentTab==='chartOptions'}"
                     ng-click="changeTab('chartOptions')"
@@ -47,16 +69,13 @@
 
     </div>
 
-    <div class="side-panel__footer side-panel__footer--button-box">
-        <div class="flex-grid flex-grid--boxed-small flex-grid--wrap-items flex-grid--small-1">
-            <button
-                    id="generate_source_category_report"
-                    class="btn btn--primary"
-                    ng-click="generate()"
-                    ng-disabled="!sourceCategoryReportForm.$valid"
-                    translate
-            >Generate</button>
-        </div>
-    </div>
-
+    <div sd-save-generate-report
+         ng-if="currentPanel === 'advanced'"
+         data-clear-filters="clearFilters"
+         data-generate-report="generate"
+         data-current-params="currentParams"
+         data-current-template="currentTemplate"
+         data-is-dirty="isDirty"
+         data-on-report-saved="onReportSaved"
+    ></div>
 </div>

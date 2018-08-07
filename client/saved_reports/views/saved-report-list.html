@@ -1,0 +1,35 @@
+<div class="saved-reports">
+    <div>
+        <input id="search_saved_reports"
+               class="saved-reports__filter"
+               ng-model="searchText"
+               placeholder="{{:: 'Search saved reports' | translate}}"
+               ng-keyup="filter()"
+               type="text"
+        />
+    </div>
+    <div class="saved-reports__group-title" translate>My Saved Reports</div>
+    <div ng-repeat="savedReport in filteredUserReports | orderBy:'name'"
+         sd-saved-report-item
+         data-report="savedReport"
+         data-remove-report="remove"
+         data-select-report="selectReport"
+         data-current-user="currentUser"
+         data-owner-name="userLookup[savedReport.user].display_name"
+         data-local-privilege="localPrivilege"
+         data-global-privilege="globalPrivilege"
+         data-is-selected="isReportSelected(savedReport)"
+    ></div>
+    <div class="saved-reports__group-title" translate>Global Saved Activity Reports</div>
+    <div ng-repeat="savedReport in filteredGlobalReports | orderBy:'name'"
+         sd-saved-report-item
+         data-report="savedReport"
+         data-remove-report="remove"
+         data-select-report="selectReport"
+         data-current-user="currentUser"
+         data-owner-name="userLookup[savedReport.user].display_name"
+         data-local-privilege="localPrivilege"
+         data-global-privilege="globalPrivilege"
+         data-is-selected="isReportSelected(savedReport)"
+    ></div>
+</div>

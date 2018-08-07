@@ -1,7 +1,7 @@
 <div sd-toggle-box data-title="Categories" data-open="true" ng-if="categories.length">
     <div class="form__row" ng-repeat="category in categories">
         <button sd-check
-                ng-model="params.categories[category]"
+                ng-model="currentParams.params.categories[category]"
         >{{category | translate}}
         </button>
     </div>
@@ -10,7 +10,7 @@
 <div sd-toggle-box data-title="Sources" data-open="true" ng-if="sources.length">
     <div class="form__row" ng-repeat="source in sources">
         <button sd-check
-                ng-model="params.sources[source]"
+                ng-model="currentParams.params.sources[source]"
         >{{source | translate}}
         </button>
     </div>
@@ -21,7 +21,7 @@
         <label class="sd-line-input__label" translate>Excluded States</label>
         <div class="flex-grid flex-grid--boxed-small flex-grid--wrap-items flex-grid--small-2">
             <button ng-repeat="state in item_states"
-                    ng-model="params.excluded_states[state.qcode]"
+                    ng-model="currentParams.params.excluded_states[state.qcode]"
                     sd-check
                     data-label-position="inside"
             >
@@ -34,7 +34,7 @@
 <div class="form__row">
     <div class="sd-line-input">
         <button sd-check
-                ng-model="params.exclude_rewrites"
+                ng-model="currentParams.params.exclude_rewrites"
                 data-label-position="inside"
         >{{'Exclude Rewrites' | translate}}</button>
     </div>
@@ -46,7 +46,7 @@
     <div class="form__row-item">
         <div class="sd-line-input sd-line-input--label-left">
             <label class="sd-line-input__label" translate>Less then</label>
-            <input type="text" class="sd-line-input__input" ng-model="params.min" />
+            <input type="text" class="sd-line-input__input" ng-model="currentParams.params.min" />
         </div>
     </div>
     <div class="form__row-item">
@@ -62,7 +62,7 @@
     <div class="form__row-item">
         <div class="sd-line-input sd-line-input--label-left">
             <label class="sd-line-input__label" translate>More then</label>
-            <input type="text" class="sd-line-input__input" ng-model="params.max" />
+            <input type="text" class="sd-line-input__input" ng-model="currentParams.params.max" />
         </div>
     </div>
     <div class="form__row-item">

@@ -1,0 +1,21 @@
+// Make sure the 'GLOBAL' label in saved reports list keeps the hand cursor
+.saved-reports__item {
+    .label {
+        cursor: pointer;
+    }
+}
+
+// Make the filter input look just like the one in global search
+.saved-reports__filter {
+    height: 5rem !important;
+    border-width: 0 0 1px 0 !important;
+    padding-left: 2rem;
+}
+
+// Make the close button position correctly
+// when in the save report form header
+.save-report__form {
+    .side-panel__tools {
+        top: unset;
+    }
+}
