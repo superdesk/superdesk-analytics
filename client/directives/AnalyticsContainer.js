@@ -2,6 +2,12 @@
  * @ngdoc directive
  * @module superdesk.apps.analytics
  * @name sdAnalyticsContainer
+ * @requires $location
+ * @requires pageTitle
+ * @requires gettext
+ * @requires lodash
+ * @requires reports
+ * @requires $rootScope
  * @description A directive that encapsulates the entire analytics module view
  */
 export function AnalyticsContainer() {

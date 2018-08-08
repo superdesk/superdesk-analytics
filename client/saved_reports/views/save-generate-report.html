@@ -1,0 +1,51 @@
+<div class="side-panel__footer"
+     ng-class="{'side-panel__footer--button-box': !showSaveForm}"
+>
+    <div sd-save-report-form
+         ng-if="showSaveForm"
+         data-report="currentParams"
+         data-current-template="currentTemplate"
+         data-toggle-save-form="toggleSaveForm"
+         data-on-report-saved="onReportSaved"
+    ></div>
+
+    <div ng-if="!showSaveForm && canSave">
+        <div class="flex-grid flex-grid--boxed-small flex-grid--wrap-items flex-grid--small-1">
+            <button
+                    id="generate_source_category_report"
+                    class="btn btn--primary"
+                    ng-click="generateReport()"
+                    translate
+            >Generate Report</button>
+        </div>
+
+        <div class="flex-grid flex-grid--boxed-small flex-grid--wrap-items flex-grid--small-2">
+            <button class="btn"
+                    ng-click="clearFilters()"
+                    ng-disabled="!isDirty()"
+                    translate
+            >Clear Filters</button>
+            <button class="btn btn--primary"
+                    ng-click="toggleSaveForm()"
+                    ng-disabled="!isDirty()"
+                    translate
+            >Save Report</button>
+        </div>
+    </div>
+
+    <div ng-if="!showSaveForm && !canSave">
+        <div class="flex-grid flex-grid--boxed-small flex-grid--wrap-items flex-grid--small-2">
+            <button class="btn"
+                    ng-click="clearFilters()"
+                    ng-disabled="!isDirty()"
+                    translate
+            >Clear Filters</button>
+            <button
+                    id="generate_source_category_report"
+                    class="btn btn--primary"
+                    ng-click="generateReport()"
+                    translate
+            >Generate Report</button>
+        </div>
+    </div>
+</div>

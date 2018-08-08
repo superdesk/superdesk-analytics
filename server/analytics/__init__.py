@@ -18,6 +18,7 @@ from analytics.processed_items_report import ProcessedItemsResource, ProcessedIt
 from analytics.content_quota_reports import ContentQuotaReportResource, ContentQuotaReportService
 from analytics.source_category_report import SourceCategoryReportResource, SourceCategoryReportService
 from analytics.base_report import BaseReportService
+from analytics.saved_reports import SavedReportsResource, SavedReportsService
 
 
 def init_app(app):
@@ -56,6 +57,20 @@ def init_app(app):
         name='source_category_report',
         label='Source Category Report View',
         description='User can view source v category reports.'
+    )
+
+    endpoint_name = SavedReportsResource.endpoint_name
+    service = SavedReportsService(endpoint_name, backend=superdesk.get_backend())
+    SavedReportsResource(endpoint_name, app=app, service=service)
+    superdesk.privilege(
+        name='global_saved_reports',
+        label='Manage Global Saved Reports',
+        description='User can manage other uses\' global saved reports'
+    )
+    superdesk.privilege(
+        name='saved_reports',
+        label='Manage Saved Reports',
+        description='User can manage saved reports'
     )
 
     # If this app is for testing, then create an endpoint for the base reporting service

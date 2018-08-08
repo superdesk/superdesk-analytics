@@ -1,0 +1,46 @@
+<div class="sd-card save-report__form">
+    <div class="sd-card__header">
+        <div class="sd-card__heading" translate>Save Report</div>
+        <div class="side-panel__tools">
+            <button class="icn-btn" ng-click="toggleSaveForm()">
+                <i class="icon-close-small"></i>
+            </button>
+        </div>
+    </div>
+    <div class="sd-card__content">
+        <form name="saveReportForm">
+            <div sd-line-input
+                 ng-model="report.name"
+                 data-label="Name"
+                 data-required="true"
+             ></div>
+
+            <div sd-line-input
+                 ng-model="report.description"
+                 data-label="Description"
+                 data-textarea="true"
+            ></div>
+
+            <div class="sd-line-input sd-line-input--no-label" ng-if="globalPrivilege">
+                <span sd-switch ng-model="report.is_global"></span>
+                <label translate>Make Global</label>
+            </div>
+        </form>
+    </div>
+    <div class="sd-card__footer">
+        <button class="btn"
+                ng-click="toggleSaveForm()"
+                translate
+        >Cancel</button>
+        <button class="btn btn--primary btn--expanded"
+                ng-if="currentTemplate._id"
+                ng-click="saveAs()"
+                translate
+        >Save As</button>
+        <button id="activity_report_save"
+                class="btn btn--primary btn--expanded"
+                ng-click="save()"
+                translate
+        >Save</button>
+    </div>
+</div>

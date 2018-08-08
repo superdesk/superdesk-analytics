@@ -8,7 +8,7 @@
         <textarea
                 class="sd-line-input__input"
                 placeholder="{{'Published Stories per Category with Source Breakdown'|translate}}"
-                ng-model="params.title"
+                ng-model="currentParams.params.title"
                 rows="2"
         ></textarea>
     </div>
@@ -20,7 +20,7 @@
         <input
                 class="sd-line-input__input"
                 placeholder="{{ generateSubtitlePlaceholder() | translate }}"
-                ng-model="params.subtitle" type="text"
+                ng-model="currentParams.params.subtitle" type="text"
         />
     </div>
 </div>
@@ -31,28 +31,28 @@
         <div class="flex-grid flex-grid--boxed-small flex-grid--wrap-items flex-grid--small-2">
             <button sd-check
                     data-type="radio"
-                    ng-model="params.dateFilter"
+                    ng-model="currentParams.params.dateFilter"
                     ng-value="yesterday"
                     data-label-position="inside"
                     ng-click="onDateFilterChange()"
             >{{ 'Yesterday' | translate }}</button>
             <button sd-check
                     data-type="radio"
-                    ng-model="params.dateFilter"
+                    ng-model="currentParams.params.dateFilter"
                     ng-value="last_week"
                     data-label-position="inside"
                     ng-click="onDateFilterChange()"
             >{{ 'Last Week' | translate }}</button>
             <button sd-check
                     data-type="radio"
-                    ng-model="params.dateFilter"
+                    ng-model="currentParams.params.dateFilter"
                     ng-value="last_month"
                     data-label-position="inside"
                     ng-click="onDateFilterChange()"
             >{{ 'Last Month' | translate }}</button>
             <button sd-check
                     data-type="radio"
-                    ng-model="params.dateFilter"
+                    ng-model="currentParams.params.dateFilter"
                     ng-value="range"
                     data-label-position="inside"
                     ng-click="onDateFilterChange()"
@@ -60,7 +60,7 @@
         </div>
     </div>
 </div>
-<div class="form__row">
+<div class="form__row" ng-if="currentParams.params.dateFilter === 'range'">
     <fieldset class="report-parameters">
         <div class="multiple">
             <div class="field">
@@ -72,7 +72,7 @@
                 </label>
                 <div
                         sd-datepicker
-                        ng-model="params.start_date"
+                        ng-model="currentParams.params.start_date"
                         id="parameters-start_date"
                         data-on-change="onDateChange()"
                 ></div>
@@ -80,14 +80,14 @@
 
             <div class="field">
                 <label
-                        for="parameters-operation_end_date"
+                        for="parameters-end_date"
                         translate
                 >
                     To
                 </label>
                 <div
                         sd-datepicker
-                        ng-model="params.end_date"
+                        ng-model="currentParams.params.end_date"
                         id="parameters-end_date"
                         data-on-change="onDateChange()"
                 ></div>

@@ -3,7 +3,7 @@
         <label class="sd-line-input__label" translate>Chart Type</label>
         <div class="flex-grid flex-grid--boxed-small flex-grid--wrap-items flex-grid--small-2">
             <button ng-repeat="type in chart_types"
-                    ng-model="params.chartType"
+                    ng-model="currentParams.params.chartType"
                     sd-check
                     type="radio"
                     ng-value="{{type.qcode}}"
@@ -18,7 +18,7 @@
 <div class="form__row">
     <div class="sd-line-input sd-line-input--is-select">
         <label class="sd-line-input__label" translate>Order Categories In:</label>
-        <select class="sd-line-input__select" ng-model="params.sort_order">
+        <select class="sd-line-input__select" ng-model="currentParams.params.sort_order">
             <option value="desc" translate>Descending Order of Stories</option>
             <option value="asc" translate>Ascending Order of Stores</option>
         </select>

@@ -23,6 +23,7 @@ import './track_activity_widget';
 import './content_quota_report';
 import './content_quota_widget';
 import './source_category_report';
+import './saved_reports';
 
 angular.module('superdesk.analytics.reports', [])
     .provider('reports', svc.ReportsProvider);
@@ -42,6 +43,7 @@ cacheIncludedTemplates.$inject = ['$templateCache'];
  */
 export default angular.module('superdesk.analytics', [
     'superdesk.analytics.reports',
+    'superdesk.analytics.saved_reports',
     'superdesk.analytics.charts', 'superdesk.analytics.search',
     'superdesk.analytics.activity-report', 'superdesk.analytics.processed-items-report',
     'superdesk.analytics.processed-items-widget', 'superdesk.analytics.track-activity-report',

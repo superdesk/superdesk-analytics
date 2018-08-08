@@ -51,34 +51,64 @@ export function formatDate(moment, config, dateTime, format = 'LL') {
  * @description Returns a subtitle for a chart based on the supplied date filter and start/end dates
  */
 export function generateSubtitle(moment, config, report) {
-    if (report.dateFilter === 'range') {
-        if (moment(report.start_date, config.model.dateformat).isValid() &&
-            moment(report.end_date, config.model.dateformat).isValid()
-        ) {
-            return formatDate(moment, config, report.start_date) + ' - ' + formatDate(moment, config, report.end_date);
+    if (report && report.dateFilter) {
+        if (report.dateFilter === 'range') {
+            if (moment(report.start_date, config.model.dateformat).isValid() &&
+                moment(report.end_date, config.model.dateformat).isValid()
+            ) {
+                return formatDate(moment, config, report.start_date) +
+                    ' - ' +
+                    formatDate(moment, config, report.end_date);
+            }
+
+            return null;
+        } else if (report.dateFilter === 'yesterday') {
+            return moment()
+                .subtract(1, 'days')
+                .format('dddd Do MMMM YYYY');
+        } else if (report.dateFilter === 'last_week') {
+            const startDate = moment()
+                .subtract(1, 'weeks')
+                .startOf('week')
+                .format('LL');
+            const endDate = moment()
+                .subtract(1, 'weeks')
+                .endOf('week')
+                .format('LL');
+
+            return startDate + ' - ' + endDate;
+        } else if (report.dateFilter === 'last_month') {
+            return moment()
+                .subtract(1, 'months')
+                .format('MMMM YYYY');
         }
-
-        return '';
-    } else if (report.dateFilter === 'yesterday') {
-        return moment()
-            .subtract(1, 'days')
-            .format('dddd Do MMMM YYYY');
-    } else if (report.dateFilter === 'last_week') {
-        const startDate = moment()
-            .subtract(1, 'weeks')
-            .startOf('week')
-            .format('LL');
-        const endDate = moment()
-            .subtract(1, 'weeks')
-            .endOf('week')
-            .format('LL');
-
-        return startDate + ' - ' + endDate;
-    } else if (report.dateFilter === 'last_month') {
-        return moment()
-            .subtract(1, 'months')
-            .format('MMMM YYYY');
     }
 
-    return '';
+    return null;
 }
+
+/**
+ * @ngdoc method
+ * @name Analytics#getErrorMessage
+ * @param {Object|String} error - The API response, containing the error message
+ * @param {String} defaultMessage - The default string to return
+ * @returns {String} string containing the error message
+ * @description Utility to return the error message from a api response, or the default message supplied
+ */
+export const getErrorMessage = (error, defaultMessage) => {
+    if (error) {
+        if (typeof error === 'string') {
+            return error;
+        } else if (error.data) {
+            if (error.data._message) {
+                return error.data._message;
+            } else if (error.data._issues && error.data._issues['validator exception']) {
+                return error.data._issues['validator exception'];
+            } else if (error.data._error && error.data._error.message) {
+                return error.data._error.message;
+            }
+        }
+    }
+
+    return defaultMessage;
+};
