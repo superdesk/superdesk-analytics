@@ -75,3 +75,37 @@ cd /path/to/superdesk-core
 source env/bin/activate
 pip install -e /path/to/superdesk-analytics
 ```
+
+
+## Highcharts Export Server
+To be able to generate charts on the server, we need to install/run the Highcharts Export Server.
+
+### Installing the service
+```
+npm install -g highcharts-export-server
+```
+
+There is also a script that can be used to automate the install:
+```
+cd server/scripts && ./install-highcharts-export-server.sh
+```
+This will automatically accept the end user licence, and use a specific version of highcharts
+* ACCEPT_HIGHCHARTS_LICENSE=1
+* HIGHCHARTS_VERSION=6.1.1
+* HIGHCHARTS_USE_STYLED=1
+
+### Running the service
+There is a python module to allow running the highcharts export server.
+```
+python3 -u -m analytics.reports.highcharts_server
+```
+
+This will start the service using the host/port configured in settings.py (relative to your current working directory)
+* HIGHCHARTS_SERVER_HOST (defaults to 'localhost')
+* HIGHCHARTS_SERVER_PORT (defaults to '6060')
+
+### Adding the service to a Honcho Procfile
+You can add the service to your Honcho Procfile with the following line:
+```
+highcharts: python3 -u -m analytics.reports.highcharts_server
+```

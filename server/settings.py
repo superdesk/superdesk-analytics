@@ -189,3 +189,7 @@ AMAZON_S3_USE_HTTPS = env('AMAZON_S3_USE_HTTPS', False)
 is_testing = os.environ.get('SUPERDESK_TESTING', '').lower() == 'true'
 ELASTICSEARCH_FORCE_REFRESH = is_testing
 ELASTICSEARCH_AUTO_AGGREGATIONS = True
+
+# URL of the Highcharts Export Server (used in analytics for generating charts on the server)
+HIGHCHARTS_SERVER_HOST = env('HIGHCHARTS_SERVER_HOST', 'localhost')
+HIGHCHARTS_SERVER_PORT = env('HIGHCHARTS_SERVER_PORT', '6060')

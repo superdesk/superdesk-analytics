@@ -31,6 +31,9 @@ before_install:
 install:
     - npm install
     - cd server && pip install -q -r requirements.txt && cd ..
+    - chmod a+x server/scripts/install-highcharts-export-server.sh
+    - cd server/scripts && ./install-highcharts-export-server.sh && cd ../../
 
 script:
+    - cd server && python3 -u -m analytics.reports.highcharts_server &
     - make test
