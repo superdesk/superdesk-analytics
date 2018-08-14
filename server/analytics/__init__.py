@@ -19,6 +19,9 @@ from analytics.content_quota_reports import ContentQuotaReportResource, ContentQ
 from analytics.source_category_report import SourceCategoryReportResource, SourceCategoryReportService
 from analytics.base_report import BaseReportService
 from analytics.saved_reports import SavedReportsResource, SavedReportsService
+from analytics.reports.scheduled_reports import ScheduledReportsResource, ScheduledReportsService
+
+import analytics.commands  # noqa
 
 
 def init_app(app):
@@ -45,6 +48,10 @@ def init_app(app):
     endpoint_name = 'source_category_report'
     service = SourceCategoryReportService(endpoint_name, backend=superdesk.get_backend())
     SourceCategoryReportResource(endpoint_name, app=app, service=service)
+
+    endpoint_name = 'scheduled_reports'
+    service = ScheduledReportsService(endpoint_name, backend=superdesk.get_backend())
+    ScheduledReportsResource(endpoint_name, app=app, service=service)
 
     superdesk.privilege(name='activity_report', label='Activity Report View',
                         description='User can view activity reports.')

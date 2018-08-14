@@ -31,28 +31,28 @@
         <div class="flex-grid flex-grid--boxed-small flex-grid--wrap-items flex-grid--small-2">
             <button sd-check
                     data-type="radio"
-                    ng-model="currentParams.params.dateFilter"
+                    ng-model="currentParams.params.date_filter"
                     ng-value="yesterday"
                     data-label-position="inside"
                     ng-click="onDateFilterChange()"
             >{{ 'Yesterday' | translate }}</button>
             <button sd-check
                     data-type="radio"
-                    ng-model="currentParams.params.dateFilter"
+                    ng-model="currentParams.params.date_filter"
                     ng-value="last_week"
                     data-label-position="inside"
                     ng-click="onDateFilterChange()"
             >{{ 'Last Week' | translate }}</button>
             <button sd-check
                     data-type="radio"
-                    ng-model="currentParams.params.dateFilter"
+                    ng-model="currentParams.params.date_filter"
                     ng-value="last_month"
                     data-label-position="inside"
                     ng-click="onDateFilterChange()"
             >{{ 'Last Month' | translate }}</button>
             <button sd-check
                     data-type="radio"
-                    ng-model="currentParams.params.dateFilter"
+                    ng-model="currentParams.params.date_filter"
                     ng-value="range"
                     data-label-position="inside"
                     ng-click="onDateFilterChange()"
@@ -60,7 +60,7 @@
         </div>
     </div>
 </div>
-<div class="form__row" ng-if="currentParams.params.dateFilter === 'range'">
+<div class="form__row" ng-if="currentParams.params.date_filter === 'range'">
     <fieldset class="report-parameters">
         <div class="multiple">
             <div class="field">

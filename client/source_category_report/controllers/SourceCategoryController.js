@@ -119,14 +119,14 @@ export function SourceCategoryController(
                 .subtract(30, 'days')
                 .format(config.view.dateformat),
             end_date: moment().format(config.view.dateformat),
-            chartType: $scope.chart_types[0].qcode,
+            chart_type: $scope.chart_types[0].qcode,
             repos: {
                 ingest: false,
                 archive: false,
                 published: true,
                 archived: true,
             },
-            dateFilter: 'range',
+            date_filter: 'range',
             min: 1,
             max: null,
             sort_order: 'desc',
@@ -352,12 +352,12 @@ export function SourceCategoryController(
     $scope.generate = () => {
         this.runQuery().then((data) => {
             const reportData = Object.assign({}, data, {
-                chartType: $scope.currentParams.params.chartType,
+                chart_type: $scope.currentParams.params.chart_type,
                 title: $scope.currentParams.params.title,
                 subtitle: $scope.currentParams.params.subtitle,
                 min: $scope.currentParams.params.min,
                 max: $scope.currentParams.params.max,
-                dateFilter: $scope.currentParams.params.dateFilter,
+                date_filter: $scope.currentParams.params.date_filter,
                 start_date: $scope.currentParams.params.start_date,
                 end_date: $scope.currentParams.params.end_date,
                 sort_order: $scope.currentParams.params.sort_order,
@@ -388,7 +388,7 @@ export function SourceCategoryController(
      * @description When the date filter changes, clear the date input fields if the filter is not 'range'
      */
     $scope.onDateFilterChange = () => {
-        if ($scope.currentParams.params.dateFilter !== 'range') {
+        if ($scope.currentParams.params.date_filter !== 'range') {
             $scope.currentParams.params.start_date = null;
             $scope.currentParams.params.end_date = null;
         }
@@ -400,8 +400,8 @@ export function SourceCategoryController(
      * @description Auto-selects 'range' as the date filter if the user inputs a date
      */
     $scope.onDateChange = function() {
-        if ($scope.currentParams.params.dateFilter !== 'range') {
-            $scope.currentParams.params.dateFilter = 'range';
+        if ($scope.currentParams.params.date_filter !== 'range') {
+            $scope.currentParams.params.date_filter = 'range';
         }
     };
 

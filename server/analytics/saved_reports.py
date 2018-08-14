@@ -20,13 +20,7 @@ from apps.archive.common import get_user, get_auth
 
 from eve.utils import ParsedRequest
 
-report_types = [
-    'activity_report',
-    'content_quota_report',
-    'processed_items_report',
-    'source_category_report',
-    'track_activity_report'
-]
+from analytics.common import get_report_service, report_types
 
 
 class SavedReportsResource(Resource):
@@ -163,3 +157,22 @@ class SavedReportsService(BaseService):
                 )
             elif not current_user_has_privilege('global_saved_reports'):
                 raise SuperdeskApiError.forbiddenError('Unauthorized to modify global report.')
+
+    def get_aggregations(self, req, **lookup):
+        saved_report = self.find_one(req=req, **lookup)
+        if not saved_report:
+            raise SuperdeskApiError.notFoundError('Saved report not found')
+
+        report_service = get_report_service(saved_report.get('report'))
+        if report_service is None:
+            raise SuperdeskApiError.badRequestError('Invalid report type')
+
+        if not getattr(report_service, 'generate_request_from_saved_report'):
+            raise SuperdeskApiError.internalError(
+                'Cannot generate aggregations from this saved report'
+            )
+
+        request = report_service.generate_request_from_saved_report(saved_report)
+        aggregations = list(report_service.get(request, lookup=None))[0]
+
+        return saved_report, aggregations

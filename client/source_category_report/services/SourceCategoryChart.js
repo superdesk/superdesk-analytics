@@ -88,7 +88,7 @@ export function SourceCategoryChart(_, chartManager, gettext, moment, config, $i
      */
     const generateConfig = function(report) {
         const categories = getCategories(report);
-        const chartType = report.chartType || 'bar';
+        const chartType = report.chart_type || 'bar';
 
         return [{
             id: 'generic',
@@ -254,7 +254,7 @@ export function SourceCategoryChart(_, chartManager, gettext, moment, config, $i
      * @description Create an of Highchart configs based on the given report parameters
      */
     this.createChart = function(report) {
-        switch (report.chartType) {
+        switch (report.chart_type) {
         case 'pie':
             return {
                 charts: generatePieConfig(report),

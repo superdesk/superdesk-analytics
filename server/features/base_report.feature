@@ -17,7 +17,7 @@ Feature: Base Analytics Report Service
             }
         ]
         """
-        When we get "/analytics_test_report"
+        When we get "/analytics_test_report?source={"query": {"filtered": {}}}"
         Then we get list with 1 items
         """
         {
@@ -50,7 +50,7 @@ Feature: Base Analytics Report Service
             }
         ]
         """
-        When we get "/analytics_test_report"
+        When we get "/analytics_test_report?source={"query": {"filtered": {}}}"
         Then we get list with 1 items
         """
         {
@@ -66,7 +66,7 @@ Feature: Base Analytics Report Service
             }]
         }
         """
-        When we get "/analytics_test_report?include_items=0"
+        When we get "/analytics_test_report?include_items=0&source={"query": {"filtered": {}}}"
         Then we get list with 1 items
         """
         {
@@ -82,7 +82,7 @@ Feature: Base Analytics Report Service
             }]
         }
         """
-        When we get "/analytics_test_report?include_items=1"
+        When we get "/analytics_test_report?include_items=1&source={"query": {"filtered": {}}}"
         Then we get list with 1 items
         """
         {
@@ -109,7 +109,7 @@ Feature: Base Analytics Report Service
             }]
         }
         """
-        When we get "/analytics_test_report?include_items=1&source={"size": 0}"
+        When we get "/analytics_test_report?include_items=1&source={"query": {"filtered": {}}, "size": 0}"
         Then we get list with 1 items
         """
         {
@@ -170,7 +170,7 @@ Feature: Base Analytics Report Service
             }
         ]
         """
-        When we get "/analytics_test_report"
+        When we get "/analytics_test_report?source={"query": {"filtered": {}}}"
         Then we get list with 1 items
         """
         {
@@ -225,12 +225,45 @@ Feature: Base Analytics Report Service
             }
         ]
         """
-        When we get "/analytics_test_report?repo=archived,published"
+        When we get "/analytics_test_report?repo=archived,published&source={"query": {"filtered": {}}}"
         Then we get list with 1 items
         """
         {"_items": [{"category": [], "source": []}]}
         """
-        When we get "/analytics_test_report?repo=archive"
+        When we get "/analytics_test_report?repo=archive&source={"query": {"filtered": {}}}"
+        Then we get list with 1 items
+        """
+        {
+            "_items": [{
+                "category": [
+                    {"key": "A", "doc_count": 1},
+                    {"key": "T", "doc_count": 1}
+                ],
+                "source": [
+                    {"key": "AAP", "doc_count": 1}
+                ]
+            }]
+        }
+        """
+
+    @auth
+    Scenario: Can provide params instead of elasticsearch query
+        Given "archived"
+        """
+        [
+            {
+                "_id": "archive1", "_type": "archived", "source": "AAP",
+                "task": {"stage": "5b501a511d41c84c0bfced4b", "desk": "5b501a501d41c84c0bfced4a"},
+                "anpa_category": [{"qcode": "A", "name": "Advisories"}, {"qcode": "T", "name": "Transport"}]
+            },
+            {
+                "_id": "archive2", "_type": "archived", "source": "AAP",
+                "task": {"stage": "5b501a6f1d41c84c0bfced4c", "desk": "5b501a501d41c84c0bfced4a"},
+                "anpa_category": [{"qcode": "A", "name": "Advisories"}]
+            }
+        ]
+        """
+        When we get "/analytics_test_report?params={"categories": {"Transport": true}}"
         Then we get list with 1 items
         """
         {
