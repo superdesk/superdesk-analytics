@@ -51,8 +51,8 @@ export function formatDate(moment, config, dateTime, format = 'LL') {
  * @description Returns a subtitle for a chart based on the supplied date filter and start/end dates
  */
 export function generateSubtitle(moment, config, report) {
-    if (report && report.dateFilter) {
-        if (report.dateFilter === 'range') {
+    if (report && report.date_filter) {
+        if (report.date_filter === 'range') {
             if (moment(report.start_date, config.model.dateformat).isValid() &&
                 moment(report.end_date, config.model.dateformat).isValid()
             ) {
@@ -62,11 +62,11 @@ export function generateSubtitle(moment, config, report) {
             }
 
             return null;
-        } else if (report.dateFilter === 'yesterday') {
+        } else if (report.date_filter === 'yesterday') {
             return moment()
                 .subtract(1, 'days')
                 .format('dddd Do MMMM YYYY');
-        } else if (report.dateFilter === 'last_week') {
+        } else if (report.date_filter === 'last_week') {
             const startDate = moment()
                 .subtract(1, 'weeks')
                 .startOf('week')
@@ -77,7 +77,7 @@ export function generateSubtitle(moment, config, report) {
                 .format('LL');
 
             return startDate + ' - ' + endDate;
-        } else if (report.dateFilter === 'last_month') {
+        } else if (report.date_filter === 'last_month') {
             return moment()
                 .subtract(1, 'months')
                 .format('MMMM YYYY');

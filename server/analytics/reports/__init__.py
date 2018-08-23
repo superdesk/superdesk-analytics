@@ -11,14 +11,18 @@
 import logging
 import requests
 from flask import current_app as app
+import csv
+from io import StringIO
+
 from superdesk.errors import SuperdeskApiError
+from analytics.common import MIME_TYPES
 
 logger = logging.getLogger(__name__)
 
 
 def generate_report(
         options,
-        chart_type='png',
+        mimetype=MIME_TYPES.PNG,
         base64=True,
         scale=1,
         width=None,
@@ -30,15 +34,23 @@ def generate_report(
     if not options.get('series'):
         raise SuperdeskApiError.badRequestError('Series data not provided')
 
-    if chart_type in ['jpg', 'png', 'pdf', 'svg']:
-        return _generate_from_highcharts(options, chart_type, base64, scale, width, no_download)
+    if mimetype in [
+        MIME_TYPES.PNG,
+        MIME_TYPES.JPEG,
+        MIME_TYPES.GIF,
+        MIME_TYPES.PDF,
+        MIME_TYPES.SVG
+    ]:
+        return generate_from_highcharts(options, mimetype, base64, scale, width, no_download)
+    elif mimetype == MIME_TYPES.CSV:
+        return generate_csv(options)
 
-    raise SuperdeskApiError.badRequestError("Unsupported chart type '{}'".format(chart_type))
+    raise SuperdeskApiError.badRequestError("Unsupported mimetype '{}'".format(mimetype))
 
 
-def _generate_from_highcharts(
+def generate_from_highcharts(
         options,
-        chart_type='png',
+        mimetype=MIME_TYPES.PNG,
         base64=True,
         scale=1,
         width=None,
@@ -57,7 +69,7 @@ def _generate_from_highcharts(
     headers = {'Content-Type': 'application/json'}
     payload = {
         'options': options,
-        'type': chart_type,
+        'type': mimetype,
         'b64': base64,
         'scale': scale,
         'width': width,
@@ -76,3 +88,13 @@ def _generate_from_highcharts(
         raise SuperdeskApiError.internalError(e)
 
     return response.content
+
+
+def generate_csv(options):
+    csv_rows = options.get('csv') or []
+    csv_file = StringIO()
+    csv_writer = csv.writer(csv_file)
+
+    csv_writer.writerows(csv_rows)
+
+    return csv_file.getvalue().encode('UTF-8')

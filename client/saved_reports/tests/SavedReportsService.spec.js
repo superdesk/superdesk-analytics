@@ -16,6 +16,7 @@ describe('savedReports', () => {
     }));
 
     beforeEach(window.module('superdesk.analytics.saved_reports'));
+    beforeEach(window.module('angularMoment'));
 
     beforeEach(inject((_savedReports_, _$q_, _$rootScope_) => {
         savedReports = _savedReports_;

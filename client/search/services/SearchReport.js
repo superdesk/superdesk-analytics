@@ -54,13 +54,13 @@ export function SearchReport(_, config, moment, api, $q) {
         let repo = '';
 
         const filterDates = function() {
-            if (!_.get(_params, 'dateFilter')) {
+            if (!_.get(_params, 'date_filter')) {
                 return;
             }
 
             const timeZone = getUTCOffset('Z');
 
-            switch (_params.dateFilter) {
+            switch (_params.date_filter) {
             case 'range':
                 params.must.push({
                     range: {
@@ -168,6 +168,10 @@ export function SearchReport(_, config, moment, api, $q) {
             }
         };
 
+        const getSize = function() {
+            return _.get(_params, 'size') || 0;
+        };
+
         filterDates();
         excludeStates();
         setRepos();
@@ -185,7 +189,7 @@ export function SearchReport(_, config, moment, api, $q) {
                     },
                 },
                 sort: [{versioncreated: 'desc'}],
-                size: 0,
+                size: getSize(),
             },
             repo: repo,
         };

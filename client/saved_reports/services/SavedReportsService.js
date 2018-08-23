@@ -1,4 +1,4 @@
-SavedReportsService.$inject = ['lodash', 'api', 'session'];
+SavedReportsService.$inject = ['lodash', 'api', 'session', 'moment', 'config'];
 
 /**
  * @ngdoc service
@@ -9,7 +9,39 @@ SavedReportsService.$inject = ['lodash', 'api', 'session'];
  * @requires session
  * @description Service to create, read, update and delete saved reports
  */
-export function SavedReportsService(_, api, session) {
+export function SavedReportsService(_, api, session, moment, config) {
+    const convertDatesForServer = (params) => {
+        const report = _.cloneDeep(params);
+
+        if (_.get(report, 'params.start_date')) {
+            report.params.start_date = moment(report.params.start_date, config.view.dateformat)
+                .format('YYYY-MM-DD');
+        }
+
+        if (_.get(report, 'params.end_date')) {
+            report.params.end_date = moment(report.params.end_date, config.view.dateformat)
+                .format('YYYY-MM-DD');
+        }
+
+        return report;
+    };
+
+    const convertDatesForClient = (params) => {
+        const report = _.cloneDeep(params);
+
+        if (_.get(report, 'params.start_date')) {
+            report.params.start_date = moment(report.params.start_date, 'YYYY-MM-DD')
+                .format(config.view.dateformat);
+        }
+
+        if (_.get(report, 'params.end_date')) {
+            report.params.end_date = moment(report.params.end_date, 'YYYY-MM-DD')
+                .format(config.view.dateformat);
+        }
+
+        return report;
+    };
+
     /**
      * @ngdoc method
      * @name savedReports#fetchById
@@ -19,6 +51,7 @@ export function SavedReportsService(_, api, session) {
      */
     this.fetchById = (reportId) => (
         api('saved_reports').getById(reportId)
+            .then((report) => convertDatesForClient(report))
     );
 
     /**
@@ -36,8 +69,14 @@ export function SavedReportsService(_, api, session) {
             where: JSON.stringify({report: reportType})
         })
             .then((result) => ({
-                user: _.filter(result._items, (report) => report.user === session.identity._id),
-                global: _.filter(result._items, (report) => report.user !== session.identity._id),
+                user: _.map(
+                    _.filter(result._items, (report) => report.user === session.identity._id),
+                    (report) => convertDatesForClient(report)
+                ),
+                global: _.map(
+                    _.filter(result._items, (report) => report.user !== session.identity._id),
+                    (report) => convertDatesForClient(report)
+                ),
             }))
     );
 
@@ -51,8 +90,8 @@ export function SavedReportsService(_, api, session) {
      */
     this.save = (updates, original = {}) => (
         api('saved_reports').save(
-            _.get(original, '_id') ? original : {},
-            _.pickBy(updates, (value, key) => !key.startsWith('_'))
+            convertDatesForServer(_.get(original, '_id') ? original : {}),
+            convertDatesForServer(_.pickBy(updates, (value, key) => !key.startsWith('_')))
         )
     );
 

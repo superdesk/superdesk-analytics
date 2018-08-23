@@ -10,6 +10,8 @@
 
 from superdesk.tests import TestCase
 from analytics.reports import generate_report
+from analytics.common import MIME_TYPES
+
 from PIL import Image
 from io import BytesIO
 
@@ -28,7 +30,7 @@ options = {
 class GenerateReportTestCase(TestCase):
     def test_generate_svg(self):
         with self.app.app_context():
-            report = generate_report(options, chart_type='svg', base64=False)
+            report = generate_report(options, mimetype=MIME_TYPES.SVG, base64=False)
 
             # Report is a buffer of bytes with size > 0
             self.assertTrue(type(report) == bytes)
@@ -46,7 +48,7 @@ class GenerateReportTestCase(TestCase):
 
     def test_generate_png(self):
         with self.app.app_context():
-            report = generate_report(options, chart_type='png', base64=False, width='800')
+            report = generate_report(options, mimetype=MIME_TYPES.PNG, base64=False, width='800')
 
             # Report is a buffer of bytes with size > 0
             self.assertTrue(type(report) == bytes)
@@ -66,7 +68,7 @@ class GenerateReportTestCase(TestCase):
 
     def test_generate_jpg(self):
         with self.app.app_context():
-            report = generate_report(options, chart_type='jpg', base64=False, width='1200')
+            report = generate_report(options, mimetype=MIME_TYPES.JPEG, base64=False, width='1200')
 
             # Report is a buffer of bytes with size > 0
             self.assertTrue(type(report) == bytes)
@@ -86,7 +88,7 @@ class GenerateReportTestCase(TestCase):
 
     def test_generate_pdf(self):
         with self.app.app_context():
-            report = generate_report(options, chart_type='pdf', base64=False, width='1200')
+            report = generate_report(options, mimetype=MIME_TYPES.PDF, base64=False, width='1200')
 
             # Report is a buffer of bytes with size > 0
             self.assertTrue(type(report) == bytes)
