@@ -32,6 +32,8 @@ describe('reportsProvider', () => {
                 id: null,
                 priority: 0,
                 privileges: {},
+                showSidePanel: true,
+                allowScheduling: false,
             }]);
         });
     });
@@ -51,12 +53,16 @@ describe('reportsProvider', () => {
                 id: null,
                 priority: 0,
                 privileges: {},
+                showSidePanel: true,
+                allowScheduling: false,
             }, {
                 id: 'report_1',
                 label: 'Report 1',
                 sidePanelTemplate: 'report.1.html',
                 priority: 100,
                 privileges: {},
+                showSidePanel: true,
+                allowScheduling: false,
             }]);
         });
     });
@@ -85,24 +91,32 @@ describe('reportsProvider', () => {
                 id: null,
                 priority: 0,
                 privileges: {},
+                showSidePanel: true,
+                allowScheduling: false,
             }, {
                 id: 'report_1',
                 label: 'Report 1',
                 sidePanelTemplate: 'report.1.html',
                 priority: 100,
                 privileges: {},
+                showSidePanel: true,
+                allowScheduling: false,
             }, {
                 id: 'report_2',
                 label: 'Report 2',
                 sidePanelTemplate: 'report.2.html',
                 priority: 200,
                 privileges: {},
+                showSidePanel: true,
+                allowScheduling: false,
             }, {
                 id: 'report_3',
                 label: 'Report 3',
                 sidePanelTemplate: 'report.3.html',
                 priority: 1000,
                 privileges: {},
+                showSidePanel: true,
+                allowScheduling: false,
             }]);
         });
     });
@@ -135,12 +149,16 @@ describe('reportsProvider', () => {
                 id: null,
                 priority: 0,
                 privileges: {},
+                showSidePanel: true,
+                allowScheduling: false,
             }, {
                 id: 'report_1',
                 label: 'Report 1',
                 sidePanelTemplate: 'report.1.html',
                 priority: 100,
                 privileges: {},
+                showSidePanel: true,
+                allowScheduling: false,
             }]);
         });
     });
@@ -173,18 +191,24 @@ describe('reportsProvider', () => {
                 id: null,
                 priority: 0,
                 privileges: {},
+                showSidePanel: true,
+                allowScheduling: false,
             }, {
                 id: 'report_1',
                 label: 'Report 1',
                 sidePanelTemplate: 'report.1.html',
                 priority: 100,
                 privileges: {},
+                showSidePanel: true,
+                allowScheduling: false,
             }, {
                 id: 'report_2',
                 label: 'Report 2',
                 sidePanelTemplate: 'report.2.html',
                 priority: 200,
                 privileges: {report_2: 1},
+                showSidePanel: true,
+                allowScheduling: false,
             }]);
         });
     });

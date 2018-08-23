@@ -1,0 +1,133 @@
+<div class="form__row form__row--no-padding form__row--flex" ng-if="asLabel">
+    <label class="form-label form-label--light" translate>When</label>
+    <p class="sd-text__info">{{label}}</p>
+</div>
+
+<div class="form__row form__row--flex form__row--small-padding" ng-if="!asLabel">
+    <div class="form__row-item form__row-item--no-grow">
+        <div class="sd-line-input sd-line-input--is-select">
+            <label class="sd-line-input__label" translate>When</label>
+            <select class="sd-line-input__select scheduled-reports__schedule-input"
+                    name="frequency"
+                    ng-model="schedule.frequency"
+                    ng-change="updateFrequency(schedule)"
+            >
+                <option ng-repeat="f in frequencies" value="{{f.value}}">
+                    {{f.label}}
+                </option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form__row-item form__row-item--no-grow" ng-if="flags.showDay">
+        <span translate>on the</span>
+    </div>
+
+    <div class="form__row-item form__row-item--no-grow" ng-if="flags.showDay">
+        <div class="sd-line-input sd-line-input--is-select sd-line-input--no-label">
+            <select class="sd-line-input__select scheduled-reports__schedule-input"
+                    ng-model="schedule.day"
+                    name="day"
+                    sd-convert-to-number
+            >
+                <option ng-repeat="d in days" value="{{d.value}}">
+                    {{d.label}}
+                </option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form__row-item form__row-item--no-grow" ng-if="flags.showDay">
+        <span translate>day</span>
+    </div>
+
+    <div class="form__row-item form__row-item--no-grow" ng-if="flags.showHour">
+        <span translate>at</span>
+    </div>
+
+    <div class="form__row-item form__row-item--no-grow" ng-if="flags.showHour">
+        <div class="sd-line-input sd-line-input--is-select sd-line-input--no-label">
+            <select class="sd-line-input__select scheduled-reports__schedule-input"
+                    ng-model="schedule.hour"
+                    name="hour"
+                    sd-convert-to-number
+            >
+                <option ng-repeat="h in hours" value="{{h.value}}">
+                    {{h.label}}
+                </option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form__row-item form__row-item--no-grow" ng-if="flags.showWeekDay">
+        <span translate>on</span>
+    </div>
+
+    <div class="form__row-item form__row--flex form__row-item--no-grow scheduled-reports__weekday-container"
+         ng-if="flags.showWeekDay"
+    >
+        <div class="scheduled-reports__weekday-input">
+            <div>
+                <span sd-check
+                      ng-model="weekdays.Monday"
+                      ng-change="onWeekdayChange()"
+                      data-label-position="inside"
+                >{{:: 'MO' | translate}}
+                </span>
+            </div>
+            <div>
+                <span sd-check
+                      ng-model="weekdays.Tuesday"
+                      ng-change="onWeekdayChange()"
+                      data-label-position="inside"
+                >{{:: 'TU' | translate}}
+                </span>
+            </div>
+            <div>
+                <span sd-check
+                      ng-model="weekdays.Wednesday"
+                      ng-change="onWeekdayChange()"
+                      data-label-position="inside"
+                >{{:: 'WE' | translate}}
+                </span>
+            </div>
+            <div>
+                <span sd-check
+                      ng-model="weekdays.Thursday"
+                      ng-change="onWeekdayChange()"
+                      data-label-position="inside"
+                >{{:: 'TH' | translate}}
+                </span>
+            </div>
+            <div>
+                <span sd-check
+                      ng-model="weekdays.Friday"
+                      ng-change="onWeekdayChange()"
+                      data-label-position="inside"
+                >{{:: 'FR' | translate}}
+                </span>
+            </div>
+            <div>
+                <span sd-check
+                      ng-model="weekdays.Saturday"
+                      ng-change="onWeekdayChange()"
+                      data-label-position="inside"
+                >{{:: 'SA' | translate}}
+                </span>
+            </div>
+            <div>
+                <span sd-check
+                      ng-model="weekdays.Sunday"
+                      ng-change="onWeekdayChange()"
+                      data-label-position="inside"
+                >{{:: 'SU' | translate}}
+                </span>
+            </div>
+        </div>
+        <div ng-if="submitted && weekdayError"
+             class="sd-line-input sd-line-input--no-label sd-line-input--invalid"
+        >
+            <span class="sd-line-input__message">{{weekdayError}}</span>
+        </div>
+    </div>
+</div>

@@ -19,6 +19,8 @@
          data-local-privilege="localPrivilege"
          data-global-privilege="globalPrivilege"
          data-is-selected="isReportSelected(savedReport)"
+         data-create-new-schedule="createNewSchedule"
+         data-view-schedules="viewSchedules"
     ></div>
     <div class="saved-reports__group-title" translate>Global Saved Activity Reports</div>
     <div ng-repeat="savedReport in filteredGlobalReports | orderBy:'name'"
@@ -31,5 +33,7 @@
          data-local-privilege="localPrivilege"
          data-global-privilege="globalPrivilege"
          data-is-selected="isReportSelected(savedReport)"
+         data-create-new-schedule="createNewSchedule"
+         data-view-schedules="viewSchedules"
     ></div>
 </div>

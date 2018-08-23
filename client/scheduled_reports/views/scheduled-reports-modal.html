@@ -1,0 +1,231 @@
+<form name="scheduleForm">
+    <div sd-modal data-model="true" class="modal--tabs modal--large scheduled-reports">
+        <div class="modal__header">
+            <button class="modal__close pull-right" ng-click="closeModal()">
+                <i class="icon-close-small"></i>
+            </button>
+            <h3 class="modal__heading">
+                {{'Edit "' + schedule.name + '" Schedule' | translate}}
+            </h3>
+        </div>
+        <div class="modal__body">
+            <div class="modal__body-content">
+                    <div class="form__row form__row--small-padding">
+                        <div class="sd-line-input sd-line-input--label-left-auto">
+                            <label class="sd-line-input__label sd-line-input__label--hide-required"
+                                   translate
+                            >Active
+                            </label>
+                            <span sd-switch
+                                  class="sd-line-input__input"
+                                  ng-model="schedule.active"
+                            ></span>
+                        </div>
+                    </div>
+
+                    <div class="form__row form__row--small-padding">
+                        <div class="sd-line-input sd-line-input--required"
+                             ng-class="{'sd-line-input--invalid': scheduleForm.name.$invalid && scheduleForm.$submitted}"
+                        >
+                            <label class="sd-line-input__label" translate>Name</label>
+                            <input class="sd-line-input__input"
+                                   type="text"
+                                   name="name"
+                                   ng-model="schedule.name"
+                                   required
+                            />
+                            <span class="sd-line-input__message"
+                                  ng-if="scheduleForm.name.$invalid && scheduleForm.$submitted"
+                                  translate
+                            >Required
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="form__row form__row--small-padding">
+                        <div class="sd-line-input">
+                            <label class="sd-line-input__label" translate>Description</label>
+                            <input class="sd-line-input__input" ng-model="schedule.description" />
+                        </div>
+                    </div>
+
+                    <div sd-report-schedule-input
+                         ng-model="schedule.schedule"
+                         data-as-label="false"
+                         data-submitted="scheduleForm.$submitted"
+                    >
+                    </div>
+
+                    <div class="form__row form__row--flex form__row--small-padding">
+                        <div class="form__row-item">
+                            <div class="sd-line-input sd-line-input--is-select sd-line-input--required">
+                                <label class="sd-line-input__label" translate>Report Type</label>
+
+                                <select class="sd-line-input__select"
+                                        ng-model="schedule.report_type"
+                                        required
+                                >
+                                    <option ng-repeat="report in reports"
+                                            value="{{report.id}}"
+                                            ng-selected="schedule.report_type === report.id"
+                                    >
+                                        {{report.label}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form__row-item">
+                            <div class="sd-line-input sd-line-input--is-select sd-line-input--required"
+                                 ng-class="{'sd-line-input--invalid': scheduleForm.saved_report.$invalid && scheduleForm.$submitted}"
+                            >
+                                <label class="sd-line-input__label" translate>
+                                    Saved Report
+                                </label>
+                                <select class="sd-line-input__select"
+                                        ng-model="schedule.saved_report"
+                                        ng-change="setSavedReport()"
+                                        name="saved_report"
+                                        required
+                                >
+                                    <option ng-repeat="report in savedReports"
+                                            value="{{report._id}}"
+                                            ng-selected="schedule.saved_report === report._id"
+                                    >
+                                        {{report.name}}
+                                    </option>
+                                </select>
+                                <span class="sd-line-input__message"
+                                  ng-if="scheduleForm.saved_report.$invalid && scheduleForm.$submitted"
+                                  translate
+                            >Required
+                            </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div sd-toggle-box data-title="Parameters"
+                         data-open="false"
+                         data-style="circle"
+                         ng-if="currentSavedReport._id"
+                    >
+                        <div class="sd-card">
+                            <div class="sd-card__content">
+                                <div sd-report-preview-proxy
+                                     data-report="currentSavedReport"
+                                ></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div sd-toggle-box data-title="Email" data-open="true" data-style="circle">
+                        <div class="sd-card">
+                            <div class="sd-card__content">
+                                <div class="form__row">
+                                    <div class="field keywords sd-line-input sd-line-input--label-left sd-line-input--required"
+                                         ng-class="{'sd-line-input--invalid': scheduleForm.$error.recipients && scheduleForm.$submitted}"
+                                    >
+                                        <label for="search-keywords"
+                                               class="sd-line-input__label"
+                                               translate
+                                        >
+                                            To:
+                                        </label>
+                                        <div id="search-keywords"
+                                             class="scheduled-reports__email-input"
+                                             sd-meta-words-list
+                                             data-field="recipients"
+                                             data-header="true"
+                                             data-list="emails"
+                                             data-item="schedule"
+                                             data-change="validateRecipients(scheduleForm)"
+                                        ></div>
+                                        <span class="sd-line-input__message"
+                                              ng-if="scheduleForm.$error.recipients && scheduleForm.$submitted"
+                                              translate
+                                        >Required
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form__row scheduled-reports__subject-row">
+                                    <div class="sd-line-input sd-line-input--required sd-line-input--label-left"
+                                         ng-class="{'sd-line-input--invalid': scheduleForm.saved_report.$invalid && scheduleForm.$submitted}"
+                                    >
+                                        <label class="sd-line-input__label" translate>Subject:</label>
+                                        <input class="sd-line-input__input"
+                                               type="text"
+                                               ng-model="schedule.extra.subject"
+                                               name="subject"
+                                        />
+                                        <span class="sd-line-input__message"
+                                              ng-if="scheduleForm.name.$invalid && scheduleForm.$submitted"
+                                              translate
+                                        >Required
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form__row">
+                                    <div class="sd-line-input sd-line-input--label-left">
+                                        <label class="sd-line-input__label" translate>Body</label>
+                                        <textarea ng-model="schedule.extra.body"
+                                                  class="scheduled-reports__email-input"
+                                                  rows="4"
+                                        ></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="form__row form__row--flex form__row--no-padding">
+                                    <div class="form__row-item">
+                                        <div class="sd-line-input sd-line-input--is-select">
+                                            <label class="sd-line-input__label" translate>Format</label>
+                                            <select class="sd-line-input__select" ng-model="schedule.mimetype">
+                                                <option ng-repeat="mime in mimeTypes" value="{{mime.type}}">{{mime.label}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form__row-item" ng-if="['image/svg+xml', 'text/csv'].indexOf(schedule.mimetype) < 0">
+                                        <div class="sd-line-input sd-line-input--is-select">
+                                            <label class="sd-line-input__label" translate>Image Width</label>
+                                            <select class="sd-line-input__select"
+                                                    ng-model="schedule.report_width"
+                                                    sd-convert-to-number
+                                            >
+                                                <option ng-repeat="width in allowedWidths" value="{{width}}">{{width}} pixels</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+        </div>
+        <div class="modal__footer">
+            <span ng-if="submitting" translate>
+                Submitting....
+            </span>
+            <button class="btn"
+                    ng-click="closeModal()"
+                    ng-disabled="submitting"
+                    translate
+            >Cancel
+            </button>
+            <button class="btn btn--primary"
+                    ng-if="schedule._id"
+                    ng-disabled="submitting"
+                    ng-click="save(scheduleForm, schedule)"
+                    type="submit"
+                    translate
+            >Save
+            </button>
+            <input class="btn btn--primary"
+                    ng-if="!schedule._id"
+                    ng-disabled="submitting"
+                    ng-click="save(scheduleForm, schedule)"
+                    type="submit"
+                    value="Create"
+                    translate
+            />
+        </div>
+    </div>
+</form>

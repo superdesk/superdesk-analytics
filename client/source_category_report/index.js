@@ -10,6 +10,7 @@
 
 import * as svc from './services';
 import * as ctrl from './controllers';
+import * as directives from './directives';
 
 function cacheIncludedTemplates($templateCache) {
     $templateCache.put(
@@ -28,6 +29,11 @@ function cacheIncludedTemplates($templateCache) {
         'source-category-report-chart-options.html',
         require('./views/source-category-report-chart-options.html')
     );
+
+    $templateCache.put(
+        'source-category-report-preview.html',
+        require('./views/source-category-report-preview.html')
+    );
 }
 cacheIncludedTemplates.$inject = ['$templateCache'];
 
@@ -43,6 +49,8 @@ angular.module('superdesk.analytics.source-category-report', [])
 
     .controller('SourceCategoryController', ctrl.SourceCategoryController)
 
+    .directive('sdSourceCategoryReportPreview', directives.SourceCategoryReportPreview)
+
     .run(cacheIncludedTemplates)
 
     .config(['reportsProvider', 'gettext', function(reportsProvider, gettext) {
@@ -53,5 +61,6 @@ angular.module('superdesk.analytics.source-category-report', [])
             controller: ctrl.SourceCategoryController,
             priority: 500,
             privileges: {source_category_report: 1},
+            allowScheduling: true,
         });
     }]);

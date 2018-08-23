@@ -381,3 +381,88 @@ Feature: Saved Reports
             {"name": "user1 global activity", "is_global": true}
          ]}
         """
+
+    @auth
+    Scenario: Cannot delete a saved report that has schedules attached
+        When we post to "/saved_reports"
+        """
+        {
+            "name": "last week",
+            "report": "source_category_report",
+            "params": {"title": "testing last week"},
+            "is_global": true
+        }
+        """
+        Then we get OK response
+        When we delete "/saved_reports/#saved_reports._id#"
+        Then we get OK response
+        When we post to "/saved_reports"
+        """
+        {
+            "name": "last week",
+            "report": "source_category_report",
+            "params": {"title": "testing last week"},
+            "is_global": true
+        }
+        """
+        Then we get OK response
+        When we post to "/scheduled_reports" with success
+        """
+        {
+            "saved_report": "#saved_reports._id#",
+            "report_type": "source_category_report",
+            "schedule": {"frequency": "hourly"},
+            "transmitter": "email",
+            "recipients": ["superdesk@localhost.com"],
+            "name": "schedule for last week",
+            "active": true,
+            "extra": {"body": "testing the body"},
+            "mimetype": "image/jpeg"
+        }
+        """
+        When we delete "/saved_reports/#saved_reports._id#"
+        Then we get error 400
+        """
+        {"_status": "ERR", "_message": "Cannot delete saved report as schedule(s) are attached"}
+        """
+        When we delete "/scheduled_reports/#scheduled_reports._id#"
+        Then we get OK response
+        When we delete "/saved_reports/#saved_reports._id#"
+        Then we get OK response
+
+    @auth
+    Scenario: Cannot remove global flag if schedules are attached
+        When we post to "/saved_reports"
+        """
+        {
+            "name": "last week",
+            "report": "source_category_report",
+            "params": {"title": "testing last week"},
+            "is_global": true
+        }
+        """
+        Then we get OK response
+        When we post to "/scheduled_reports" with success
+        """
+        {
+            "saved_report": "#saved_reports._id#",
+            "report_type": "source_category_report",
+            "schedule": {"frequency": "hourly"},
+            "transmitter": "email",
+            "recipients": ["superdesk@localhost.com"],
+            "name": "schedule for last week",
+            "active": true,
+            "extra": {"body": "testing the body"},
+            "mimetype": "image/jpeg"
+        }
+        """
+        When we patch "/saved_reports/#saved_reports._id#"
+        """
+        {"is_global": false}
+        """
+        Then we get error 400
+        """
+        {"_issues": {
+            "validator exception": "400: Cannot remove global flag as schedule(s) are attached"
+        }}
+        """

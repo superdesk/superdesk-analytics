@@ -30,7 +30,7 @@ export function formatDateForServer(moment, config, date, addDays = 0) {
 /**
  * @ngdoc method
  * @name Analytics#formatDate
- * @param {Object} moment
+ * @param {Function} moment
  * @param {Object} config
  * @param {String} dateTime
  * @param {String} format

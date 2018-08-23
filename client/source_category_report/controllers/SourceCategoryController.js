@@ -350,6 +350,8 @@ export function SourceCategoryController(
      * @description Using the current form parameters, query the Search API and update the chart configs
      */
     $scope.generate = () => {
+        $scope.changeContentView('report');
+
         this.runQuery().then((data) => {
             const reportData = Object.assign({}, data, {
                 chart_type: $scope.currentParams.params.chart_type,
