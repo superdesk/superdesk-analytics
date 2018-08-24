@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "hint": "eslint client --ext=jsx --ext=js",
+    "hint": "eslint client --ext=jsx --ext=js --ext=tsx --ext=ts",
     "test": "npm run hint && npm run unit_test",
     "unit_test": "karma start karma.conf.js --log-level debug --display-error-details --single-run",
     "karma": "karma start karma.conf.js --log-level debug --display-error-details"
@@ -18,12 +18,11 @@
   "homepage": "https://github.com/superdesk/superdesk-analytics#readme",
   "dependencies": {
     "highcharts": "^6.1.1",
-    "twix": "^1.1.5"
+    "twix": "^1.1.5",
+    "@types/lodash": "4.14.116",
+    "ts-loader": "3.5.0"
   },
   "devDependencies": {
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-preset-es2015": "^6.24.1",
-    "babel-preset-react": "^6.24.1",
     "eslint": "^3.7.1",
     "eslint-plugin-jasmine": "^1.8.1",
     "eslint-plugin-angular": "^1.6.1",
@@ -37,11 +36,12 @@
     "karma-webpack": "^2.0.13",
     "lodash": "^4.17.5",
     "moment-timezone": "^0.5.14",
-    "superdesk-core": "^1.21.0",
+    "superdesk-core": "superdesk/superdesk-client-core#master",
     "angular-embed": "superdesk/angular-embed#d75968e",
     "angular-embedly": "Urigo/angular-embedly#0.0.8",
     "jquery": "3.3.1",
     "jquery.gridster": "dustmoo/gridster.js#c306335397816beceb74e4a176067baef34a0359",
-    "rangy": "1.3.0"
+    "rangy": "1.3.0",
+    "typescript-eslint-parser": "^18.0.0"
   }
 }
