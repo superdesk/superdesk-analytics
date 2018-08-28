@@ -10,6 +10,7 @@
 
 from superdesk import get_resource_service
 from collections import namedtuple
+from subprocess import check_call, PIPE
 
 report_types = [
     'activity_report',
@@ -74,3 +75,11 @@ def get_report_service(report_type):
         return get_resource_service('track_activity_report')
 
     return None
+
+
+def is_highcharts_installed():
+    try:
+        check_call(['which', 'highcharts-export-server'], stdout=PIPE, stderr=PIPE)
+        return True
+    except Exception:
+        return False

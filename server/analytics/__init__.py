@@ -21,7 +21,43 @@ from analytics.base_report import BaseReportService
 from analytics.saved_reports import SavedReportsResource, SavedReportsService
 from analytics.reports.scheduled_reports import ScheduledReportsResource, ScheduledReportsService
 
-import analytics.commands  # noqa
+from analytics.commands import SendScheduledReports  # noqa
+from analytics.common import is_highcharts_installed
+from superdesk.celery_app import celery
+from superdesk.default_settings import celery_queue, crontab
+
+
+def init_schedule_task(app):
+    # Now check the application config to see if scheduled reports is enabled
+    if not app.config.get('ANALYTICS_ENABLE_SCHEDULED_REPORTS', False):
+        return
+
+    # First check to see if highcharts-export-server is installed and globally accessible
+    if not is_highcharts_installed():
+        superdesk.logger.warn('Highcharts export server is not installed')
+        return
+
+    # Make sure the TASK_ROUTES are set
+    if not app.config['CELERY_TASK_ROUTES']:
+        app.config['CELERY_TASK_ROUTES'] = {}
+
+    # If the celery task is not configured, then set the default now
+    if not app.config['CELERY_TASK_ROUTES'].get('analytics.send_scheduled_reports'):
+        app.config['CELERY_TASK_ROUTES']['analytics.send_scheduled_reports'] = {
+            'queue': celery_queue('default'),
+            'routing_key': 'analytics.schedules'
+        }
+
+    # Make sure the BEAT_SCHEDULE are set
+    if not app.config['CELERY_BEAT_SCHEDULE']:
+        app.config['CELERY_BEAT_SCHEDULE'] = {}
+
+    # If the celery schedule is not configured, then set the default now
+    if not app.config['CELERY_BEAT_SCHEDULE'].get('analytics:send_scheduled_reports'):
+        app.config['CELERY_BEAT_SCHEDULE']['analytics:send_scheduled_reports'] = {
+            'task': 'analytics.send_scheduled_reports',
+            'schedule': crontab(minute='0')  # Runs once every hour
+        }
 
 
 def init_app(app):
@@ -96,3 +132,10 @@ def init_app(app):
         endpoint_name = 'analytics_test_report'
         service = TestReportService(endpoint_name, backend=superdesk.get_backend())
         BaseReportResource(endpoint_name, app=app, service=service)
+
+    init_schedule_task(app)
+
+
+@celery.task(soft_time_limit=600)
+def send_scheduled_reports():
+    SendScheduledReports().run()
