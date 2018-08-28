@@ -149,6 +149,7 @@ export function SourceCategoryChart(_, chartManager, gettext, moment, config, $i
                     dataLabels: {
                         enabled: true,
                         format: '{point.name}: {point.percentage:.1f}% ({point.y})',
+                        style: {textOverflow: 'ellipsis'}, // Fixes issue SDESK-3291
                     },
                     size: 300,
                 },
