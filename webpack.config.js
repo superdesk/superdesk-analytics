@@ -34,7 +34,7 @@ module.exports = function makeConfig(grunt) {
                 path.join(__dirname, 'node_modules/superdesk-core/node_modules'),
                 'node_modules'
             ],
-            extensions: ['.js', '.jsx', '.json'],
+            extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
             alias: {
                 images: path.resolve(__dirname, 'node_modules/superdesk-core/images'),
                 apps: path.resolve(__dirname, 'node_modules/superdesk-core/scripts/apps'),
@@ -58,13 +58,19 @@ module.exports = function makeConfig(grunt) {
         module: {
             rules: [
                 {
-                    test: /\.jsx?$/,
+                    test: /\.(ts|tsx)?$/,
                     exclude: /node_modules\/(?!(superdesk-core)\/).*/,
-                    loader: 'babel-loader',
+                    loader: 'ts-loader',
                     options: {
-                        plugins: ['transform-object-rest-spread'],
-                        cacheDirectory: true,
-                        presets: ['es2015', 'react'],
+                        transpileOnly: false
+                    }
+                },
+                {
+                    test: /\.(js|jsx)?$/,
+                    exclude: /node_modules\/(?!(superdesk-core)\/).*/,
+                    loader: 'ts-loader',
+                    options: {
+                        transpileOnly: true
                     }
                 },
                 {

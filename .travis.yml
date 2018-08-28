@@ -5,6 +5,10 @@ python: 3.5
 dist: trusty
 sudo: required
 
+env:
+  global:
+    - TRAVIS_NODE_VERSION="6"
+
 services:
     - mongodb
     - redis-server
@@ -23,7 +27,7 @@ cache:
     - npm
 
 before_install:
-    - npm config set loglevel warn
+    - node --version
     - sudo apt-get purge elasticsearch
     - sudo apt-get install -t stable elasticsearch
     - sudo service elasticsearch restart
@@ -32,7 +36,7 @@ install:
     - npm install
     - cd server && pip install -q -r requirements.txt && cd ..
     - chmod a+x server/scripts/install-highcharts-export-server.sh
-    - cd server/scripts && ./install-highcharts-export-server.sh && cd ../../
+    - pip install -e .
 
 script:
     - cd server && python3 -u -m analytics.reports.highcharts_server &

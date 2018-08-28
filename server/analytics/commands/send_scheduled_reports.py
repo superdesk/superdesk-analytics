@@ -9,6 +9,7 @@
 # at https://www.sourcefabric.org/superdesk/license
 
 from superdesk import Command, command, Option, get_resource_service
+from superdesk.logging import logger
 from superdesk.errors import SuperdeskApiError
 from superdesk.emails import SuperdeskMessage
 from superdesk.celery_app import celery
@@ -67,11 +68,13 @@ class SendScheduledReports(Command):
         Option('--now', '-n', dest='now', required=False)
     ]
 
-    def run(self, now):
+    def run(self, now=None):
         schedules = self.get_schedules()
 
         now_utc = now or utcnow()
         now_local = utc_to_local(app.config['DEFAULT_TIMEZONE'], now_utc)
+
+        logger.info('Starting to send scheduled reports: {}'.format(now_utc))
 
         # Set now to the beginning of the hour (in local time)
         now_local = now_local.replace(minute=0, second=0, microsecond=0)
@@ -89,6 +92,8 @@ class SendScheduledReports(Command):
                 {'_last_sent': now_utc},
                 scheduled_report
             )
+
+        logger.info('Completed sending scheduled reports: {}'.format(now_utc))
 
     def get_schedules(self):
         return list(
