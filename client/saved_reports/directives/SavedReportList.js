@@ -46,6 +46,8 @@ export function SavedReportList(
             selectReport: '=',
             currentReport: '=',
             onReportDeleted: '=',
+            createNewSchedule: '=',
+            viewSchedules: '=',
         },
         link: function(scope, element, attrs, controller) {
             /**

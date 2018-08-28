@@ -23,9 +23,12 @@ export function ReportsProvider(_) {
      * @description Registers the provided report
      */
     this.addReport = function(report) {
-        report.priority = _.get(report, 'priority', 1000);
-        report.privileges = _.get(report, 'privileges', {});
-        reports[report.id] = report;
+        reports[report.id] = Object.assign({
+            priority: 1000,
+            privileges: {},
+            showSidePanel: true,
+            allowScheduling: false
+        }, report);
     };
 
     /**

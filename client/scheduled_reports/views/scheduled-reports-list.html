@@ -1,0 +1,77 @@
+<div class="subnav subnav--padded scheduled-reports__filter-subnav" ng-if="currentSavedReport._id">
+    <span class="tag-label tag-label--highlight1">
+        {{'Saved Report: ' + currentSavedReport.name | translate}}
+        <button class="tag-label__remove" ng-click="clearSavedReport()">
+            <i class="icon-close-small"></i>
+        </button>
+    </span>
+</div>
+
+<div class="sd-column-box__main-column--padded">
+    <div class="flex-grid flex-grid--boxed flex-grid--wrap-items flex-grid--xlarge-3 flex-grid--large-2 flex-grid--medium-1 flex-grid--small-1">
+        <div ng-repeat="schedule in schedules" class="flex-grid__item">
+            <div class="sd-card">
+                <div class="sd-card__header" ng-class="{'sd-card__header--light': !schedule.active}">
+                    <div class="sd-card__heading">{{schedule.name}}</div>
+                    <div class="sd-card__actions">
+                        <a class="icn-btn" ng-click="openModal(schedule)">
+                            <i class="icon-pencil"></i>
+                        </a>
+                        <a class="icn-btn" ng-click="remove(schedule)">
+                            <i class="icon-trash"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="sd-card__content">
+                    <div class="form__row">
+                        <p>{{schedule.description}}</p>
+                    </div>
+
+                    <div sd-report-schedule-input
+                         ng-model="schedule.schedule"
+                         data-as-label="true"
+                    ></div>
+
+                    <div class="form__row form__row--no-padding form__row--flex">
+                        <label class="form-label form-label--light" translate>Format</label>
+                        <p class="sd-text__info">{{getFileType(schedule)| translate}}</p>
+                    </div>
+                    <div class="form__row form__row--no-padding form__row--flex">
+                        <label class="form-label form-label--light" translate>Width</label>
+                        <p class="sd-text__info">{{schedule.report_width}}</p>
+                    </div>
+                    <div class="form__row form__row--flex">
+                        <label class="form-label form-label--light" translate>Recipients</label>
+                        <p class="sd-text__info">{{schedule.recipients.join(', ')}}</p>
+                    </div>
+
+                    <div class="form__row form__row--flex form__row--no-padding">
+                        <label class="form-label form-label--light" translate>Report Type</label>
+                        <p>{{getSavedReportType(schedule)}}</p>
+                    </div>
+                    <div class="form__row form__row--flex">
+                        <label class="form-label form-label--light" translate>Saved Report</label>
+                        <p>{{getSavedReportName(schedule)}}</p>
+                    </div>
+
+                    <div sd-toggle-box data-title="Report Parameters"
+                         data-open="false"
+                         data-style="circle"
+                    >
+                        <div sd-report-preview-proxy
+                             data-report="getSavedReport(schedule)"
+                        ></div>
+                    </div>
+                </div>
+                <div class="sd-card__footer sd-grid-item__text-label">
+                    {{'Last Run: ' + getLastRunDescription(schedule) | translate}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div sd-scheduled-reports-modal
+     ng-if="step.showModal"
+></div>

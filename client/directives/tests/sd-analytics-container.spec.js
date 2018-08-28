@@ -8,24 +8,32 @@ describe('sd-analytics-container', () => {
         id: null,
         priority: 0,
         privileges: {},
+        showSidePanel: true,
+        allowScheduling: false,
     }, {
         id: 'report_1',
         label: 'Report 1',
         sidePanelTemplate: 'report.1.html',
         priority: 100,
         privileges: {},
+        showSidePanel: true,
+        allowScheduling: false,
     }, {
         id: 'report_2',
         label: 'Report 2',
         sidePanelTemplate: 'report.2.html',
         priority: 200,
         privileges: {},
+        showSidePanel: true,
+        allowScheduling: false,
     }, {
         id: 'report_3',
         label: 'Report 3',
         sidePanelTemplate: 'report.3.html',
         priority: 300,
         privileges: {},
+        showSidePanel: true,
+        allowScheduling: false,
     }];
 
     beforeEach(window.module('superdesk.templates-cache'));
@@ -59,7 +67,10 @@ describe('sd-analytics-container', () => {
         expect(scope.reports).toEqual(reports);
 
         // Default values
-        expect(scope.flags).toEqual({showSidePanel: false});
+        expect(scope.flags).toEqual({
+            showSidePanel: false,
+            contentView: 'report',
+        });
         expect(scope.currentReport).toEqual(reports[0]);
         expect(scope.reportConfigs).toEqual({charts: []});
 

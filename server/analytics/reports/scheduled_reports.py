@@ -8,13 +8,16 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
+from superdesk import get_resource_service
 from superdesk.services import BaseService
 from superdesk.resource import Resource
 from superdesk.notification import push_notification
+from superdesk.errors import SuperdeskApiError
 
 from analytics.common import mime_types, MIME_TYPES
 
 from collections import namedtuple
+from copy import deepcopy
 
 frequencies = ['hourly', 'daily', 'weekly', 'monthly']
 FREQUENCIES = namedtuple('FREQUENCIES', ['HOURLY', 'DAILY', 'WEEKLY', 'MONTHLY'])(*frequencies)
@@ -34,6 +37,17 @@ class ScheduledReportsResource(Resource):
 
     schema = {
         'saved_report': Resource.rel('saved_reports'),
+        'report_type': {
+            'type': 'string',
+            'required': True,
+            'allowed': [
+                'activity_report',
+                'track_activity_report',
+                'processed_items_report',
+                'content_quota_report',
+                'source_category_report'
+            ]
+        },
         'schedule': {
             'type': 'dict',
             'required': True,
@@ -97,6 +111,13 @@ class ScheduledReportsResource(Resource):
             'type': 'string',
             'required': True
         },
+        'description': {
+            'type': 'string'
+        },
+        'active': {
+            'type': 'boolean',
+            'default': False
+        },
         'extra': {
             'type': 'dict'  # i.e. email body
         },
@@ -109,13 +130,30 @@ class ScheduledReportsResource(Resource):
 class ScheduledReportsService(BaseService):
     def on_created(self, docs):
         for doc in docs:
+            self._validate_on_create_or_update(doc)
             self._push_notification(doc, 'create')
 
     def on_updated(self, updates, original):
+        doc = deepcopy(original)
+        doc.update(updates)
+        self._validate_on_create_or_update(doc)
         self._push_notification(original, 'update')
 
     def on_deleted(self, doc):
         self._push_notification(doc, 'delete')
+
+    @staticmethod
+    def _validate_on_create_or_update(doc):
+        saved_service = get_resource_service('saved_reports')
+        saved_report = saved_service.find_one(
+            req=None,
+            _id=doc['saved_report']
+        )
+
+        if not saved_report.get('is_global'):
+            raise SuperdeskApiError.badRequestError(
+                'A schedule must be attached to a global saved report'
+            )
 
     @staticmethod
     def _push_notification(doc, operation):

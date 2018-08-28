@@ -10,13 +10,18 @@
     ></div>
 
     <div ng-if="!showSaveForm && canSave">
-        <div class="flex-grid flex-grid--boxed-small flex-grid--wrap-items flex-grid--small-1">
+        <div class="flex-grid flex-grid--boxed-small flex-grid--wrap-items flex-grid--small-2">
             <button
                     id="generate_source_category_report"
                     class="btn btn--primary"
                     ng-click="generateReport()"
                     translate
-            >Generate Report</button>
+            >Run Report</button>
+            <button class="btn btn--success"
+                    ng-click="viewSchedule()"
+                    ng-disabled="!currentTemplate._id || !currentTemplate.is_global"
+                    translate
+            >Schedule</button>
         </div>
 
         <div class="flex-grid flex-grid--boxed-small flex-grid--wrap-items flex-grid--small-2">

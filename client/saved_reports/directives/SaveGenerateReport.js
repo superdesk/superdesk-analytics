@@ -19,6 +19,7 @@ export function SaveGenerateReport(_, privileges) {
             isDirty: '=',
             currentTemplate: '=',
             _onReportSaved: '=onReportSaved',
+            _viewSchedule: '=viewSchedule'
         },
         link: function(scope, element, attrs, controller) {
             scope.showSaveForm = false;
@@ -48,6 +49,15 @@ export function SaveGenerateReport(_, privileges) {
                         return savedReport;
                     })
                 )
+            );
+
+            /**
+             * @ngdoc method
+             * @name sdSaveGenerateReport#viewSchedule
+             * @description Views schedules for the current saved report
+             */
+            scope.viewSchedule = () => (
+                scope._viewSchedule(scope.currentTemplate)
             );
         },
     };

@@ -1,0 +1,37 @@
+<div class="form__row form__row--no-padding">
+    <label class="form-label form-label--light" translate>Title</label>
+    <p>{{report.params.title || 'Published Stories per Category with Source breakdown' | translate}}</p>
+</div>
+<div class="form__row form__row--no-padding">
+    <label class="form-label form-label--light" translate>Subtitle</label>
+    <p>{{subtitle}}</p>
+</div>
+<div class="form__row form__row--no-padding">
+    <label class="form-label form-label--light" translate>Date Filter</label>
+    <p>{{dates}}</p>
+</div>
+<div class="form__row form__row--no-padding">
+    <label class="form-label form-label--light" translate>Categories</label>
+    <p>{{categories}}</p>
+</div>
+<div class="form__row form__row--no-padding">
+    <label class="form-label form-label--light" translate>Sources</label>
+    <p>{{sources}}</p>
+</div>
+<div class="form__row form__row--no-padding">
+    <label class="form-label form-label--light" translate>Excluded States</label>
+    <p>{{excluded_states}}</p>
+</div>
+<div class="form__row form__row--no-padding">
+    <label class="form-label form-label--light" translate>Exclude Categories with</label>
+    <p ng-if="report.params.min">{{'Less then ' + report.params.min + ' stories' | translate}}</p>
+    <p ng-if="report.params.max">{{'More then ' + report.params.max + ' stories' | translate}}</p>
+</div>
+<div class="form__row form__row--no-padding">
+    <label class="form-label form-label--light" translate>Chart Type</label>
+    <p>{{report.params.chart_type}}</p>
+</div>
+<div class="form__row form__row--no-padding">
+    <label class="form-label form-label--light" translate>Order Categories In</label>
+    <p>{{report.params.sort_order}}</p>
+</div>

@@ -8,7 +8,7 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-from superdesk import json
+from superdesk import json, get_resource_service
 from superdesk.services import BaseService
 from superdesk.resource import Resource
 from superdesk.notification import push_notification
@@ -78,14 +78,14 @@ class SavedReportsService(BaseService):
         Checks if the request owner and the saved search owner are the same person
         If not then the request owner should have global saved reports privilege
         """
-        self._validate_on_update_or_delete(original)
+        self._validate_on_update(updates, original)
         super().on_update(updates, original)
 
     def on_updated(self, updates, original):
         self._push_notification(original, 'update')
 
     def on_delete(self, doc):
-        self._validate_on_update_or_delete(doc)
+        self._validate_on_delete(doc)
 
     def on_deleted(self, doc):
         self._push_notification(doc, 'delete')
@@ -142,7 +142,7 @@ class SavedReportsService(BaseService):
             raise SuperdeskApiError.forbiddenError('Unauthorized to create global report.')
 
     @staticmethod
-    def _validate_on_update_or_delete(doc):
+    def _validate_ownership(doc):
         """
         Validate saved reports on update/delete
 
@@ -157,6 +157,35 @@ class SavedReportsService(BaseService):
                 )
             elif not current_user_has_privilege('global_saved_reports'):
                 raise SuperdeskApiError.forbiddenError('Unauthorized to modify global report.')
+
+    def _validate_on_update(self, updates, original):
+        self._validate_ownership(original)
+
+        scheduled_service = get_resource_service('scheduled_reports')
+        schedules = scheduled_service.get(
+            req=None,
+            lookup={'saved_report': original['_id']}
+        )
+
+        if schedules.count() > 0:
+            if original.get('is_global') and not updates.get('is_global'):
+                raise SuperdeskApiError.badRequestError(
+                    'Cannot remove global flag as schedule(s) are attached'
+                )
+
+    def _validate_on_delete(self, doc):
+        self._validate_ownership(doc)
+
+        scheduled_service = get_resource_service('scheduled_reports')
+        schedules = scheduled_service.get(
+            req=None,
+            lookup={'saved_report': doc['_id']}
+        )
+
+        if schedules.count() > 0:
+            raise SuperdeskApiError.badRequestError(
+                'Cannot delete saved report as schedule(s) are attached'
+            )
 
     def get_aggregations(self, req, **lookup):
         saved_report = self.find_one(req=req, **lookup)

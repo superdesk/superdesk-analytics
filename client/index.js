@@ -24,6 +24,7 @@ import './content_quota_report';
 import './content_quota_widget';
 import './source_category_report';
 import './saved_reports';
+import './scheduled_reports';
 
 angular.module('superdesk.analytics.reports', [])
     .provider('reports', svc.ReportsProvider);
@@ -44,18 +45,22 @@ cacheIncludedTemplates.$inject = ['$templateCache'];
 export default angular.module('superdesk.analytics', [
     'superdesk.analytics.reports',
     'superdesk.analytics.saved_reports',
-    'superdesk.analytics.charts', 'superdesk.analytics.search',
+    'superdesk.analytics.charts',
+    'superdesk.analytics.search',
+    'superdesk.analytics.scheduled_reports',
     'superdesk.analytics.activity-report', 'superdesk.analytics.processed-items-report',
     'superdesk.analytics.processed-items-widget', 'superdesk.analytics.track-activity-report',
     'superdesk.analytics.track-activity-widget', 'superdesk.analytics.activity-report-widget',
     'superdesk.analytics.content-quota-report', 'superdesk.analytics.content-quota-widget',
-    'superdesk.analytics.source-category-report'
+    'superdesk.analytics.source-category-report',
+    'superdesk-ui'
 ])
     .service('analyticsWidgetSettings', svc.AnalyticsWidgetSettings)
 
     .directive('sdAnalyticsContainer', directive.AnalyticsContainer)
     .directive('sdAfterRender', directive.AfterRender)
     .directive('sdReportDropdown', directive.ReportDropdown)
+    .directive('sdConvertToNumber', directive.ConvertToNumber)
 
     .run(cacheIncludedTemplates)
 

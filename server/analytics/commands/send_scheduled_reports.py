@@ -97,7 +97,10 @@ class SendScheduledReports(Command):
 
     def get_schedules(self):
         return list(
-            get_resource_service('scheduled_reports').get(req=None, lookup={})
+            get_resource_service('scheduled_reports').get(
+                req=None,
+                lookup={'active': {'$eq': True}}
+            )
         )
 
     def should_send_report(self, scheduled_report, now_local):

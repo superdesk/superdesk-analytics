@@ -21,6 +21,8 @@ export function SavedReportItem(_) {
             globalPrivilege: '=',
             localPrivilege: '=',
             isSelected: '=',
+            _createNewSchedule: '=createNewSchedule',
+            _viewSchedules: '=viewSchedules',
         },
         link: function(scope) {
             scope.selected = false;
@@ -35,15 +37,25 @@ export function SavedReportItem(_) {
                 // Highlight the item
                 scope.selected = true;
 
-                // Make sure that the select function is not called
-                event.preventDefault();
-                event.stopPropagation();
+                scope.preventClick(event);
 
                 scope.removeReport(scope.report)
                     .finally(() => {
                         // If the user clicks 'CANCEL', then deselect this item
                         scope.selected = false;
                     });
+            };
+
+            /**
+             * @ngdoc method
+             * @name sdSavedReportItem#preventClick
+             * @param {MouseEvent} event
+             * @description Prevents default functionality on click (i.e. don't propagate)
+             */
+            scope.preventClick = (event) => {
+                // Make sure that the select function is not called
+                event.preventDefault();
+                event.stopPropagation();
             };
 
             /**
@@ -73,6 +85,24 @@ export function SavedReportItem(_) {
              */
             scope.forCurrentUser = () => (
                 scope.currentUser === _.get(scope, 'report.user')
+            );
+
+            /**
+             * @ngdoc method
+             * @name sdSavedReportItem#createNewSchedule
+             * @description Opens the create new schedule modal for this saved report
+             */
+            scope.createNewSchedule = () => (
+                scope._createNewSchedule(scope.report)
+            );
+
+            /**
+             * @ngdoc method
+             * @name sdSavedReportItem#viewSchedules
+             * @description Views the schedules for this saved report
+             */
+            scope.viewSchedules = () => (
+                scope._viewSchedules(scope.report)
             );
         },
     };

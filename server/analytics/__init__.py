@@ -115,6 +115,11 @@ def init_app(app):
         label='Manage Saved Reports',
         description='User can manage saved reports'
     )
+    superdesk.privilege(
+        name='scheduled_reports',
+        label='Manage Scheduling Reports',
+        description='User can manage scheduling of reports'
+    )
 
     # If this app is for testing, then create an endpoint for the base reporting service
     # so the core searching/aggregation functionality can be tested

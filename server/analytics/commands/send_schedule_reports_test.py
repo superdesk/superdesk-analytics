@@ -118,7 +118,8 @@ class SendScheduleReportTestCase(TestCase):
                 'mimetype': MIME_TYPES.PNG,
                 'extra': {'body': 'This is a test email'},
                 'recipients': ['superdesk@localhost.com'],
-                'report_width': 1200
+                'report_width': 1200,
+                'active': True
             }])
 
             scheduled_service = get_resource_service('scheduled_reports')
@@ -181,7 +182,8 @@ class SendScheduleReportTestCase(TestCase):
                 'mimetype': MIME_TYPES.JPEG,
                 'extra': {'body': 'This is a test email'},
                 'recipients': ['superdesk@localhost.com'],
-                'report_width': 1200
+                'report_width': 1200,
+                'active': True
             }])
 
             scheduled_service = get_resource_service('scheduled_reports')
@@ -238,7 +240,8 @@ class SendScheduleReportTestCase(TestCase):
                 'transmitter': 'email',
                 'mimetype': MIME_TYPES.CSV,
                 'extra': {'body': 'This is a test email'},
-                'recipients': ['superdesk@localhost.com']
+                'recipients': ['superdesk@localhost.com'],
+                'active': True
             }])
 
             now_local = to_local('2018-06-30T00')
@@ -284,7 +287,8 @@ class SendScheduleReportTestCase(TestCase):
                 'transmitter': 'email',
                 'mimetype': MIME_TYPES.PNG,
                 'extra': {'body': 'This is a test email'},
-                'recipients': ['superdesk@localhost.com']
+                'recipients': ['superdesk@localhost.com'],
+                'active': True
             }])
 
             now_local = to_local('2018-06-30T00')

@@ -35,5 +35,29 @@
         >
             <i class="icon-trash"></i>
         </button>
+        <div dropdown
+             dropdown-append-to-body
+             class="dropdown dropdown--align-right"
+             ng-if="report.is_global"
+        >
+            <button dropdown__toggle
+                    class="icn-btn dropdown__toggle"
+                    ng-click="preventClick($event)"
+            >
+                <i class="icon-dots-vertical"></i>
+            </button>
+            <ul class="dropdown__menu">
+                <li>
+                    <div class="dropdown__menu-label" translate>Scheduling</div>
+                </li>
+                <li class="dropdown__menu-divider"></li>
+                <li>
+                    <button ng-click="createNewSchedule()" translate>Create new schedule</button>
+                </li>
+                <li>
+                    <button ng-click="viewSchedules()" translate>View schedules</button>
+                </li>
+            </ul>
+        </div>
     </div>
 </div>

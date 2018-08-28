@@ -1,0 +1,33 @@
+.scheduled-reports__filter-subnav {
+    background-color: white;
+    z-index: 1000;
+}
+
+// Hack to get the email input to have a ui-framework look
+.scheduled-reports__email-input {
+    grid-row: 1/2 !important;
+    grid-column: 3/5 !important;
+
+    & input {
+        background-color: inherit;
+        border-top: none;
+        border-left: none;
+        border-right: none;
+    }
+}
+
+.scheduled-reports__subject-row {
+    padding-bottom: 3rem !important;
+}
+
+.scheduled-reports__schedule-input {
+    padding-right: 2rem !important;
+}
+
+.scheduled-reports__weekday-container {
+    flex-direction: column;
+}
+
+.scheduled-reports__weekday-input {
+    display: flex;
+}
