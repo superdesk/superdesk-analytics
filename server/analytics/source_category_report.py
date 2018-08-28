@@ -194,7 +194,8 @@ class SourceCategoryReportService(BaseReportService):
                         'allowPointSelect': True,
                         'dataLabels': {
                             'enabled': True,
-                            'format': '{point.name}: {point.percentage:.1f}% ({point.y})'
+                            'format': '{point.name}: {point.percentage:.1f}% ({point.y})',
+                            'style': {'textOverflow': 'ellipsis'}  # Fixes issue SDESK-3291
                         },
                         'size': 300
                     }
