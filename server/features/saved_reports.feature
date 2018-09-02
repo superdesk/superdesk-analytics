@@ -90,49 +90,6 @@ Feature: Saved Reports
         """
 
     @auth
-    Scenario: Only allows reports for known types
-        When we post to "/saved_reports"
-        """
-        {"name": "test", "report": "activity_report", "params": {"title": "test"}}
-        """
-        Then we get OK response
-        When we post to "/saved_reports"
-        """
-        {"name": "test", "report": "content_quota_report", "params": {"title": "test"}}
-        """
-        Then we get OK response
-        When we post to "/saved_reports"
-        """
-        {"name": "test", "report": "processed_items_report", "params": {"title": "test"}}
-        """
-        Then we get OK response
-        When we post to "/saved_reports"
-        """
-        {"name": "test", "report": "source_category_report", "params": {"title": "test"}}
-        """
-        Then we get OK response
-        When we post to "/saved_reports"
-        """
-        {"name": "test", "report": "track_activity_report", "params": {"title": "test"}}
-        """
-        Then we get OK response
-        When we post to "/saved_reports"
-        """
-        {"name": "test", "report": "test_report", "params": {"title": "test"}}
-        """
-        Then we get error 400
-        """
-        {"_issues": {"report": "unallowed value test_report"}, "_status": "ERR"}
-        """
-        When we get "/saved_reports?where={"report":"source_category_report"}"
-        Then we get OK response
-        When we get "/saved_reports?where={"report":"test_report"}"
-        Then we get error 400
-        """
-        {"_status": "ERR", "_message": "Unknown report type: test_report"}
-        """
-
-    @auth
     Scenario: Permission required to create global report
         When we patch "/users/#CONTEXT_USER_ID#"
         """

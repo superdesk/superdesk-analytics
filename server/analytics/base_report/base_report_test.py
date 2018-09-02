@@ -193,14 +193,16 @@ class BaseReportServiceTestCase(TestCase):
         with self.app.app_context():
             query = self.service.generate_elastic_query({
                 'params': {
-                    'excluded_states': {
-                        'draft': False,
-                        'ingested': False,
-                        'in_progress': False,
-                        'published': True,
-                        'killed': True,
-                        'corrected': True,
-                        'recalled': False
+                    'must_not': {
+                        'states': {
+                            'draft': False,
+                            'ingested': False,
+                            'in_progress': False,
+                            'published': True,
+                            'killed': True,
+                            'corrected': True,
+                            'recalled': False
+                        }
                     }
                 }
             })
@@ -245,11 +247,14 @@ class BaseReportServiceTestCase(TestCase):
         with self.app.app_context():
             query = self.service.generate_elastic_query({
                 'params': {
-                    'categories': {
-                        'Domestic Sport': True,
-                        'Finance': False,
-                        'International Sport': True
-                    }
+                    'must': {
+                        'categories': {
+                            'Domestic Sport': True,
+                            'Finance': False,
+                            'International Sport': True
+                        }
+                    },
+                    'category_field': 'name'
                 }
             })
             self.assertEqual(query, {
@@ -272,10 +277,12 @@ class BaseReportServiceTestCase(TestCase):
         with self.app.app_context():
             query = self.service.generate_elastic_query({
                 'params': {
-                    'sources': {
-                        'AAP': True,
-                        'Reuters': True,
-                        'AP': False
+                    'must': {
+                        'sources': {
+                            'AAP': True,
+                            'Reuters': True,
+                            'AP': False
+                        }
                     }
                 }
             })
@@ -295,8 +302,11 @@ class BaseReportServiceTestCase(TestCase):
     def test_generate_elastic_query_exclude_rewrites(self):
         with self.app.app_context():
             query = self.service.generate_elastic_query({
-                'params': {'exclude_rewrites': True}
+                'params': {
+                    'must_not': {'rewrites': True}
+                }
             })
+
             self.assertEqual(query, {
                 'source': {
                     'query': {'filtered': {'filter': {'bool': {
@@ -311,7 +321,9 @@ class BaseReportServiceTestCase(TestCase):
             })
 
             query = self.service.generate_elastic_query({
-                'params': {'exclude_rewrites': False}
+                'params': {
+                    'must_not': {'rewrites': False}
+                }
             })
             self.assertEqual(query, {
                 'source': {

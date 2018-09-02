@@ -262,6 +262,7 @@ export function SourceCategoryChart(_, chartManager, gettext, moment, config, $i
                 wrapCharts: true,
                 height500: true,
                 fullWidth: false,
+                multiChart: true,
             };
         case 'table':
             return {
@@ -269,6 +270,7 @@ export function SourceCategoryChart(_, chartManager, gettext, moment, config, $i
                 wrapCharts: true,
                 height500: false,
                 fullWidth: true,
+                multiChart: false,
             };
         default:
             return {
@@ -276,6 +278,7 @@ export function SourceCategoryChart(_, chartManager, gettext, moment, config, $i
                 wrapCharts: false,
                 height500: false,
                 fullWidth: true,
+                multiChart: false,
             };
         }
     };

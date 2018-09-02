@@ -39,14 +39,7 @@ class ScheduledReportsResource(Resource):
         'saved_report': Resource.rel('saved_reports'),
         'report_type': {
             'type': 'string',
-            'required': True,
-            'allowed': [
-                'activity_report',
-                'track_activity_report',
-                'processed_items_report',
-                'content_quota_report',
-                'source_category_report'
-            ]
+            'required': True
         },
         'schedule': {
             'type': 'dict',

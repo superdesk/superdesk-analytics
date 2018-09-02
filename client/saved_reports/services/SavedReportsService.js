@@ -23,6 +23,11 @@ export function SavedReportsService(_, api, session, moment, config) {
                 .format('YYYY-MM-DD');
         }
 
+        if (_.get(report, 'params.date')) {
+            report.params.date = moment(report.params.date, config.view.dateformat)
+                .format('YYYY-MM-DD');
+        }
+
         return report;
     };
 
@@ -36,6 +41,11 @@ export function SavedReportsService(_, api, session, moment, config) {
 
         if (_.get(report, 'params.end_date')) {
             report.params.end_date = moment(report.params.end_date, 'YYYY-MM-DD')
+                .format(config.view.dateformat);
+        }
+
+        if (_.get(report, 'params.date')) {
+            report.params.date = moment(report.params.date, 'YYYY-MM-DD')
                 .format(config.view.dateformat);
         }
 

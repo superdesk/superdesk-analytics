@@ -263,7 +263,7 @@ Feature: Base Analytics Report Service
             }
         ]
         """
-        When we get "/analytics_test_report?params={"categories": {"Transport": true}}"
+        When we get "/analytics_test_report?params={"must": {"categories": {"T": true}}}"
         Then we get list with 1 items
         """
         {
