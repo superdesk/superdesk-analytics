@@ -135,12 +135,17 @@ export function ReportScheduleInput(gettext, _) {
              * @description Validates input when the week days change
              */
             scope.onWeekdayChange = () => {
-                scope.schedule.week_days = Object.keys(scope.weekdays)
-                    .filter((day) => !!scope.weekdays[day]);
+                if (scope.flags.showWeekDay) {
+                    scope.schedule.week_days = Object.keys(scope.weekdays)
+                        .filter((day) => !!scope.weekdays[day]);
 
-                if (scope.schedule.week_days.length < 1) {
-                    ngModel.$setValidity('weekDayRequired', false);
-                    scope.weekdayError = gettext('Must select at least one day');
+                    if (scope.schedule.week_days.length < 1) {
+                        ngModel.$setValidity('weekDayRequired', false);
+                        scope.weekdayError = gettext('Must select at least one day');
+                    } else {
+                        ngModel.$setValidity('weekDayRequired', true);
+                        scope.weekdayError = null;
+                    }
                 } else {
                     ngModel.$setValidity('weekDayRequired', true);
                     scope.weekdayError = null;

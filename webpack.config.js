@@ -30,6 +30,7 @@ module.exports = function makeConfig(grunt) {
                 __dirname,
                 path.join(__dirname, 'client'),
                 path.join(__dirname, 'node_modules/superdesk-core'),
+                path.join(__dirname, 'node_modules/superdesk-core/scripts'),
                 path.join(__dirname, 'node_modules/superdesk-core/styles/sass'),
                 path.join(__dirname, 'node_modules/superdesk-core/node_modules'),
                 'node_modules'
@@ -37,9 +38,6 @@ module.exports = function makeConfig(grunt) {
             extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
             alias: {
                 images: path.resolve(__dirname, 'node_modules/superdesk-core/images'),
-                apps: path.resolve(__dirname, 'node_modules/superdesk-core/scripts/apps'),
-                core: path.resolve(__dirname, 'node_modules/superdesk-core/scripts/core'),
-                vendor: path.resolve(__dirname, 'node_modules/superdesk-core/scripts/vendor'),
 
                 'angular-embedly': path.resolve(
                     __dirname,

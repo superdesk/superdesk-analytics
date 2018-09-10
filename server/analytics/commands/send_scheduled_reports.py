@@ -12,7 +12,6 @@ from superdesk import Command, command, Option, get_resource_service
 from superdesk.logging import logger
 from superdesk.errors import SuperdeskApiError
 from superdesk.emails import SuperdeskMessage
-from superdesk.celery_app import celery
 from superdesk.lock import lock, unlock
 from superdesk.utc import utc_to_local, utcnow
 
@@ -22,9 +21,9 @@ from analytics.reports import generate_report
 from flask import current_app as app
 
 
-@celery.task(bind=True, max_retries=3, soft_time_limit=120)
+# Send the email synchronously as celery/kmobo failed to pass binary attachments
+# TODO: Serialise attachments so celery can be used with sending emails
 def send_email_report(
-        self,
         _id,
         subject,
         sender,
@@ -52,11 +51,14 @@ def send_email_report(
 
         if attachments is not None:
             for attachment in attachments:
-                msg.attach(
-                    attachment.get('filename'),
-                    attachment.get('mimetype'),
-                    attachment.get('file')
-                )
+                if attachment.get('mimetype') == MIME_TYPES.HTML:
+                    msg.html += attachment.get('file')
+                else:
+                    msg.attach(
+                        attachment.get('filename'),
+                        attachment.get('mimetype'),
+                        attachment.get('file')
+                    )
 
         return app.mail.send(msg)
     finally:
@@ -190,15 +192,18 @@ class SendScheduledReports(Command):
 
         attachments = []
 
-        mime_type = scheduled_report.get('mimetype')
-
         i = 1
         for option in options:
+            mime_type = scheduled_report.get('mimetype')
+
+            if isinstance(option, dict) and option.get('type') == 'table':
+                mime_type = MIME_TYPES.HTML
+
             attachments.append({
                 'file': generate_report(
                     option,
                     mimetype=mime_type,
-                    base64=True,
+                    base64=False,
                     width=scheduled_report.get('report_width')
                 ),
                 'mimetype': mime_type,
@@ -214,7 +219,7 @@ class SendScheduledReports(Command):
 
             extra = scheduled_report.get('extra') or {}
 
-            send_email_report.delay(
+            send_email_report(
                 _id=scheduled_report.get('_id'),
                 subject='Superdesk Analytics - {}'.format(scheduled_report.get('name')),
                 sender=sender,

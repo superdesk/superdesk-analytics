@@ -17,7 +17,8 @@ report_types = [
     'content_quota_report',
     'processed_items_report',
     'source_category_report',
-    'track_activity_report'
+    'track_activity_report',
+    'mission_report'
 ]
 
 REPORT_TYPES = namedtuple('REPORT_TYPES', [
@@ -25,7 +26,8 @@ REPORT_TYPES = namedtuple('REPORT_TYPES', [
     'CONTENT_QUOTA',
     'PROCESSED_ITEMS',
     'SOURCE_CATEGORY',
-    'TRACK_ACTIVITY'
+    'TRACK_ACTIVITY',
+    'MISSION'
 ])(*report_types)
 
 mime_types = [
@@ -34,7 +36,8 @@ mime_types = [
     'image/gif',
     'application/pdf',
     'image/svg+xml',
-    'text/csv'
+    'text/csv',
+    'text/html'
 ]
 
 MIME_TYPES = namedtuple('MIME_TYPES', [
@@ -43,7 +46,8 @@ MIME_TYPES = namedtuple('MIME_TYPES', [
     'GIF',
     'PDF',
     'SVG',
-    'CSV'
+    'CSV',
+    'HTML'
 ])(*mime_types)
 
 
@@ -60,6 +64,8 @@ def get_mime_type_extension(mimetype):
         return 'svg'
     elif mimetype == MIME_TYPES.CSV:
         return 'csv'
+    elif mimetype == MIME_TYPES.HTML:
+        return 'html'
 
 
 def get_report_service(report_type):
@@ -73,6 +79,8 @@ def get_report_service(report_type):
         return get_resource_service('source_category_report')
     elif report_type == REPORT_TYPES.TRACK_ACTIVITY:
         return get_resource_service('track_activity_report')
+    elif report_type == REPORT_TYPES.MISSION:
+        return get_resource_service('mission_report')
 
     return None
 

@@ -110,33 +110,36 @@ export function SourceCategoryController(
         $scope.currentTemplate = {};
 
         $scope.currentParams = {
-            params: {},
             report: 'source_category_report',
-        };
-
-        $scope.currentParams.params = {
-            start_date: moment()
-                .subtract(30, 'days')
-                .format(config.view.dateformat),
-            end_date: moment().format(config.view.dateformat),
-            chart_type: $scope.chart_types[0].qcode,
-            repos: {
-                ingest: false,
-                archive: false,
-                published: true,
-                archived: true,
+            params: {
+                start_date: moment()
+                    .subtract(30, 'days')
+                    .format(config.view.dateformat),
+                end_date: moment().format(config.view.dateformat),
+                chart_type: $scope.chart_types[0].qcode,
+                repos: {
+                    ingest: false,
+                    archive: false,
+                    published: true,
+                    archived: true,
+                },
+                date_filter: 'range',
+                min: 1,
+                max: null,
+                sort_order: 'desc',
+                must: {
+                    categories: {},
+                    sources: {},
+                },
+                must_not: {
+                    rewrites: false,
+                    states: {},
+                },
             },
-            date_filter: 'range',
-            min: 1,
-            max: null,
-            sort_order: 'desc',
-            categories: {},
-            sources: {},
-            exclude_rewrites: false,
         };
 
         // Set the default values for excluded_states for the form
-        $scope.currentParams.params.excluded_states = _.mapValues(
+        $scope.currentParams.params.must_not.states = _.mapValues(
             _.keyBy($scope.item_states, 'qcode'),
             (state) => state.default_exclude
         );
@@ -292,7 +295,13 @@ export function SourceCategoryController(
      * @returns {Promise<Object>} - Search API query response
      * @description Sends the current form parameters to the search API
      */
-    this.runQuery = () => searchReport.query('source_category_report', $scope.currentParams.params);
+    this.runQuery = () => searchReport.query(
+        'source_category_report',
+        {
+            ...$scope.currentParams.params,
+            category_field: 'name',
+        }
+    );
 
     /**
      * @ngdoc method
@@ -306,12 +315,13 @@ export function SourceCategoryController(
             Object.keys(data.sources);
 
         $scope.sources.forEach((source) => {
-            $scope.currentParams.params.sources[source] = $scope.currentParams.params.sources[source] || false;
+            $scope.currentParams.params.must.sources[source] =
+                $scope.currentParams.params.must.sources[source] || false;
         });
 
-        Object.keys($scope.currentParams.params.sources).forEach((source) => {
+        Object.keys($scope.currentParams.params.must.sources).forEach((source) => {
             if (!_.get(data.sources, source)) {
-                delete $scope.currentParams.params.sources[source];
+                delete $scope.currentParams.params.must.sources[source];
             }
         });
     };
@@ -333,13 +343,13 @@ export function SourceCategoryController(
             categories;
 
         $scope.categories.forEach((category) => {
-            $scope.currentParams.params.categories[category] =
-                $scope.currentParams.params.categories[category] || false;
+            $scope.currentParams.params.must.categories[category] =
+                $scope.currentParams.params.must.categories[category] || false;
         });
 
-        Object.keys($scope.currentParams.params.categories).forEach((category) => {
+        Object.keys($scope.currentParams.params.must.categories).forEach((category) => {
             if (!_.get(data.categories, category)) {
-                delete $scope.currentParams.params.categories[category];
+                delete $scope.currentParams.params.must.categories[category];
             }
         });
     };

@@ -60,6 +60,12 @@ class BaseReportService(SearchService):
         """
         return {}
 
+    def generate_html(self, docs, args):
+        """
+        Overwrite this method to generate the html table based on the aggregation data
+        """
+        return {}
+
     def get_aggregation_buckets(self, docs, aggregation_ids=None):
         """
         Retrieves the aggregation buckets from the documents provided
@@ -144,6 +150,8 @@ class BaseReportService(SearchService):
             report = self.generate_highcharts_config(docs, args)
         elif args['return_type'] == MIME_TYPES.CSV:
             report = self.generate_csv(docs, args)
+        elif args['return_type'] == MIME_TYPES.HTML:
+            report = self.generate_html(docs, args)
         else:
             report = self.generate_report(docs, args)
 
@@ -152,124 +160,161 @@ class BaseReportService(SearchService):
 
         return ListCursor([report])
 
+    def get_utc_offset(self):
+        return get_timezone_offset(app.config['DEFAULT_TIMEZONE'], utcnow())
+
+    def format_date(self, date, end_of_day=False):
+        time_suffix = 'T23:59:59' if end_of_day else 'T00:00:00'
+        utc_offset = self.get_utc_offset()
+
+        return date + time_suffix + utc_offset
+
+    def _es_get_filter_values(self, filters):
+        if not isinstance(filters, dict):
+            return filters
+
+        return [name for name, value in filters.items() if value]
+
+    def _es_filter_categories(self, query, categories, must, params):
+        field = params.get('category_field') or 'qcode'
+
+        query[must].append({
+            'terms': {'anpa_category.{}'.format(field): sorted(categories)}
+        })
+
+    def _es_filter_sources(self, query, sources, must, params):
+        query[must].append({
+            'terms': {'source': sorted(sources)}
+        })
+
+    def _es_filter_genre(self, query, genres, must, params):
+        query[must].append({
+            'terms': {'genre.qcode': genres}
+        })
+
+    def _es_filter_ingest_providers(self, query, ingests, must, params):
+        query[must].append({
+            'terms': {'ingest_provider': ingests}
+        })
+
+    def _es_filter_stages(self, query, stages, must, params):
+        query[must].append({
+            'terms': {'task.stage': stages}
+        })
+
+    def _es_filter_states(self, query, states, must, params):
+        query[must].append({
+            'terms': {'state': sorted(states)}
+        })
+
+    def _es_filter_rewrites(self, query, value, must, params):
+        if value:
+            query[must].append({
+                'exists': {'field': 'rewrite_of'}
+            })
+
+    def _es_set_repos(self, query, params):
+        query['repo'] = ','.join([
+            repo
+            for repo, value in sorted((params.get('repos') or {}).items())
+            if value and repo
+        ])
+
+    def _es_set_size(self, query, params):
+        query['size'] = params.get('size') or 0
+
+    def _es_set_sort(self, query, params):
+        query['sort'] = params.get('sort') or [{'versioncreated': 'desc'}]
+
+    def _es_filter_dates(self, query, params):
+        date_filter = params.get('date_filter')
+        if not date_filter:
+            return
+
+        time_zone = self.get_utc_offset()
+        lt = None
+        gte = None
+
+        if date_filter == 'range':
+            lt = self.format_date(params.get('end_date'), True)
+            gte = self.format_date(params.get('start_date'))
+        elif date_filter == 'day':
+            lt = self.format_date(params.get('date'), True)
+            gte = self.format_date(params.get('date'))
+        elif date_filter == 'yesterday':
+            lt = 'now/d'
+            gte = 'now-1d/d'
+        elif date_filter == 'last_week':
+            lt = 'now/w'
+            gte = 'now-1w/w'
+        elif date_filter == 'last_month':
+            lt = 'now/M'
+            gte = 'now-1M/M'
+
+        if lt is not None and gte is not None:
+            query['must'].append({
+                'range': {
+                    'versioncreated': {
+                        'lt': lt,
+                        'gte': gte,
+                        'time_zone': time_zone
+                    }
+                }
+            })
+
     def generate_elastic_query(self, args):
         params = args.get('params') or {}
 
-        filters = {
-            'must': [],
-            'must_not': []
+        query_funcs = {
+            'categories': self._es_filter_categories,
+            'sources': self._es_filter_sources,
+            'genre': self._es_filter_genre,
+            'ingest_providers': self._es_filter_ingest_providers,
+            'stages': self._es_filter_stages,
+            'states': self._es_filter_states,
+            'rewrites': self._es_filter_rewrites
         }
 
-        def get_utc_offset():
-            return get_timezone_offset(app.config['DEFAULT_TIMEZONE'], utcnow())
-
-        def format_date(date, end_of_day=False):
-            time_suffix = 'T23:59:59' if end_of_day else 'T00:00:00'
-            utc_offset = get_utc_offset()
-
-            return date + time_suffix + utc_offset
-
-        def filter_dates():
-            date_filter = params.get('date_filter')
-            if not date_filter:
-                return
-
-            time_zone = get_utc_offset()
-            lt = None
-            gte = None
-
-            if date_filter == 'range':
-                lt = format_date(params.get('end_date'), True)
-                gte = format_date(params.get('start_date'))
-            elif date_filter == 'yesterday':
-                lt = 'now/d'
-                gte = 'now-1d/d'
-            elif date_filter == 'last_week':
-                lt = 'now/w'
-                gte = 'now-1w/w'
-            elif date_filter == 'last_month':
-                lt = 'now/M'
-                gte = 'now-1M/M'
-
-            if lt is not None and gte is not None:
-                filters['must'].append({
-                    'range': {
-                        'versioncreated': {
-                            'lt': lt,
-                            'gte': gte,
-                            'time_zone': time_zone
-                        }
-                    }
-                })
-
-        def exclude_states():
-            states = params.get('excluded_states')
-            if not states:
-                return
-
-            exclude = [state for state, enabled in states.items() if enabled]
-
-            if not len(exclude):
-                return
-
-            filters['must_not'].append({'terms': {'state': sorted(exclude)}})
-
-        def get_repos():
-            repos = params.get('repos')
-            if not repos:
-                return
-
-            return ','.join([repo for repo, enabled in sorted(repos.items()) if enabled])
-
-        def filter_categories():
-            categories = params.get('categories')
-            if not categories:
-                return
-
-            categories = [category for category, enabled in categories.items() if enabled]
-
-            if not len(categories):
-                return
-
-            filters['must'].append({'terms': {'anpa_category.name': sorted(categories)}})
-
-        def filter_sources():
-            sources = params.get('sources')
-            if not sources:
-                return
-
-            sources_list = [source for source, enabled in sources.items() if enabled]
-
-            if not len(sources_list):
-                return
-
-            filters['must'].append({'terms': {'source': sorted(sources_list)}})
-
-        def filter_rewrites():
-            if not params.get('exclude_rewrites'):
-                return
-
-            filters['must_not'].append({'exists': {'field': 'rewrite_of'}})
-
-        def get_size():
-            return params.get('size') or 0
-
-        filter_dates()
-        exclude_states()
-        filter_categories()
-        filter_sources()
-        filter_rewrites()
-        repo = get_repos()
-
         query = {
+            'must': [],
+            'must_not': [],
+            'sort': [],
+            'size': 0
+        }
+
+        self._es_set_repos(query, params)
+        self._es_set_size(query, params)
+        self._es_set_sort(query, params)
+        self._es_filter_dates(query, params)
+
+        for must in ['must', 'must_not']:
+            for field, filters in (params.get(must) or {}).items():
+                values = self._es_get_filter_values(filters)
+                func = query_funcs.get(field)
+
+                if (isinstance(values, list) and len(values) < 1) or not func:
+                    continue
+
+                func(query, values, must, params)
+
+        es_query = {
             'source': {
-                'query': {'filtered': {'filter': {'bool': filters}}},
-                'sort': [{'versioncreated': 'desc'}],
-                'size': get_size()
+                'query': {
+                    'filtered': {
+                        'filter': {
+                            'bool': {
+                                'must': query['must'],
+                                'must_not': query['must_not']
+                            },
+                        },
+                    },
+                },
+                'sort': query['sort'],
+                'size': query['size']
             }
         }
 
-        if repo:
-            query['repo'] = repo
+        if len(query['repo']) > 0:
+            es_query['repo'] = query['repo']
 
-        return query
+        return es_query

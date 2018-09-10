@@ -131,17 +131,6 @@ class SourceCategoryReportService(BaseReportService):
         def get_subtitle():
             return params.get('subtitle') or ''
 
-        def get_series_data():
-            series = []
-
-            for name, totals in sources.items():
-                series.append({
-                    'name': name,
-                    'data': [totals.get(category) or 0 for category in categories]
-                })
-
-            return series
-
         def generate_config():
             return [{
                 'id': 'generic',

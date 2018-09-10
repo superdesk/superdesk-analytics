@@ -1,7 +1,7 @@
 <div sd-toggle-box data-title="Categories" data-open="true" ng-if="categories.length">
     <div class="form__row" ng-repeat="category in categories">
         <button sd-check
-                ng-model="currentParams.params.categories[category]"
+                ng-model="currentParams.params.must.categories[category]"
         >{{category | translate}}
         </button>
     </div>
@@ -10,7 +10,7 @@
 <div sd-toggle-box data-title="Sources" data-open="true" ng-if="sources.length">
     <div class="form__row" ng-repeat="source in sources">
         <button sd-check
-                ng-model="currentParams.params.sources[source]"
+                ng-model="currentParams.params.must.sources[source]"
         >{{source | translate}}
         </button>
     </div>
@@ -21,7 +21,7 @@
         <label class="sd-line-input__label" translate>Excluded States</label>
         <div class="flex-grid flex-grid--boxed-small flex-grid--wrap-items flex-grid--small-2">
             <button ng-repeat="state in item_states"
-                    ng-model="currentParams.params.excluded_states[state.qcode]"
+                    ng-model="currentParams.params.must_not.states[state.qcode]"
                     sd-check
                     data-label-position="inside"
             >
@@ -34,7 +34,7 @@
 <div class="form__row">
     <div class="sd-line-input">
         <button sd-check
-                ng-model="currentParams.params.exclude_rewrites"
+                ng-model="currentParams.params.must_not.rewrites"
                 data-label-position="inside"
         >{{'Exclude Rewrites' | translate}}</button>
     </div>

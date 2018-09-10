@@ -45,11 +45,13 @@ describe('searchReport', () => {
 
     it('can generate list of excluded states', () => {
         searchReport.query('source_category_report', {
-            excluded_states: {
-                published: false,
-                killed: true,
-                corrected: true,
-                recalled: true,
+            must_not: {
+                states: {
+                    published: false,
+                    killed: true,
+                    corrected: true,
+                    recalled: true,
+                }
             },
         });
 
@@ -223,11 +225,14 @@ describe('searchReport', () => {
 
     it('can generate category filters', () => {
         searchReport.query('source_category_report', {
-            categories: {
-                Finance: true,
-                Sport: false,
-                Advisories: true,
+            must: {
+                categories: {
+                    Finance: true,
+                    Sport: false,
+                    Advisories: true,
+                },
             },
+            category_field: 'name',
         });
 
         expect(api.query).toHaveBeenCalledWith('source_category_report', {
@@ -247,14 +252,44 @@ describe('searchReport', () => {
             },
             repo: '',
         });
+
+        searchReport.query('source_category_report', {
+            must: {
+                categories: {
+                    f: true,
+                    a: false,
+                    s: true,
+                },
+            },
+        });
+
+        expect(api.query).toHaveBeenCalledWith('source_category_report', {
+            source: {
+                query: {
+                    filtered: {
+                        filter: {
+                            bool: {
+                                must: [{terms: {'anpa_category.qcode': ['f', 's']}}],
+                                must_not: [],
+                            },
+                        },
+                    },
+                },
+                sort: [{versioncreated: 'desc'}],
+                size: 0,
+            },
+            repo: '',
+        });
     });
 
     it('can generate source filters', () => {
         searchReport.query('source_category_report', {
-            sources: {
-                AAP: true,
-                Reuters: false,
-                AP: true,
+            must: {
+                sources: {
+                    AAP: true,
+                    Reuters: false,
+                    AP: true,
+                },
             },
         });
 
@@ -278,7 +313,11 @@ describe('searchReport', () => {
     });
 
     it('can generate exclude rewrite filters', () => {
-        searchReport.query('source_category_report', {exclude_rewrites: true});
+        searchReport.query('source_category_report', {
+            must_not: {
+                rewrites: true,
+            },
+        });
 
         expect(api.query).toHaveBeenCalledWith('source_category_report', {
             source: {
@@ -298,7 +337,11 @@ describe('searchReport', () => {
             repo: '',
         });
 
-        searchReport.query('source_category_report', {exclude_rewrites: false});
+        searchReport.query('source_category_report', {
+            must_not: {
+                rewrites: false,
+            },
+        });
 
         expect(api.query).toHaveBeenCalledWith('source_category_report', {
             source: {

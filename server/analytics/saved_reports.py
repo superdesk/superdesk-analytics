@@ -20,7 +20,7 @@ from apps.archive.common import get_user, get_auth
 
 from eve.utils import ParsedRequest
 
-from analytics.common import get_report_service, report_types
+from analytics.common import get_report_service
 
 
 class SavedReportsResource(Resource):
@@ -36,7 +36,6 @@ class SavedReportsResource(Resource):
         },
         'report': {
             'type': 'string',
-            'allowed': report_types,
             'required': True
         },
         'params': {
@@ -103,11 +102,6 @@ class SavedReportsService(BaseService):
 
         if lookup:
             where.update(lookup)
-
-        if where.get('report') and where.get('report') not in report_types:
-            raise SuperdeskApiError.badRequestError(
-                'Unknown report type: {}'.format(where.get('report'))
-            )
 
         if '$or' not in where:
             where['$or'] = []

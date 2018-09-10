@@ -31,7 +31,7 @@ def generate_report(
     if not isinstance(options, dict):
         raise SuperdeskApiError.badRequestError('Provided options must be a dictionary')
 
-    if not options.get('series'):
+    if 'series' not in options and 'rows' not in options:
         raise SuperdeskApiError.badRequestError('Series data not provided')
 
     if mimetype in [
@@ -44,6 +44,8 @@ def generate_report(
         return generate_from_highcharts(options, mimetype, base64, scale, width, no_download)
     elif mimetype == MIME_TYPES.CSV:
         return generate_csv(options)
+    elif mimetype == MIME_TYPES.HTML:
+        return generate_html(options)
 
     raise SuperdeskApiError.badRequestError("Unsupported mimetype '{}'".format(mimetype))
 
@@ -98,3 +100,30 @@ def generate_csv(options):
     csv_writer.writerows(csv_rows)
 
     return csv_file.getvalue().encode('UTF-8')
+
+
+def generate_html(options):
+    rows = options.get('rows') or []
+    headers = options.get('headers') or []
+    title = options.get('title') or ''
+
+    if len(rows) < 1:
+        return '''<div><h3>{}</h3></div>'''.format(title)
+
+    thead = '<tr><th>{}</th></tr>'.format('</th><th>'.join(headers))
+    tbody = ''
+    for row in rows:
+        tbody += '<tr><td>{}</td></tr>'.format('</td><td>'.join(row))
+
+    return '''
+<div>
+    <h3>{}</h3>
+    <table border=1 style="width: 100%;">
+        <thead>
+            {}
+        </thead>
+        <tbody>
+            {}
+        </tbody>
+    </table>
+<div>'''.format(title, thead, tbody)
