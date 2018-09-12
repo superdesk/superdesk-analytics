@@ -44,31 +44,24 @@
                 </div>
             </div>
 
-            <div class="sd-column-box--2">
-                <!-- Side Panel With a Controller -->
+            <div class="sd-column-box--2"
+                 ng-if="currentReport.id"
+            >
                 <div class="sd-filters-panel"
-                     ng-if="currentReport.id && currentReport.controller"
-                     ng-include="currentReport.sidePanelTemplate"
-                     ng-controller="currentReport.controller"
-                ></div>
-
-                <!-- Side Panel Without a Controller -->
-                <div class="sd-filters-panel"
-                     ng-if="currentReport.id && !currentReport.controller"
                      ng-include="currentReport.sidePanelTemplate"
                 ></div>
 
-                <!-- Report/Schedule Content View -->
                 <div class="sd-column-box__main-column sd-column-box__main-column__listpanel">
+                    <!-- Report View -->
                     <div class="sd-column-box__main-column__items"
-                         ng-if="currentReport.id && flags.contentView == 'report'"
-                         ng-include="currentReport.contentTemplate || 'analytics-report-basic.html'"
-                         ng-controller="currentReport.controller"
+                         ng-if="flags.contentView == 'report'"
+                         ng-include="'analytics-report-basic.html'"
                      ></div>
 
+                    <!-- Schedule View -->
                     <div sd-scheduled-reports-list
                          class="sd-column-box__main-column__items"
-                         ng-if="currentReport.id && currentReport.allowScheduling && flags.contentView == 'schedules'"
+                         ng-if="currentReport.allowScheduling && flags.contentView == 'schedules'"
                          data-current-report="currentReport"
                          data-current-saved-report="savedReportForSchedule"
                          data-clear-saved-report="clearSavedReportForSchedule"
