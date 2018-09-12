@@ -58,7 +58,6 @@ angular.module('superdesk.analytics.source-category-report', [])
             id: 'source_category_report',
             label: gettext('Source Category'),
             sidePanelTemplate: 'source-category-report-panel.html',
-            controller: ctrl.SourceCategoryController,
             priority: 500,
             privileges: {source_category_report: 1},
             allowScheduling: true,
