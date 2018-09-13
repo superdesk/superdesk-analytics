@@ -123,10 +123,12 @@ class ScheduledReportsResource(Resource):
 class ScheduledReportsService(BaseService):
     def on_created(self, docs):
         for doc in docs:
+            self.set_schedule(doc)
             self._validate_on_create_or_update(doc)
             self._push_notification(doc, 'create')
 
     def on_updated(self, updates, original):
+        self.set_schedule(updates)
         doc = deepcopy(original)
         doc.update(updates)
         self._validate_on_create_or_update(doc)
@@ -134,6 +136,49 @@ class ScheduledReportsService(BaseService):
 
     def on_deleted(self, doc):
         self._push_notification(doc, 'delete')
+
+    def set_schedule(self, updates):
+        # Sometimes 'schedule' is not in the updates provided
+        # Eve/Cerberus will ensure the document has 'schedule' set
+        # as it is configured as required
+        if not updates.get('schedule'):
+            return
+
+        schedule = updates.get('schedule') or {}
+        hour = schedule.get('hour', -1)
+        day = schedule.get('day', -1)
+        week_days = schedule.get('week_days') or []
+        frequency = schedule.get('frequency') or 'hourly'
+
+        # Fix issue with incorrect schedule attributes being stored
+        if frequency == 'hourly':
+            updates['schedule'].update({
+                'frequency': 'hourly',
+                'hour': -1,
+                'day': -1,
+                'week_days': []
+            })
+        elif frequency == 'daily':
+            updates['schedule'].update({
+                'frequency': 'daily',
+                'hour': hour,
+                'day': -1,
+                'week_days': []
+            })
+        elif frequency == 'weekly':
+            updates['schedule'].update({
+                'frequency': 'weekly',
+                'hour': hour,
+                'day': -1,
+                'week_days': week_days
+            })
+        elif frequency == 'monthly':
+            updates['schedule'].update({
+                'frequency': 'monthly',
+                'hour': hour,
+                'day': day,
+                'week_days': []
+            })
 
     @staticmethod
     def _validate_on_create_or_update(doc):

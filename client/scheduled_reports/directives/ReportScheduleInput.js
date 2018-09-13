@@ -40,16 +40,7 @@ export function ReportScheduleInput(gettext, _) {
                     value: 'monthly',
                 }];
 
-                scope.weekdays = {
-                    Monday: false,
-                    Tuesday: false,
-                    Wednesday: false,
-                    Thursday: false,
-                    Friday: false,
-                    Saturday: false,
-                    Sunday: false,
-                };
-
+                scope.resetWeekdays();
                 (scope.schedule.week_days || []).forEach((day) => {
                     scope.weekdays[day] = true;
                 });
@@ -98,12 +89,25 @@ export function ReportScheduleInput(gettext, _) {
                         showDay: false,
                         showWeekDay: false,
                     };
+
+                    schedule.hour = -1;
+                    schedule.day = -1;
+                    schedule.week_days = [];
+                    scope.resetWeekdays();
                 } else if (schedule.frequency === 'daily') {
                     scope.flags = {
                         showHour: true,
                         showDay: false,
                         showWeekDay: false,
                     };
+
+                    schedule.day = -1;
+                    schedule.week_days = [];
+                    scope.resetWeekdays();
+
+                    if (_.get(schedule, 'hour', -1) < 0) {
+                        schedule.hour = 0;
+                    }
                 } else if (schedule.frequency === 'weekly') {
                     scope.flags = {
                         showHour: true,
@@ -111,21 +115,31 @@ export function ReportScheduleInput(gettext, _) {
                         showWeekDay: true,
                     };
 
+                    schedule.day = -1;
+                    (scope.schedule.week_days || []).forEach((day) => {
+                        scope.weekdays[day] = true;
+                    });
                     scope.onWeekdayChange();
+                    if (_.get(schedule, 'hour', -1) < 0) {
+                        schedule.hour = 0;
+                    }
                 } else if (schedule.frequency === 'monthly') {
                     scope.flags = {
                         showHour: true,
                         showDay: true,
                         showWeekDay: false,
                     };
-                }
 
-                if (scope.flags.showHour && (!schedule.hour || schedule.hour < 0)) {
-                    schedule.hour = 0;
-                }
+                    schedule.week_days = [];
+                    scope.resetWeekdays();
 
-                if (scope.flags.showDay && (!schedule.day || schedule.day < 0)) {
-                    schedule.day = 1;
+                    if (_.get(schedule, 'hour', -1) < 0) {
+                        schedule.hour = 0;
+                    }
+
+                    if (_.get(schedule, 'day', -1) < 1) {
+                        schedule.day = 1;
+                    }
                 }
             };
 
@@ -150,6 +164,23 @@ export function ReportScheduleInput(gettext, _) {
                     ngModel.$setValidity('weekDayRequired', true);
                     scope.weekdayError = null;
                 }
+            };
+
+            /**
+             * @ngdoc method
+             * @name sdReportScheduleInput#resetWeekdays
+             * @description Turns all weekday selections off
+             */
+            scope.resetWeekdays = () => {
+                scope.weekdays = {
+                    Monday: false,
+                    Tuesday: false,
+                    Wednesday: false,
+                    Thursday: false,
+                    Friday: false,
+                    Saturday: false,
+                    Sunday: false,
+                };
             };
 
             /**

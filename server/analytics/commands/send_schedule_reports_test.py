@@ -244,11 +244,8 @@ class SendScheduleReportTestCase(TestCase):
                 'active': True
             }])
 
-            now_local = to_local('2018-06-30T00')
-            now_utc = local_to_utc(app.config['DEFAULT_TIMEZONE'], now_local)
-
             with self.app.mail.record_messages() as outbox:
-                SendScheduledReports().run(now_utc)
+                SendScheduledReports().run('2018-06-30T00')
 
                 self.assertEqual(len(outbox), 1)
 
@@ -291,11 +288,8 @@ class SendScheduleReportTestCase(TestCase):
                 'active': True
             }])
 
-            now_local = to_local('2018-06-30T00')
-            now_utc = local_to_utc(app.config['DEFAULT_TIMEZONE'], now_local)
-
             with self.app.mail.record_messages() as outbox:
-                SendScheduledReports().run(now_utc)
+                SendScheduledReports().run('2018-06-30T00')
 
                 self.assertEqual(len(outbox), 1)
 
