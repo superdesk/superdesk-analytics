@@ -142,8 +142,12 @@ export function SavedReportList(
                 if (scope.searchText || scope.searchText !== '') {
                     const searchString = scope.searchText.toLowerCase();
                     const filterReports = (report) => (
-                        report.name.toLowerCase().indexOf(searchString) >= 0 ||
-                        report.description.toLowerCase().indexOf(searchString) >= 0
+                        _.get(report, 'name', '')
+                            .toLowerCase()
+                            .indexOf(searchString) >= 0 ||
+                        _.get(report, 'description', '')
+                            .toLowerCase()
+                            .indexOf(searchString) >= 0
                     );
 
                     scope.filteredUserReports = _.filter(scope.userReports, filterReports);
