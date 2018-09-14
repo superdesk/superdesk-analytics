@@ -23,7 +23,7 @@ export function SearchReport(_, config, moment, api, $q) {
     /**
      * @ngdoc method
      * @name SearchReport#formatDate
-     * @param {String} date - Date string in the format from config.view.dateformat
+     * @param {String} date - Date string in the format from config.model.dateformat
      * @param {Boolean} endOfDay - If true, sets the time to the end of the day
      * @return {String}|null
      * @description If date is supplied, then returns a date/time string used in elastic query
@@ -33,7 +33,7 @@ export function SearchReport(_, config, moment, api, $q) {
             const timeSuffix = endOfDay ? 'T23:59:59' : 'T00:00:00';
             const utcOffset = getUTCOffset();
 
-            return moment(date, config.view.dateformat).format('YYYY-MM-DD') + timeSuffix + utcOffset;
+            return moment(date, config.model.dateformat).format('YYYY-MM-DD') + timeSuffix + utcOffset;
         }
 
         return null;
