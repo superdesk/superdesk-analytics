@@ -292,15 +292,13 @@ export function SourceCategoryController(
     /**
      * @ngdoc method
      * @name SourceCategoryController#runQuery
+     * @param {Object} params - Parameters used for searching the API
      * @returns {Promise<Object>} - Search API query response
      * @description Sends the current form parameters to the search API
      */
-    this.runQuery = () => searchReport.query(
+    this.runQuery = (params) => searchReport.query(
         'source_category_report',
-        {
-            ...$scope.currentParams.params,
-            category_field: 'name',
-        }
+        params
     );
 
     /**
@@ -362,7 +360,10 @@ export function SourceCategoryController(
     $scope.generate = () => {
         $scope.changeContentView('report');
 
-        this.runQuery().then((data) => {
+        this.runQuery({
+            ...$scope.currentParams.params,
+            category_field: 'name',
+        }).then((data) => {
             const reportData = Object.assign({}, data, {
                 chart_type: $scope.currentParams.params.chart_type,
                 title: $scope.currentParams.params.title,
@@ -430,7 +431,10 @@ export function SourceCategoryController(
 
         $scope.currentTab = tabName;
         if ($scope.currentTab === 'filters') {
-            this.runQuery().then((data) => {
+            // If the tab has changed to filters, then reload the list of
+            // categories and sources based on what is available in the
+            // published and archived collections
+            this.runQuery({}).then((data) => {
                 this.updateSources(data);
                 this.updateCategories(data);
             });
