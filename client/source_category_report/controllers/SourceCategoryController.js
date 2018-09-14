@@ -114,8 +114,8 @@ export function SourceCategoryController(
             params: {
                 start_date: moment()
                     .subtract(30, 'days')
-                    .format(config.view.dateformat),
-                end_date: moment().format(config.view.dateformat),
+                    .format(config.model.dateformat),
+                end_date: moment().format(config.model.dateformat),
                 chart_type: $scope.chart_types[0].qcode,
                 repos: {
                     ingest: false,
