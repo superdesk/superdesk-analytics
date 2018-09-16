@@ -13,12 +13,13 @@ from superdesk.logging import logger
 from superdesk.errors import SuperdeskApiError
 from superdesk.emails import SuperdeskMessage
 from superdesk.lock import lock, unlock
-from superdesk.utc import utc_to_local, utcnow
+from superdesk.utc import utc_to_local, utcnow, local_to_utc
 
 from analytics.common import get_report_service, MIME_TYPES, get_mime_type_extension
 from analytics.reports import generate_report
 
 from flask import current_app as app
+from datetime import datetime
 
 
 # Send the email synchronously as celery/kmobo failed to pass binary attachments
@@ -61,39 +62,67 @@ def send_email_report(
                     )
 
         return app.mail.send(msg)
+    except Exception as e:
+        logger.error('Failed to send report email. Error: {}'.format(str(e)))
     finally:
         unlock(lock_id, remove=True)
 
 
 class SendScheduledReports(Command):
     option_list = [
-        Option('--now', '-n', dest='now', required=False)
+        Option(
+            '--now', '-n',
+            dest='now',
+            required=False,
+            help="Local date/hour in the format '%Y-%m-%dT%H', i.e. 2018-09-13T10"
+        )
     ]
 
     def run(self, now=None):
-        schedules = self.get_schedules()
+        if now:
+            now_utc = now if isinstance(now, datetime) else local_to_utc(
+                app.config['DEFAULT_TIMEZONE'],
+                datetime.strptime(now, '%Y-%m-%dT%H')
+            )
+        else:
+            now_utc = utcnow()
 
-        now_utc = now or utcnow()
         now_local = utc_to_local(app.config['DEFAULT_TIMEZONE'], now_utc)
 
         logger.info('Starting to send scheduled reports: {}'.format(now_utc))
+
+        schedules = self.get_schedules()
+
+        if len(schedules) < 1:
+            logger.info('No enabled schedules found, not continuing')
+            return
 
         # Set now to the beginning of the hour (in local time)
         now_local = now_local.replace(minute=0, second=0, microsecond=0)
 
         for scheduled_report in schedules:
-            if not self.should_send_report(scheduled_report, now_local):
-                continue
+            schedule_id = str(scheduled_report.get('_id'))
 
-            attachments = self.get_attachments(scheduled_report)
-            self.send_report(scheduled_report, attachments)
+            try:
+                if not self.should_send_report(scheduled_report, now_local):
+                    logger.info('Scheduled Report {} not scheduled to be sent'.format(schedule_id))
+                    continue
 
-            # Update the _last_sent of the schedule
-            get_resource_service('scheduled_reports').system_update(
-                scheduled_report.get('_id'),
-                {'_last_sent': now_utc},
-                scheduled_report
-            )
+                logger.info('Attempting to send Scheduled Report {}'.format(schedule_id))
+                attachments = self.get_attachments(scheduled_report)
+                self.send_report(scheduled_report, attachments)
+
+                # Update the _last_sent of the schedule
+                get_resource_service('scheduled_reports').system_update(
+                    scheduled_report.get('_id'),
+                    {'_last_sent': now_utc},
+                    scheduled_report
+                )
+            except Exception as e:
+                logger.error('Failed to generate report for {}. Error: {}'.format(
+                    schedule_id,
+                    str(e)
+                ))
 
         logger.info('Completed sending scheduled reports: {}'.format(now_utc))
 
@@ -109,11 +138,7 @@ class SendScheduledReports(Command):
         # Set now to the beginning of the hour (in local time)
         now_to_hour = now_local.replace(minute=0, second=0, microsecond=0)
 
-        schedule = scheduled_report.get('schedule') or {}
-        week_day = now_to_hour.strftime('%A')
-
         last_sent = None
-
         if scheduled_report.get('_last_sent'):
             last_sent = utc_to_local(
                 app.config['DEFAULT_TIMEZONE'],
@@ -124,6 +149,9 @@ class SendScheduledReports(Command):
                 microsecond=0
             )
 
+        # Fix issue with incorrect schedule attributes being stored
+        get_resource_service('scheduled_reports').set_schedule(scheduled_report)
+        schedule = scheduled_report.get('schedule') or {}
         schedule_hour = schedule.get('hour', -1)
         schedule_day = schedule.get('day', -1)
         schedule_week_days = schedule.get('week_days') or []
@@ -135,6 +163,7 @@ class SendScheduledReports(Command):
 
         # Is this report to be run on this week day (i.e. Monday, Wednesday etc)?
         # None or [] = every week day
+        week_day = now_to_hour.strftime('%A')
         if len(schedule_week_days) > 0 and week_day not in schedule_week_days:
             return False
 
@@ -199,17 +228,23 @@ class SendScheduledReports(Command):
             if isinstance(option, dict) and option.get('type') == 'table':
                 mime_type = MIME_TYPES.HTML
 
-            attachments.append({
-                'file': generate_report(
-                    option,
-                    mimetype=mime_type,
-                    base64=False,
-                    width=scheduled_report.get('report_width')
-                ),
-                'mimetype': mime_type,
-                'filename': 'chart_{}.{}'.format(i, get_mime_type_extension(mime_type))
-            })
-            i += 1
+            try:
+                attachments.append({
+                    'file': generate_report(
+                        option,
+                        mimetype=mime_type,
+                        base64=False,
+                        width=scheduled_report.get('report_width')
+                    ),
+                    'mimetype': mime_type,
+                    'filename': 'chart_{}.{}'.format(i, get_mime_type_extension(mime_type))
+                })
+                i += 1
+            except Exception as e:
+                logger.error('Failed to generate chart for {}. Error: {}'.format(
+                    str(scheduled_report.get('_id')),
+                    str(e)
+                ))
 
         return attachments
 
