@@ -1,4 +1,4 @@
-SaveGenerateReport.$inject = ['lodash', 'privileges'];
+SaveGenerateReport.$inject = ['lodash', 'privileges', 'savedReports'];
 
 /**
  * @ngdoc directive
@@ -8,23 +8,24 @@ SaveGenerateReport.$inject = ['lodash', 'privileges'];
  * @requires privileges
  * @description A directive that renders the form generate/clear/save button controls
  */
-export function SaveGenerateReport(_, privileges) {
+export function SaveGenerateReport(_, privileges, savedReports) {
     return {
         template: require('../views/save-generate-report.html'),
         replace: true,
         scope: {
-            clearFilters: '=',
             generateReport: '=',
             currentParams: '=',
             isDirty: '=',
-            currentTemplate: '=',
-            _onReportSaved: '=onReportSaved',
             _viewSchedule: '=viewSchedule'
         },
         link: function(scope, element, attrs, controller) {
             scope.showSaveForm = false;
             scope.canSave = _.get(privileges, 'privileges.saved_reports') === 1 ||
                 _.get(privileges, 'privileges.global_saved_reports') === 1;
+
+            scope.$watch(() => savedReports.currentReport._id, () => {
+                scope.currentTemplate = savedReports.currentReport;
+            });
 
             /**
              * @ngdoc method
@@ -37,27 +38,15 @@ export function SaveGenerateReport(_, privileges) {
 
             /**
              * @ngdoc method
-             * @name sdSaveGenerateReport#onReportSaved
-             * @param {Promise<object>} response - Promise with the API save response
-             * @return {Promise}
-             * @description Toggles the save report form if the save is successful
-             */
-            scope.onReportSaved = (response) => (
-                scope._onReportSaved(
-                    response.then((savedReport) => {
-                        scope.toggleSaveForm();
-                        return savedReport;
-                    })
-                )
-            );
-
-            /**
-             * @ngdoc method
              * @name sdSaveGenerateReport#viewSchedule
              * @description Views schedules for the current saved report
              */
             scope.viewSchedule = () => (
                 scope._viewSchedule(scope.currentTemplate)
+            );
+
+            scope.clearFilters = () => (
+                savedReports.selectReport({})
             );
         },
     };

@@ -33,6 +33,7 @@ export function AnalyticsContainer() {
                 $scope.flags.contentView = $scope.flags.contentView || 'report';
                 $scope.currentReport = {};
                 $scope.reportConfigs = $scope.reportConfigs || _.cloneDeep(defaultReportConfigs);
+                $scope.currentPanel = 'advanced';
 
                 /**
                  * @ngdoc method
@@ -59,6 +60,7 @@ export function AnalyticsContainer() {
 
                     $scope.currentReport = report || null;
                     $scope.reportConfigs = _.cloneDeep(defaultReportConfigs);
+                    $scope.currentPanel = 'advanced';
 
                     if (_.get(report, 'id')) {
                         $location.search('report', report.id);
@@ -184,6 +186,16 @@ export function AnalyticsContainer() {
                  */
                 $scope.viewSchedules = (savedReport) => {
                     $scope.changeContentView('schedules', savedReport);
+                };
+
+                /**
+                 * @ngdoc method
+                 * @name sdAnalyticsContainer#changePanel
+                 * @param {String} panelName - The name of the panel to change to
+                 * @description Changes the current outter tab (panel) to use in the side panel
+                 */
+                $scope.changePanel = (panelName) => {
+                    $scope.currentPanel = panelName;
                 };
 
                 init();

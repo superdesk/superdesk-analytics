@@ -15,6 +15,7 @@ describe('savedReports', () => {
         $provide.value('session', {identity: {_id: 'user1'}});
     }));
 
+    beforeEach(window.module('superdesk.core.notify'));
     beforeEach(window.module('superdesk.analytics.saved_reports'));
     beforeEach(window.module('angularMoment'));
 
@@ -112,7 +113,7 @@ describe('savedReports', () => {
     });
 
     it('can remove a saved report', () => {
-        apiMock.remove = jasmine.createSpy();
+        apiMock.remove = jasmine.createSpy().and.returnValue($q.when({}));
         savedReports.remove({report: 'one'});
 
         expect(apiEndpoint).toHaveBeenCalledWith('saved_reports', {_id: 'user1'});

@@ -43,9 +43,6 @@ export function SavedReportList(
         template: require('../views/saved-report-list.html'),
         scope: {
             reportType: '@',
-            selectReport: '=',
-            currentReport: '=',
-            onReportDeleted: '=',
             createNewSchedule: '=',
             viewSchedules: '=',
         },
@@ -80,6 +77,9 @@ export function SavedReportList(
                 scope.localPrivilege = privileges.privileges.saved_reports === 1;
                 scope.globalPrivilege = privileges.privileges.global_saved_reports === 1;
 
+                scope.currentReport = savedReports.currentReport;
+                scope.selectReport = savedReports.selectReport;
+
                 // Focus the filter input element
                 $timeout(() => {
                     element.find('input')
@@ -110,7 +110,7 @@ export function SavedReportList(
                 modal.confirm(
                     gettext('Are you sure you want to delete the saved report?')
                 ).then(() => (
-                    scope.onReportDeleted(savedReports.remove(report))
+                    savedReports.remove(report)
                 ))
             );
 
