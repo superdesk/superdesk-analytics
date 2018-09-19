@@ -1,4 +1,16 @@
-SavedReportsService.$inject = ['lodash', 'api', 'session', 'moment', 'config'];
+import {getErrorMessage} from '../../utils';
+
+SavedReportsService.$inject = [
+    'lodash',
+    'api',
+    'session',
+    'moment',
+    'config',
+    '$location',
+    'notify',
+    'gettext',
+    '$rootScope'
+];
 
 /**
  * @ngdoc service
@@ -9,7 +21,22 @@ SavedReportsService.$inject = ['lodash', 'api', 'session', 'moment', 'config'];
  * @requires session
  * @description Service to create, read, update and delete saved reports
  */
-export function SavedReportsService(_, api, session, moment, config) {
+export function SavedReportsService(
+    _,
+    api,
+    session,
+    moment,
+    config,
+    $location,
+    notify,
+    gettext,
+    $rootScope
+) {
+    const init = () => {
+        this.currentReport = {};
+        $rootScope.$on('savedreports:update', angular.bind(this, this.onReportUpdated));
+    };
+
     const convertDatesForServer = (params) => {
         const report = _.cloneDeep(params);
 
@@ -103,7 +130,23 @@ export function SavedReportsService(_, api, session, moment, config) {
             convertDatesForServer(_.get(original, '_id') ? original : {}),
             convertDatesForServer(_.pickBy(updates, (value, key) => !key.startsWith('_')))
         )
-            .then((savedReport) => convertDatesForClient(savedReport))
+            .then((savedReport) => {
+                notify.success(gettext('Report saved!'));
+
+                const convertedReport = convertDatesForClient(savedReport);
+
+                // If this is the currently selected report, then update it (mainly for _etag)
+                // Otherwise if no report is selected, then select this newly saved report
+                if (this.isReportSelected(savedReport) || !_.get(this.currentReport, '_id')) {
+                    this.selectReport(convertedReport);
+                }
+
+                return convertedReport;
+            }, (error) => {
+                notify.error(
+                    getErrorMessage(error, gettext('Failed to save report'))
+                );
+            })
     );
 
     /**
@@ -115,5 +158,79 @@ export function SavedReportsService(_, api, session, moment, config) {
      */
     this.remove = (report) => (
         api('saved_reports', session.identity).remove(report)
+            .then(() => {
+                notify.success(gettext('Report deleted!'));
+
+                // If this report is currently selected, then deselect it now
+                // (makes sure that the selected report and url params are cleared)
+                if (this.isReportSelected(report)) {
+                    this.selectReport({});
+                }
+            }, (error) => {
+                notify.error(
+                    getErrorMessage(error, gettext('Failed to delete the saved report'))
+                );
+            })
     );
+
+    this.isReportSelected = (report) => (
+        _.get(this.currentReport, '_id') === _.get(report, '_id')
+    );
+
+    this.selectReport = (selectedReport) => {
+        this.currentReport = _.cloneDeep(selectedReport);
+        $location.search('template', _.get(selectedReport, '_id') || null);
+    };
+
+    this.selectReportFromURL = () => {
+        const reportId = $location.search().template;
+
+        if (!reportId) {
+            return;
+        }
+
+        this.fetchById(reportId)
+            .then((report) => {
+                this.selectReport(report);
+            }, (error) => {
+                if (_.get(error, 'status') === 404) {
+                    notify.error(gettext('Saved report not found!'));
+                } else {
+                    notify.error(
+                        getErrorMessage(error, gettext('Failed to load the saved report!'))
+                    );
+                }
+            });
+    };
+
+    this.onReportUpdated = (event, data) => {
+        const operation = _.get(data, 'operation');
+        const reportId = _.get(data, 'report_id');
+        const sessionId = _.get(data, 'session_id');
+
+        const currentSessionId = _.get(session, 'sessionId');
+        const currentReportId = _.get(this.currentReport, '_id');
+
+        // Ignore this event if it was triggered in this session, or
+        // is not for the currently selected report
+        if (sessionId === currentSessionId || reportId !== currentReportId) {
+            return;
+        }
+
+        if (operation === 'update') {
+            notify.warning(
+                gettext('The Saved Report you are using was updated!')
+            );
+        } else if (operation === 'delete') {
+            // If this report is currently selected, then deselect it now
+            // (makes sure that the selected report and url params are cleared)
+            this.selectReport({});
+
+            notify.warning(
+                gettext('The Saved Report you are using was deleted!')
+            );
+        }
+    };
+
+    init();
 }

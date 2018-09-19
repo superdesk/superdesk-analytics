@@ -15,7 +15,6 @@ export function SaveReportForm(savedReports, privileges, $timeout, _) {
         scope: {
             report: '=',
             toggleSaveForm: '=',
-            onReportSaved: '=',
             currentTemplate: '=',
         },
         link: function(scope, element, attrs, controller) {
@@ -25,9 +24,10 @@ export function SaveReportForm(savedReports, privileges, $timeout, _) {
              * @description Creates or updates the current report parameters
              */
             scope.save = () => {
-                scope.onReportSaved(
-                    savedReports.save(scope.report, scope.currentTemplate)
-                );
+                savedReports.save(scope.report, scope.currentTemplate)
+                    .then(() => {
+                        scope.toggleSaveForm();
+                    });
             };
 
             /**
@@ -36,9 +36,10 @@ export function SaveReportForm(savedReports, privileges, $timeout, _) {
              * @description Duplicates the currently selected saved report
              */
             scope.saveAs = () => {
-                scope.onReportSaved(
-                    savedReports.save(scope.report)
-                );
+                savedReports.save(scope.report)
+                    .then(() => {
+                        scope.toggleSaveForm();
+                    });
             };
 
             // Focus the name input element

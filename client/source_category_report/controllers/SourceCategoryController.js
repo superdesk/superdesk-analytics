@@ -1,4 +1,4 @@
-import {generateSubtitle, getErrorMessage} from '../../utils';
+import {generateSubtitle} from '../../utils';
 
 SourceCategoryController.$inject = [
     '$scope',
@@ -10,9 +10,6 @@ SourceCategoryController.$inject = [
     'notify',
     'sourceCategoryChart',
     'savedReports',
-    '$rootScope',
-    'session',
-    '$location',
 ];
 
 /**
@@ -27,9 +24,6 @@ SourceCategoryController.$inject = [
  * @requires notify
  * @requires sourceCategoryChart
  * @requires savedReports
- * @requires $rootScope
- * @requires session
- * @requires $location
  * @description Controller for Source/Category reports
  */
 export function SourceCategoryController(
@@ -41,10 +35,7 @@ export function SourceCategoryController(
     searchReport,
     notify,
     sourceCategoryChart,
-    savedReports,
-    $rootScope,
-    session,
-    $location
+    savedReports
 ) {
     /**
      * @ngdoc method
@@ -55,15 +46,8 @@ export function SourceCategoryController(
         $scope.categories = [];
         $scope.sources = [];
         $scope.currentTab = 'parameters';
-        $scope.currentPanel = 'advanced';
 
         this.initDefaultParams();
-
-        this.deregisterReportsUpdate = $rootScope.$on(
-            'savedreports:update',
-            angular.bind(this, this.onSavedReportUpdated)
-        );
-        $scope.$on('$destroy', angular.bind(this, this.onDestroy));
     };
 
     /**
@@ -107,8 +91,6 @@ export function SourceCategoryController(
             name: gettext('Table'),
         }];
 
-        $scope.currentTemplate = {};
-
         $scope.currentParams = {
             report: 'source_category_report',
             params: {
@@ -146,21 +128,7 @@ export function SourceCategoryController(
 
         $scope.defaultReportParams = _.cloneDeep($scope.currentParams);
 
-        // If a savedReport (template) is in the url, then load and apply its values
-        if ($location.search().template) {
-            savedReports.fetchById($location.search().template)
-                .then((savedReport) => {
-                    $scope.selectReport(savedReport);
-                }, (error) => {
-                    if (_.get(error, 'status') === 404) {
-                        notify.error(gettext('Saved report not found!'));
-                    } else {
-                        notify.error(
-                            getErrorMessage(error, gettext('Failed to load the saved report!'))
-                        );
-                    }
-                });
-        }
+        savedReports.selectReportFromURL();
     };
 
     /**
@@ -171,123 +139,14 @@ export function SourceCategoryController(
      */
     $scope.isDirty = () => !_.isEqual($scope.currentParams, $scope.defaultReportParams);
 
-    /**
-     * @ngdoc method
-     * @name SourceCategoryController#clearFilters
-     * @description Sets the current report parameters to the default values, and clears the currently
-     * selected saved report/template
-     */
-    $scope.clearFilters = () => {
-        $scope.currentParams = _.cloneDeep($scope.defaultReportParams);
-        $scope.currentTemplate = {};
-        $location.search('template', null);
-    };
-
-    /**
-     * @ngdoc method
-     * @name SourceCategoryController#selectReport
-     * @param {object} selectedReport - The saved report/template to select
-     * @description Selects the provided saved report/template and sets the form values
-     */
-    $scope.selectReport = (selectedReport) => {
-        $scope.currentTemplate = _.cloneDeep(selectedReport);
-        $scope.currentParams = _.cloneDeep(selectedReport);
-        $scope.changePanel('advanced');
-        $location.search('template', _.get(selectedReport, '_id'));
-    };
-
-    /**
-     * @ngdoc method
-     * @name SourceCategoryController#onReportSaved
-     * @param {Promise<object>} response - Promise with the API save response
-     * @description If the save is successful, select that report and notify the user, otherwise notify the
-     * user if the save fails
-     */
-    $scope.onReportSaved = (response) => (
-        response.then((savedReport) => {
-            $scope.selectReport(savedReport);
-            notify.success(gettext('Report saved!'));
-        }, (error) => {
-            notify.error(
-                getErrorMessage(error, gettext('Failed to delete the saved report!'))
-            );
-        })
-    );
-
-    /**
-     * @ngdoc method
-     * @name SourceCategoryController#onReportDeleted
-     * @param {Promise<object>} response - Promise with the API remove response
-     * @description Notify the user of the result when deleting a saved report
-     */
-    $scope.onReportDeleted = (response) => (
-        response.then(() => {
-            notify.success(gettext('Report deleted!'));
-        }, (error) => {
-            notify.error(
-                getErrorMessage(error, gettext('Failed to delete the saved report!'))
-            );
-        })
-    );
-
-    /**
-     * @ngdoc method
-     * @name SourceCategoryController#onDestroy
-     * @description Make sure to reset the defaultReportParams to empty object on controller destruction
-     */
-    this.onDestroy = () => {
-        $scope.defaultReportParams = {};
-        this.deregisterReportsUpdate();
-    };
-
-    /**
-     * @ngdoc method
-     * @name SourceCategoryController#onSavedReportUpdated
-     * @param {object} event - The websocket event object
-     * @param {object} data - The websocket data (saved report details)
-     * @description Respond when a saved report is created/updated/deleted
-     * (from a websocket notification from the server)
-     */
-    this.onSavedReportUpdated = (event, data) => {
-        const reportType = _.get(data, 'report_type');
-        const operation = _.get(data, 'operation');
-        const reportId = _.get(data, 'report_id');
-        const userId = _.get(data, 'user_id');
-        const sessionId = _.get(data, 'session_id');
-
-        const currentUserId = _.get(session, 'identity._id');
-        const currentSessionId = _.get(session, 'sessionId');
-
-        // Disregard if this update is not the same type as this report
-        if (reportType !== 'source_category_report') {
-            return;
+    $scope.$watch(() => savedReports.currentReport._id, (newReportId) => {
+        if (newReportId) {
+            $scope.currentParams = _.cloneDeep(savedReports.currentReport);
+            $scope.changePanel('advanced');
+        } else {
+            $scope.currentParams = _.cloneDeep($scope.defaultReportParams);
         }
-
-        // Disregard if this update is not for the currently used template
-        if (reportId !== _.get($scope.currentTemplate, '_id')) {
-            return;
-        }
-
-        if (operation === 'delete') {
-            // If the saved report was deleted, then unset the currentTemplate
-            $scope.$applyAsync(() => {
-                $scope.currentTemplate = {};
-
-                // Remove the saved report ID from the url parameters
-                $location.search('template', null);
-
-                if (sessionId !== currentSessionId) {
-                    notify.warning(gettext('The Saved Report you are using was deleted!'));
-                }
-            });
-        } else if (operation === 'update' && userId !== currentUserId) {
-            // Otherwise if this report was updated in a different session,
-            // then notify the current user
-            $scope.$applyAsync(() => {
-                notify.warning(gettext('The Saved Report you are using was updated!'));
-            });
-        }
-    };
+    });
 
     /**
      * @ngdoc method
@@ -439,16 +298,6 @@ export function SourceCategoryController(
                 this.updateCategories(data);
             });
         }
-    };
-
-    /**
-     * @ngdoc method
-     * @name SourceCategoryController#changePanel
-     * @param {String} panelName - The name of the panel to change to
-     * @description Changes the current outter tab (panel) to use in the side panel
-     */
-    $scope.changePanel = (panelName) => {
-        $scope.currentPanel = panelName;
     };
 
     this.init();
