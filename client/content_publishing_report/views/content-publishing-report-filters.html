@@ -1,0 +1,128 @@
+<div class="form__row">
+    <div class="sd-line-input sd-line-input--no-margin">
+        <label class="sd-line-input__label" translate>Desks</label>
+        <div id="filter-desks"
+             sd-meta-terms
+             class="data"
+             data-item="desks"
+             data-field="selected"
+             data-unique="_id"
+             data-list="desks.list"
+             data-header="true"
+             data-reload-list="true"
+             data-change="onUpdateSelect('desks', '_id')"
+        >
+        </div>
+    </div>
+</div>
+
+<div class="form__row">
+    <div class="sd-line-input sd-line-input--no-margin">
+        <label class="sd-line-input__label" translate>Users</label>
+        <div id="filter-users"
+             sd-meta-terms
+             class="data"
+             data-item="users"
+             data-field="selected"
+             data-unique="_id"
+             data-list="users.list"
+             data-header="true"
+             data-reload-list="true"
+             data-change="onUpdateSelect('users', '_id')"
+        >
+        </div>
+    </div>
+</div>
+
+<div class="form__row">
+    <div class="sd-line-input sd-line-input--no-margin">
+        <label class="sd-line-input__label" translate>Categories</label>
+        <div id="filter-categories"
+             sd-meta-terms
+             class="data"
+             data-item="categories"
+             data-field="selected"
+             data-unique="qcode"
+             data-list="categories.list"
+             data-header="true"
+             data-reload-list="true"
+             data-change="onUpdateSelect('categories', 'qcode')"
+        >
+        </div>
+    </div>
+</div>
+
+<div class="form__row">
+    <div class="sd-line-input sd-line-input--no-margin">
+        <label class="sd-line-input__label" translate>Genre</label>
+        <div id="filter-genres"
+             sd-meta-terms
+             class="data"
+             data-item="genre"
+             data-field="selected"
+             data-unique="qcode"
+             data-list="genre.list"
+             data-header="true"
+             data-reload-list="true"
+             data-change="onUpdateSelect('genre', 'qcode')"
+        >
+        </div>
+    </div>
+</div>
+
+<div class="form__row">
+    <div class="sd-line-input sd-line-input--no-margin">
+        <label class="sd-line-input__label" translate>Source</label>
+        <div id="filter-sources"
+             sd-meta-terms
+             class="data"
+             data-item="sources"
+             data-field="selected"
+             data-unique="qcode"
+             data-list="sources.list"
+             data-header="true"
+             data-reload-list="true"
+             data-change="onUpdateSelect('sources', 'qcode')"
+        >
+        </div>
+    </div>
+</div>
+
+<div sd-toggle-box data-title="{{:: 'Urgency' | translate}}" data-open="false">
+    <div class="form__row" ng-repeat="urg in urgency.list | orderBy: 'name'">
+        <button sd-check
+                ng-model="urgency.selected[urg.qcode]"
+                ng-change="onUpdateUrgency()"
+        >
+            {{:: urg.name | translate}}
+        </button>
+    </div>
+</div>
+
+<div sd-toggle-box data-title="{{:: 'Content State' | translate}}" data-open="false">
+    <div class="form__row">
+        <div class="sd-line-input sd-line-input--no-margin">
+            <label class="sd-line-input__label" translate>Excluded States</label>
+            <div class="flex-grid flex-grid--boxed-small flex-grid--wrap-items flex-grid--small-2">
+                <button ng-repeat="state in item_states"
+                        ng-model="currentParams.params.must_not.states[state.qcode]"
+                        sd-check
+                        data-label-position="inside"
+                >
+                    {{:: state.name | translate}}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="form__row">
+        <div class="sd-line-input">
+            <button sd-check
+                    ng-model="currentParams.params.must_not.rewrites"
+                    data-label-position="inside"
+            >
+                {{:: 'Exclude Rewrites' | translate}}
+            </button>
+        </div>
+    </div>
+</div>

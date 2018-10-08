@@ -1,0 +1,49 @@
+<div class="form__row form__row--no-padding">
+    <div class="sd-line-input">
+        <label class="sd-line-input__label" translate>Title</label>
+        <textarea
+                class="sd-line-input__input"
+                placeholder="{{:: generateTitlePlaceholder() | translate}}"
+                ng-model="currentParams.params.chart.title"
+                rows="2"
+        ></textarea>
+    </div>
+</div>
+
+<div class="form__row">
+    <div class="sd-line-input">
+        <label class="sd-line-input__label" translate>Subtitle</label>
+        <input
+                class="sd-line-input__input"
+                placeholder="{{:: generateSubtitlePlaceholder() | translate }}"
+                ng-model="currentParams.params.chart.subtitle" type="text"
+        />
+    </div>
+</div>
+
+<div class="form__row">
+    <div class="sd-line-input sd-line-input--no-margin">
+        <label class="sd-line-input__label" translate>Chart Type</label>
+        <div class="flex-grid flex-grid--boxed-small flex-grid--wrap-items flex-grid--small-2">
+            <button ng-repeat="type in chart_types"
+                    ng-model="currentParams.params.chart.type"
+                    sd-check
+                    type="radio"
+                    ng-value="{{type.qcode}}"
+                    data-label-position="inside"
+            >
+                {{:: type.name | translate}}
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="form__row">
+    <div class="sd-line-input sd-line-input--is-select">
+        <label class="sd-line-input__label" translate>Order Categories In:</label>
+        <select class="sd-line-input__select" ng-model="currentParams.params.chart.sort_order">
+            <option value="desc" translate>Descending Order of Stories</option>
+            <option value="asc" translate>Ascending Order of Stores</option>
+        </select>
+    </div>
+</div>

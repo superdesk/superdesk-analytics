@@ -25,6 +25,7 @@ import './content_quota_widget';
 import './source_category_report';
 import './saved_reports';
 import './scheduled_reports';
+import './content_publishing_report';
 
 angular.module('superdesk.analytics.reports', [])
     .provider('reports', svc.ReportsProvider);
@@ -53,6 +54,7 @@ export default angular.module('superdesk.analytics', [
     'superdesk.analytics.track-activity-widget', 'superdesk.analytics.activity-report-widget',
     'superdesk.analytics.content-quota-report', 'superdesk.analytics.content-quota-widget',
     'superdesk.analytics.source-category-report',
+    'superdesk.analytics.content-publishing-report',
     'superdesk-ui'
 ])
     .service('analyticsWidgetSettings', svc.AnalyticsWidgetSettings)
