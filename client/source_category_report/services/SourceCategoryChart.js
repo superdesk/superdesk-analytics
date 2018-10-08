@@ -1,21 +1,19 @@
 import {generateSubtitle} from '../../utils';
 
-SourceCategoryChart.$inject = ['lodash', 'chartManager', 'gettext', 'moment', 'config', '$interpolate', 'notify'];
+SourceCategoryChart.$inject = ['lodash', 'gettext', 'moment', 'config', '$interpolate'];
 
 /**
  * @ngdoc service
  * @module superdesk.apps.analytics.source-category-report
  * @name SourceCategoryChart
  * @requires lodash
- * @requires chartManager
  * @requires gettext
  * @requires moment
  * @requires config
  * @requires $interpolate
- * @requires notify
  * @description Source/Category chart generation service
  */
-export function SourceCategoryChart(_, chartManager, gettext, moment, config, $interpolate, notify) {
+export function SourceCategoryChart(_, gettext, moment, config, $interpolate) {
     /**
      * @ngdoc method
      * @name SourceCategoryChart#getCategories

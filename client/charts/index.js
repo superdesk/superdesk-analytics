@@ -32,6 +32,7 @@ angular.module('superdesk.analytics.charts', [])
     .value('Highcharts', Highcharts)
 
     .service('chartManager', svc.ChartManager)
+    .service('chartConfig', svc.ChartConfig)
 
     .directive('sdChart', directives.Chart)
     .directive('sdChartContainer', directives.ChartContainer);

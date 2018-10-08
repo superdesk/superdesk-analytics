@@ -1,14 +1,15 @@
-ReportPreviewProxy.$inject = ['$compile'];
+ReportPreviewProxy.$inject = ['$compile', 'lodash'];
 
 /**
  * @ngdoc directive
  * @module superdesk.apps.analytics.scheduled_reports
  * @name sdReportPreviewProxy
  * @requires $compile
+ * @requires lodash
  * @description A directive that compiles and renders a preview directive based on the
  * provided report in the scope
  */
-export function ReportPreviewProxy($compile) {
+export function ReportPreviewProxy($compile, _) {
     return {
         scope: {
             report: '=',
@@ -21,9 +22,14 @@ export function ReportPreviewProxy($compile) {
              * for the provided report
              */
             const constructTemplate = () => {
-                const template = `<div sd-${scope.report.report.replace(/_/g, '-')}-preview ></div>`;
+                const reportType = _.get(scope.report, 'report');
 
-                element.replaceWith($compile(template)(scope));
+                if (reportType) {
+                    const directive = `sda-${reportType.replace(/_/g, '-')}-preview`;
+                    const template = `<div ${directive}></div>`;
+
+                    element.replaceWith($compile(template)(scope));
+                }
             };
 
             scope.$watch('report', constructTemplate);

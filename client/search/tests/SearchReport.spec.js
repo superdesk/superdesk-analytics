@@ -21,18 +21,13 @@ describe('searchReport', () => {
         spyOn(api, 'query').and.returnValue($q.when({_items: []}));
     }));
 
-    it('can call api save for source_category_report endpoint', () => {
-        searchReport.query('source_category_report', {});
-
-        expect(api.query).toHaveBeenCalledWith('source_category_report', {
+    const expectBoolQuery = (endpoint, result) => {
+        expect(api.query).toHaveBeenCalledWith(endpoint, {
             source: {
                 query: {
                     filtered: {
                         filter: {
-                            bool: {
-                                must: [],
-                                must_not: [],
-                            },
+                            bool: result,
                         },
                     },
                 },
@@ -40,6 +35,15 @@ describe('searchReport', () => {
                 size: 0,
             },
             repo: '',
+        });
+    };
+
+    it('can call api save for source_category_report endpoint', () => {
+        searchReport.query('source_category_report', {});
+
+        expectBoolQuery('source_category_report', {
+            must: [],
+            must_not: [],
         });
     });
 
@@ -55,24 +59,9 @@ describe('searchReport', () => {
             },
         });
 
-        expect(api.query).toHaveBeenCalledWith('source_category_report', {
-            source: {
-                query: {
-                    filtered: {
-                        filter: {
-                            bool: {
-                                must: [],
-                                must_not: [
-                                    {terms: {state: ['killed', 'corrected', 'recalled']}},
-                                ],
-                            },
-                        },
-                    },
-                },
-                sort: [{versioncreated: 'desc'}],
-                size: 0,
-            },
-            repo: '',
+        expectBoolQuery('source_category_report', {
+            must: [],
+            must_not: [{terms: {state: ['killed', 'corrected', 'recalled']}}],
         });
     });
 
@@ -112,114 +101,138 @@ describe('searchReport', () => {
             start_date: '01/06/2018',
             end_date: '30/06/2018',
         });
-        expect(api.query).toHaveBeenCalledWith('source_category_report', {
-            source: {
-                query: {
-                    filtered: {
-                        filter: {
-                            bool: {
-                                must: [{
-                                    range: {
-                                        versioncreated: {
-                                            lt: '2018-06-30T23:59:59+0100',
-                                            gte: '2018-06-01T00:00:00+0100',
-                                            time_zone: '+01:00',
-                                        },
-                                    },
-                                }],
-                                must_not: [],
-                            },
-                        },
+
+        expectBoolQuery('source_category_report', {
+            must: [{
+                range: {
+                    versioncreated: {
+                        lt: '2018-06-30T23:59:59+0100',
+                        gte: '2018-06-01T00:00:00+0100',
+                        time_zone: '+01:00',
                     },
                 },
-                sort: [{versioncreated: 'desc'}],
-                size: 0,
-            },
-            repo: '',
+            }],
+            must_not: [],
         });
 
         // Yesterday
         searchReport.query('source_category_report', {date_filter: 'yesterday'});
-        expect(api.query).toHaveBeenCalledWith('source_category_report', {
-            source: {
-                query: {
-                    filtered: {
-                        filter: {
-                            bool: {
-                                must: [{
-                                    range: {
-                                        versioncreated: {
-                                            lt: 'now/d',
-                                            gte: 'now-1d/d',
-                                            time_zone: '+01:00',
-                                        },
-                                    },
-                                }],
-                                must_not: [],
-                            },
-                        },
+
+        expectBoolQuery('source_category_report', {
+            must: [{
+                range: {
+                    versioncreated: {
+                        lt: 'now/d',
+                        gte: 'now-1d/d',
+                        time_zone: '+01:00',
                     },
                 },
-                sort: [{versioncreated: 'desc'}],
-                size: 0,
-            },
-            repo: '',
+            }],
+            must_not: [],
         });
 
         // Last Week
         searchReport.query('source_category_report', {date_filter: 'last_week'});
-        expect(api.query).toHaveBeenCalledWith('source_category_report', {
-            source: {
-                query: {
-                    filtered: {
-                        filter: {
-                            bool: {
-                                must: [{
-                                    range: {
-                                        versioncreated: {
-                                            lt: 'now/w',
-                                            gte: 'now-1w/w',
-                                            time_zone: '+01:00',
-                                        },
-                                    },
-                                }],
-                                must_not: [],
-                            },
-                        },
+
+        expectBoolQuery('source_category_report', {
+            must: [{
+                range: {
+                    versioncreated: {
+                        lt: 'now/w',
+                        gte: 'now-1w/w',
+                        time_zone: '+01:00',
                     },
                 },
-                sort: [{versioncreated: 'desc'}],
-                size: 0,
-            },
-            repo: '',
+            }],
+            must_not: [],
         });
 
         // Last Month
         searchReport.query('source_category_report', {date_filter: 'last_month'});
-        expect(api.query).toHaveBeenCalledWith('source_category_report', {
-            source: {
-                query: {
-                    filtered: {
-                        filter: {
-                            bool: {
-                                must: [{
-                                    range: {
-                                        versioncreated: {
-                                            lt: 'now/M',
-                                            gte: 'now-1M/M',
-                                            time_zone: '+01:00',
-                                        },
-                                    },
-                                }],
-                                must_not: [],
-                            },
-                        },
+
+        expectBoolQuery('source_category_report', {
+            must: [{
+                range: {
+                    versioncreated: {
+                        lt: 'now/M',
+                        gte: 'now-1M/M',
+                        time_zone: '+01:00',
                     },
                 },
-                sort: [{versioncreated: 'desc'}],
-                size: 0,
+            }],
+            must_not: [],
+        });
+    });
+
+    it('can generate the date filters using date.filter/start/end', () => {
+        // Range
+        searchReport.query('source_category_report', {
+            dates: {
+                filter: 'range',
+                start: '01/06/2018',
+                end: '30/06/2018',
             },
-            repo: '',
+        });
+
+        expectBoolQuery('source_category_report', {
+            must: [{
+                range: {
+                    versioncreated: {
+                        lt: '2018-06-30T23:59:59+0100',
+                        gte: '2018-06-01T00:00:00+0100',
+                        time_zone: '+01:00',
+                    },
+                },
+            }],
+            must_not: [],
+        });
+
+        // Yesterday
+        searchReport.query('source_category_report', {dates: {filter: 'yesterday'}});
+
+        expectBoolQuery('source_category_report', {
+            must: [{
+                range: {
+                    versioncreated: {
+                        lt: 'now/d',
+                        gte: 'now-1d/d',
+                        time_zone: '+01:00',
+                    },
+                },
+            }],
+            must_not: [],
+        });
+
+        // Last Week
+        searchReport.query('source_category_report', {dates: {filter: 'last_week'}});
+
+        expectBoolQuery('source_category_report', {
+            must: [{
+                range: {
+                    versioncreated: {
+                        lt: 'now/w',
+                        gte: 'now-1w/w',
+                        time_zone: '+01:00',
+                    },
+                },
+            }],
+            must_not: [],
+        });
+
+        // Last Month
+        searchReport.query('source_category_report', {dates: {filter: 'last_month'}});
+
+        expectBoolQuery('source_category_report', {
+            must: [{
+                range: {
+                    versioncreated: {
+                        lt: 'now/M',
+                        gte: 'now-1M/M',
+                        time_zone: '+01:00',
+                    },
+                },
+            }],
+            must_not: [],
         });
     });
 
@@ -235,22 +248,9 @@ describe('searchReport', () => {
             category_field: 'name',
         });
 
-        expect(api.query).toHaveBeenCalledWith('source_category_report', {
-            source: {
-                query: {
-                    filtered: {
-                        filter: {
-                            bool: {
-                                must: [{terms: {'anpa_category.name': ['Finance', 'Advisories']}}],
-                                must_not: [],
-                            },
-                        },
-                    },
-                },
-                sort: [{versioncreated: 'desc'}],
-                size: 0,
-            },
-            repo: '',
+        expectBoolQuery('source_category_report', {
+            must: [{terms: {'anpa_category.name': ['Finance', 'Advisories']}}],
+            must_not: [],
         });
 
         searchReport.query('source_category_report', {
@@ -263,22 +263,9 @@ describe('searchReport', () => {
             },
         });
 
-        expect(api.query).toHaveBeenCalledWith('source_category_report', {
-            source: {
-                query: {
-                    filtered: {
-                        filter: {
-                            bool: {
-                                must: [{terms: {'anpa_category.qcode': ['f', 's']}}],
-                                must_not: [],
-                            },
-                        },
-                    },
-                },
-                sort: [{versioncreated: 'desc'}],
-                size: 0,
-            },
-            repo: '',
+        expectBoolQuery('source_category_report', {
+            must: [{terms: {'anpa_category.qcode': ['f', 's']}}],
+            must_not: [],
         });
     });
 
@@ -293,22 +280,9 @@ describe('searchReport', () => {
             },
         });
 
-        expect(api.query).toHaveBeenCalledWith('source_category_report', {
-            source: {
-                query: {
-                    filtered: {
-                        filter: {
-                            bool: {
-                                must: [{terms: {source: ['AAP', 'AP']}}],
-                                must_not: [],
-                            },
-                        },
-                    },
-                },
-                sort: [{versioncreated: 'desc'}],
-                size: 0,
-            },
-            repo: '',
+        expectBoolQuery('source_category_report', {
+            must: [{terms: {source: ['AAP', 'AP']}}],
+            must_not: [],
         });
     });
 
@@ -319,22 +293,9 @@ describe('searchReport', () => {
             },
         });
 
-        expect(api.query).toHaveBeenCalledWith('source_category_report', {
-            source: {
-                query: {
-                    filtered: {
-                        filter: {
-                            bool: {
-                                must: [],
-                                must_not: [{exists: {field: 'rewrite_of'}}],
-                            },
-                        },
-                    },
-                },
-                sort: [{versioncreated: 'desc'}],
-                size: 0,
-            },
-            repo: '',
+        expectBoolQuery('source_category_report', {
+            must: [],
+            must_not: [{exists: {field: 'rewrite_of'}}],
         });
 
         searchReport.query('source_category_report', {
@@ -343,22 +304,279 @@ describe('searchReport', () => {
             },
         });
 
-        expect(api.query).toHaveBeenCalledWith('source_category_report', {
-            source: {
-                query: {
-                    filtered: {
-                        filter: {
-                            bool: {
-                                must: [],
-                                must_not: [],
-                            },
-                        },
+        expectBoolQuery('source_category_report', {
+            must: [],
+            must_not: [],
+        });
+    });
+
+    it('can generate desk filters', () => {
+        searchReport.query(
+            'source_category_report',
+            {must: {desks: ['desk1', 'desk2']}}
+        );
+
+        expectBoolQuery('source_category_report', {
+            must: [{terms: {'task.desk': ['desk1', 'desk2']}}],
+            must_not: [],
+        });
+
+        searchReport.query(
+            'source_category_report',
+            {must_not: {desks: ['desk1', 'desk2']}}
+        );
+
+        expectBoolQuery('source_category_report', {
+            must: [],
+            must_not: [{terms: {'task.desk': ['desk1', 'desk2']}}],
+        });
+    });
+
+    it('can generate user filters', () => {
+        searchReport.query(
+            'source_category_report',
+            {must: {users: ['user1', 'user2']}}
+        );
+
+        expectBoolQuery('source_category_report', {
+            must: [{terms: {'task.user': ['user1', 'user2']}}],
+            must_not: [],
+        });
+
+        searchReport.query(
+            'source_category_report',
+            {must_not: {users: ['user1', 'user2']}}
+        );
+
+        expectBoolQuery('source_category_report', {
+            must: [],
+            must_not: [{terms: {'task.user': ['user1', 'user2']}}],
+        });
+    });
+
+    it('can generate urgency filters', () => {
+        searchReport.query(
+            'source_category_report',
+            {must: {urgency: [1, 3]}}
+        );
+
+        expectBoolQuery('source_category_report', {
+            must: [{terms: {urgency: [1, 3]}}],
+            must_not: [],
+        });
+
+        searchReport.query(
+            'source_category_report',
+            {must_not: {urgency: [1, 3]}}
+        );
+
+        expectBoolQuery('source_category_report', {
+            must: [],
+            must_not: [{terms: {urgency: [1, 3]}}],
+        });
+    });
+
+    describe('can send query as param object', () => {
+        it('param object for dates', () => {
+            searchReport.query(
+                'source_category_report',
+                {
+                    date_filter: 'range',
+                    start_date: '01/06/2018',
+                    end_date: '30/06/2018',
+                },
+                true
+            );
+
+            expect(api.query).toHaveBeenCalledWith('source_category_report', {
+                params: {
+                    date_filter: 'range',
+                    start_date: '2018-06-01',
+                    end_date: '2018-06-30',
+                    must: {},
+                    must_not: {},
+                    chart: {},
+                },
+            });
+
+            searchReport.query(
+                'source_category_report',
+                {
+                    date_filter: 'yesterday',
+                    start_date: '01/06/2018',
+                    end_date: '30/06/2018',
+                },
+                true
+            );
+
+            expect(api.query).toHaveBeenCalledWith('source_category_report', {
+                params: {
+                    date_filter: 'yesterday',
+                    must: {},
+                    must_not: {},
+                    chart: {},
+                },
+            });
+
+            searchReport.query(
+                'source_category_report',
+                {
+                    dates: {
+                        filter: 'range',
+                        start: '01/06/2018',
+                        end: '30/06/2018',
+                    }
+                },
+                true
+            );
+
+            expect(api.query).toHaveBeenCalledWith('source_category_report', {
+                params: {
+                    dates: {
+                        filter: 'range',
+                        start: '2018-06-01',
+                        end: '2018-06-30',
+                    },
+                    must: {},
+                    must_not: {},
+                    chart: {},
+                },
+            });
+
+            searchReport.query(
+                'source_category_report',
+                {
+                    dates: {
+                        filter: 'yesterday',
+                        start: '01/06/2018',
+                        end: '30/06/2018',
+                    }
+                },
+                true
+            );
+
+            expect(api.query).toHaveBeenCalledWith('source_category_report', {
+                params: {
+                    dates: {filter: 'yesterday'},
+                    must: {},
+                    must_not: {},
+                    chart: {},
+                },
+            });
+        });
+
+        it('param object for filtered must/must_not', () => {
+            searchReport.query(
+                'source_category_report',
+                {
+                    dates: {filter: 'yesterday'},
+                    must: {
+                        desks: [],
+                        users: ['user1', 'user2'],
+                        states: {
+                            published: true,
+                            killed: false,
+                        }
+                    },
+                    must_not: {
+                        urgency: [],
+                        categories: ['a', 'b'],
+                        rewrites: false,
                     },
                 },
-                sort: [{versioncreated: 'desc'}],
-                size: 0,
-            },
-            repo: '',
+                true
+            );
+
+            expect(api.query).toHaveBeenCalledWith('source_category_report', {
+                params: {
+                    dates: {filter: 'yesterday'},
+                    must: {
+                        users: ['user1', 'user2'],
+                        states: {published: true}
+                    },
+                    must_not: {
+                        categories: ['a', 'b'],
+                    },
+                    chart: {},
+                },
+            });
+        });
+
+        it('includes aggregations', () => {
+            searchReport.query(
+                'source_category_report',
+                {
+                    dates: {filter: 'yesterday'},
+                    aggs: {
+                        group: {field: 'anpa_category.qcode'},
+                        subgroup: {field: 'urgency'},
+                    },
+                },
+                true
+            );
+
+            expect(api.query).toHaveBeenCalledWith('source_category_report', {
+                params: {
+                    dates: {filter: 'yesterday'},
+                    must: {},
+                    must_not: {},
+                    chart: {},
+                },
+                aggs: {
+                    group: {field: 'anpa_category.qcode'},
+                    subgroup: {field: 'urgency'},
+                },
+            });
+        });
+
+        it('includes repos', () => {
+            searchReport.query(
+                'source_category_report',
+                {
+                    dates: {filter: 'yesterday'},
+                    repos: {
+                        ingest: false,
+                        archive: false,
+                        published: true,
+                        archived: true,
+                    },
+                },
+                true
+            );
+
+            expect(api.query).toHaveBeenCalledWith('source_category_report', {
+                params: {
+                    dates: {filter: 'yesterday'},
+                    must: {},
+                    must_not: {},
+                    chart: {},
+                },
+                repo: {
+                    published: true,
+                    archived: true,
+                },
+            });
+        });
+
+        it('includes return_type', () => {
+            searchReport.query(
+                'source_category_report',
+                {
+                    dates: {filter: 'yesterday'},
+                    return_type: 'highcharts_config',
+                },
+                true
+            );
+
+            expect(api.query).toHaveBeenCalledWith('source_category_report', {
+                params: {
+                    dates: {filter: 'yesterday'},
+                    must: {},
+                    must_not: {},
+                    chart: {},
+                },
+                return_type: 'highcharts_config',
+            });
         });
     });
 });
