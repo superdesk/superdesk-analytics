@@ -11,15 +11,17 @@
 from superdesk import Command, command, Option, get_resource_service
 from superdesk.logging import logger
 from superdesk.errors import SuperdeskApiError
-from superdesk.emails import SuperdeskMessage
 from superdesk.lock import lock, unlock
 from superdesk.utc import utc_to_local, utcnow, local_to_utc
 
 from analytics.common import get_report_service, MIME_TYPES, get_mime_type_extension
 from analytics.reports import generate_report
+from analytics.emails import AnalyticsMessage
 
-from flask import current_app as app
+from flask import current_app as app, render_template
 from datetime import datetime
+from uuid import uuid4
+from email.charset import Charset, QP
 
 
 # Send the email synchronously as celery/kmobo failed to pass binary attachments
@@ -40,30 +42,72 @@ def send_email_report(
         return
 
     try:
-        msg = SuperdeskMessage(
+        charset = Charset('utf-8')
+        charset.header_encoding = QP
+        charset.body_encoding = QP
+
+        msg = AnalyticsMessage(
             subject,
             sender=sender,
             recipients=recipients,
             cc=cc,
             bcc=bcc,
             body=text_body,
-            html=html_body
+            charset=charset
         )
+
+        reports = []
 
         if attachments is not None:
             for attachment in attachments:
-                if attachment.get('mimetype') == MIME_TYPES.HTML:
-                    msg.html += attachment.get('file')
-                else:
-                    msg.attach(
-                        attachment.get('filename'),
-                        attachment.get('mimetype'),
-                        attachment.get('file')
-                    )
+                try:
+                    uuid = str(uuid4())
+                    if attachment.get('mimetype') == MIME_TYPES.HTML:
+                        reports.append({
+                            'id': uuid,
+                            'type': 'html',
+                            'html': attachment.get('file')
+                        })
+                    else:
+                        msg.attach(
+                            filename=attachment.get('filename'),
+                            content_type='{}; name="{}"'.format(attachment.get('mimetype'), attachment.get('filename')),
+                            data=attachment.get('file'),
+                            disposition='attachment',
+                            headers={
+                                'Content-ID': '<{}>'.format(uuid),
+                                'X-Attachment-Id': uuid
+                            }.items()
+                        )
+
+                        reports.append({
+                            'id': uuid,
+                            'type': 'image',
+                            'filename': attachment.get('filename'),
+                            'width': attachment.get('width')
+                        })
+
+                        msg.body += '\n[image: {}]'.format(attachment.get('filename'))
+                except Exception as e:
+                    logger.error('Failed to generate attachment.')
+                    logger.exception(e)
+
+        msg.body = render_template(
+            "analytics_scheduled_report.txt",
+            text_body=text_body,
+            reports=reports
+        )
+
+        msg.html = render_template(
+            "analytics_scheduled_report.html",
+            html_body=html_body,
+            reports=reports
+        )
 
         return app.mail.send(msg)
     except Exception as e:
         logger.error('Failed to send report email. Error: {}'.format(str(e)))
+        logger.exception(e)
     finally:
         unlock(lock_id, remove=True)
 
@@ -123,6 +167,7 @@ class SendScheduledReports(Command):
                     schedule_id,
                     str(e)
                 ))
+                logger.exception(e)
 
         logger.info('Completed sending scheduled reports: {}'.format(now_utc))
 
@@ -237,7 +282,8 @@ class SendScheduledReports(Command):
                         width=scheduled_report.get('report_width')
                     ),
                     'mimetype': mime_type,
-                    'filename': 'chart_{}.{}'.format(i, get_mime_type_extension(mime_type))
+                    'filename': 'chart_{}.{}'.format(i, get_mime_type_extension(mime_type)),
+                    'width': scheduled_report.get('report_width')
                 })
                 i += 1
             except Exception as e:

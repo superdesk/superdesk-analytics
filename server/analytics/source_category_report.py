@@ -221,8 +221,8 @@ class SourceCategoryReportService(BaseReportService):
             for source_name, source_data in sources.items():
                 for category_name, category_count in source_data.items():
                     source_config = configs.get(category_name) or {}
-                    series = source_config.get('series')[0]
-                    series.get('data').push({
+                    series_config = source_config.get('series')[0]
+                    series_config.get('data').append({
                         'name': source_name,
                         'y': category_count,
                         'color': colours[i]
