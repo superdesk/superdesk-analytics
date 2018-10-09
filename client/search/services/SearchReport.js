@@ -1,4 +1,4 @@
-SearchReport.$inject = ['lodash', 'config', 'moment', 'api', '$q'];
+SearchReport.$inject = ['lodash', 'config', 'moment', 'api', '$q', 'gettext', 'gettextCatalog'];
 
 /**
  * @ngdoc service
@@ -9,15 +9,199 @@ SearchReport.$inject = ['lodash', 'config', 'moment', 'api', '$q'];
  * @requires moment
  * @requires api
  * @requires $q
+ * @requires gettext
+ * @requires gettextCatalog
  * @description Search service used to query the reporting endpoints
  */
-export function SearchReport(_, config, moment, api, $q) {
+export function SearchReport(_, config, moment, api, $q, gettext, gettextCatalog) {
+    /**
+     * @ngdoc property
+     * @name SearchReport#itemStates
+     * @type {Array<Object>}
+     * @description Common item states for use with reports
+     */
+    this.itemStates = [{
+        qcode: 'published',
+        name: gettext('Published'),
+    }, {
+        qcode: 'killed',
+        name: gettext('Killed'),
+    }, {
+        qcode: 'corrected',
+        name: gettext('Corrected'),
+    }, {
+        qcode: 'recalled',
+        name: gettext('Recalled'),
+    }];
+
+    /**
+     * @ngdoc method
+     * @name SearchReport#filterItemStates
+     * @param {Array<String>} states - Array of item state qcodes
+     * @return {Array<Object>}
+     * @description Filters the common item states for use with report filters
+     */
+    this.filterItemStates = (states) => (
+        this.itemStates.filter(
+            (state) => states.indexOf(state.qcode) > -1
+        )
+    );
+
+    /**
+     * @ngdoc property
+     * @name SearchReport#dataFields
+     * @type {Array<Object>}
+     * @description Common data fields for use with reports
+     */
+    this.dataFields = [{
+        qcode: 'anpa_category.qcode',
+        name: gettext('Category'),
+    }, {
+        qcode: 'genre.qcode',
+        name: gettext('Genre'),
+    }, {
+        qcode: 'source',
+        name: gettext('Source'),
+    }, {
+        qcode: 'urgency',
+        name: gettextCatalog.getString('Urgency'),
+    }];
+
+    /**
+     * @ngdoc method
+     * @name SearchReport#filterDataFields
+     * @param {Array<String>} sources - Array of field qcodes
+     * @return {Array<Object>}
+     * @description Filters the common data fields for use with report filters
+     */
+    this.filterDataFields = (sources) => (
+        this.dataFields.filter(
+            (source) => sources.indexOf(source.qcode) > -1
+        )
+    );
+
+    /**
+     * @ngdoc method
+     * @name convertDatesForServer
+     * @param {Object} params - Report parameters
+     * @return {Object}
+     * @description Clones the parameters and modifies the date fields for use with the server
+     */
+    const convertDatesForServer = (params) => {
+        const report = _.cloneDeep(params);
+
+        if (_.get(report, 'start_date')) {
+            report.start_date = moment(report.start_date, config.model.dateformat)
+                .format('YYYY-MM-DD');
+        } else if (_.get(report, 'dates.start')) {
+            report.dates.start = moment(report.dates.start, config.model.dateformat)
+                .format('YYYY-MM-DD');
+        }
+
+        if (_.get(report, 'end_date')) {
+            report.end_date = moment(report.end_date, config.model.dateformat)
+                .format('YYYY-MM-DD');
+        } else if (_.get(report, 'dates.end')) {
+            report.dates.end = moment(report.dates.end, config.model.dateformat)
+                .format('YYYY-MM-DD');
+        }
+
+        if (_.get(report, 'date')) {
+            report.date = moment(report.date, config.model.dateformat)
+                .format('YYYY-MM-DD');
+        } else if (_.get(report, 'dates.date')) {
+            report.dates.date = moment(report.dates.date, config.model.dateformat)
+                .format('YYYY-MM-DD');
+        }
+
+        if (report.date_filter && report.date_filter !== 'range') {
+            delete report.start_date;
+            delete report.end_date;
+        } else if (_.get(report, 'dates.filter') && report.dates.filter !== 'range') {
+            delete report.dates.start;
+            delete report.dates.end;
+        }
+
+        return report;
+    };
+
+    /**
+     * @ngdoc method
+     * @name getUTCOffset
+     * @param {String} format - The format of the response
+     * @return {String}
+     * @description Generates the UTC offset using the format provided
+     */
     const getUTCOffset = function(format = 'ZZ') {
         if (_.get(config, 'search.useDefaultTimezone') && _.get(config, 'defaultTimezone')) {
             return moment.tz(config.defaultTimezone).format(format);
         }
 
         return moment().format(format);
+    };
+
+    /**
+     * @ngdoc method
+     * @name getFilterAndDates
+     * @param {Object} params - Report parameters
+     * @return {Object}
+     * @description Returns the date filter, start, end and date fields from the report parameters
+     */
+    const getFilterAndDates = (params) => {
+        const dateFilter = _.get(params, 'date_filter') || _.get(params, 'dates.filter');
+        const startDate = _.get(params, 'start_date') || _.get(params, 'dates.start');
+        const endDate = _.get(params, 'end_date') || _.get(params, 'dates.end');
+        const date = _.get(params, 'date') || _.get(params, 'dates.date');
+
+        return {dateFilter, startDate, endDate, date};
+    };
+
+    /**
+     * @ngdoc method
+     * @name filterValues
+     * @param {Array|boolean} value - The value to check
+     * @return {boolean}
+     * @description Returns true if this variable has a value to keep
+     */
+    const filterValues = (value) => {
+        if (_.isArray(value)) {
+            return value.length > 0;
+        } else if (_.isBoolean(value)) {
+            return value !== false;
+        }
+
+        return value !== null;
+    };
+
+    /**
+     * @ngdoc method
+     * @name filterNullParams
+     * @param {Object} params - Report parameters
+     * @description Filters our null values from the report parameters
+     */
+    const filterNullParams = (params) => {
+        params.must = _.pickBy(params.must || {}, filterValues);
+        params.must_not = _.pickBy(params.must_not || {}, filterValues);
+        params.chart = _.pickBy(params.chart || {}, filterValues);
+
+        if (params.must.states) {
+            const states = _.pickBy(params.must.states, filterValues);
+
+            if (_.isEqual(states, {})) {
+                delete params.must.states;
+            } else {
+                params.must.states = states;
+            }
+        }
+        if (params.must_not.states) {
+            const states = _.pickBy(params.must_not.states, filterValues);
+
+            if (_.isEqual(states, {})) {
+                delete params.must_not.states;
+            } else {
+                params.must_not.states = states;
+            }
+        }
     };
 
     /**
@@ -39,7 +223,14 @@ export function SearchReport(_, config, moment, api, $q) {
         return null;
     };
 
-    this._getFilterValues = (filter) => {
+    /**
+     * @ngdoc method
+     * @name getFilterValues
+     * @param {Object} filter - The must/must_not filter
+     * @return {Object}
+     * @description Returns the values for the filter attribute in the report parameters
+     */
+    const getFilterValues = (filter) => {
         if (_.isArray(filter) || _.isBoolean(filter)) {
             return filter;
         }
@@ -48,6 +239,14 @@ export function SearchReport(_, config, moment, api, $q) {
             Object.keys(filter),
             (name) => !!filter[name]
         );
+    };
+
+    this._filterDesks = (query, desks, must, params) => {
+        query[must].push({terms: {'task.desk': desks}});
+    };
+
+    this._filterUsers = (query, users, must, params) => {
+        query[must].push({terms: {'task.user': users}});
     };
 
     this._filterCategories = (query, categories, must, params) => {
@@ -62,6 +261,12 @@ export function SearchReport(_, config, moment, api, $q) {
 
     this._filterGenre = (query, genres, must, params) => {
         query[must].push({terms: {'genre.qcode': genres}});
+    };
+
+    this._filterUrgencies = (query, urgencies, must, params) => {
+        query[must].push(
+            {terms: {urgency: urgencies.map((val) => parseInt(val, 10))}}
+        );
     };
 
     this._filterIngestProviders = (query, ingests, must, params) => {
@@ -101,7 +306,9 @@ export function SearchReport(_, config, moment, api, $q) {
     };
 
     this._filterDates = (query, params) => {
-        if (!_.get(params, 'date_filter')) {
+        const {dateFilter, startDate, endDate, date} = getFilterAndDates(params);
+
+        if (!dateFilter) {
             return;
         }
 
@@ -109,14 +316,14 @@ export function SearchReport(_, config, moment, api, $q) {
         let lt = null;
         let gte = null;
 
-        switch (params.date_filter) {
+        switch (dateFilter) {
         case 'range':
-            lt = formatDate(params.end_date, true);
-            gte = formatDate(params.start_date);
+            lt = formatDate(endDate, true);
+            gte = formatDate(startDate);
             break;
         case 'day':
-            lt = formatDate(params.date, true);
-            gte = formatDate(params.date);
+            lt = formatDate(date, true);
+            gte = formatDate(date);
             break;
         case 'yesterday':
             lt = 'now/d';
@@ -147,6 +354,38 @@ export function SearchReport(_, config, moment, api, $q) {
 
     /**
      * @ngdoc method
+     * @name constructParams
+     * @param {Object} args - Report parameters
+     * @return {Object}
+     * @description Modifies the report parameters for use with an API call
+     */
+    const constructParams = (args) => {
+        const params = convertDatesForServer(args);
+
+        filterNullParams(params);
+        delete params.aggs;
+        delete params.repos;
+        delete params.return_type;
+
+        const payload = {params};
+
+        if (args.aggs) {
+            payload.aggs = args.aggs;
+        }
+
+        if (args.repos) {
+            payload.repo = _.pickBy(args.repos, filterValues);
+        }
+
+        if (args.return_type) {
+            payload.return_type = args.return_type;
+        }
+
+        return payload;
+    };
+
+    /**
+     * @ngdoc method
      * @name SearchReport@constructQuery
      * @param {Object} params - The parameters used to construct the elastic query
      * @return {Object}
@@ -154,9 +393,12 @@ export function SearchReport(_, config, moment, api, $q) {
      */
     const constructQuery = (params) => {
         const queryFuncs = {
+            desks: this._filterDesks,
+            users: this._filterUsers,
             categories: this._filterCategories,
             sources: this._filterSources,
             genre: this._filterGenre,
+            urgency: this._filterUrgencies,
             ingest_providers: this._filterIngestProviders,
             stages: this._filterStages,
             states: this._filterStates,
@@ -175,7 +417,7 @@ export function SearchReport(_, config, moment, api, $q) {
 
         ['must', 'must_not'].forEach((must) => {
             _.forEach(params[must], (filter, field) => {
-                const values = this._getFilterValues(filter);
+                const values = getFilterValues(filter);
                 const func = queryFuncs[field];
 
                 if (_.isArray(values) && _.isEmpty(values) || !func) {
@@ -186,7 +428,7 @@ export function SearchReport(_, config, moment, api, $q) {
             });
         });
 
-        return {
+        const payload = {
             source: {
                 query: {
                     filtered: {
@@ -203,6 +445,12 @@ export function SearchReport(_, config, moment, api, $q) {
             },
             repo: query.repo,
         };
+
+        if (_.get(params, 'aggs')) {
+            payload.aggs = params.aggs;
+        }
+
+        return payload;
     };
 
     /**
@@ -210,11 +458,15 @@ export function SearchReport(_, config, moment, api, $q) {
      * @name SearchReport#query
      * @param {String} endpoint - The name of the endpoint to query
      * @param {Object} params - The parameters used to search elastic
+     * @param {Object} asObject - Send as param object or elastic query
      * @return {Object}
      * @description Constructs an elastic query then sends that query to the provided endpoint
      */
-    this.query = function(endpoint, params) {
-        return api.query(endpoint, constructQuery(params))
+    this.query = function(endpoint, params, asObject = false) {
+        return api.query(
+            endpoint,
+            asObject ? constructParams(params) : constructQuery(params)
+        )
             .then((items) => $q.when(_.get(items, '_items[0]') || {}));
     };
 }

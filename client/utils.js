@@ -112,3 +112,15 @@ export const getErrorMessage = (error, defaultMessage) => {
 
     return defaultMessage;
 };
+
+/**
+ * @ngdoc method
+ * @name Analytics#getNameFromQcode
+ * @param {Object} data - Object where the keys are the qcode
+ * @param {String} qcode - Qcode value to search for
+ * @return {String}
+ * @description Returns the name from the data source given the qcode
+ */
+export const getNameFromQcode = (data, qcode) => (
+    _.get(data, `['${qcode}'].name`) || qcode
+);

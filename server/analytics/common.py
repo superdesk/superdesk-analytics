@@ -91,3 +91,16 @@ def is_highcharts_installed():
         return True
     except Exception:
         return False
+
+
+def get_cv_by_qcode(name):
+    cvs = get_resource_service('vocabularies').find_one(req=None, _id=name)
+    return {
+        item.get('qcode'): item
+        for item in cvs.get('items') or []
+        if item.get('is_active', True)
+    }
+
+
+def get_name_from_qcode(data, qcode):
+    return (data.get(qcode) or {}).get('name') or qcode

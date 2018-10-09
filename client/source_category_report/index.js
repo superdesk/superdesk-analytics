@@ -49,7 +49,7 @@ angular.module('superdesk.analytics.source-category-report', [])
 
     .controller('SourceCategoryController', ctrl.SourceCategoryController)
 
-    .directive('sdSourceCategoryReportPreview', directives.SourceCategoryReportPreview)
+    .directive('sdaSourceCategoryReportPreview', directives.SourceCategoryReportPreview)
 
     .run(cacheIncludedTemplates)
 

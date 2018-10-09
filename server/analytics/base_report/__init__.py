@@ -97,6 +97,10 @@ class BaseReportService(SearchService):
             'repo': params.get('repo'),
             'aggregations': 1
         }
+
+        if params.get('aggs'):
+            request.args['aggs'] = json.dumps(params['aggs'])
+
         return request
 
     def _get_request_or_lookup(self, req, **lookup):
@@ -109,10 +113,11 @@ class BaseReportService(SearchService):
                 args = req.args
         else:
             args = {
-                'source': lookup.get('source', None),
-                'params': lookup.get('params', None),
-                'repo': lookup.get('repo', None),
-                'return_type': lookup.get('return_type', 'aggregations')
+                'source': lookup.get('source') or None,
+                'params': lookup.get('params') or None,
+                'repo': lookup.get('repo') or None,
+                'return_type': lookup.get('return_type') or 'aggregations',
+                'aggs': lookup.get('aggs') or None
             }
 
         # Args can either have source or params, not both
@@ -126,9 +131,22 @@ class BaseReportService(SearchService):
                 args['params'] = json.loads(args['params'])
             args.pop('source', None)
 
+            # args['params']['aggs'] takes precedence over args['aggs']
+            if args['params'].get('aggs'):
+                args['aggs'] = args['params']['aggs']
+
+        if 'aggs' in args:
+            if isinstance(args['aggs'], str):
+                args['aggs'] = json.loads(args['aggs'])
+            elif args['aggs'] is None:
+                del args['aggs']
+
         args['return_type'] = args.get('return_type', 'aggregations')
 
         return args
+
+    def run_query(self, request, params):
+        return super().get(request, lookup=None)
 
     def get(self, req, **lookup):
         args = self._get_request_or_lookup(req, **lookup)
@@ -138,13 +156,19 @@ class BaseReportService(SearchService):
                 'source': args['source'],
                 'repo': args.get('repo')
             }
+
+            if args.get('aggs'):
+                params['aggs'] = args['aggs']
+
         elif args.get('params'):
             params = self.generate_elastic_query(args)
+            if args.get('aggs'):
+                params['aggs'] = args['aggs']
         else:
             raise SuperdeskApiError.badRequestError('source/query not provided')
 
         request = self.get_parsed_request(params)
-        docs = super().get(request, lookup=None)
+        docs = self.run_query(request, params)
 
         if args['return_type'] == 'highcharts_config':
             report = self.generate_highcharts_config(docs, args)
@@ -175,6 +199,16 @@ class BaseReportService(SearchService):
 
         return [name for name, value in filters.items() if value]
 
+    def _es_filter_desks(self, query, desks, must, params):
+        query[must].append({
+            'terms': {'task.desk': desks}
+        })
+
+    def _es_filter_users(self, query, users, must, params):
+        query[must].append({
+            'terms': {'task.user': users}
+        })
+
     def _es_filter_categories(self, query, categories, must, params):
         field = params.get('category_field') or 'qcode'
 
@@ -190,6 +224,11 @@ class BaseReportService(SearchService):
     def _es_filter_genre(self, query, genres, must, params):
         query[must].append({
             'terms': {'genre.qcode': genres}
+        })
+
+    def _es_filter_urgencies(self, query, urgencies, must, params):
+        query[must].append({
+            'terms': {'urgency': urgencies}
         })
 
     def _es_filter_ingest_providers(self, query, ingests, must, params):
@@ -227,20 +266,25 @@ class BaseReportService(SearchService):
         query['sort'] = params.get('sort') or [{'versioncreated': 'desc'}]
 
     def _es_filter_dates(self, query, params):
-        date_filter = params.get('date_filter')
+        dates = params.get('dates') or {}
+        date_filter = params.get('date_filter') or dates.get('filter')
         if not date_filter:
             return
+
+        start_date = params.get('start_date') or dates.get('start')
+        end_date = params.get('end_date') or dates.get('end')
+        date = params.get('date') or dates.get('date')
 
         time_zone = self.get_utc_offset()
         lt = None
         gte = None
 
         if date_filter == 'range':
-            lt = self.format_date(params.get('end_date'), True)
-            gte = self.format_date(params.get('start_date'))
+            lt = self.format_date(end_date, True)
+            gte = self.format_date(start_date)
         elif date_filter == 'day':
-            lt = self.format_date(params.get('date'), True)
-            gte = self.format_date(params.get('date'))
+            lt = self.format_date(date, True)
+            gte = self.format_date(date)
         elif date_filter == 'yesterday':
             lt = 'now/d'
             gte = 'now-1d/d'
@@ -266,9 +310,12 @@ class BaseReportService(SearchService):
         params = args.get('params') or {}
 
         query_funcs = {
+            'desks': self._es_filter_desks,
+            'users': self._es_filter_users,
             'categories': self._es_filter_categories,
             'sources': self._es_filter_sources,
             'genre': self._es_filter_genre,
+            'urgency': self._es_filter_urgencies,
             'ingest_providers': self._es_filter_ingest_providers,
             'stages': self._es_filter_stages,
             'states': self._es_filter_states,
@@ -316,5 +363,8 @@ class BaseReportService(SearchService):
 
         if len(query['repo']) > 0:
             es_query['repo'] = query['repo']
+
+        if query.get('aggs'):
+            es_query['aggs'] = query['aggs']
 
         return es_query
