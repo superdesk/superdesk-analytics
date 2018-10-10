@@ -68,8 +68,10 @@ export function ContentPublishingReportPreview(
                 scope.title = contentPublishingReports.generateTitle(params);
                 scope.subtitle = contentPublishingReports.generateSubtitle(params);
 
-                scope.group = contentPublishingReports.getGroupTitle(_.get(params, 'aggs.group.field'));
-                scope.subgroup = contentPublishingReports.getGroupTitle(_.get(params, 'aggs.subgroup.field'));
+                scope.group = contentPublishingReports.getFieldTitle(_.get(params, 'aggs.group.field'));
+                scope.subgroup = contentPublishingReports.getFieldTitle(
+                    _.get(params, 'aggs.subgroup.field')
+                ) || '-';
             };
 
             const convertIdsToString = (source, ids, idField, nameField) => (

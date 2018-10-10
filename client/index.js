@@ -26,6 +26,7 @@ import './source_category_report';
 import './saved_reports';
 import './scheduled_reports';
 import './content_publishing_report';
+import './email_report';
 
 angular.module('superdesk.analytics.reports', [])
     .provider('reports', svc.ReportsProvider);
@@ -49,6 +50,7 @@ export default angular.module('superdesk.analytics', [
     'superdesk.analytics.charts',
     'superdesk.analytics.search',
     'superdesk.analytics.scheduled_reports',
+    'superdesk.analytics.email_report',
     'superdesk.analytics.activity-report', 'superdesk.analytics.processed-items-report',
     'superdesk.analytics.processed-items-widget', 'superdesk.analytics.track-activity-report',
     'superdesk.analytics.track-activity-widget', 'superdesk.analytics.activity-report-widget',

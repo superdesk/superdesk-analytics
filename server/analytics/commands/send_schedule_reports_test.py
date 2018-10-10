@@ -9,10 +9,12 @@
 # at https://www.sourcefabric.org/superdesk/license
 
 from superdesk import get_resource_service
+from superdesk.utc import local_to_utc
+
 from analytics.tests import TestCase
 from analytics.commands.send_scheduled_reports import SendScheduledReports
 from analytics.common import MIME_TYPES
-from superdesk.utc import local_to_utc
+from analytics.email_report.email_report import EmailReportService
 
 from datetime import datetime
 from flask import current_app as app
@@ -20,6 +22,7 @@ from dateutil.rrule import rrule, HOURLY
 import pytz
 from unittest import mock
 from os import urandom
+from base64 import b64encode, b64decode
 
 
 def to_naive(date_str):
@@ -40,14 +43,14 @@ def to_local(date_str):
     return local_tz.localize(local_datetime)
 
 
-mock_file = bytearray(urandom(123))
-mock_csv = 'Source,Domestic Sport,Finance\r\nAAP,2,3\r\nAP,5,10\r\n'.encode('UTF-8')
+mock_file = b64encode(bytearray(urandom(123)))
+mock_csv = b64encode('Source,Domestic Sport,Finance\r\nAAP,2,3\r\nAP,5,10\r\n'.encode('UTF-8'))
 mock_array = [{
-    'file': bytearray(urandom(456)),
+    'file': b64encode(bytearray(urandom(456))),
     'mimetype': MIME_TYPES.PNG,
     'filename': 'chart_1.png'
 }, {
-    'file': bytearray(urandom(789)),
+    'file': b64encode(bytearray(urandom(789))),
     'mimetype': MIME_TYPES.PNG,
     'filename': 'chart_2.png'
 }]
@@ -101,7 +104,7 @@ class SendScheduleReportTestCase(TestCase):
         self.assertEqual(len(expected_hits), count)
 
     @mock.patch(
-        'analytics.commands.send_scheduled_reports.generate_report',
+        'analytics.email_report.email_report.generate_report',
         return_value=mock_file
     )
     def test_run_hourly_png(self, mocked):
@@ -156,7 +159,7 @@ class SendScheduleReportTestCase(TestCase):
 
                 # Test attachment
                 self.assertEqual(len(outbox[0].attachments), 1)
-                self.assertEqual(outbox[0].attachments[0].data, mock_file)
+                self.assertEqual(outbox[0].attachments[0].data, b64decode(mock_file))
                 self.assertEqual(
                     outbox[0].attachments[0].content_type,
                     '{}; name="chart_1.png"'.format(MIME_TYPES.PNG)
@@ -167,7 +170,7 @@ class SendScheduleReportTestCase(TestCase):
             self.assertEqual(report.get('_last_sent'), to_utc('2018-06-30T03'))
 
     @mock.patch(
-        'analytics.commands.send_scheduled_reports.generate_report',
+        'analytics.email_report.email_report.generate_report',
         return_value=mock_file
     )
     def test_run_daily_jpeg(self, mocked):
@@ -232,7 +235,7 @@ class SendScheduleReportTestCase(TestCase):
             self.assertEqual(report.get('_last_sent'), to_utc('2018-06-30T01'))
 
     @mock.patch(
-        'analytics.commands.send_scheduled_reports.generate_report',
+        'analytics.email_report.email_report.generate_report',
         return_value=mock_csv
     )
     def test_email_csv(self, mocked):
@@ -264,11 +267,11 @@ class SendScheduleReportTestCase(TestCase):
                     '{}; name="chart_1.csv"'.format(MIME_TYPES.CSV)
                 )
                 self.assertEqual(outbox[0].attachments[0].filename, 'chart_1.csv')
-                self.assertEqual(outbox[0].attachments[0].data, mock_csv)
+                self.assertEqual(outbox[0].attachments[0].data, b64decode(mock_csv))
 
     @mock.patch.object(
-        SendScheduledReports,
-        'get_attachments',
+        EmailReportService,
+        '_gen_attachments',
         return_value=mock_array
     )
     def test_email_multiple_attachments(self, mock):
@@ -311,14 +314,14 @@ class SendScheduleReportTestCase(TestCase):
                     '{}; name="chart_1.png"'.format(MIME_TYPES.PNG)
                 )
                 self.assertEqual(outbox[0].attachments[0].filename, 'chart_1.png')
-                self.assertEqual(outbox[0].attachments[0].data, mock_array[0].get('file'))
+                self.assertEqual(outbox[0].attachments[0].data, b64decode(mock_array[0].get('file')))
 
                 self.assertEqual(
                     outbox[0].attachments[1].content_type,
                     '{}; name="chart_2.png"'.format(MIME_TYPES.PNG)
                 )
                 self.assertEqual(outbox[0].attachments[1].filename, 'chart_2.png')
-                self.assertEqual(outbox[0].attachments[1].data, mock_array[1].get('file'))
+                self.assertEqual(outbox[0].attachments[1].data, b64decode(mock_array[1].get('file')))
 
     def test_send_report_hourly(self):
         # Test every hour

@@ -87,7 +87,7 @@ export function ScheduledReportsModal(_, savedReports, scheduledReports, notify,
              * If the form is not valid, then does not do anything except sets the form as submitted
              */
             scope.save = (scheduleForm, schedule) => {
-                scheduleForm.$setSubmitted(true);
+                scheduleForm.$setSubmitted();
                 scope.validateRecipients(scheduleForm);
 
                 if (scheduleForm.$invalid) {

@@ -7,6 +7,7 @@ ScheduledReportsList.$inject = [
     'savedReports',
     'gettext',
     'moment',
+    'emailReport',
 ];
 
 /**
@@ -20,9 +21,20 @@ ScheduledReportsList.$inject = [
  * @requires notify
  * @requires savedReports
  * @requires gettext
+ * @requires emailReport
  * @description A directive that renders the list of scheduled report cards
  */
-export function ScheduledReportsList(modal, _, reports, scheduledReports, notify, savedReports, gettext, moment) {
+export function ScheduledReportsList(
+    modal,
+    _,
+    reports,
+    scheduledReports,
+    notify,
+    savedReports,
+    gettext,
+    moment,
+    emailReport
+) {
     return {
         template: require('../views/scheduled-reports-list.html'),
         scope: {
@@ -240,6 +252,32 @@ export function ScheduledReportsList(modal, _, reports, scheduledReports, notify
                 }
 
                 return moment(lastSent).format('llll');
+            };
+
+            /**
+             * @ngdoc method
+             * @name sdScheduledReportsList#openEmailModal
+             * @param {Object} schedule - The schedule to send an email for
+             * @description Opens the sdEmailReportModal with the provided schedule
+             */
+            scope.openEmailModal = (schedule) => {
+                const savedReport = scope.getSavedReport(schedule);
+
+                const report = {
+                    type: _.get(schedule, 'report_type'),
+                    params: _.get(savedReport, 'params') || {},
+                    mimetype: _.get(schedule, 'mimetype') || scope.mimeTypes[0].type,
+                    width: _.get(schedule, 'report_width') || 800,
+                };
+
+                const email = {
+                    recipients: _.get(schedule, 'recipients') || [],
+                    subject: _.get(schedule, 'extra.subject') || '',
+                    txt: {body: _.get(schedule, 'extra.body') || ''},
+                    html: {body: _.get(schedule, 'extra.body') || ''},
+                };
+
+                emailReport.openEmailModal(report, email);
             };
 
             this.init();
