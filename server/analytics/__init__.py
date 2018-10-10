@@ -20,6 +20,7 @@ from analytics.source_category_report import SourceCategoryReportResource, Sourc
 from analytics.base_report import BaseReportService
 from analytics.saved_reports import SavedReportsResource, SavedReportsService
 from analytics.reports.scheduled_reports import ScheduledReportsResource, ScheduledReportsService
+from analytics.content_publishing_report import init_app as init_content_publishing_report
 
 from analytics.commands import SendScheduledReports  # noqa
 from analytics.common import is_highcharts_installed
@@ -120,6 +121,8 @@ def init_app(app):
         label='Manage Scheduling Reports',
         description='User can manage scheduling of reports'
     )
+
+    init_content_publishing_report(app)
 
     # If this app is for testing, then create an endpoint for the base reporting service
     # so the core searching/aggregation functionality can be tested
