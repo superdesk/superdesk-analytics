@@ -1,0 +1,1 @@
+export {ContentPublishingReportController} from './ContentPublishingReportController';
