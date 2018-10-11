@@ -1,0 +1,128 @@
+<form name="emailForm">
+    <div sd-modal data-model="true" class="modal--tabs modal--large">
+        <div class="modal__header">
+            <button class="modal__close pull-right" ng-click="closeModal()">
+                <i class="icon-close-small"></i>
+            </button>
+            <h3 class="modal__heading" translate>
+                Send Report via Email
+            </h3>
+        </div>
+        <div class="modal__body">
+            <div class="modal__body-content">
+                <div class="form__row">
+                    <div class="field keywords sd-line-input sd-line-input--label-left sd-line-input--required"
+                         ng-class="{'sd-line-input--invalid': emailForm.$error.recipients && emailForm.$submitted}"
+                    >
+                        <label for="search-keywords"
+                               class="sd-line-input__label"
+                               translate
+                        >
+                            To:
+                        </label>
+                        <div id="search-keywords"
+                             class="scheduled-reports__email-input"
+                             sd-meta-words-list
+                             data-field="recipients"
+                             data-header="true"
+                             data-list="emails"
+                             data-item="email"
+                             data-change="validateRecipients(emailForm)"
+                        ></div>
+                        <span class="sd-line-input__message"
+                              ng-if="emailForm.$error.recipients && emailForm.$submitted"
+                              translate
+                        >Required
+                        </span>
+                    </div>
+                </div>
+                <div class="form__row scheduled-reports__subject-row">
+                    <div class="sd-line-input sd-line-input--required sd-line-input--label-left"
+                         ng-class="{'sd-line-input--invalid': emailForm.subject.$invalid && emailForm.$submitted}"
+                    >
+                        <label class="sd-line-input__label" translate>Subject:</label>
+                        <input class="sd-line-input__input"
+                               type="text"
+                               ng-model="email.subject"
+                               name="subject"
+                               required
+                        />
+                        <span class="sd-line-input__message"
+                              ng-if="emailForm.subject.$invalid && emailForm.$submitted"
+                              translate
+                        >Required
+                        </span>
+                    </div>
+                </div>
+                <div class="form__row">
+                    <div class="sd-line-input sd-line-input--label-left"
+                         ng-class="{'sd-line-input--invalid': emailForm.body.$invalid && emailForm.$submitted}"
+                    >
+                        <label class="sd-line-input__label" translate>Body</label>
+                        <textarea ng-model="email.txt.body"
+                                  class="scheduled-reports__email-input"
+                                  rows="4"
+                                  name="body"
+                                  required
+                        ></textarea>
+                        <span class="sd-line-input__message"
+                              ng-if="emailForm.body.$invalid && emailForm.$submitted"
+                              translate
+                        >Required
+                    </div>
+                </div>
+
+                <div class="form__row form__row--flex form__row--no-padding">
+                    <div class="form__row-item">
+                        <div class="sd-line-input sd-line-input--is-select">
+                            <label class="sd-line-input__label" translate>Format</label>
+                            <select class="sd-line-input__select" ng-model="report.mimetype">
+                                <option ng-repeat="mime in mimeTypes" value="{{mime.type}}">{{mime.label}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form__row-item" ng-if="['image/svg+xml', 'text/csv'].indexOf(schedule.mimetype) < 0">
+                        <div class="sd-line-input sd-line-input--is-select">
+                            <label class="sd-line-input__label" translate>Image Width</label>
+                            <select class="sd-line-input__select"
+                                    ng-model="report.width"
+                                    sd-convert-to-number
+                            >
+                                <option ng-repeat="width in allowedWidths" value="{{width}}">{{width}} pixels</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div sd-toggle-box data-title="Parameters"
+                     data-open="false"
+                     data-style="circle"
+                >
+                    <div class="sd-card">
+                        <div class="sd-card__content">
+                            <div sd-report-preview-proxy
+                                 data-report="report"
+                            ></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal__footer">
+            <span ng-if="submitting" translate>
+                Submitting....
+            </span>
+            <button class="btn"
+                    ng-click="closeModal()"
+                    ng-disabled="submitting"
+                    translate
+            >Cancel</button>
+            <button class="btn btn--primary"
+                    ng-click="sendEmail(emailForm)"
+                    ng-disabled="submitting"
+                    type="submit"
+                    translate
+            >Send Email</button>
+        </div>
+    </div>
+</form>

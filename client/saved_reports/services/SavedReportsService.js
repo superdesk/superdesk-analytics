@@ -37,42 +37,82 @@ export function SavedReportsService(
         $rootScope.$on('savedreports:update', angular.bind(this, this.onReportUpdated));
     };
 
-    const convertDatesForServer = (params) => {
+    /**
+     * @ngdoc method
+     * @name savedReports#convertDatesForServer
+     * @param {Object} params - Report parameters
+     * @return {Object}
+     * @description Returns a cloned parameters with dates converted for the server
+     */
+    this.convertDatesForServer = (params) => {
         const report = _.cloneDeep(params);
 
-        if (_.get(report, 'params.start_date')) {
-            report.params.start_date = moment(report.params.start_date, config.model.dateformat)
+        if (_.get(report, 'start_date')) {
+            report.start_date = moment(report.start_date, config.model.dateformat)
+                .format('YYYY-MM-DD');
+        } else if (_.get(report, 'dates.start')) {
+            report.dates.start = moment(report.dates.start, config.model.dateformat)
                 .format('YYYY-MM-DD');
         }
 
-        if (_.get(report, 'params.end_date')) {
-            report.params.end_date = moment(report.params.end_date, config.model.dateformat)
+        if (_.get(report, 'end_date')) {
+            report.end_date = moment(report.end_date, config.model.dateformat)
+                .format('YYYY-MM-DD');
+        } else if (_.get(report, 'dates.end')) {
+            report.dates.end = moment(report.dates.end, config.model.dateformat)
                 .format('YYYY-MM-DD');
         }
 
-        if (_.get(report, 'params.date')) {
-            report.params.date = moment(report.params.date, config.model.dateformat)
+        if (_.get(report, 'date')) {
+            report.date = moment(report.date, config.model.dateformat)
                 .format('YYYY-MM-DD');
+        } else if (_.get(report, 'dates.date')) {
+            report.dates.date = moment(report.dates.date, config.model.dateformat)
+                .format('YYYY-MM-DD');
+        }
+
+        if (report.date_filter && report.date_filter !== 'range') {
+            delete report.start_date;
+            delete report.end_date;
+        } else if (_.get(report, 'dates.filter') && report.dates.filter !== 'range') {
+            delete report.dates.start;
+            delete report.dates.end;
         }
 
         return report;
     };
 
-    const convertDatesForClient = (params) => {
+    /**
+     * @ngdoc method
+     * @name savedReports#convertDatesForClient
+     * @param {Object} params - Report parameters
+     * @return {Object}
+     * @description Returns a cloned parameters with dates converted for the client
+     */
+    this.convertDatesForClient = (params) => {
         const report = _.cloneDeep(params);
 
         if (_.get(report, 'params.start_date')) {
             report.params.start_date = moment(report.params.start_date, 'YYYY-MM-DD')
+                .format(config.model.dateformat);
+        } else if (_.get(report, 'params.dates.start')) {
+            report.params.dates.start = moment(report.params.date.start, 'YYYY-MM-DD')
                 .format(config.model.dateformat);
         }
 
         if (_.get(report, 'params.end_date')) {
             report.params.end_date = moment(report.params.end_date, 'YYYY-MM-DD')
                 .format(config.model.dateformat);
+        } else if (_.get(report, 'params.dates.end')) {
+            report.params.dates.end = moment(report.params.dates.end, 'YYYY-MM-DD')
+                .format(config.model.dateformat);
         }
 
         if (_.get(report, 'params.date')) {
             report.params.date = moment(report.params.date, 'YYYY-MM-DD')
+                .format(config.model.dateformat);
+        } else if (_.get(report, 'params.dates.date')) {
+            report.params.dates.date = moment(report.params.dates.date, 'YYYY-MM-DD')
                 .format(config.model.dateformat);
         }
 
@@ -88,7 +128,7 @@ export function SavedReportsService(
      */
     this.fetchById = (reportId) => (
         api('saved_reports').getById(reportId)
-            .then((report) => convertDatesForClient(report))
+            .then((report) => this.convertDatesForClient(report))
     );
 
     /**
@@ -108,11 +148,11 @@ export function SavedReportsService(
             .then((result) => ({
                 user: _.map(
                     _.filter(result._items, (report) => report.user === session.identity._id),
-                    (report) => convertDatesForClient(report)
+                    (report) => this.convertDatesForClient(report)
                 ),
                 global: _.map(
                     _.filter(result._items, (report) => report.user !== session.identity._id),
-                    (report) => convertDatesForClient(report)
+                    (report) => this.convertDatesForClient(report)
                 ),
             }))
     );
@@ -127,13 +167,13 @@ export function SavedReportsService(
      */
     this.save = (updates, original = {}) => (
         api('saved_reports').save(
-            convertDatesForServer(_.get(original, '_id') ? original : {}),
-            convertDatesForServer(_.pickBy(updates, (value, key) => !key.startsWith('_')))
+            this.convertDatesForServer(_.get(original, '_id') ? original : {}),
+            this.convertDatesForServer(_.pickBy(updates, (value, key) => !key.startsWith('_')))
         )
             .then((savedReport) => {
                 notify.success(gettext('Report saved!'));
 
-                const convertedReport = convertDatesForClient(savedReport);
+                const convertedReport = this.convertDatesForClient(savedReport);
 
                 // If this is the currently selected report, then update it (mainly for _etag)
                 // Otherwise if no report is selected, then select this newly saved report
@@ -173,15 +213,33 @@ export function SavedReportsService(
             })
     );
 
+    /**
+     * @ngdoc method
+     * @name savedReports#isReportSelected
+     * @param {Object} report - The report to check against
+     * @return {boolean}
+     * @description Returns true if the provided report is selected, false if not
+     */
     this.isReportSelected = (report) => (
         _.get(this.currentReport, '_id') === _.get(report, '_id')
     );
 
+    /**
+     * @ngdoc method
+     * @name savedReports#selectReport
+     * @param {Object} selectedReport - The report to select
+     * @description Select the provided report
+     */
     this.selectReport = (selectedReport) => {
         this.currentReport = _.cloneDeep(selectedReport);
         $location.search('template', _.get(selectedReport, '_id') || null);
     };
 
+    /**
+     * @ngdoc method
+     * @name savedReports#selectReportFromURL
+     * @description Fetches and selects a report from the url parameters (if set)
+     */
     this.selectReportFromURL = () => {
         const reportId = $location.search().template;
 
@@ -203,6 +261,13 @@ export function SavedReportsService(
             });
     };
 
+    /**
+     * @ngdoc method
+     * @name savedReports#onReportUpdated
+     * @param {Event} event - Browser Websocket event
+     * @param {Object} data - Saved report and operation type
+     * @description Responds to updates on saved reports
+     */
     this.onReportUpdated = (event, data) => {
         const operation = _.get(data, 'operation');
         const reportId = _.get(data, 'report_id');

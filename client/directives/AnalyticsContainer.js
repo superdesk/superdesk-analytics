@@ -9,12 +9,14 @@
  * @requires reports
  * @requires $rootScope
  * @requires $timeout
+ * @requires emailReport
  * @description A directive that encapsulates the entire analytics module view
  */
 export function AnalyticsContainer() {
     return {
         controllerAs: 'analytics',
         controller: ['$scope', '$location', 'pageTitle', 'gettext', 'lodash', 'reports', '$rootScope', '$timeout',
+            'emailReport',
             function AnalyticsContainerController(
                 $scope,
                 $location,
@@ -23,7 +25,8 @@ export function AnalyticsContainer() {
                 _,
                 reports,
                 $rootScope,
-                $timeout
+                $timeout,
+                emailReport
             ) {
                 const defaultReportConfigs = {charts: []};
 
@@ -34,6 +37,7 @@ export function AnalyticsContainer() {
                 $scope.currentReport = {};
                 $scope.reportConfigs = $scope.reportConfigs || _.cloneDeep(defaultReportConfigs);
                 $scope.currentPanel = 'advanced';
+                $scope.emailModal = emailReport.modal;
 
                 /**
                  * @ngdoc method

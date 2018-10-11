@@ -14,10 +14,25 @@
                 <div class="sd-card__header" ng-class="{'sd-card__header--light': !schedule.active}">
                     <div class="sd-card__heading">{{schedule.name}}</div>
                     <div class="sd-card__actions">
-                        <a class="icn-btn" ng-click="openModal(schedule)">
+                        <a class="icn-btn"
+                           ng-click="openEmailModal(schedule)"
+                           data-sd-tooltip="{{:: 'Email this report' | translate}}"
+                           data-flow="down"
+                        >
+                            <i class="icon-share-alt"></i>
+                        </a>
+                        <a class="icn-btn"
+                           ng-click="openModal(schedule)"
+                           data-sd-tooltip="{{:: 'Edit this Schedule' | translate}}"
+                           data-flow="down"
+                        >
                             <i class="icon-pencil"></i>
                         </a>
-                        <a class="icn-btn" ng-click="remove(schedule)">
+                        <a class="icn-btn"
+                           ng-click="remove(schedule)"
+                           data-sd-tooltip="{{:: 'Delete this Schedule' | translate}}"
+                           data-flow="down"
+                        >
                             <i class="icon-trash"></i>
                         </a>
                     </div>
