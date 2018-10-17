@@ -1,7 +1,7 @@
 import {formatDate, generateSubtitle} from '../../utils';
-import {generateTitle} from '../controllers/ContentPublishingReportController';
+import {generateTitle} from '../controllers/PublishingPerformanceReportController';
 
-ContentPublishingReportPreview.$inject = [
+PublishingPerformanceReportPreview.$inject = [
     'lodash',
     'moment',
     'config',
@@ -11,14 +11,14 @@ ContentPublishingReportPreview.$inject = [
     'userList',
     'desks',
     'metadata',
-    '$interpolate',
     'chartConfig',
+    '$interpolate',
 ];
 
 /**
  * @ngdoc directive
- * @module superdesk.apps.analytics.content-publishing-report
- * @name ContentPublishingReportPreview
+ * @module superdesk.apps.analytics.publishing-performance-report
+ * @name PublishingPerformanceReportPreview
  * @requires lodash
  * @requires moment
  * @requires config
@@ -28,11 +28,11 @@ ContentPublishingReportPreview.$inject = [
  * @requires userList
  * @requires desks
  * @requires metadata
- * @requires $interpolate
  * @requires chartConfig
- * @description Directive to render the preview for ContentPublishing report in Schedules page
+ * @requires $interpolate
+ * @description Directive to render the preview for Publishing Performance report in Schedules page
  */
-export function ContentPublishingReportPreview(
+export function PublishingPerformanceReportPreview(
     _,
     moment,
     config,
@@ -42,11 +42,11 @@ export function ContentPublishingReportPreview(
     userList,
     desks,
     metadata,
-    $interpolate,
-    chartConfig
+    chartConfig,
+    $interpolate
 ) {
     return {
-        template: require('../views/content-publishing-report-preview.html'),
+        template: require('../views/publishing-performance-report-preview.html'),
         link: function(scope) {
             const params = _.get(scope.report, 'params') || {};
             const chart = chartConfig.newConfig('chart', _.get(params, 'chart.type'));

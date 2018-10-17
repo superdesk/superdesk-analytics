@@ -26,6 +26,7 @@ import './source_category_report';
 import './saved_reports';
 import './scheduled_reports';
 import './content_publishing_report';
+import './publishing_performance_report';
 import './email_report';
 
 angular.module('superdesk.analytics.reports', [])
@@ -57,6 +58,7 @@ export default angular.module('superdesk.analytics', [
     'superdesk.analytics.content-quota-report', 'superdesk.analytics.content-quota-widget',
     'superdesk.analytics.source-category-report',
     'superdesk.analytics.content-publishing-report',
+    'superdesk.analytics.publishing-performance-report',
     'superdesk-ui'
 ])
     .service('analyticsWidgetSettings', svc.AnalyticsWidgetSettings)
@@ -65,6 +67,7 @@ export default angular.module('superdesk.analytics', [
     .directive('sdAfterRender', directive.AfterRender)
     .directive('sdReportDropdown', directive.ReportDropdown)
     .directive('sdConvertToNumber', directive.ConvertToNumber)
+    .directive('sdaSourceFilters', directive.SourceFilters)
 
     .run(cacheIncludedTemplates)
 

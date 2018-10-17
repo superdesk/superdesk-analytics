@@ -1,6 +1,17 @@
 import {formatDate} from '../../utils';
 
-ChartConfig.$inject = ['lodash', 'notify', 'gettext', 'moment', 'config'];
+ChartConfig.$inject = [
+    'lodash',
+    'notify',
+    'gettext',
+    'gettextCatalog',
+    'moment',
+    'config',
+    '$q',
+    'userList',
+    'desks',
+    'metadata',
+];
 
 /**
  * @ngdoc service
@@ -9,11 +20,27 @@ ChartConfig.$inject = ['lodash', 'notify', 'gettext', 'moment', 'config'];
  * @param lodash
  * @param notify
  * @param gettext
+ * @param gettextCatalog
  * @param moment
  * @param config
+ * @param $q
+ * @param userList
+ * @param desks
+ * @param metadata
  * @description Highchart Config generator
  */
-export function ChartConfig(_, notify, gettext, moment, config) {
+export function ChartConfig(
+    _,
+    notify,
+    gettext,
+    gettextCatalog,
+    moment,
+    config,
+    $q,
+    userList,
+    desks,
+    metadata
+) {
     const self = this;
 
     /**
@@ -90,6 +117,8 @@ export function ChartConfig(_, notify, gettext, moment, config) {
             (chartType) => types.indexOf(chartType.qcode) > -1
         )
     );
+
+    self.translations = {};
 
     /**
      * @ngdoc class
@@ -178,7 +207,7 @@ export function ChartConfig(_, notify, gettext, moment, config) {
         /**
          * @ngdoc method
          * @name HighchartConfig#getSubtitleConfig
-         * @return {string}
+         * @return {Object}
          * @description Returns the subtitle config to use for the chart
          */
         getSubtitleConfig() {
@@ -193,7 +222,7 @@ export function ChartConfig(_, notify, gettext, moment, config) {
          * @description Returns the name for the given source
          */
         getSourceName(field) {
-            return field;
+            return this.getTranslationTitle(field);
         }
 
         /**
@@ -259,7 +288,9 @@ export function ChartConfig(_, notify, gettext, moment, config) {
          * @description Returns the list of titles used for the data sources
          */
         getSourceTitles(field, keys) {
-            return keys;
+            const names = this.getTranslationNames(field);
+
+            return keys.map((qcode) => _.get(names, qcode) || qcode);
         }
 
         /**
@@ -271,7 +302,7 @@ export function ChartConfig(_, notify, gettext, moment, config) {
          * @description Returns the name for the specific data source
          */
         getSourceTitle(field, qcode) {
-            return qcode;
+            return this.getTranslationNames(field)[qcode] || qcode;
         }
 
         /**
@@ -465,6 +496,15 @@ export function ChartConfig(_, notify, gettext, moment, config) {
 
         /**
          * @ngdoc method
+         * @name HighchartConfig#clearSources
+         * @description Clears the sources array
+         */
+        clearSources() {
+            this.sources = [];
+        }
+
+        /**
+         * @ngdoc method
          * @name HighchartConfig#genHighchartsConfig
          * @return {Object}
          * @description Generates and returns the Highcharts config
@@ -528,14 +568,16 @@ export function ChartConfig(_, notify, gettext, moment, config) {
         genMultiTableConfig() {
             const xAxis = this.getXAxisConfig();
             const seriesData = this.getSeriesData();
-            const {data} = this.getParent();
+            const {field, data} = this.getParent();
 
             const headers = [xAxis.title.text].concat(
                 seriesData.map((series) => series.name),
                 gettext('Total Stories')
             );
 
-            const tableRows = (this.getSortedKeys(data) || []).map((group) => [group]);
+            const tableRows = (this.getSortedKeys(data) || []).map(
+                (group) => [this.getSourceTitle(field, group)]
+            );
 
             seriesData.forEach((series) => {
                 series.data.forEach((count, index) => {
@@ -583,17 +625,155 @@ export function ChartConfig(_, notify, gettext, moment, config) {
          * @description Generates and returns the Highcharts or Table configs based on chart options
          */
         genConfig() {
-            if (this.chartType === 'table') {
-                this.config = this.genTableConfig();
-            } else {
-                this.config = Object.assign(
-                    {},
-                    self.defaultConfig,
-                    this.genHighchartsConfig()
-                );
+            return this.loadTranslations()
+                .then(() => {
+                    if (this.chartType === 'table') {
+                        this.config = this.genTableConfig();
+                    } else {
+                        this.config = Object.assign(
+                            {},
+                            self.defaultConfig,
+                            this.genHighchartsConfig()
+                        );
+                    }
+
+                    return this.config;
+                });
+        }
+
+        /**
+         * @ngdoc method
+         * @name HighchartConfig#loadTranslations
+         * @param {String} parentField - Name of the first field (defaults to Parent)
+         * @param {String} childField - Name of the second field (defaults to Child)
+         * @return {Promise} Resolves when all translations have been loaded
+         * @description Loads data for translating id/qcode to display names
+         */
+        loadTranslations(parentField = null, childField = null) {
+            const promises = [];
+            const translateField = {
+                'task.desk': () => {
+                    promises.push(desks.fetchDesks()
+                        .then((data) => {
+                            self.translations['task.desk'] = {
+                                title: gettext('Desk'),
+                                names: _.fromPairs(_.map(
+                                    _.get(data, '_items') || [],
+                                    (desk) => [_.get(desk, '_id'), _.get(desk, 'name')]
+                                ))
+                            };
+                        }));
+                },
+                'task.user': () => {
+                    promises.push(userList.getAll()
+                        .then((users) => {
+                            self.translations['task.user'] = {
+                                title: gettext('User'),
+                                names: _.fromPairs(_.map(
+                                    users || [],
+                                    (user) => [_.get(user, '_id'), _.get(user, 'display_name')]
+                                ))
+                            };
+                        }));
+                },
+                'anpa_category.qcode': () => {
+                    promises.push(metadata.initialize()
+                        .then(() => {
+                            self.translations['anpa_category.qcode'] = {
+                                title: gettext('Category'),
+                                names: _.fromPairs(_.map(
+                                    _.get(metadata, 'values.categories') || [],
+                                    (item) => [_.get(item, 'qcode'), _.get(item, 'name')]
+                                ))
+                            };
+                        }));
+                },
+                'genre.qcode': () => {
+                    promises.push(metadata.initialize()
+                        .then(() => {
+                            self.translations['genre.qcode'] = {
+                                title: gettext('Genre'),
+                                names: _.fromPairs(_.map(
+                                    _.get(metadata, 'values.genre') || [],
+                                    (item) => [_.get(item, 'qcode'), _.get(item, 'name')]
+                                ))
+                            };
+                        }));
+                },
+                urgency: () => {
+                    promises.push(metadata.initialize()
+                        .then(() => {
+                            self.translations.urgency = {
+                                title: gettext('Urgency'),
+                                names: _.fromPairs(_.map(
+                                    _.get(metadata, 'values.urgency') || [],
+                                    (item) => [_.get(item, 'qcode'), _.get(item, 'name')]
+                                ))
+                            };
+                        }));
+                },
+                state: () => {
+                    self.translations.state = {
+                        title: gettext('State'),
+                        names: {
+                            published: gettext('Published'),
+                            killed: gettext('Killed'),
+                            corrected: gettext('Corrected'),
+                            updated: gettext('Updated'),
+                        },
+                    };
+                },
+                source: () => {
+                    self.translations.source = {title: gettext('Source')};
+                },
+            };
+
+            let fieldName = parentField || this.getParent().field;
+
+            if (_.get(translateField, fieldName)) {
+                translateField[fieldName]();
             }
 
-            return this.config;
+            fieldName = childField || this.getChild().field;
+
+            if (_.get(translateField, fieldName)) {
+                translateField[fieldName]();
+            }
+
+            return $q.all(promises);
+        }
+
+        /**
+         * @ngdoc method
+         * @name HighchartConfig#getTranslations
+         * @param {String} field - Name of the field to get translations for
+         * @return {Object}
+         * @description Helper function to get the translations for a field
+         */
+        getTranslations(field) {
+            return self.translations[field] || {};
+        }
+
+        /**
+         * @ngdoc method
+         * @name HighchartConfig#getTranslationTitle
+         * @param {String} field - Name of the field to get translated title for
+         * @return {String}
+         * @description Helper function to get the translated title for a field
+         */
+        getTranslationTitle(field) {
+            return this.getTranslations(field).title || field;
+        }
+
+        /**
+         * @ngdoc method
+         * @name HighchartConfig#getTranslationNames
+         * @param {String} field - Name of the field to get translated names for
+         * @return {Object}
+         * @description Helper function to get the translated id->name map for a field
+         */
+        getTranslationNames(field) {
+            return this.getTranslations(field).names || {};
         }
     }
 

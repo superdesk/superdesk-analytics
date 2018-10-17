@@ -69,12 +69,17 @@ def generate_from_highcharts(
 
     url = 'http://{}:{}'.format(host, port)
     headers = {'Content-Type': 'application/json'}
+
+    # Set the width size of the image to generate
+    if 'exporting' not in options:
+        options['exporting'] = {}
+    options['exporting']['sourceWidth'] = width
+
     payload = {
         'options': options,
         'type': mimetype,
         'b64': base64,
         'scale': scale,
-        'width': width,
         'noDownload': no_download
     }
 

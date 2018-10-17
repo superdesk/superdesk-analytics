@@ -1,5 +1,5 @@
 <div class="side-panel side-panel--transparent side-panel--shadow-left"
-     ng-controller="ContentPublishingReportController"
+     ng-controller="PublishingPerformanceReportController"
 >
     <div class="side-panel__header side-panel__header--border-b">
         <div class="side-panel__tools">
@@ -29,7 +29,7 @@
 
     <div sd-saved-report-list
          ng-if="currentPanel === 'saved'"
-         data-report-type="content_publishing_report"
+         data-report-type="publishing_performance_report"
          data-create-new-schedule="createNewSchedule"
          data-view-schedules="viewSchedules"
          class="side-panel__content"
@@ -63,11 +63,12 @@
         <div class="side-panel__content-block">
             <form name="publishingReportForm">
                 <div ng-show="currentTab==='parameters'"
-                     ng-include="'content-publishing-report-parameters.html'"
+                     ng-include="'publishing-performance-report-parameters.html'"
                 ></div>
                 <div sda-source-filters
                      ng-if="currentTab === 'filters'"
                 ></div>
+
                 <div ng-show="currentTab==='chartOptions'"
                      ng-include="'chart-form-options.html'"
                 ></div>

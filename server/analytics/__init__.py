@@ -21,6 +21,7 @@ from analytics.base_report import BaseReportService
 from analytics.saved_reports import SavedReportsResource, SavedReportsService
 from analytics.reports.scheduled_reports import ScheduledReportsResource, ScheduledReportsService
 from analytics.content_publishing_report import init_app as init_content_publishing_report
+from analytics.publishing_performance_report import init_app as init_publishing_performance_report
 from analytics.email_report import init_app as init_email_report
 
 from analytics.commands import SendScheduledReports  # noqa
@@ -124,6 +125,7 @@ def init_app(app):
     )
 
     init_content_publishing_report(app)
+    init_publishing_performance_report(app)
     init_email_report(app)
 
     # If this app is for testing, then create an endpoint for the base reporting service

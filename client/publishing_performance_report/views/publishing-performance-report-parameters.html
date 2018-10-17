@@ -1,0 +1,92 @@
+<div class="sd-alert sd-alert--hollow" translate>
+    Generate a report showing statistics for published content.
+</div>
+
+<div class="form__row">
+    <div class="sd-line-input sd-line-input--is-select">
+        <label class="sd-line-input__label" translate>Group By:</label>
+        <select class="sd-line-input__select"
+                ng-model="currentParams.params.aggs.group.field"
+                ng-change="updateChartConfig(true)"
+        >
+            <option ng-repeat="group in group_by | orderBy: 'name'"
+                    value="{{group.qcode}}"
+            >
+                {{:: group.name | translate}}
+            </option>
+        </select>
+    </div>
+</div>
+
+<div class="form__row">
+    <div class="sd-line-input sd-line-input--no-margin">
+        <label class="sd-line-input__label" translate>Date Filters</label>
+        <div class="flex-grid flex-grid--boxed-small flex-grid--wrap-items flex-grid--small-2">
+            <button sd-check
+                    data-type="radio"
+                    ng-model="currentParams.params.dates.filter"
+                    ng-value="yesterday"
+                    data-label-position="inside"
+                    ng-click="onDateFilterChange()"
+            >{{:: 'Yesterday' | translate }}</button>
+            <button sd-check
+                    data-type="radio"
+                    ng-model="currentParams.params.dates.filter"
+                    ng-value="last_week"
+                    data-label-position="inside"
+                    ng-click="onDateFilterChange()"
+            >{{:: 'Last Week' | translate }}</button>
+            <button sd-check
+                    data-type="radio"
+                    ng-model="currentParams.params.dates.filter"
+                    ng-value="last_month"
+                    data-label-position="inside"
+                    ng-click="onDateFilterChange()"
+            >{{:: 'Last Month' | translate }}</button>
+            <button sd-check
+                    data-type="radio"
+                    ng-model="currentParams.params.dates.filter"
+                    ng-value="range"
+                    data-label-position="inside"
+                    ng-click="onDateFilterChange()"
+            >{{:: 'Range' | translate }}</button>
+        </div>
+    </div>
+</div>
+
+<div class="form__row" ng-if="currentParams.params.dates.filter === 'range'">
+    <fieldset class="report-parameters">
+        <div class="multiple">
+            <div class="field">
+                <label
+                        for="parameters-start_date"
+                        translate
+                >
+                    From
+                </label>
+                <div
+                        sd-datepicker
+                        ng-model="currentParams.params.dates.start"
+                        id="parameters-start_date"
+                        data-on-change="updateChartConfig()"
+                ></div>
+            </div>
+
+            <div class="field">
+                <label
+                        for="parameters-end_date"
+                        translate
+                >
+                    To
+                </label>
+                <div
+                        sd-datepicker
+                        ng-model="currentParams.params.dates.end"
+                        id="parameters-end_date"
+                        data-on-change="updateChartConfig()"
+                ></div>
+            </div>
+
+        </div>
+    </fieldset>
+</div>

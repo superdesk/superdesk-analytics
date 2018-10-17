@@ -8,6 +8,11 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
+
+from superdesk import get_resource_service
+
+from analytics.common import get_cv_by_qcode
+
 from copy import deepcopy
 
 
@@ -32,6 +37,8 @@ class ChartConfig:
         self.chart_type = chart_type
         self.sources = []
         self.sort_order = 'desc'
+
+        self.translations = {}
 
     def is_multi_source(self):
         """Returns True if this chart has multiple data sources
@@ -112,8 +119,7 @@ class ChartConfig:
         :param str field: The field attribute of the source, i.e. anpa_category.qcode
         :return str: Data source name
         """
-
-        return field
+        return self._get_translation_title(field)
 
     def get_x_axis_config(self):
         """Generates the title and categories config for the X Axis
@@ -166,8 +172,11 @@ class ChartConfig:
         :param list[str] keys: An array of key values for the data sources
         :return list[str]: Names of the source data
         """
-
-        return keys
+        names = self._get_translation_names(field)
+        return [
+            names.get(qcode) or qcode
+            for qcode in keys
+        ]
 
     def get_source_title(self, field, qcode):
         """Generates the name for the specific data source
@@ -176,8 +185,7 @@ class ChartConfig:
         :param str qcode: The key value for the specific data source
         :return str: Name of the source type
         """
-
-        return qcode
+        return self._get_translation_names(field).get(qcode) or qcode
 
     def get_sorted_keys(self, data):
         """Generates array of keys based on sorting of the data (using this.sortOrder)
@@ -413,7 +421,10 @@ class ChartConfig:
         headers.extend([series['name'] for series in series_data])
         headers.append('Total Stories')
 
-        table_rows = [[group] for group in self.get_sorted_keys(parent['data']) or []]
+        table_rows = [
+            [self.get_source_title(parent['field'], group)]
+            for group in self.get_sorted_keys(parent['data']) or []
+        ]
 
         for series in series_data:
             for index, count in enumerate(series['data'], start=0):
@@ -452,9 +463,82 @@ class ChartConfig:
         """
         self.config = deepcopy(ChartConfig.defaultConfig)
 
+        self.load_translations()
+
         if self.chart_type == 'table':
             self.config.update(self.gen_table_config())
         else:
             self.config.update(self.gen_highcharts_config())
 
         return self.config
+
+    def load_translations(self, parent_field=None, child_field=None):
+        """Loads data for translating id/qcode to display names
+
+        :param str parent_field: Name of the first field (defaults to Parent)
+        :param str child_field: Name of the second field (defaults to Child)
+        """
+        if parent_field is None:
+            parent = self.get_parent()
+            parent_field = parent['field']
+
+        if child_field is None:
+            child = self.get_child()
+            child_field = child['field']
+
+        def load_translations_for_field(field):
+            if field == 'task.desk':
+                self.translations[field] = {
+                    'title': 'Desk',
+                    'names': {
+                        str(desk.get('_id')): desk.get('name')
+                        for desk in list(get_resource_service('desks').get(req=None, lookup={}))
+                    }
+                }
+            elif field == 'task.user':
+                self.translations[field] = {
+                    'title': 'User',
+                    'names': {
+                        str(user.get('_id')): user.get('display_name')
+                        for user in list(get_resource_service('users').get(req=None, lookup={}))
+                    }
+                }
+            elif field == 'anpa_category.qcode':
+                self.translations[field] = {
+                    'title': 'Category',
+                    'names': get_cv_by_qcode('categories', 'name')
+                }
+            elif field == 'genre.qcode':
+                self.translations[field] = {
+                    'title': 'Genre',
+                    'names': get_cv_by_qcode('genre', 'name')
+                }
+            elif field == 'urgency':
+                self.translations[field] = {
+                    'title': 'Urgency',
+                    'names': get_cv_by_qcode('urgency', 'name')
+                }
+            elif field == 'state':
+                self.translations[field] = {
+                    'title': 'State',
+                    'names': {
+                        'published': 'Published',
+                        'killed': 'Killed',
+                        'corrected': 'Corrected',
+                        'updated': 'Updated'
+                    }
+                }
+            elif field == 'source':
+                self.translations[field] = {'title': 'Source'}
+
+        load_translations_for_field(parent_field)
+        load_translations_for_field(child_field)
+
+    def _get_translations(self, field):
+        return self.translations.get(field) or {}
+
+    def _get_translation_title(self, field):
+        return self._get_translations(field).get('title') or field
+
+    def _get_translation_names(self, field):
+        return self._get_translations(field).get('names') or {}
