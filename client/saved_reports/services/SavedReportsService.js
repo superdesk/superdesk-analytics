@@ -47,36 +47,36 @@ export function SavedReportsService(
     this.convertDatesForServer = (params) => {
         const report = _.cloneDeep(params);
 
-        if (_.get(report, 'start_date')) {
-            report.start_date = moment(report.start_date, config.model.dateformat)
+        if (_.get(report, 'params.start_date')) {
+            report.params.start_date = moment(report.params.start_date, config.model.dateformat)
                 .format('YYYY-MM-DD');
-        } else if (_.get(report, 'dates.start')) {
-            report.dates.start = moment(report.dates.start, config.model.dateformat)
-                .format('YYYY-MM-DD');
-        }
-
-        if (_.get(report, 'end_date')) {
-            report.end_date = moment(report.end_date, config.model.dateformat)
-                .format('YYYY-MM-DD');
-        } else if (_.get(report, 'dates.end')) {
-            report.dates.end = moment(report.dates.end, config.model.dateformat)
+        } else if (_.get(report, 'params.dates.start')) {
+            report.params.dates.start = moment(report.params.dates.start, config.model.dateformat)
                 .format('YYYY-MM-DD');
         }
 
-        if (_.get(report, 'date')) {
-            report.date = moment(report.date, config.model.dateformat)
+        if (_.get(report, 'params.end_date')) {
+            report.params.end_date = moment(report.params.end_date, config.model.dateformat)
                 .format('YYYY-MM-DD');
-        } else if (_.get(report, 'dates.date')) {
-            report.dates.date = moment(report.dates.date, config.model.dateformat)
+        } else if (_.get(report, 'params.dates.end')) {
+            report.params.dates.end = moment(report.params.dates.end, config.model.dateformat)
                 .format('YYYY-MM-DD');
         }
 
-        if (report.date_filter && report.date_filter !== 'range') {
-            delete report.start_date;
-            delete report.end_date;
-        } else if (_.get(report, 'dates.filter') && report.dates.filter !== 'range') {
-            delete report.dates.start;
-            delete report.dates.end;
+        if (_.get(report, 'params.date')) {
+            report.params.date = moment(report.params.date, config.model.dateformat)
+                .format('YYYY-MM-DD');
+        } else if (_.get(report, 'params.dates.date')) {
+            report.params.dates.date = moment(report.params.dates.date, config.model.dateformat)
+                .format('YYYY-MM-DD');
+        }
+
+        if (_.get(report, 'params.date_filter') && report.params.date_filter !== 'range') {
+            delete report.params.start_date;
+            delete report.params.end_date;
+        } else if (_.get(report, 'params.dates.filter') && report.params.dates.filter !== 'range') {
+            delete report.params.dates.start;
+            delete report.params.dates.end;
         }
 
         return report;
@@ -96,7 +96,7 @@ export function SavedReportsService(
             report.params.start_date = moment(report.params.start_date, 'YYYY-MM-DD')
                 .format(config.model.dateformat);
         } else if (_.get(report, 'params.dates.start')) {
-            report.params.dates.start = moment(report.params.date.start, 'YYYY-MM-DD')
+            report.params.dates.start = moment(report.params.dates.start, 'YYYY-MM-DD')
                 .format(config.model.dateformat);
         }
 

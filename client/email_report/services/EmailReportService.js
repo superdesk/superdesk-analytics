@@ -60,10 +60,7 @@ export function EmailReportService(api, notify, gettext, savedReports, _) {
      */
     this.send = (report, email) => (
         api('email_report').save({}, {
-            report: {
-                ...report,
-                params: savedReports.convertDatesForServer(report.params),
-            },
+            report: savedReports.convertDatesForServer(report),
             email: email
         })
             .then(() => {
