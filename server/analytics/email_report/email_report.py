@@ -56,6 +56,10 @@ class EmailReportResource(Resource):
                     'type': 'integer',
                     'required': False,
                     'default': 800
+                },
+                'translations': {
+                    'type': 'dict',
+                    'required': False
                 }
             }
         },
@@ -146,6 +150,7 @@ class EmailReportService(BaseService):
         generated_report = list(report_service.get(
             req=None,
             params=report.get('params') or {},
+            translations=report.get('translations') or {},
             return_type=return_type
         ))[0]
 

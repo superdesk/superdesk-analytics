@@ -222,7 +222,7 @@ export function ChartConfig(
          * @description Returns the name for the given source
          */
         getSourceName(field) {
-            return this.getTranslationTitle(field);
+            return self.getTranslationTitle(field);
         }
 
         /**
@@ -288,7 +288,7 @@ export function ChartConfig(
          * @description Returns the list of titles used for the data sources
          */
         getSourceTitles(field, keys) {
-            const names = this.getTranslationNames(field);
+            const names = self.getTranslationNames(field);
 
             return keys.map((qcode) => _.get(names, qcode) || qcode);
         }
@@ -302,7 +302,7 @@ export function ChartConfig(
          * @description Returns the name for the specific data source
          */
         getSourceTitle(field, qcode) {
-            return this.getTranslationNames(field)[qcode] || qcode;
+            return self.getTranslationNames(field)[qcode] || qcode;
         }
 
         /**
@@ -646,136 +646,176 @@ export function ChartConfig(
          * @name HighchartConfig#loadTranslations
          * @param {String} parentField - Name of the first field (defaults to Parent)
          * @param {String} childField - Name of the second field (defaults to Child)
+         * @param {boolean} clearCurrent - Clears current translations if true
          * @return {Promise} Resolves when all translations have been loaded
          * @description Loads data for translating id/qcode to display names
          */
-        loadTranslations(parentField = null, childField = null) {
-            const promises = [];
-            const translateField = {
-                'task.desk': () => {
-                    promises.push(desks.fetchDesks()
-                        .then((data) => {
-                            self.translations['task.desk'] = {
-                                title: gettext('Desk'),
-                                names: _.fromPairs(_.map(
-                                    _.get(data, '_items') || [],
-                                    (desk) => [_.get(desk, '_id'), _.get(desk, 'name')]
-                                ))
-                            };
-                        }));
-                },
-                'task.user': () => {
-                    promises.push(userList.getAll()
-                        .then((users) => {
-                            self.translations['task.user'] = {
-                                title: gettext('User'),
-                                names: _.fromPairs(_.map(
-                                    users || [],
-                                    (user) => [_.get(user, '_id'), _.get(user, 'display_name')]
-                                ))
-                            };
-                        }));
-                },
-                'anpa_category.qcode': () => {
-                    promises.push(metadata.initialize()
-                        .then(() => {
-                            self.translations['anpa_category.qcode'] = {
-                                title: gettext('Category'),
-                                names: _.fromPairs(_.map(
-                                    _.get(metadata, 'values.categories') || [],
-                                    (item) => [_.get(item, 'qcode'), _.get(item, 'name')]
-                                ))
-                            };
-                        }));
-                },
-                'genre.qcode': () => {
-                    promises.push(metadata.initialize()
-                        .then(() => {
-                            self.translations['genre.qcode'] = {
-                                title: gettext('Genre'),
-                                names: _.fromPairs(_.map(
-                                    _.get(metadata, 'values.genre') || [],
-                                    (item) => [_.get(item, 'qcode'), _.get(item, 'name')]
-                                ))
-                            };
-                        }));
-                },
-                urgency: () => {
-                    promises.push(metadata.initialize()
-                        .then(() => {
-                            self.translations.urgency = {
-                                title: gettext('Urgency'),
-                                names: _.fromPairs(_.map(
-                                    _.get(metadata, 'values.urgency') || [],
-                                    (item) => [_.get(item, 'qcode'), _.get(item, 'name')]
-                                ))
-                            };
-                        }));
-                },
-                state: () => {
-                    self.translations.state = {
-                        title: gettext('State'),
-                        names: {
-                            published: gettext('Published'),
-                            killed: gettext('Killed'),
-                            corrected: gettext('Corrected'),
-                            updated: gettext('Updated'),
-                        },
-                    };
-                },
-                source: () => {
-                    self.translations.source = {title: gettext('Source')};
-                },
-            };
-
-            let fieldName = parentField || this.getParent().field;
-
-            if (_.get(translateField, fieldName)) {
-                translateField[fieldName]();
-            }
-
-            fieldName = childField || this.getChild().field;
-
-            if (_.get(translateField, fieldName)) {
-                translateField[fieldName]();
-            }
-
-            return $q.all(promises);
-        }
-
-        /**
-         * @ngdoc method
-         * @name HighchartConfig#getTranslations
-         * @param {String} field - Name of the field to get translations for
-         * @return {Object}
-         * @description Helper function to get the translations for a field
-         */
-        getTranslations(field) {
-            return self.translations[field] || {};
-        }
-
-        /**
-         * @ngdoc method
-         * @name HighchartConfig#getTranslationTitle
-         * @param {String} field - Name of the field to get translated title for
-         * @return {String}
-         * @description Helper function to get the translated title for a field
-         */
-        getTranslationTitle(field) {
-            return this.getTranslations(field).title || field;
-        }
-
-        /**
-         * @ngdoc method
-         * @name HighchartConfig#getTranslationNames
-         * @param {String} field - Name of the field to get translated names for
-         * @return {Object}
-         * @description Helper function to get the translated id->name map for a field
-         */
-        getTranslationNames(field) {
-            return this.getTranslations(field).names || {};
+        loadTranslations(parentField = null, childField = null, clearCurrent = false) {
+            return self.loadTranslations(
+                [
+                    parentField || this.getParent().field,
+                    childField || this.getChild().field,
+                ],
+                clearCurrent
+            );
         }
     }
+
+    /**
+     * @ngdoc method
+     * @name ChartConfig#setTranslation
+     * @param {String} field - The name of the field for this translation
+     * @param {String} title - The title of the field name
+     * @param {Object} names - Map of id/qcode to display names
+     * @description Saves the provided field translations
+     */
+    self.setTranslation = (field, title, names = {}) => {
+        self.translations[field.replace(/\./g, '_')] = {title, names};
+    };
+
+    /**
+     * @ngdoc method
+     * @name ChartConfig#getTranslations
+     * @param {String} field - Name of the field to get translations for
+     * @return {Object}
+     * @description Helper function to get the translations for a field
+     */
+    self.getTranslations = (field) => (
+        self.translations[field.replace(/\./g, '_')] || {}
+    );
+
+    /**
+     * @ngdoc method
+     * @name ChartConfig#getTranslationTitle
+     * @param {String} field - Name of the field to get translated title for
+     * @return {String}
+     * @description Helper function to get the translated title for a field
+     */
+    self.getTranslationTitle = (field) => (
+        self.getTranslations(field).title || field
+    );
+
+    /**
+     * @ngdoc method
+     * @name ChartConfig#getTranslationNames
+     * @param {String} field - Name of the field to get translated names for
+     * @return {Object}
+     * @description Helper function to get the translated id->name map for a field
+     */
+    self.getTranslationNames = (field) => (
+        self.getTranslations(field).names || {}
+    );
+
+    /**
+     * @ngdoc method
+     * @name ChartConfig#loadTranslations
+     * @param {Array} fields - Array of field names to load translations for
+     * @param {boolean} clearCurrent - Clears current translations if true
+     * @return {Promise} Resolves when all translations have been loaded
+     * @description Loads data for translating id/qcode to display names
+     */
+    self.loadTranslations = (fields, clearCurrent = false) => {
+        if (clearCurrent) {
+            self.translations = {};
+        }
+
+        const promises = [];
+        const translateField = {
+            'task.desk': () => {
+                promises.push(desks.fetchDesks()
+                    .then((data) => {
+                        self.setTranslation(
+                            'task.desk',
+                            gettext('Desk'),
+                            _.fromPairs(_.map(
+                                _.get(data, '_items') || [],
+                                (desk) => [_.get(desk, '_id'), _.get(desk, 'name')]
+                            ))
+                        );
+                    }));
+            },
+            'task.user': () => {
+                promises.push(userList.getAll()
+                    .then((users) => {
+                        self.setTranslation(
+                            'task.user',
+                            gettext('User'),
+                            _.fromPairs(_.map(
+                                users || [],
+                                (user) => [_.get(user, '_id'), _.get(user, 'display_name')]
+                            ))
+                        );
+                    }));
+            },
+            'anpa_category.qcode': () => {
+                promises.push(metadata.initialize()
+                    .then(() => {
+                        self.setTranslation(
+                            'anpa_category.qcode',
+                            gettext('Category'),
+                            _.fromPairs(_.map(
+                                _.get(metadata, 'values.categories') || [],
+                                (item) => [_.get(item, 'qcode'), _.get(item, 'name')]
+                            ))
+                        );
+                    }));
+            },
+            'genre.qcode': () => {
+                promises.push(metadata.initialize()
+                    .then(() => {
+                        self.setTranslation(
+                            'genre.qcode',
+                            gettext('Genre'),
+                            _.fromPairs(_.map(
+                                _.get(metadata, 'values.genre') || [],
+                                (item) => [_.get(item, 'qcode'), _.get(item, 'name')]
+                            ))
+                        );
+                    }));
+            },
+            urgency: () => {
+                promises.push(metadata.initialize()
+                    .then(() => {
+                        self.setTranslation(
+                            'urgency',
+                            gettextCatalog.getString('Urgency'),
+                            _.fromPairs(_.map(
+                                _.get(metadata, 'values.urgency') || [],
+                                (item) => [_.get(item, 'qcode'), _.get(item, 'name')]
+                            ))
+                        );
+                    }));
+            },
+            state: () => {
+                self.setTranslation(
+                    'state',
+                    gettext('State'),
+                    {
+                        published: gettext('Published'),
+                        killed: gettext('Killed'),
+                        corrected: gettext('Corrected'),
+                        updated: gettext('Updated'),
+                    }
+                );
+            },
+            source: () => {
+                self.setTranslation(
+                    'source',
+                    gettext('Source')
+                );
+            },
+        };
+
+        fields.forEach(
+            (field) => {
+                if (_.get(translateField, field)) {
+                    translateField[field]();
+                }
+            }
+        );
+
+        return $q.all(promises);
+    };
 
     /**
      * @ngdoc method

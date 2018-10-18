@@ -47,6 +47,10 @@ class SavedReportsResource(Resource):
             'type': 'boolean',
             'default': False
         },
+        'translations': {
+            'type': 'dict',
+            'required': False
+        }
     }
 
     url = 'saved_reports'
@@ -78,6 +82,7 @@ class SavedReportsService(BaseService):
         If not then the request owner should have global saved reports privilege
         """
         self._validate_on_update(updates, original)
+        self._null_updates_from_original(updates, original)
         super().on_update(updates, original)
 
     def on_updated(self, updates, original):
@@ -199,3 +204,26 @@ class SavedReportsService(BaseService):
         aggregations = list(report_service.get(request, lookup=None))[0]
 
         return saved_report, aggregations
+
+    def _null_updates_from_original(self, updates, original):
+        """Null values that are not in the updated report params"""
+
+        self._null_values(updates, original, 'translations')
+
+        if 'params' in updates:
+            self._null_values(updates['params'], original['params'], 'must')
+            self._null_values(updates['params'], original['params'], 'must_not')
+            self._null_values(updates['params'], original['params'], 'chart')
+            self._null_values(updates['params'], original['params'], 'dates')
+            self._null_values(updates['params'], original['params'], 'aggs')
+            self._null_values(updates['params'], original['params'], 'repos')
+
+    def _null_values(self, updates, original, field):
+        """Sets values to None that are in original but not in updates"""
+
+        if field not in updates:
+            return
+
+        for key in (original or {}).get(field) or {}:
+            if key not in updates[field]:
+                updates[field][key] = None

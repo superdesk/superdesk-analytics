@@ -487,58 +487,96 @@ class ChartConfig:
             child_field = child['field']
 
         def load_translations_for_field(field):
-            if field == 'task.desk':
-                self.translations[field] = {
-                    'title': 'Desk',
-                    'names': {
+            # If a translation for this field has already been loaded
+            # then don't bother re-loading the translation for it
+            if field in self.translations:
+                return
+
+            elif field == 'task.desk':
+                self._set_translation(
+                    'task.desk',
+                    'Desk',
+                    {
                         str(desk.get('_id')): desk.get('name')
                         for desk in list(get_resource_service('desks').get(req=None, lookup={}))
                     }
-                }
+                )
             elif field == 'task.user':
-                self.translations[field] = {
-                    'title': 'User',
-                    'names': {
+                self._set_translation(
+                    'task.user',
+                    'User',
+                    {
                         str(user.get('_id')): user.get('display_name')
                         for user in list(get_resource_service('users').get(req=None, lookup={}))
                     }
-                }
+                )
             elif field == 'anpa_category.qcode':
-                self.translations[field] = {
-                    'title': 'Category',
-                    'names': get_cv_by_qcode('categories', 'name')
-                }
+                self._set_translation(
+                    'anpa_category.qcode',
+                    'Category',
+                    get_cv_by_qcode('categories', 'name')
+                )
             elif field == 'genre.qcode':
-                self.translations[field] = {
-                    'title': 'Genre',
-                    'names': get_cv_by_qcode('genre', 'name')
-                }
+                self._set_translation(
+                    'genre.qcode',
+                    'Genre',
+                    get_cv_by_qcode('genre', 'name')
+                )
             elif field == 'urgency':
-                self.translations[field] = {
-                    'title': 'Urgency',
-                    'names': get_cv_by_qcode('urgency', 'name')
-                }
+                self._set_translation(
+                    'urgency',
+                    'Urgency',
+                    get_cv_by_qcode('urgency', 'name')
+                )
             elif field == 'state':
-                self.translations[field] = {
-                    'title': 'State',
-                    'names': {
+                self._set_translation(
+                    'state',
+                    'State',
+                    {
                         'published': 'Published',
                         'killed': 'Killed',
                         'corrected': 'Corrected',
                         'updated': 'Updated'
                     }
-                }
+                )
             elif field == 'source':
-                self.translations[field] = {'title': 'Source'}
+                self._set_translation('source', 'Source')
 
         load_translations_for_field(parent_field)
         load_translations_for_field(child_field)
 
+    def _set_translation(self, field, title, names=None):
+        """Saves the provided field translations
+
+        :param str field: The name of the field for this translation
+        :param str title: The title of the field name
+        :param dict names: Map of id/qcode to display names
+        """
+        self.translations[field.replace('.', '_')] = {
+            'title': title,
+            'names': names or {}
+        }
+
     def _get_translations(self, field):
-        return self.translations.get(field) or {}
+        """Helper function to get the translations for a field
+
+        :param str field: Name of the field to get translations for
+        :return dict: Title and name translations
+        """
+        return self.translations.get(field.replace('.', '_')) or {}
 
     def _get_translation_title(self, field):
+        """Helper function to get the translated title for a field
+
+        :param str field: Name of the field to get translated title for
+        :return str: Title of the field
+        """
         return self._get_translations(field).get('title') or field
 
     def _get_translation_names(self, field):
+        """Helper function to get the translated id/qcode to name map for a field
+
+        :param str field: Name of the field to get translated names for
+        :return dict: id/qcode to name map
+        """
         return self._get_translations(field).get('names') or {}

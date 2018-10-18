@@ -117,7 +117,8 @@ class BaseReportService(SearchService):
                 'params': lookup.get('params') or None,
                 'repo': lookup.get('repo') or None,
                 'return_type': lookup.get('return_type') or 'aggregations',
-                'aggs': lookup.get('aggs') or None
+                'aggs': lookup.get('aggs') or None,
+                'translations': lookup.get('translations') or None
             }
 
         # Args can either have source or params, not both
@@ -140,6 +141,12 @@ class BaseReportService(SearchService):
                 args['aggs'] = json.loads(args['aggs'])
             elif args['aggs'] is None:
                 del args['aggs']
+
+        if 'translations' in args:
+            if isinstance(args['translations'], str):
+                args['translations'] = json.loads(args['translations'])
+            elif args['translations'] is None:
+                del args['translations']
 
         args['return_type'] = args.get('return_type', 'aggregations')
 

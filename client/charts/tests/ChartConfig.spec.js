@@ -500,7 +500,7 @@ describe('chartConfig', () => {
             chart.loadTranslations();
             $rootScope.$digest();
             expect(chartConfig.translations).toEqual({
-                'anpa_category.qcode': {
+                anpa_category_qcode: {
                     title: 'Category',
                     names: {
                         a: 'Advisories',
@@ -554,7 +554,7 @@ describe('chartConfig', () => {
             chart.loadTranslations();
             $rootScope.$digest();
             expect(chartConfig.translations).toEqual({
-                'genre.qcode': {
+                genre_qcode: {
                     title: 'Genre',
                     names: {
                         Article: 'Article (news)',
@@ -580,7 +580,7 @@ describe('chartConfig', () => {
             chart.loadTranslations();
             $rootScope.$digest();
             expect(chartConfig.translations).toEqual({
-                'task.desk': {
+                task_desk: {
                     title: 'Desk',
                     names: {
                         desk1: 'Politic Desk',
@@ -606,7 +606,7 @@ describe('chartConfig', () => {
             chart.loadTranslations();
             $rootScope.$digest();
             expect(chartConfig.translations).toEqual({
-                'task.user': {
+                task_user: {
                     title: 'User',
                     names: {
                         user1: 'first user',
@@ -659,7 +659,10 @@ describe('chartConfig', () => {
             chart.loadTranslations();
             $rootScope.$digest();
             expect(chartConfig.translations).toEqual({
-                source: {title: 'Source'},
+                source: {
+                    title: 'Source',
+                    names: {},
+                },
             });
 
             expect(chart.getXAxisConfig()).toEqual({

@@ -313,6 +313,29 @@ export function PublishingPerformanceReportController(
             }));
     };
 
+    /**
+     * @ngdoc method
+     * @name PublishingPerformanceReportController#getReportParams
+     * @return {Promise}
+     * @description Loads field translations for this report and returns them along with current report params
+     * This is used so that saving this report will also save the translations with it
+     */
+    $scope.getReportParams = () => {
+        const groupField = _.get($scope.currentParams, 'params.aggs.group.field');
+        const subgroupField = _.get($scope.currentParams, 'params.aggs.subgroup.field');
+
+        return chartConfig.loadTranslations([groupField, subgroupField], true)
+            .then(() => (
+                $q.when(
+                    Object.assign(
+                        {},
+                        $scope.currentParams,
+                        {translations: chartConfig.translations}
+                    )
+                )
+            ));
+    };
+
     this.init();
 }
 
