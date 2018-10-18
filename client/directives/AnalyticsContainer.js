@@ -10,13 +10,14 @@
  * @requires $rootScope
  * @requires $timeout
  * @requires emailReport
+ * @required savedReports
  * @description A directive that encapsulates the entire analytics module view
  */
 export function AnalyticsContainer() {
     return {
         controllerAs: 'analytics',
         controller: ['$scope', '$location', 'pageTitle', 'gettext', 'lodash', 'reports', '$rootScope', '$timeout',
-            'emailReport',
+            'emailReport', 'savedReports',
             function AnalyticsContainerController(
                 $scope,
                 $location,
@@ -26,7 +27,8 @@ export function AnalyticsContainer() {
                 reports,
                 $rootScope,
                 $timeout,
-                emailReport
+                emailReport,
+                savedReports
             ) {
                 const defaultReportConfigs = {charts: []};
 
@@ -58,6 +60,7 @@ export function AnalyticsContainer() {
                  * @description Changes the current report
                  */
                 $scope.changeReport = (report) => {
+                    // If the report type has not changed, then don't do anything
                     if (_.get(report, 'id') === _.get($scope.currentReport, 'id')) {
                         return;
                     }
@@ -73,6 +76,9 @@ export function AnalyticsContainer() {
                         $location.search('report', null);
                         $scope.flags.showSidePanel = false;
                     }
+
+                    // Deselect any saved report
+                    savedReports.selectReport({});
                 };
 
                 /**

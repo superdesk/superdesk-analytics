@@ -8,6 +8,7 @@ ScheduledReportsList.$inject = [
     'gettext',
     'moment',
     'emailReport',
+    '$q',
 ];
 
 /**
@@ -22,6 +23,7 @@ ScheduledReportsList.$inject = [
  * @requires savedReports
  * @requires gettext
  * @requires emailReport
+ * @requires $q
  * @description A directive that renders the list of scheduled report cards
  */
 export function ScheduledReportsList(
@@ -33,7 +35,8 @@ export function ScheduledReportsList(
     savedReports,
     gettext,
     moment,
-    emailReport
+    emailReport,
+    $q
 ) {
     return {
         template: require('../views/scheduled-reports-list.html'),
@@ -50,28 +53,19 @@ export function ScheduledReportsList(
             */
             this.init = () => {
                 scope.currentSchedule = null;
-                scope.step = {showModal: false};
+                scope.flags = {
+                    showModal: false,
+                    loading: true,
+                };
                 scope.reports = reports.filter((report) => !!report.allowScheduling);
                 scope.schedules = [];
-                scope.savedReports = {};
-
-                savedReports.fetchAll(scope.currentReport.id)
-                    .then((reports) => {
-                        _.concat(
-                            reports.global,
-                            _.filter(reports.user, (report) => report.is_global)
-                        ).forEach((savedReport) => {
-                            scope.savedReports[savedReport._id] = savedReport;
-                        });
-                    });
-
-                this.loadSchedules();
 
                 scope.$on('analytics:schedules:open_create_modal', angular.bind(this, this.openCreateModal));
                 scope.$on('analytics:schedules:view_schedule', angular.bind(this, this.viewScheduleForReport));
                 scope.$on('analytics:schedules:create_new', angular.bind(this, this.createNewFromSavedReport));
-                scope.$on('scheduled_reports:update', angular.bind(this, this.loadSchedules));
-                scope.$watch('currentSavedReport', angular.bind(this, this.loadSchedules));
+                scope.$on('scheduled_reports:update', angular.bind(this, this.loadSchedulesAndReports));
+                scope.$watch('currentSavedReport', angular.bind(this, this.loadSchedulesAndReports));
+                scope.$watch('currentReport', angular.bind(this, this.loadSchedulesAndReports));
             };
 
             /**
@@ -101,39 +95,57 @@ export function ScheduledReportsList(
 
             /**
              * @ngdoc method
-             * @name sdScheduledReportsList#getSavedReportName
-             * @param {Object} schedule - The schedule to get the saved report name
-             * @return {String}
-             * @description Gets the name of the saved report for the provided schedule
-             */
-            scope.getSavedReportName = (schedule) => (
-                _.get(scope.savedReports, `[${schedule.saved_report}].name`) || '-'
-            );
-
-            /**
-             * @ngdoc method
-             * @name sdScheduledReportsList#getSavedReport
-             * @param {Object} schedule - The schedule to get the saved report for
-             * @return {Object} The saved report
-             * @description Retrieves the saved report for the provded schedule
-             */
-            scope.getSavedReport = (schedule) => (
-                _.get(scope.savedReports, `[${schedule.saved_report}]`) || {}
-            );
-
-            /**
-             * @ngdoc method
              * @name sdScheduledReportsList#loadSchedules
              * @description Loads all the schedules for the current report type
              */
-            this.loadSchedules = () => {
-                scheduledReports.fetchAll(scope.currentReport.id)
-                    .then((schedules) => {
-                        scope.schedules = _.filter(
+            this.loadSchedules = () => (
+                scheduledReports.fetchAll(_.get(scope, 'currentReport.id'))
+                    .then((schedules) => (
+                        _.filter(
                             schedules,
                             (schedule) => !scope.currentSavedReport ||
                                 schedule.saved_report === scope.currentSavedReport._id
-                        );
+                        )
+                    ))
+            );
+
+            /**
+             * @ngdoc method
+             * @name sdScheduledReportsList#loadSavedReports
+             * @description Loads all the saved reports for the current report type
+             */
+            this.loadSavedReports = () => (
+                savedReports.fetchAll(_.get(scope, 'currentReport.id'))
+                    .then((reports) => (
+                        _.keyBy(
+                            _.concat(
+                                reports.global,
+                                _.filter(reports.user, (report) => report.is_global)
+                            ),
+                            '_id'
+                        )
+                    ))
+            );
+
+            /**
+             * @ngdoc method
+             * @name sdScheduledReportsList#loadSchedulesAndReports
+             * @description Loads all schedules and saved reports for the current report type
+             */
+            this.loadSchedulesAndReports = () => {
+                scope.flags.loading = true;
+
+                $q.all({
+                    reports: this.loadSavedReports(),
+                    schedules: this.loadSchedules(),
+                })
+                    .then((data) => {
+                        _.forEach(data.schedules, (schedule) => {
+                            schedule._report = _.get(data.reports, `[${schedule.saved_report}]`) || null;
+                        });
+
+                        scope.schedules = data.schedules;
+                        scope.flags.loading = false;
                     });
             };
 
@@ -145,7 +157,7 @@ export function ScheduledReportsList(
              */
             scope.openModal = (schedule) => {
                 scope.currentSchedule = schedule;
-                scope.step.showModal = true;
+                scope.flags.showModal = true;
             };
 
             /**
@@ -155,7 +167,7 @@ export function ScheduledReportsList(
              */
             scope.closeModal = () => {
                 scope.currentSchedule = null;
-                scope.step.showModal = false;
+                scope.flags.showModal = false;
             };
 
             /**
@@ -203,7 +215,7 @@ export function ScheduledReportsList(
                     transmitter: 'email',
                     saved_report: savedReport._id || null,
                 };
-                scope.step.showModal = true;
+                scope.flags.showModal = true;
             };
 
             /**
@@ -261,7 +273,7 @@ export function ScheduledReportsList(
              * @description Opens the sdEmailReportModal with the provided schedule
              */
             scope.openEmailModal = (schedule) => {
-                const savedReport = scope.getSavedReport(schedule);
+                const savedReport = _.get(schedule, '_report') || {};
 
                 const report = {
                     type: _.get(schedule, 'report_type'),
