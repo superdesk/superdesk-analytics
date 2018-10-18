@@ -1,15 +1,64 @@
 describe('chartConfig', () => {
     let chartConfig;
+    let $rootScope;
+    let metadata;
+    let $q;
+    let config;
+    let desks;
+    let userList;
 
     beforeEach(window.module('angularMoment'));
+    beforeEach(window.module('superdesk.apps.users'));
+    beforeEach(window.module('superdesk.apps.authoring.metadata'));
+    beforeEach(window.module('superdesk.apps.desks'));
     beforeEach(window.module('superdesk.core.notify'));
     beforeEach(window.module('superdesk.analytics.charts'));
 
-    beforeEach(() => {
-        inject(($injector) => {
-            chartConfig = $injector.get('chartConfig');
-        });
-    });
+    beforeEach(inject((_$rootScope_, _chartConfig_, _metadata_, _$q_, _desks_, _userList_) => {
+        $rootScope = _$rootScope_;
+        chartConfig = _chartConfig_;
+        metadata = _metadata_;
+        $q = _$q_;
+        desks = _desks_;
+        userList = _userList_;
+
+        metadata.values = {
+            categories: [
+                {qcode: 'a', name: 'Advisories'},
+                {qcode: 'b', name: 'Basketball'},
+                {qcode: 'c', name: 'Cricket'},
+            ],
+            urgency: [
+                {qcode: 1, name: 1},
+                {qcode: 2, name: 2},
+                {qcode: 3, name: 3},
+                {qcode: 4, name: 4},
+                {qcode: 5, name: 5},
+            ],
+            genre: [
+                {qcode: 'Article', name: 'Article (news)'},
+                {qcode: 'Sidebar', name: 'Sidebar'},
+                {qcode: 'Factbox', name: 'Factbox'},
+            ]
+        };
+        spyOn(metadata, 'initialize').and.returnValue($q.when(metadata));
+
+        spyOn(desks, 'fetchDesks').and.returnValue($q.when({
+            _items: [
+                {_id: 'desk1', name: 'Politic Desk'},
+                {_id: 'desk2', name: 'Sports Desk'},
+                {_id: 'desk3', name: 'System Desk'},
+            ],
+        }));
+
+        spyOn(userList, 'getAll').and.returnValue($q.when([
+            {_id: 'user1', display_name: 'first user'},
+            {_id: 'user2', display_name: 'second user'},
+            {_id: 'user3', display_name: 'last user'},
+        ]));
+
+        config = {};
+    }));
 
     const genSingleChart = (chartId, chartType) => {
         const chart = chartConfig.newConfig(chartId, chartType);
@@ -22,22 +71,22 @@ describe('chartConfig', () => {
         const chart = chartConfig.newConfig(chartId, chartType);
 
         chart.addSource('anpa_category.qcode', {
-            a: {
-                1: 1,
-                3: 1,
-            },
-            b: {
-                1: 1,
-                3: 2,
-            },
-            c: {
-                1: 2,
-                3: 1,
-                5: 1,
-            },
+            a: {1: 1, 3: 1},
+            b: {1: 1, 3: 2},
+            c: {1: 2, 3: 1, 5: 1},
         });
         chart.addSource('urgency', {1: 4, 3: 4, 5: 1});
         return chart;
+    };
+
+    const genConfig = (chart) => {
+        chart.genConfig()
+            .then((generatedConfig) => {
+                config = generatedConfig;
+            });
+        $rootScope.$digest();
+
+        return config;
     };
 
     it('can generate single series', () => {
@@ -48,7 +97,7 @@ describe('chartConfig', () => {
 
         expect(chart.isMultiSource()).toBe(false);
 
-        expect(chart.genConfig()).toEqual({
+        expect(genConfig(chart)).toEqual({
             id: 'cid',
             type: 'bar',
             chart: {
@@ -58,8 +107,8 @@ describe('chartConfig', () => {
             title: {text: 'Charts'},
             subtitle: {text: 'For Today'},
             xAxis: {
-                title: {text: 'anpa_category.qcode'},
-                categories: ['b', 'a', 'c'],
+                title: {text: 'Category'},
+                categories: ['Basketball', 'Advisories', 'Cricket'],
             },
             yAxis: {
                 title: {text: 'Published Stories'},
@@ -107,13 +156,12 @@ describe('chartConfig', () => {
 
     it('can sort single series', () => {
         const chart = genSingleChart('cid', 'bar');
-        let config;
 
         chart.sortOrder = 'asc';
-        config = chart.genConfig();
+        genConfig(chart);
         expect(config.xAxis).toEqual({
-            title: {text: 'anpa_category.qcode'},
-            categories: ['c', 'a', 'b'],
+            title: {text: 'Category'},
+            categories: ['Cricket', 'Advisories', 'Basketball'],
         });
         expect(config.series).toEqual([{
             name: 'Published Stories',
@@ -121,10 +169,10 @@ describe('chartConfig', () => {
         }]);
 
         chart.sortOrder = 'desc';
-        config = chart.genConfig();
+        genConfig(chart);
         expect(config.xAxis).toEqual({
-            title: {text: 'anpa_category.qcode'},
-            categories: ['b', 'a', 'c'],
+            title: {text: 'Category'},
+            categories: ['Basketball', 'Advisories', 'Cricket'],
         });
         expect(config.series).toEqual([{
             name: 'Published Stories',
@@ -139,8 +187,7 @@ describe('chartConfig', () => {
         chart.subtitle = 'For Today';
 
         expect(chart.isMultiSource()).toBe(true);
-
-        expect(chart.genConfig()).toEqual({
+        expect(genConfig(chart)).toEqual({
             id: 'cid',
             type: 'column',
             chart: {
@@ -150,8 +197,8 @@ describe('chartConfig', () => {
             title: {text: 'Charts'},
             subtitle: {text: 'For Today'},
             xAxis: {
-                title: {text: 'anpa_category.qcode'},
-                categories: ['c', 'b', 'a'],
+                title: {text: 'Category'},
+                categories: ['Cricket', 'Basketball', 'Advisories'],
             },
             yAxis: {
                 title: {text: 'Published Stories'},
@@ -160,7 +207,7 @@ describe('chartConfig', () => {
             },
             legend: {
                 enabled: true,
-                title: {text: 'urgency'},
+                title: {text: 'Urgency'},
             },
             tooltip: {
                 headerFormat: '{series.name}/{point.x}: {point.y}',
@@ -208,13 +255,12 @@ describe('chartConfig', () => {
 
     it('can sort stacked series', () => {
         const chart = genStackedChart('cid', 'bar');
-        let config;
 
         chart.sortOrder = 'asc';
-        config = chart.genConfig();
+        genConfig(chart);
         expect(config.xAxis).toEqual({
-            title: {text: 'anpa_category.qcode'},
-            categories: ['a', 'b', 'c'],
+            title: {text: 'Category'},
+            categories: ['Advisories', 'Basketball', 'Cricket'],
         });
         expect(config.series).toEqual([{
             name: '1',
@@ -228,10 +274,10 @@ describe('chartConfig', () => {
         }]);
 
         chart.sortOrder = 'desc';
-        config = chart.genConfig();
+        genConfig(chart);
         expect(config.xAxis).toEqual({
-            title: {text: 'anpa_category.qcode'},
-            categories: ['c', 'b', 'a'],
+            title: {text: 'Category'},
+            categories: ['Cricket', 'Basketball', 'Advisories'],
         });
         expect(config.series).toEqual([{
             name: '1',
@@ -250,65 +296,62 @@ describe('chartConfig', () => {
 
         chart.title = 'Tables';
         chart.subtitle = 'For Today';
-
-        expect(chart.isMultiSource()).toBe(false);
-        expect(chart.genConfig()).toEqual({
+        expect(genConfig(chart)).toEqual({
             id: 'tid',
             type: 'table',
             chart: {type: 'column'},
             title: 'Tables',
             subtitle: 'For Today',
             xAxis: {
-                title: {text: 'anpa_category.qcode'},
-                categories: ['b', 'a', 'c'],
+                title: {text: 'Category'},
+                categories: ['Basketball', 'Advisories', 'Cricket'],
             },
             series: [{
                 name: 'Published Stories',
                 data: [4, 3, 1],
             }],
-            headers: ['anpa_category.qcode', 'Published Stories'],
+            headers: ['Category', 'Published Stories'],
             rows: [
-                ['b', 4],
-                ['a', 3],
-                ['c', 1],
+                ['Basketball', 4],
+                ['Advisories', 3],
+                ['Cricket', 1],
             ],
         });
     });
 
     it('can sort single column table', () => {
         const chart = genSingleChart('tid', 'table');
-        let config;
 
         chart.sortOrder = 'asc';
-        config = chart.genConfig();
+        genConfig(chart);
         expect(config.xAxis).toEqual({
-            title: {text: 'anpa_category.qcode'},
-            categories: ['c', 'a', 'b'],
+            title: {text: 'Category'},
+            categories: ['Cricket', 'Advisories', 'Basketball'],
         });
         expect(config.series).toEqual([{
             name: 'Published Stories',
             data: [1, 3, 4],
         }]);
         expect(config.rows).toEqual([
-            ['c', 1],
-            ['a', 3],
-            ['b', 4],
+            ['Cricket', 1],
+            ['Advisories', 3],
+            ['Basketball', 4],
         ]);
 
         chart.sortOrder = 'desc';
-        config = chart.genConfig();
+        genConfig(chart);
         expect(config.xAxis).toEqual({
-            title: {text: 'anpa_category.qcode'},
-            categories: ['b', 'a', 'c'],
+            title: {text: 'Category'},
+            categories: ['Basketball', 'Advisories', 'Cricket'],
         });
         expect(config.series).toEqual([{
             name: 'Published Stories',
             data: [4, 3, 1],
         }]);
         expect(config.rows).toEqual([
-            ['b', 4],
-            ['a', 3],
-            ['c', 1],
+            ['Basketball', 4],
+            ['Advisories', 3],
+            ['Cricket', 1],
         ]);
     });
 
@@ -319,16 +362,15 @@ describe('chartConfig', () => {
         chart.subtitle = 'For Today';
 
         expect(chart.isMultiSource()).toBe(true);
-
-        expect(chart.genConfig()).toEqual({
+        expect(genConfig(chart)).toEqual({
             id: 'tid',
             type: 'table',
             chart: {type: 'column'},
             title: 'Tables',
             subtitle: 'For Today',
             xAxis: {
-                title: {text: 'anpa_category.qcode'},
-                categories: ['c', 'b', 'a'],
+                title: {text: 'Category'},
+                categories: ['Cricket', 'Basketball', 'Advisories'],
             },
             series: [{
                 name: '1',
@@ -340,24 +382,23 @@ describe('chartConfig', () => {
                 name: '5',
                 data: [1, 0, 0],
             }],
-            headers: ['anpa_category.qcode', '1', '3', '5', 'Total Stories'],
+            headers: ['Category', '1', '3', '5', 'Total Stories'],
             rows: [
-                ['c', 2, 1, 1, 4],
-                ['b', 1, 2, 0, 3],
-                ['a', 1, 1, 0, 2],
+                ['Cricket', 2, 1, 1, 4],
+                ['Basketball', 1, 2, 0, 3],
+                ['Advisories', 1, 1, 0, 2],
             ],
         });
     });
 
     it('test sort multi column table', () => {
         const chart = genStackedChart('tid', 'table');
-        let config;
 
         chart.sortOrder = 'asc';
-        config = chart.genConfig();
+        genConfig(chart);
         expect(config.xAxis).toEqual({
-            title: {text: 'anpa_category.qcode'},
-            categories: ['a', 'b', 'c'],
+            title: {text: 'Category'},
+            categories: ['Advisories', 'Basketball', 'Cricket'],
         });
         expect(config.series).toEqual([{
             name: '1',
@@ -370,16 +411,16 @@ describe('chartConfig', () => {
             data: [0, 0, 1],
         }]);
         expect(config.rows).toEqual([
-            ['a', 1, 1, 0, 2],
-            ['b', 1, 2, 0, 3],
-            ['c', 2, 1, 1, 4],
+            ['Advisories', 1, 1, 0, 2],
+            ['Basketball', 1, 2, 0, 3],
+            ['Cricket', 2, 1, 1, 4],
         ]);
 
         chart.sortOrder = 'desc';
-        config = chart.genConfig();
+        genConfig(chart);
         expect(config.xAxis).toEqual({
-            title: {text: 'anpa_category.qcode'},
-            categories: ['c', 'b', 'a'],
+            title: {text: 'Category'},
+            categories: ['Cricket', 'Basketball', 'Advisories'],
         });
         expect(config.series).toEqual([{
             name: '1',
@@ -392,9 +433,9 @@ describe('chartConfig', () => {
             data: [1, 0, 0],
         }]);
         expect(config.rows).toEqual([
-            ['c', 2, 1, 1, 4],
-            ['b', 1, 2, 0, 3],
-            ['a', 1, 1, 0, 2],
+            ['Cricket', 2, 1, 1, 4],
+            ['Basketball', 1, 2, 0, 3],
+            ['Advisories', 1, 1, 0, 2],
         ]);
     });
 
@@ -439,13 +480,192 @@ describe('chartConfig', () => {
             })
         );
 
-        const config = chart.genConfig();
-
+        genConfig(chart);
         expect(config.title).toEqual({text: 'Charts - Testing'});
         expect(config.subtitle).toEqual({text: 'For Today - Test 2'});
         expect(config.xAxis).toEqual({
             title: {text: 'Category'},
             categories: ['Basketball', 'Advisories', 'Cricket'],
+        });
+    });
+
+    describe('chart text translations', () => {
+        it('translates anpa_category.qcode', () => {
+            const chart = chartConfig.newConfig('category', 'bar');
+
+            chart.addSource('anpa_category.qcode', {a: 3, b: 4, c: 1});
+
+            expect(chartConfig.translations).toEqual({});
+
+            chart.loadTranslations();
+            $rootScope.$digest();
+            expect(chartConfig.translations).toEqual({
+                'anpa_category.qcode': {
+                    title: 'Category',
+                    names: {
+                        a: 'Advisories',
+                        b: 'Basketball',
+                        c: 'Cricket',
+                    },
+                },
+            });
+
+            expect(chart.getXAxisConfig()).toEqual({
+                title: {text: 'Category'},
+                categories: ['Basketball', 'Advisories', 'Cricket'],
+            });
+        });
+
+        it('translates urgency', () => {
+            const chart = chartConfig.newConfig('urgency', 'bar');
+
+            chart.addSource('urgency', {1: 4, 3: 4, 5: 1});
+
+            expect(chartConfig.translations).toEqual({});
+
+            chart.loadTranslations();
+            $rootScope.$digest();
+            expect(chartConfig.translations).toEqual({
+                urgency: {
+                    title: 'Urgency',
+                    names: {
+                        1: 1,
+                        2: 2,
+                        3: 3,
+                        4: 4,
+                        5: 5,
+                    },
+                },
+            });
+
+            expect(chart.getXAxisConfig()).toEqual({
+                title: {text: 'Urgency'},
+                categories: [1, 3, 5],
+            });
+        });
+
+        it('translates genre.qcode', () => {
+            const chart = chartConfig.newConfig('genre', 'bar');
+
+            chart.addSource('genre.qcode', {Article: 4, Sidebar: 4, Factbox: 1});
+
+            expect(chartConfig.translations).toEqual({});
+
+            chart.loadTranslations();
+            $rootScope.$digest();
+            expect(chartConfig.translations).toEqual({
+                'genre.qcode': {
+                    title: 'Genre',
+                    names: {
+                        Article: 'Article (news)',
+                        Sidebar: 'Sidebar',
+                        Factbox: 'Factbox',
+                    },
+                },
+            });
+
+            expect(chart.getXAxisConfig()).toEqual({
+                title: {text: 'Genre'},
+                categories: ['Article (news)', 'Sidebar', 'Factbox'],
+            });
+        });
+
+        it('translates task.desk', () => {
+            const chart = chartConfig.newConfig('desk', 'bar');
+
+            chart.addSource('task.desk', {desk1: 4, desk2: 5, desk3: 1});
+
+            expect(chartConfig.translations).toEqual({});
+
+            chart.loadTranslations();
+            $rootScope.$digest();
+            expect(chartConfig.translations).toEqual({
+                'task.desk': {
+                    title: 'Desk',
+                    names: {
+                        desk1: 'Politic Desk',
+                        desk2: 'Sports Desk',
+                        desk3: 'System Desk',
+                    },
+                },
+            });
+
+            expect(chart.getXAxisConfig()).toEqual({
+                title: {text: 'Desk'},
+                categories: ['Sports Desk', 'Politic Desk', 'System Desk'],
+            });
+        });
+
+        it('translates task.user', () => {
+            const chart = chartConfig.newConfig('user', 'bar');
+
+            chart.addSource('task.user', {user1: 3, user2: 4, user3: 5});
+
+            expect(chartConfig.translations).toEqual({});
+
+            chart.loadTranslations();
+            $rootScope.$digest();
+            expect(chartConfig.translations).toEqual({
+                'task.user': {
+                    title: 'User',
+                    names: {
+                        user1: 'first user',
+                        user2: 'second user',
+                        user3: 'last user',
+                    },
+                },
+            });
+
+            expect(chart.getXAxisConfig()).toEqual({
+                title: {text: 'User'},
+                categories: ['last user', 'second user', 'first user'],
+            });
+        });
+
+        it('translates state', () => {
+            const chart = chartConfig.newConfig('state', 'bar');
+
+            chart.addSource('state', {published: 3, killed: 1, updated: 5});
+
+            expect(chartConfig.translations).toEqual({});
+
+            chart.loadTranslations();
+            $rootScope.$digest();
+            expect(chartConfig.translations).toEqual({
+                state: {
+                    title: 'State',
+                    names: {
+                        published: 'Published',
+                        killed: 'Killed',
+                        corrected: 'Corrected',
+                        updated: 'Updated',
+                    },
+                },
+            });
+
+            expect(chart.getXAxisConfig()).toEqual({
+                title: {text: 'State'},
+                categories: ['Updated', 'Published', 'Killed'],
+            });
+        });
+
+        it('translates source', () => {
+            const chart = chartConfig.newConfig('state', 'bar');
+
+            chart.addSource('source', {aap: 3, ftp: 1, ap: 5});
+
+            expect(chartConfig.translations).toEqual({});
+
+            chart.loadTranslations();
+            $rootScope.$digest();
+            expect(chartConfig.translations).toEqual({
+                source: {title: 'Source'},
+            });
+
+            expect(chart.getXAxisConfig()).toEqual({
+                title: {text: 'Source'},
+                categories: ['ap', 'aap', 'ftp'],
+            });
         });
     });
 });

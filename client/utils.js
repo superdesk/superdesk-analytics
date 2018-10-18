@@ -46,42 +46,47 @@ export function formatDate(moment, config, dateTime, format = 'LL') {
  * @name Analytics#generateSubtitle
  * @param {Object} moment
  * @param {Object} config
- * @param {Object} report
+ * @param {Object} params
  * @returns {String}
  * @description Returns a subtitle for a chart based on the supplied date filter and start/end dates
  */
-export function generateSubtitle(moment, config, report) {
-    if (report && report.date_filter) {
-        if (report.date_filter === 'range') {
-            if (moment(report.start_date, config.model.dateformat).isValid() &&
-                moment(report.end_date, config.model.dateformat).isValid()
-            ) {
-                return formatDate(moment, config, report.start_date) +
-                    ' - ' +
-                    formatDate(moment, config, report.end_date);
-            }
+export function generateSubtitle(moment, config, params) {
+    if (_.get(params, 'chart.subtitle')) {
+        return params.chart.subtitle;
+    }
 
-            return null;
-        } else if (report.date_filter === 'yesterday') {
-            return moment()
-                .subtract(1, 'days')
-                .format('dddd Do MMMM YYYY');
-        } else if (report.date_filter === 'last_week') {
-            const startDate = moment()
-                .subtract(1, 'weeks')
-                .startOf('week')
-                .format('LL');
-            const endDate = moment()
-                .subtract(1, 'weeks')
-                .endOf('week')
-                .format('LL');
+    const dateFilter = _.get(params, 'date_filter') || _.get(params, 'dates.filter');
 
-            return startDate + ' - ' + endDate;
-        } else if (report.date_filter === 'last_month') {
-            return moment()
-                .subtract(1, 'months')
-                .format('MMMM YYYY');
+    if (dateFilter === 'range') {
+        const start = _.get(params, 'start_date') || _.get(params, 'dates.start');
+        const end = _.get(params, 'end_date') || _.get(params, 'dates.end');
+
+        if (moment(start, config.model.dateformat).isValid() &&
+            moment(end, config.model.dateformat).isValid()
+        ) {
+            return formatDate(moment, config, start) +
+                ' - ' +
+                formatDate(moment, config, end);
         }
+    } else if (dateFilter === 'yesterday') {
+        return moment()
+            .subtract(1, 'days')
+            .format('dddd Do MMMM YYYY');
+    } else if (dateFilter === 'last_week') {
+        const startDate = moment()
+            .subtract(1, 'weeks')
+            .startOf('week')
+            .format('LL');
+        const endDate = moment()
+            .subtract(1, 'weeks')
+            .endOf('week')
+            .format('LL');
+
+        return startDate + ' - ' + endDate;
+    } else if (dateFilter === 'last_month') {
+        return moment()
+            .subtract(1, 'months')
+            .format('MMMM YYYY');
     }
 
     return null;
@@ -112,15 +117,3 @@ export const getErrorMessage = (error, defaultMessage) => {
 
     return defaultMessage;
 };
-
-/**
- * @ngdoc method
- * @name Analytics#getNameFromQcode
- * @param {Object} data - Object where the keys are the qcode
- * @param {String} qcode - Qcode value to search for
- * @return {String}
- * @description Returns the name from the data source given the qcode
- */
-export const getNameFromQcode = (data, qcode) => (
-    _.get(data, `['${qcode}'].name`) || qcode
-);

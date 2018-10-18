@@ -13,11 +13,6 @@ export function EmailReportModal(emailReport, _, gettext, scheduledReports) {
     return {
         template: require('../views/email-report-modal.html'),
         link: function(scope) {
-            // TODO: Validate the form, i.e. recipients must not be empty
-            //          Create a separate directive for the email form input???
-
-            // TODO: Use the newer tag input from the UI-Framework
-
             /**
              * @ngdoc method
              * @name init

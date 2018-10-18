@@ -1,0 +1,1 @@
+export {PublishingPerformanceReportController} from './PublishingPerformanceReportController';

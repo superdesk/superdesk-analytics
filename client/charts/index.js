@@ -21,6 +21,14 @@ require('highcharts/js/modules/export-data')(Highcharts);
 require('highcharts/js/modules/offline-exporting')(Highcharts);
 require('highcharts/js/modules/no-data-to-display')(Highcharts);
 
+function cacheIncludedTemplates($templateCache) {
+    $templateCache.put(
+        'chart-form-options.html',
+        require('./views/chart-form-options.html')
+    );
+}
+cacheIncludedTemplates.$inject = ['$templateCache'];
+
 /**
  * @ngdoc module
  * @module superdesk.analytics.charts
@@ -35,4 +43,6 @@ angular.module('superdesk.analytics.charts', [])
     .service('chartConfig', svc.ChartConfig)
 
     .directive('sdChart', directives.Chart)
-    .directive('sdChartContainer', directives.ChartContainer);
+    .directive('sdChartContainer', directives.ChartContainer)
+
+    .run(cacheIncludedTemplates);

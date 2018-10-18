@@ -16,16 +16,16 @@ from analytics.chart_config import ChartConfig
 from datetime import datetime, timedelta
 
 
-class ContentPublishingReportResource(Resource):
-    """Content Publishing Report schema
+class PublishingPerformanceReportResource(Resource):
+    """Publishing Performance Report schema
     """
 
     item_methods = ['GET']
     resource_methods = ['GET']
-    privileges = {'GET': 'content_publishing_report'}
+    privileges = {'GET': 'publishing_performance_report'}
 
 
-class ContentPublishingReportService(BaseReportService):
+class PublishingPerformanceReportService(BaseReportService):
     aggregations = {
         'source': {
             'terms': {
@@ -43,6 +43,40 @@ class ContentPublishingReportService(BaseReportService):
             'terms': {
                 'field': agg.get('field'),
                 'size': agg.get('size') or 0
+            },
+            'aggs': {
+                'no_rewrite_of': {
+                    'filter': {
+                        'not': {
+                            'filter': {
+                                'exists': {
+                                    'field': 'rewrite_of'
+                                }
+                            }
+                        }
+                    },
+                    'aggs': {
+                        'state': {
+                            'terms': {
+                                'field': 'state'
+                            }
+                        }
+                    }
+                },
+                'rewrite_of': {
+                    'filter': {
+                        'exists': {
+                            'field': 'rewrite_of'
+                        }
+                    },
+                    'aggs': {
+                        'state': {
+                            'terms': {
+                                'field': 'state'
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -56,17 +90,12 @@ class ContentPublishingReportService(BaseReportService):
         aggs = params.pop('aggs', None)
 
         if not aggs or not (aggs.get('group') or {}).get('field'):
-            self.aggregations = ContentPublishingReportService.aggregations
+            self.aggregations = PublishingPerformanceReportService.aggregations
             return super().run_query(request, params)
 
         self.aggregations = {
             'parent': self._get_aggregation_query(aggs['group'])
         }
-
-        if aggs.get('subgroup'):
-            self.aggregations['parent']['aggs'] = {
-                'child': self._get_aggregation_query(aggs['subgroup'])
-            }
 
         docs = super().run_query(request, params)
 
@@ -80,12 +109,15 @@ class ContentPublishingReportService(BaseReportService):
         """
         agg_buckets = self.get_aggregation_buckets(getattr(docs, 'hits'))
 
-        report = {'groups': {}}
-
-        has_children = 'field' in ((args.get('aggs') or {}).get('subgroup') or {})
-
-        if has_children:
-            report['subgroups'] = {}
+        report = {
+            'groups': {},
+            'subgroups': {
+                'killed': 0,
+                'corrected': 0,
+                'updated': 0,
+                'published': 0
+            }
+        }
 
         for parent in agg_buckets.get('parent') or []:
             parent_key = parent.get('key')
@@ -93,24 +125,45 @@ class ContentPublishingReportService(BaseReportService):
             if not parent_key:
                 continue
 
-            if not has_children:
-                report['groups'][parent_key] = parent.get('doc_count') or 0
-                continue
+            report['groups'][parent_key] = {
+                'killed': 0,
+                'corrected': 0,
+                'updated': 0,
+                'published': 0,
+            }
 
-            report['groups'][parent_key] = {}
+            no_rewrite_of = (parent.get('no_rewrite_of') or {}).get('state') or {}
+            rewrite_of = (parent.get('rewrite_of') or {}).get('state') or {}
 
-            for child in (parent.get('child') or {}).get('buckets') or []:
-                child_key = child.get('key')
+            for child in no_rewrite_of.get('buckets') or []:
+                state_key = child.get('key')
 
-                if not child_key:
+                if not state_key:
                     continue
 
-                if child_key not in report['subgroups']:
-                    report['subgroups'][child_key] = 0
+                doc_count = child.get('doc_count') or 0
+
+                if state_key == 'published':
+                    report['groups'][parent_key]['published'] += doc_count
+                    report['subgroups']['published'] += doc_count
+                elif state_key == 'killed':
+                    report['groups'][parent_key]['killed'] += doc_count
+                    report['subgroups']['killed'] += doc_count
+
+            for child in rewrite_of.get('buckets') or []:
+                state_key = child.get('key')
+
+                if not state_key:
+                    continue
 
                 doc_count = child.get('doc_count') or 0
-                report['groups'][parent_key][child_key] = doc_count
-                report['subgroups'][child_key] += doc_count
+
+                if state_key == 'corrected':
+                    report['groups'][parent_key]['corrected'] += doc_count
+                    report['subgroups']['corrected'] += doc_count
+                elif state_key == 'published':
+                    report['groups'][parent_key]['updated'] += doc_count
+                    report['subgroups']['updated'] += doc_count
 
         return report
 
@@ -127,10 +180,17 @@ class ContentPublishingReportService(BaseReportService):
 
         chart_config = ChartConfig('content_publishing', chart_type)
 
-        chart_config.add_source(group.get('field'), report.get('groups'))
-
-        if report.get('subgroups'):
-            chart_config.add_source(subgroup.get('field'), report['subgroups'])
+        group_keys = list(report['groups'].keys())
+        if len(group_keys) == 1 and report.get('subgroups'):
+            chart_config.add_source(
+                subgroup.get('field'),
+                report['subgroups']
+            )
+            chart_config.load_translations(group.get('field'))
+        else:
+            chart_config.add_source(group.get('field'), report.get('groups'))
+            if report.get('subgroups'):
+                chart_config.add_source(subgroup.get('field'), report['subgroups'])
 
         def gen_title():
             if chart.get('title'):
@@ -139,13 +199,15 @@ class ContentPublishingReportService(BaseReportService):
             group_type = group.get('field')
             group_title = chart_config.get_source_name(group_type)
 
-            if subgroup.get('field'):
-                subgroup_type = subgroup.get('field')
-                subgroup_title = chart_config.get_source_name(subgroup_type)
+            if len(group_keys) == 1 and report.get('subgroups'):
+                data_name = chart_config.get_source_title(
+                    group_type,
+                    group_keys[0]
+                )
 
-                return 'Published Stories per {} with {} breakdown'.format(
+                return 'Published Stories for {}: {}'.format(
                     group_title,
-                    subgroup_title
+                    data_name
                 )
 
             return 'Published Stories per {}'.format(group_title)

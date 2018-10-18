@@ -65,6 +65,12 @@ export function SearchReport(_, config, moment, api, $q, gettext, gettextCatalog
     }, {
         qcode: 'urgency',
         name: gettextCatalog.getString('Urgency'),
+    }, {
+        qcode: 'task.desk',
+        name: gettext('Desk'),
+    }, {
+        qcode: 'task.user',
+        name: gettext('User'),
     }];
 
     /**

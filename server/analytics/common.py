@@ -19,7 +19,8 @@ report_types = [
     'source_category_report',
     'track_activity_report',
     'mission_report',
-    'content_publishing_report'
+    'content_publishing_report',
+    'publishing_performance_report'
 ]
 
 REPORT_TYPES = namedtuple('REPORT_TYPES', [
@@ -29,7 +30,8 @@ REPORT_TYPES = namedtuple('REPORT_TYPES', [
     'SOURCE_CATEGORY',
     'TRACK_ACTIVITY',
     'MISSION',
-    'CONTENT_PUBLISHING'
+    'CONTENT_PUBLISHING',
+    'PUBLISHING_PERFORMANCE'
 ])(*report_types)
 
 mime_types = [
@@ -85,6 +87,8 @@ def get_report_service(report_type):
         return get_resource_service('mission_report')
     elif report_type == REPORT_TYPES.CONTENT_PUBLISHING:
         return get_resource_service('content_publishing_report')
+    elif report_type == REPORT_TYPES.PUBLISHING_PERFORMANCE:
+        return get_resource_service('publishing_performance_report')
 
     return None
 
@@ -97,14 +101,10 @@ def is_highcharts_installed():
         return False
 
 
-def get_cv_by_qcode(name):
+def get_cv_by_qcode(name, field=None):
     cvs = get_resource_service('vocabularies').find_one(req=None, _id=name)
-    return {
-        item.get('qcode'): item
+    return {} if not cvs else {
+        item.get('qcode'): item if field is None else item.get(field)
         for item in cvs.get('items') or []
         if item.get('is_active', True)
     }
-
-
-def get_name_from_qcode(data, qcode):
-    return (data.get(qcode) or {}).get('name') or qcode

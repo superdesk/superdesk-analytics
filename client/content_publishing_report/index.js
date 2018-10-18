@@ -8,7 +8,6 @@
  * at https://www.sourcefabric.org/superdesk/license
  */
 
-import * as svc from './services';
 import * as ctrl from './controllers';
 import * as directives from './directives';
 
@@ -21,14 +20,6 @@ function cacheIncludedTemplates($templateCache) {
         'content-publishing-report-parameters.html',
         require('./views/content-publishing-report-parameters.html')
     );
-    $templateCache.put(
-        'content-publishing-report-filters.html',
-        require('./views/content-publishing-report-filters.html')
-    );
-    $templateCache.put(
-        'content-publishing-report-chart-options.html',
-        require('./views/content-publishing-report-chart-options.html')
-    );
 }
 cacheIncludedTemplates.$inject = ['$templateCache'];
 
@@ -40,11 +31,8 @@ cacheIncludedTemplates.$inject = ['$templateCache'];
  * @description Superdesk analytics generate report of content publishing statistics.
  */
 angular.module('superdesk.analytics.content-publishing-report', [])
-    .service('contentPublishingReports', svc.ContentPublishingReports)
-
     .controller('ContentPublishingReportController', ctrl.ContentPublishingReportController)
 
-    .directive('sdaContentPublishingReportFilters', directives.ContentPublishingReportFilters)
     .directive('sdaContentPublishingReportPreview', directives.ContentPublishingReportPreview)
 
     .run(cacheIncludedTemplates)

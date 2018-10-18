@@ -1,6 +1,6 @@
 import {getErrorMessage, generateSubtitle} from '../../utils';
 
-ContentPublishingReportController.$inject = [
+PublishingPerformanceReportController.$inject = [
     '$scope',
     'gettext',
     'gettextCatalog',
@@ -12,13 +12,13 @@ ContentPublishingReportController.$inject = [
     'config',
     '$q',
     'chartConfig',
-    '$interpolate',
+    '$interpolate'
 ];
 
 /**
  * @ngdoc controller
- * @module superdesk.apps.analytics.content-publishing-report
- * @name ContentPublishingReportController
+ * @module superdesk.apps.analytics.publishing-performance-report
+ * @name PublishingPerformanceReportController
  * @requires $scope
  * @requires gettext
  * @requires gettextCatalog
@@ -31,9 +31,9 @@ ContentPublishingReportController.$inject = [
  * @requires $q
  * @requires chartConfig
  * @requires $interpolate
- * @description Controller for Content Publishing reports
+ * @description Controller for Publishing Performance reports
  */
-export function ContentPublishingReportController(
+export function PublishingPerformanceReportController(
     $scope,
     gettext,
     gettextCatalog,
@@ -49,7 +49,7 @@ export function ContentPublishingReportController(
 ) {
     /**
      * @ngdoc method
-     * @name ContentPublishingReportController#init
+     * @name PublishingPerformanceReportController#init
      * @description Initialises the scope parameters
      */
     this.init = () => {
@@ -63,7 +63,7 @@ export function ContentPublishingReportController(
 
     /**
      * @ngdoc method
-     * @name ContentPublishingReportController#initDefaultParams
+     * @name PublishingPerformanceReportController#initDefaultParams
      * @description Initialises the default report parameters
      */
     this.initDefaultParams = () => {
@@ -76,11 +76,11 @@ export function ContentPublishingReportController(
         );
 
         $scope.report_groups = searchReport.filterDataFields(
-            ['anpa_category.qcode', 'genre.qcode', 'source', 'urgency']
+            ['task.desk', 'task.user', 'anpa_category.qcode', 'source', 'urgency', 'genre.qcode']
         );
 
         $scope.currentParams = {
-            report: 'content_publishing_report',
+            report: 'publishing_performance_report',
             params: {
                 dates: {
                     filter: 'range',
@@ -115,8 +115,11 @@ export function ContentPublishingReportController(
                 min: 1,
                 aggs: {
                     group: {
-                        field: _.get($scope, 'report_groups[0].qcode') || 'anpa_category.qcode',
+                        field: _.get($scope, 'report_groups[0].qcode') || 'task.desk',
                         size: 0,
+                    },
+                    subgroup: {
+                        field: 'state',
                     },
                 },
                 chart: {
@@ -131,12 +134,11 @@ export function ContentPublishingReportController(
         $scope.defaultReportParams = _.cloneDeep($scope.currentParams);
 
         $scope.group_by = _.cloneDeep($scope.report_groups);
-        $scope.updateGroupOptions();
     };
 
     /**
      * @ngdoc method
-     * @name ContentPublishingReportController#updateChartConfig
+     * @name PublishingPerformanceReportController#updateChartConfig
      * @param {boolean} reloadTranslations - Reloads text translations if true
      * @description Updates the local HighchartConfig instance parameters
      */
@@ -164,20 +166,21 @@ export function ContentPublishingReportController(
 
     /**
      * @ngdoc method
-     * @name ContentPublishingReportController#generateTitle
+     * @name PublishingPerformanceReportController#generateTitle
      * @return {String}
      * @description Returns the title to use for the Highcharts config
      */
-    $scope.generateTitle = () => generateTitle(
+    $scope.generateTitle = (report) => generateTitle(
         $interpolate,
         gettextCatalog,
         this.chart,
-        _.get($scope, 'currentParams.params') || {}
+        _.get($scope, 'currentParams.params') || {},
+        report
     );
 
     /**
      * @ngdoc method
-     * @name ContentPublishingReportController#generateSubtitle
+     * @name PublishingPerformanceReportController#generateSubtitle
      * @return {String}
      * @description Returns the subtitle to use for the Highcharts config based on the date parameters
      */
@@ -186,28 +189,6 @@ export function ContentPublishingReportController(
         config,
         _.get($scope, 'currentParams.params') || {}
     );
-
-    /**
-     * @ngdoc method
-     * @name ContentPublishingReportController#updateGroupOptions
-     * @description Updates the available group/subgroup options when the user changes the group
-     */
-    $scope.updateGroupOptions = () => {
-        $scope.subgroup_by = _.filter(
-            $scope.report_groups,
-            (group) => group.qcode !== $scope.currentParams.params.aggs.group.field
-        );
-
-        if (_.get($scope, 'currentParams.params.aggs.subgroup.field.length', 0) < 1) {
-            delete $scope.currentParams.params.aggs.subgroup;
-        } else {
-            $scope.currentParams.params.aggs.subgroup.size = 0;
-
-            if ($scope.currentParams.params.aggs.group.field === $scope.currentParams.params.aggs.subgroup.field) {
-                $scope.currentParams.params.aggs.subgroup.field = null;
-            }
-        }
-    };
 
     $scope.isDirty = () => true;
 
@@ -222,7 +203,7 @@ export function ContentPublishingReportController(
 
     /**
      * @ngdoc method
-     * @name ContentPublishingReportController#onDateFilterChange
+     * @name PublishingPerformanceReportController#onDateFilterChange
      * @description When the date filter changes, clear the date input fields if the filter is not 'range'
      */
     $scope.onDateFilterChange = () => {
@@ -236,30 +217,26 @@ export function ContentPublishingReportController(
 
     /**
      * @ngdoc method
-     * @name ContentPublishingReportController#runQuery
+     * @name PublishingPerformanceReportController#runQuery
      * @param {Object} params - The report parameters used to search the data
      * @return {Object}
      * @description Queries the ContentPublishing API and returns it's response
      */
     $scope.runQuery = (params) => searchReport.query(
-        'content_publishing_report',
+        'publishing_performance_report',
         params,
         true
     );
 
     /**
      * @ngdoc method
-     * @name ContentPublishingReportController#generate
+     * @name PublishingPerformanceReportController#generate
      * @description Updates the Highchart configs in the report's content view
      */
     $scope.generate = () => {
         $scope.changeContentView('report');
 
         const params = _.cloneDeep($scope.currentParams.params);
-
-        if (!_.get(params, 'aggs.subgroup.field')) {
-            delete params.aggs.subgroup;
-        }
 
         $scope.runQuery(params)
             .then((data) => {
@@ -285,7 +262,7 @@ export function ContentPublishingReportController(
 
     /**
      * @ngdoc method
-     * @name ContentPublishingReportController#changeTab
+     * @name PublishingPerformanceReportController#changeTab
      * @param {String} tabName - The name of the tab to change to
      * @description Change the current tab in the filters panel
      */
@@ -295,7 +272,7 @@ export function ContentPublishingReportController(
 
     /**
      * @ngdoc method
-     * @name ContentPublishingReportController#createChart
+     * @name PublishingPerformanceReportController#createChart
      * @param {Object} report - The report parameters used to search the data
      * @return {Object}
      * @description Generates the Highcharts config from the report parameters
@@ -303,22 +280,30 @@ export function ContentPublishingReportController(
     this.createChart = (report) => {
         this.chart.clearSources();
 
-        this.chart.addSource(
-            _.get(report, 'aggs.group.field'),
-            report.groups
-        );
-
-        if (_.get(report, 'subgroups')) {
+        if (Object.keys(report.groups).length === 1 && _.get(report, 'subgroups')) {
             this.chart.addSource(
                 _.get(report, 'aggs.subgroup.field'),
                 report.subgroups
             );
+        } else {
+            this.chart.addSource(
+                _.get(report, 'aggs.group.field'),
+                report.groups
+            );
+
+            if (_.get(report, 'subgroups')) {
+                this.chart.addSource(
+                    _.get(report, 'aggs.subgroup.field'),
+                    report.subgroups
+                );
+            }
         }
 
         this.chart.getTitle = () => $scope.generateTitle(report);
         this.chart.getSubtitle = $scope.generateSubtitle;
 
-        return this.chart.genConfig()
+        return this.chart.loadTranslations(_.get(report, 'aggs.group.field'))
+            .then(() => this.chart.genConfig())
             .then((config) => ({
                 charts: [config],
                 wrapCharts: report.chart.type === 'table',
@@ -338,10 +323,11 @@ export function ContentPublishingReportController(
  * @param {Object} gettextCatalog - angular-gettext
  * @param {HighchartConfig} chart - HighchartConfig instance
  * @param {Object} params - Report parameters
+ * @param {Object} report - Report results
  * @return {String}
  * @description Construct the title for the chart based on report parameters and results
  */
-export const generateTitle = ($interpolate, gettextCatalog, chart, params) => {
+export const generateTitle = ($interpolate, gettextCatalog, chart, params, report = null) => {
     if (_.get(params, 'chart.title')) {
         return params.chart.title;
     }
@@ -349,15 +335,15 @@ export const generateTitle = ($interpolate, gettextCatalog, chart, params) => {
     const parentField = _.get(params, 'aggs.group.field');
     const parentName = chart.getSourceName(parentField);
 
-    if (_.get(params, 'aggs.subgroup.field.length', 0) > 0) {
-        const childField = _.get(params, 'aggs.subgroup.field');
-        const childName = chart.getSourceName(childField);
+    if (report && Object.keys(report.groups).length === 1 && _.get(report, 'subgroups')) {
+        const dataName = chart.getSourceTitle(
+            parentField,
+            Object.keys(report.groups)[0]
+        );
 
         return $interpolate(
-            gettextCatalog.getString(
-                'Published Stories per {{ group }} with {{ subgroup }} breakdown'
-            )
-        )({group: parentName, subgroup: childName});
+            gettextCatalog.getString('Published Stories for {{ group }}: {{ data }}')
+        )({group: parentName, data: dataName});
     }
 
     return $interpolate(

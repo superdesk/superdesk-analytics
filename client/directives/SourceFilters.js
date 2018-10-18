@@ -1,4 +1,4 @@
-ContentPublishingReportFilters.$inject = [
+SourceFilters.$inject = [
     'lodash',
     '$q',
     'userList',
@@ -6,18 +6,7 @@ ContentPublishingReportFilters.$inject = [
     'metadata',
 ];
 
-/**
- * @ngdoc directive
- * @module superdesk.apps.analytics.content-publishing-report
- * @name ContentPublishingReportFilters
- * @requires lodash
- * @requires $q
- * @requires userList
- * @requires desks
- * @requires metadata
- * @description Directive to render the report filter tab
- */
-export function ContentPublishingReportFilters(
+export function SourceFilters(
     _,
     $q,
     userList,
@@ -25,7 +14,7 @@ export function ContentPublishingReportFilters(
     metadata
 ) {
     return {
-        template: require('../views/content-publishing-report-filters.html'),
+        template: require('../views/report-fitlers.html'),
         link: function(scope) {
             this.init = () => {
                 scope.desks = {list: [], selected: []};
@@ -72,7 +61,7 @@ export function ContentPublishingReportFilters(
 
             /**
              * @ngdoc method
-             * @name ContentPublishingReportFilters#querySources
+             * @name PublishingPerformanceReportFilters#querySources
              * @description Searches the published/archived repos for the list of sources
              */
             this.querySources = () => (
@@ -91,7 +80,7 @@ export function ContentPublishingReportFilters(
 
             /**
              * @ngdoc method
-             * @name ContentPublishingReportFilters#loadSources
+             * @name PublishingPerformanceReportFilters#loadSources
              * @param {object} data - Aggregation data retrieved from the Search API
              * @description Updates the list of available sources based on the aggregation data
              */
@@ -107,7 +96,7 @@ export function ContentPublishingReportFilters(
 
             /**
              * @ngdoc method
-             * @name ContentPublishingReportFilters#onLoadSelect
+             * @name PublishingPerformanceReportFilters#onLoadSelect
              * @param {String} field - The name of the field that was loaded
              * @param {String} key - The key attribute of the source to use
              * @description Loads the associated data for select input
@@ -137,7 +126,7 @@ export function ContentPublishingReportFilters(
 
             /**
              * @ngdoc method
-             * @name ContentPublishingReportFilters#onLoadCheck
+             * @name PublishingPerformanceReportFilters#onLoadCheck
              * @param {String} field - The name of the field that was loaded
              * @param {String} key - The key attribute of the source to use
              * @description Loads the associated data for checkbox input
@@ -167,7 +156,7 @@ export function ContentPublishingReportFilters(
 
             /**
              * @ngdoc method
-             * @name ContentPublishingReportFilters#onUpdateSelect
+             * @name PublishingPerformanceReportFilters#onUpdateSelect
              * @param {String} field - The name of the field that was loaded
              * @param {String} key - The key attribute of the source to use
              * @description Updates the report parameters from a select input
@@ -185,7 +174,7 @@ export function ContentPublishingReportFilters(
 
             /**
              * @ngdoc method
-             * @name ContentPublishingReportFilters#onUpdateUrgency
+             * @name PublishingPerformanceReportFilters#onUpdateUrgency
              * @description Updates the report parameters for the urgency input (checkbox input)
              */
             scope.onUpdateUrgency = () => {
@@ -206,6 +195,6 @@ export function ContentPublishingReportFilters(
             };
 
             this.init();
-        },
+        }
     };
 }

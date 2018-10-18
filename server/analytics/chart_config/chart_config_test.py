@@ -10,10 +10,54 @@
 
 from superdesk.tests import TestCase
 
+from analytics import init_app
 from analytics.chart_config import ChartConfig
 
 
 class ChartConfigTestCase(TestCase):
+    def setUp(self):
+        self.maxDiff = None
+
+        with self.app.app_context():
+            init_app(self.app)
+
+            self.app.data.insert('vocabularies', [{
+                '_id': 'categories',
+                'items': [
+                    {'qcode': 'a', 'name': 'Advisories', 'is_active': True},
+                    {'qcode': 'b', 'name': 'Basketball', 'is_active': True},
+                    {'qcode': 'c', 'name': 'Cricket', 'is_active': True}
+                ]
+            }, {
+                '_id': 'urgency',
+                'items': [
+                    {'qcode': 1, 'name': 1, 'is_active': True},
+                    {'qcode': 2, 'name': 2, 'is_active': True},
+                    {'qcode': 3, 'name': 3, 'is_active': True},
+                    {'qcode': 4, 'name': 4, 'is_active': True},
+                    {'qcode': 5, 'name': 5, 'is_active': True}
+                ]
+            }, {
+                '_id': 'genre',
+                'items': [
+                    {'qcode': 'Article', 'name': 'Article (news)', 'is_active': True},
+                    {'qcode': 'Sidebar', 'name': 'Sidebar', 'is_active': True},
+                    {'qcode': 'Factbox', 'name': 'Factbox', 'is_active': True}
+                ],
+            }])
+
+            self.app.data.insert('desks', [
+                {'_id': 'desk1', 'name': 'Politic Desk'},
+                {'_id': 'desk2', 'name': 'Sports Desk'},
+                {'_id': 'desk3', 'name': 'System Desk'}
+            ])
+
+            self.app.data.insert('users', [
+                {'_id': 'user1', 'display_name': 'first user'},
+                {'_id': 'user2', 'display_name': 'second user'},
+                {'_id': 'user3', 'display_name': 'last user'}
+            ])
+
     @staticmethod
     def _gen_single_chart(chart_id, chart_type):
         chart = ChartConfig(chart_id, chart_type)
@@ -24,19 +68,9 @@ class ChartConfigTestCase(TestCase):
     def _gen_stacked_chart(chart_id, chart_type):
         chart = ChartConfig(chart_id, chart_type)
         chart.add_source('anpa_category.qcode', {
-            'a': {
-                1: 1,
-                3: 1,
-            },
-            'b': {
-                1: 1,
-                3: 2,
-            },
-            'c': {
-                1: 2,
-                3: 1,
-                5: 1,
-            },
+            'a': {1: 1, 3: 1},
+            'b': {1: 1, 3: 2},
+            'c': {1: 2, 3: 1, 5: 1},
         })
         chart.add_source('urgency', {1: 4, 3: 4, 5: 1})
         return chart
@@ -57,8 +91,8 @@ class ChartConfigTestCase(TestCase):
             'title': {'text': 'Charts'},
             'subtitle': {'text': 'For Today'},
             'xAxis': {
-                'title': {'text': 'anpa_category.qcode'},
-                'categories': ['b', 'a', 'c'],
+                'title': {'text': 'Category'},
+                'categories': ['Basketball', 'Advisories', 'Cricket'],
             },
             'yAxis': {
                 'title': {'text': 'Published Stories'},
@@ -93,8 +127,8 @@ class ChartConfigTestCase(TestCase):
 
         config = chart.gen_config()
         self.assertEqual(config['xAxis'], {
-            'title': {'text': 'anpa_category.qcode'},
-            'categories': ['c', 'a', 'b'],
+            'title': {'text': 'Category'},
+            'categories': ['Cricket', 'Advisories', 'Basketball'],
         })
         self.assertEqual(config['series'], [{
             'name': 'Published Stories',
@@ -104,8 +138,8 @@ class ChartConfigTestCase(TestCase):
         chart.sort_order = 'desc'
         config = chart.gen_config()
         self.assertEqual(config['xAxis'], {
-            'title': {'text': 'anpa_category.qcode'},
-            'categories': ['b', 'a', 'c'],
+            'title': {'text': 'Category'},
+            'categories': ['Basketball', 'Advisories', 'Cricket'],
         })
         self.assertEqual(config['series'], [{
             'name': 'Published Stories',
@@ -128,8 +162,8 @@ class ChartConfigTestCase(TestCase):
             'title': {'text': 'Charts'},
             'subtitle': {'text': 'For Today'},
             'xAxis': {
-                'title': {'text': 'anpa_category.qcode'},
-                'categories': ['c', 'b', 'a'],
+                'title': {'text': 'Category'},
+                'categories': ['Cricket', 'Basketball', 'Advisories'],
             },
             'yAxis': {
                 'title': {'text': 'Published Stories'},
@@ -138,7 +172,7 @@ class ChartConfigTestCase(TestCase):
             },
             'legend': {
                 'enabled': True,
-                'title': {'text': 'urgency'},
+                'title': {'text': 'Urgency'},
             },
             'tooltip': {
                 'headerFormat': '{series.name}/{point.x}: {point.y}',
@@ -173,8 +207,8 @@ class ChartConfigTestCase(TestCase):
 
         config = chart.gen_config()
         self.assertEqual(config['xAxis'], {
-            'title': {'text': 'anpa_category.qcode'},
-            'categories': ['a', 'b', 'c'],
+            'title': {'text': 'Category'},
+            'categories': ['Advisories', 'Basketball', 'Cricket'],
         })
         self.assertEqual(config['series'], [{
             'name': '1',
@@ -190,8 +224,8 @@ class ChartConfigTestCase(TestCase):
         chart.sort_order = 'desc'
         config = chart.gen_config()
         self.assertEqual(config['xAxis'], {
-            'title': {'text': 'anpa_category.qcode'},
-            'categories': ['c', 'b', 'a'],
+            'title': {'text': 'Category'},
+            'categories': ['Cricket', 'Basketball', 'Advisories'],
         })
         self.assertEqual(config['series'], [{
             'name': '1',
@@ -217,18 +251,18 @@ class ChartConfigTestCase(TestCase):
             'title': 'Tables',
             'subtitle': 'For Today',
             'xAxis': {
-                'title': {'text': 'anpa_category.qcode'},
-                'categories': ['b', 'a', 'c'],
+                'title': {'text': 'Category'},
+                'categories': ['Basketball', 'Advisories', 'Cricket'],
             },
             'series': [{
                 'name': 'Published Stories',
                 'data': [4, 3, 1],
             }],
-            'headers': ['anpa_category.qcode', 'Published Stories'],
+            'headers': ['Category', 'Published Stories'],
             'rows': [
-                ['b', 4],
-                ['a', 3],
-                ['c', 1]
+                ['Basketball', 4],
+                ['Advisories', 3],
+                ['Cricket', 1]
             ],
             'credits': {'enabled': False}
         })
@@ -239,33 +273,33 @@ class ChartConfigTestCase(TestCase):
 
         config = chart.gen_config()
         self.assertEqual(config['xAxis'], {
-            'title': {'text': 'anpa_category.qcode'},
-            'categories': ['c', 'a', 'b']
+            'title': {'text': 'Category'},
+            'categories': ['Cricket', 'Advisories', 'Basketball']
         })
         self.assertEqual(config['series'], [{
             'name': 'Published Stories',
             'data': [1, 3, 4]
         }])
         self.assertEqual(config['rows'], [
-            ['c', 1],
-            ['a', 3],
-            ['b', 4]
+            ['Cricket', 1],
+            ['Advisories', 3],
+            ['Basketball', 4]
         ])
 
         chart.sort_order = 'desc'
         config = chart.gen_config()
         self.assertEqual(config['xAxis'], {
-            'title': {'text': 'anpa_category.qcode'},
-            'categories': ['b', 'a', 'c']
+            'title': {'text': 'Category'},
+            'categories': ['Basketball', 'Advisories', 'Cricket']
         })
         self.assertEqual(config['series'], [{
             'name': 'Published Stories',
             'data': [4, 3, 1]
         }])
         self.assertEqual(config['rows'], [
-            ['b', 4],
-            ['a', 3],
-            ['c', 1]
+            ['Basketball', 4],
+            ['Advisories', 3],
+            ['Cricket', 1]
         ])
 
     def test_generate_multi_column_table(self):
@@ -281,8 +315,8 @@ class ChartConfigTestCase(TestCase):
             'title': 'Tables',
             'subtitle': 'For Today',
             'xAxis': {
-                'title': {'text': 'anpa_category.qcode'},
-                'categories': ['c', 'b', 'a'],
+                'title': {'text': 'Category'},
+                'categories': ['Cricket', 'Basketball', 'Advisories'],
             },
             'series': [{
                 'name': '1',
@@ -294,11 +328,11 @@ class ChartConfigTestCase(TestCase):
                 'name': '5',
                 'data': [1, 0, 0],
             }],
-            'headers': ['anpa_category.qcode', '1', '3', '5', 'Total Stories'],
+            'headers': ['Category', '1', '3', '5', 'Total Stories'],
             'rows': [
-                ['c', 2, 1, 1, 4],
-                ['b', 1, 2, 0, 3],
-                ['a', 1, 1, 0, 2],
+                ['Cricket', 2, 1, 1, 4],
+                ['Basketball', 1, 2, 0, 3],
+                ['Advisories', 1, 1, 0, 2],
             ],
             'credits': {'enabled': False},
         })
@@ -309,8 +343,8 @@ class ChartConfigTestCase(TestCase):
 
         config = chart.gen_config()
         self.assertEqual(config['xAxis'], {
-            'title': {'text': 'anpa_category.qcode'},
-            'categories': ['a', 'b', 'c'],
+            'title': {'text': 'Category'},
+            'categories': ['Advisories', 'Basketball', 'Cricket'],
         })
         self.assertEqual(config['series'], [{
             'name': '1',
@@ -323,16 +357,16 @@ class ChartConfigTestCase(TestCase):
             'data': [0, 0, 1],
         }])
         self.assertEqual(config['rows'], [
-            ['a', 1, 1, 0, 2],
-            ['b', 1, 2, 0, 3],
-            ['c', 2, 1, 1, 4],
+            ['Advisories', 1, 1, 0, 2],
+            ['Basketball', 1, 2, 0, 3],
+            ['Cricket', 2, 1, 1, 4],
         ])
 
         chart.sort_order = 'desc'
         config = chart.gen_config()
         self.assertEqual(config['xAxis'], {
-            'title': {'text': 'anpa_category.qcode'},
-            'categories': ['c', 'b', 'a'],
+            'title': {'text': 'Category'},
+            'categories': ['Cricket', 'Basketball', 'Advisories'],
         })
         self.assertEqual(config['series'], [{
             'name': '1',
@@ -345,9 +379,9 @@ class ChartConfigTestCase(TestCase):
             'data': [1, 0, 0],
         }])
         self.assertEqual(config['rows'], [
-            ['c', 2, 1, 1, 4],
-            ['b', 1, 2, 0, 3],
-            ['a', 1, 1, 0, 2],
+            ['Cricket', 2, 1, 1, 4],
+            ['Basketball', 1, 2, 0, 3],
+            ['Advisories', 1, 1, 0, 2],
         ])
 
     def test_change_chart_functionality(self):
@@ -397,4 +431,161 @@ class ChartConfigTestCase(TestCase):
         self.assertEqual(config['xAxis'], {
             'title': {'text': 'Category'},
             'categories': ['Basketball', 'Advisories', 'Cricket']
+        })
+
+    def test_translate_anpa_category(self):
+        chart = ChartConfig('catrgory', 'bar')
+        chart.add_source('anpa_category.qcode', {'a': 3, 'b': 4, 'c': 1})
+
+        self.assertEqual(chart.translations, {})
+
+        chart.load_translations()
+        self.assertEqual(chart.translations, {
+            'anpa_category.qcode': {
+                'title': 'Category',
+                'names': {
+                    'a': 'Advisories',
+                    'b': 'Basketball',
+                    'c': 'Cricket'
+                }
+            }
+        })
+
+        self.assertEqual(chart.get_x_axis_config(), {
+            'title': {'text': 'Category'},
+            'categories': ['Basketball', 'Advisories', 'Cricket']
+        })
+
+    def test_translate_urgency(self):
+        chart = ChartConfig('urgency', 'bar')
+        chart.add_source('urgency', {1: 4, 3: 4, 5: 1})
+
+        self.assertEqual(chart.translations, {})
+
+        chart.load_translations()
+        self.assertEqual(chart.translations, {
+            'urgency': {
+                'title': 'Urgency',
+                'names': {
+                    1: 1,
+                    2: 2,
+                    3: 3,
+                    4: 4,
+                    5: 5
+                }
+            }
+        })
+
+        self.assertEqual(chart.get_x_axis_config(), {
+            'title': {'text': 'Urgency'},
+            'categories': [1, 3, 5]
+        })
+
+    def test_translate_genre(self):
+        chart = ChartConfig('genre', 'bar')
+        chart.add_source('genre.qcode', {'Article': 4, 'Sidebar': 5, 'Factbox': 1})
+
+        self.assertEqual(chart.translations, {})
+
+        chart.load_translations()
+        self.assertEqual(chart.translations, {
+            'genre.qcode': {
+                'title': 'Genre',
+                'names': {
+                    'Article': 'Article (news)',
+                    'Sidebar': 'Sidebar',
+                    'Factbox': 'Factbox'
+                }
+            }
+        })
+
+        self.assertEqual(chart.get_x_axis_config(), {
+            'title': {'text': 'Genre'},
+            'categories': ['Sidebar', 'Article (news)', 'Factbox']
+        })
+
+    def test_translate_desk(self):
+        chart = ChartConfig('desk', 'bar')
+        chart.add_source('task.desk', {'desk1': 4, 'desk2': 5, 'desk3': 1})
+
+        self.assertEqual(chart.translations, {})
+
+        chart.load_translations()
+        self.assertEqual(chart.translations, {
+            'task.desk': {
+                'title': 'Desk',
+                'names': {
+                    'desk1': 'Politic Desk',
+                    'desk2': 'Sports Desk',
+                    'desk3': 'System Desk'
+                }
+            }
+        })
+
+        self.assertEqual(chart.get_x_axis_config(), {
+            'title': {'text': 'Desk'},
+            'categories': ['Sports Desk', 'Politic Desk', 'System Desk']
+        })
+
+    def test_translate_user(self):
+        chart = ChartConfig('user', 'bar')
+        chart.add_source('task.user', {'user1': 3, 'user2': 4, 'user3': 5})
+
+        self.assertEqual(chart.translations, {})
+
+        chart.load_translations()
+        self.assertEqual(chart.translations, {
+            'task.user': {
+                'title': 'User',
+                'names': {
+                    'user1': 'first user',
+                    'user2': 'second user',
+                    'user3': 'last user'
+                }
+            }
+        })
+
+        self.assertEqual(chart.get_x_axis_config(), {
+            'title': {'text': 'User'},
+            'categories': ['last user', 'second user', 'first user']
+        })
+
+    def test_translate_state(self):
+        chart = ChartConfig('state', 'bar')
+        chart.add_source('state', {'published': 3, 'killed': 1, 'updated': 5})
+
+        self.assertEqual(chart.translations, {})
+
+        chart.load_translations()
+        self.assertEqual(chart.translations, {
+            'state': {
+                'title': 'State',
+                'names': {
+                    'published': 'Published',
+                    'killed': 'Killed',
+                    'corrected': 'Corrected',
+                    'updated': 'Updated',
+                }
+            }
+        })
+
+        self.assertEqual(chart.get_x_axis_config(), {
+            'title': {'text': 'State'},
+            'categories': ['Updated', 'Published', 'Killed']
+        })
+
+    def test_translate_source(self):
+        chart = ChartConfig('source', 'bar')
+        chart.add_source('source', {'aap': 3, 'ftp': 1, 'ap': 5})
+
+        self.assertEqual(chart.translations, {})
+
+        chart.load_translations()
+        self.assertEqual(chart.translations, {
+            'source': {'title': 'Source'}
+        })
+
+        self.assertEqual(chart.get_x_axis_config(), {
+            'title': {'text': 'Source'},
+            'categories': ['ap', 'aap', 'ftp']
         })

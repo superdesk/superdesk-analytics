@@ -3,7 +3,7 @@
         <label class="sd-line-input__label" translate>Title</label>
         <textarea
                 class="sd-line-input__input"
-                placeholder="{{:: generateTitlePlaceholder() | translate}}"
+                placeholder="{{generateTitle() | translate}}"
                 ng-model="currentParams.params.chart.title"
                 rows="2"
         ></textarea>
@@ -15,7 +15,7 @@
         <label class="sd-line-input__label" translate>Subtitle</label>
         <input
                 class="sd-line-input__input"
-                placeholder="{{:: generateSubtitlePlaceholder() | translate }}"
+                placeholder="{{generateSubtitle() | translate}}"
                 ng-model="currentParams.params.chart.subtitle" type="text"
         />
     </div>
@@ -31,6 +31,7 @@
                     type="radio"
                     ng-value="{{type.qcode}}"
                     data-label-position="inside"
+                    ng-click="updateChartConfig()"
             >
                 {{:: type.name | translate}}
             </button>
@@ -41,7 +42,10 @@
 <div class="form__row">
     <div class="sd-line-input sd-line-input--is-select">
         <label class="sd-line-input__label" translate>Order Categories In:</label>
-        <select class="sd-line-input__select" ng-model="currentParams.params.chart.sort_order">
+        <select class="sd-line-input__select"
+                ng-model="currentParams.params.chart.sort_order"
+                ng-change="updateChartConfig()"
+        >
             <option value="desc" translate>Descending Order of Stories</option>
             <option value="asc" translate>Ascending Order of Stores</option>
         </select>
