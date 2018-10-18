@@ -119,6 +119,7 @@ class ContentPublishingReportService(BaseReportService):
         aggs = args.get('aggs') or {}
         group = aggs.get('group') or {}
         subgroup = aggs.get('subgroup') or {}
+        translations = args.get('translations') or {}
 
         chart = params.get('chart') or {}
         chart_type = chart.get('type') or 'bar'
@@ -188,6 +189,8 @@ class ContentPublishingReportService(BaseReportService):
         chart_config.get_title = gen_title
         chart_config.get_subtitle = gen_subtitle
         chart_config.sort_order = chart.get('sort_order') or 'desc'
+
+        chart_config.translations = translations
 
         report['highcharts'] = [chart_config.gen_config()]
 

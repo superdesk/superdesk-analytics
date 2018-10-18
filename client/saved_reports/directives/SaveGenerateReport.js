@@ -14,16 +14,19 @@ export function SaveGenerateReport(_, privileges, savedReports) {
         replace: true,
         scope: {
             generateReport: '=',
-            currentParams: '=',
+            getReportParams: '=',
             isDirty: '=',
             _viewSchedule: '=viewSchedule'
         },
         link: function(scope, element, attrs, controller) {
             scope.showSaveForm = false;
+            scope.currentParams = {};
+            scope.currentTemplate = {};
+
             scope.canSave = _.get(privileges, 'privileges.saved_reports') === 1 ||
                 _.get(privileges, 'privileges.global_saved_reports') === 1;
 
-            scope.$watch(() => savedReports.currentReport._id, () => {
+            scope.$watch(() => savedReports.currentReport, () => {
                 scope.currentTemplate = savedReports.currentReport;
             });
 
@@ -33,7 +36,27 @@ export function SaveGenerateReport(_, privileges, savedReports) {
              * @description Toggles the save report form
              */
             scope.toggleSaveForm = () => {
-                scope.showSaveForm = !scope.showSaveForm;
+                const showSaveForm = !scope.showSaveForm;
+
+                // If we're opening the form, then request the current params
+                // and translations from the current report controller
+                if (showSaveForm) {
+                    scope.getReportParams()
+                    .then((params) => {
+                        scope.currentParams = Object.assign(
+                            {},
+                            params,
+                            {
+                                name: scope.currentTemplate.name,
+                                description: scope.currentTemplate.description,
+                            }
+                        );
+                        scope.showSaveForm = showSaveForm;
+                    });
+                } else {
+                    scope.showSaveForm = showSaveForm;
+                    scope.currentParams = {};
+                }
             };
 
             /**

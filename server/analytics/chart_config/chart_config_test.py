@@ -441,7 +441,7 @@ class ChartConfigTestCase(TestCase):
 
         chart.load_translations()
         self.assertEqual(chart.translations, {
-            'anpa_category.qcode': {
+            'anpa_category_qcode': {
                 'title': 'Category',
                 'names': {
                     'a': 'Advisories',
@@ -489,7 +489,7 @@ class ChartConfigTestCase(TestCase):
 
         chart.load_translations()
         self.assertEqual(chart.translations, {
-            'genre.qcode': {
+            'genre_qcode': {
                 'title': 'Genre',
                 'names': {
                     'Article': 'Article (news)',
@@ -512,7 +512,7 @@ class ChartConfigTestCase(TestCase):
 
         chart.load_translations()
         self.assertEqual(chart.translations, {
-            'task.desk': {
+            'task_desk': {
                 'title': 'Desk',
                 'names': {
                     'desk1': 'Politic Desk',
@@ -535,7 +535,7 @@ class ChartConfigTestCase(TestCase):
 
         chart.load_translations()
         self.assertEqual(chart.translations, {
-            'task.user': {
+            'task_user': {
                 'title': 'User',
                 'names': {
                     'user1': 'first user',
@@ -582,7 +582,10 @@ class ChartConfigTestCase(TestCase):
 
         chart.load_translations()
         self.assertEqual(chart.translations, {
-            'source': {'title': 'Source'}
+            'source': {
+                'title': 'Source',
+                'names': {}
+            }
         })
 
         self.assertEqual(chart.get_x_axis_config(), {

@@ -10,6 +10,7 @@ SourceCategoryController.$inject = [
     'notify',
     'sourceCategoryChart',
     'savedReports',
+    '$q',
 ];
 
 /**
@@ -24,6 +25,7 @@ SourceCategoryController.$inject = [
  * @requires notify
  * @requires sourceCategoryChart
  * @requires savedReports
+ * @requires $q
  * @description Controller for Source/Category reports
  */
 export function SourceCategoryController(
@@ -35,7 +37,8 @@ export function SourceCategoryController(
     searchReport,
     notify,
     sourceCategoryChart,
-    savedReports
+    savedReports,
+    $q
 ) {
     /**
      * @ngdoc method
@@ -299,6 +302,10 @@ export function SourceCategoryController(
             });
         }
     };
+
+    $scope.getReportParams = () => (
+        $q.when(_.cloneDeep($scope.currentParams))
+    );
 
     this.init();
 }

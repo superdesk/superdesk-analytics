@@ -59,20 +59,20 @@ export function ReportScheduleInput(gettext, _) {
 
                 if (frequency === 'hourly') {
                     scope.label = gettext('Hourly');
-                }
+                } else {
+                    const hour = scope.hours[_.get(scope.schedule, 'hour')].label;
 
-                const hour = scope.hours[_.get(scope.schedule, 'hour')].label;
+                    if (frequency === 'daily') {
+                        scope.label = gettext('Daily at ') + hour;
+                    } else if (frequency === 'weekly') {
+                        const days = _.get(scope.schedule, 'week_days');
 
-                if (frequency === 'daily') {
-                    scope.label = gettext('Daily at ') + hour;
-                } else if (frequency === 'weekly') {
-                    const days = _.get(scope.schedule, 'week_days');
+                        scope.label = gettext('Weekly on ') + days.join(', ') + gettext(' at ') + hour;
+                    } else if (frequency === 'monthly') {
+                        const day = scope.days[_.get(scope.schedule, 'day') - 1].label;
 
-                    scope.label = gettext('Weekly on ') + days.join(', ') + gettext(' at ') + hour;
-                } else if (frequency === 'monthly') {
-                    const day = scope.days[_.get(scope.schedule, 'day') - 1].label;
-
-                    scope.label = gettext('Monthly on the ') + day + gettext(' day at ') + hour;
+                        scope.label = gettext('Monthly on the ') + day + gettext(' day at ') + hour;
+                    }
                 }
             };
 

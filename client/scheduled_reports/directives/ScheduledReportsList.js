@@ -280,6 +280,7 @@ export function ScheduledReportsList(
                     params: _.get(savedReport, 'params') || {},
                     mimetype: _.get(schedule, 'mimetype') || scope.mimeTypes[0].type,
                     width: _.get(schedule, 'report_width') || 800,
+                    translations: _.get(savedReport, 'translations') || {},
                 };
 
                 const email = {
