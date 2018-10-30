@@ -1,128 +1,216 @@
-<div class="form__row">
-    <div class="sd-line-input sd-line-input--no-margin">
-        <label class="sd-line-input__label" translate>Desks</label>
-        <div id="filter-desks"
-             sd-meta-terms
-             class="data"
-             data-item="desks"
-             data-field="selected"
-             data-unique="_id"
-             data-list="desks.list"
-             data-header="true"
-             data-reload-list="true"
-             data-change="onUpdateSelect('desks', '_id')"
-        >
-        </div>
-    </div>
+<div ng-if="!flags.ready" class="sda-report-filters__loader sd-list-item">
+    <div class="sd-loader"></div>
 </div>
 
-<div class="form__row">
-    <div class="sd-line-input sd-line-input--no-margin">
-        <label class="sd-line-input__label" translate>Users</label>
-        <div id="filter-users"
-             sd-meta-terms
-             class="data"
-             data-item="users"
-             data-field="selected"
-             data-unique="_id"
-             data-list="users.list"
-             data-header="true"
-             data-reload-list="true"
-             data-change="onUpdateSelect('users', '_id')"
-        >
-        </div>
-    </div>
-</div>
-
-<div class="form__row">
-    <div class="sd-line-input sd-line-input--no-margin">
-        <label class="sd-line-input__label" translate>Categories</label>
-        <div id="filter-categories"
-             sd-meta-terms
-             class="data"
-             data-item="categories"
-             data-field="selected"
-             data-unique="qcode"
-             data-list="categories.list"
-             data-header="true"
-             data-reload-list="true"
-             data-change="onUpdateSelect('categories', 'qcode')"
-        >
-        </div>
-    </div>
-</div>
-
-<div class="form__row">
-    <div class="sd-line-input sd-line-input--no-margin">
-        <label class="sd-line-input__label" translate>Genre</label>
-        <div id="filter-genres"
-             sd-meta-terms
-             class="data"
-             data-item="genre"
-             data-field="selected"
-             data-unique="qcode"
-             data-list="genre.list"
-             data-header="true"
-             data-reload-list="true"
-             data-change="onUpdateSelect('genre', 'qcode')"
-        >
-        </div>
-    </div>
-</div>
-
-<div class="form__row">
-    <div class="sd-line-input sd-line-input--no-margin">
-        <label class="sd-line-input__label" translate>Source</label>
-        <div id="filter-sources"
-             sd-meta-terms
-             class="data"
-             data-item="sources"
-             data-field="selected"
-             data-unique="qcode"
-             data-list="sources.list"
-             data-header="true"
-             data-reload-list="true"
-             data-change="onUpdateSelect('sources', 'qcode')"
-        >
-        </div>
-    </div>
-</div>
-
-<div sd-toggle-box data-title="{{:: 'Urgency' | translate}}" data-open="false">
-    <div class="form__row" ng-repeat="urg in urgency.list | orderBy: 'name'">
-        <button sd-check
-                ng-model="urgency.selected[urg.qcode]"
-                ng-change="onUpdateUrgency()"
-        >
-            {{:: urg.name | translate}}
-        </button>
-    </div>
-</div>
-
-<div sd-toggle-box data-title="{{:: 'Content State' | translate}}" data-open="false">
-    <div class="form__row">
-        <div class="sd-line-input sd-line-input--no-margin">
-            <label class="sd-line-input__label" translate>Excluded States</label>
-            <div class="flex-grid flex-grid--boxed-small flex-grid--wrap-items flex-grid--small-2">
-                <button ng-repeat="state in item_states"
-                        ng-model="currentParams.params.must_not.states[state.qcode]"
-                        sd-check
-                        data-label-position="inside"
-                >
-                    {{:: state.name | translate}}
-                </button>
+<div ng-if="flags.ready" class="sda-report-filters">
+    <toggle-box-next data-title="filters.desks.label"
+                     data-style="'circle'"
+                     ng-if="filters.desks.enabled"
+    >
+        <div class="sda-report-filters__filter">
+            <div class="sda-report-filters__exclude">
+                <label translate>Exclude</label>
+                <span sd-switch
+                      ng-model="filters.desks.exclude"
+                      ng-change="onFilterChanged(filters.desks)"
+                ></span>
+            </div>
+            <div class="form__row">
+                <sd-tag-input
+                        ng-model="filters.desks.selected"
+                        data-field="{{filters.desks.labelField}}"
+                        data-key-property="{{filters.desks.keyField}}"
+                        data-items="filters.desks.items"
+                        data-on-change="onFilterChanged(filters.desks)"
+                        data-freetext="false"
+                        data-replace-spaces-with-dashes="false"
+                        data-placeholder="{{filters.desks.placeholder}}"
+                        data-max-results-to-show="0"
+                ></sd-tag-input>
             </div>
         </div>
-    </div>
+    </toggle-box-next>
 
-    <div class="form__row">
-        <div class="sd-line-input">
-            <button sd-check
-                    ng-model="currentParams.params.must_not.rewrites"
-                    data-label-position="inside"
-            >
-                {{:: 'Exclude Rewrites' | translate}}
-            </button>
+    <toggle-box-next data-title="filters.users.label"
+                     data-style="'circle'"
+                     ng-if="filters.users.enabled"
+    >
+        <div class="sda-report-filters__filter">
+            <div class="sda-report-filters__exclude">
+                <label translate>Exclude</label>
+                <span sd-switch
+                      ng-model="filters.users.exclude"
+                      ng-change="onFilterChanged(filters.users)"
+                ></span>
+            </div>
+            <div class="form__row">
+                <sd-tag-input
+                        ng-model="filters.users.selected"
+                        data-field="{{filters.users.labelField}}"
+                        data-key-property="{{filters.users.keyField}}"
+                        data-items="filters.users.items"
+                        data-on-change="onFilterChanged(filters.users)"
+                        data-freetext="false"
+                        data-replace-spaces-with-dashes="false"
+                        data-placeholder="{{filters.users.placeholder}}"
+                        data-max-results-to-show="0"
+                ></sd-tag-input>
+            </div>
         </div>
-    </div>
+    </toggle-box-next>
+
+    <toggle-box-next data-title="filters.categories.label"
+                     data-style="'circle'"
+                     ng-if="filters.categories.enabled"
+    >
+        <div class="sda-report-filters__filter">
+            <div class="sda-report-filters__exclude">
+                <label translate>Exclude</label>
+                <span sd-switch
+                      ng-model="filters.categories.exclude"
+                      ng-change="onFilterChanged(filters.categories)"
+                ></span>
+            </div>
+            <div class="form__row">
+                <sd-tag-input
+                        ng-model="filters.categories.selected"
+                        data-field="{{filters.categories.labelField}}"
+                        data-key-property="{{filters.categories.keyField}}"
+                        data-items="filters.categories.items"
+                        data-on-change="onFilterChanged(filters.categories)"
+                        data-freetext="false"
+                        data-replace-spaces-with-dashes="false"
+                        data-placeholder="{{filters.categories.placeholder}}"
+                        data-max-results-to-show="0"
+                ></sd-tag-input>
+            </div>
+        </div>
+    </toggle-box-next>
+
+    <toggle-box-next data-title="filters.genre.label"
+                     data-style="'circle'"
+                     ng-if="filters.genre.enabled"
+    >
+        <div class="sda-report-filters__filter">
+            <div class="sda-report-filters__exclude">
+                <label translate>Exclude</label>
+                <span sd-switch
+                      ng-model="filters.genre.exclude"
+                      ng-change="onFilterChanged(filters.genre)"
+                ></span>
+            </div>
+            <div class="form__row">
+                <sd-tag-input
+                        ng-model="filters.genre.selected"
+                        data-field="{{filters.genre.labelField}}"
+                        data-key-property="{{filters.genre.keyField}}"
+                        data-items="filters.genre.items"
+                        data-on-change="onFilterChanged(filters.genre)"
+                        data-freetext="false"
+                        data-replace-spaces-with-dashes="false"
+                        data-placeholder="{{filters.genre.placeholder}}"
+                        data-max-results-to-show="0"
+                ></sd-tag-input>
+            </div>
+        </div>
+    </toggle-box-next>
+
+    <toggle-box-next data-title="filters.sources.label"
+                     data-style="'circle'"
+                     ng-if="filters.sources.enabled"
+    >
+        <div class="sda-report-filters__filter">
+            <div class="sda-report-filters__exclude">
+                <label translate>Exclude</label>
+                <span sd-switch
+                      ng-model="filters.sources.exclude"
+                      ng-change="onFilterChanged(filters.sources)"
+                ></span>
+            </div>
+            <div class="form__row">
+                <sd-tag-input
+                        ng-model="filters.sources.selected"
+                        data-field="{{filters.sources.labelField}}"
+                        data-key-property="{{filters.sources.keyField}}"
+                        data-items="filters.sources.items"
+                        data-on-change="onFilterChanged(filters.sources)"
+                        data-freetext="false"
+                        data-replace-spaces-with-dashes="false"
+                        data-placeholder="{{filters.sources.placeholder}}"
+                        data-max-results-to-show="0"
+                ></sd-tag-input>
+            </div>
+        </div>
+    </toggle-box-next>
+
+    <toggle-box-next data-title="filters.urgency.label"
+                     data-style="'circle'"
+                     ng-if="filters.urgency.enabled"
+    >
+        <div class="sda-report-filters__filter">
+            <div class="sda-report-filters__exclude">
+                <label translate>Exclude</label>
+                <span sd-switch
+                      ng-model="filters.urgency.exclude"
+                      ng-change="onFilterChanged(filters.urgency)"
+                ></span>
+            </div>
+            <div class="form__row">
+                <sd-tag-input
+                        ng-model="filters.urgency.selected"
+                        data-field="{{filters.urgency.labelField}}"
+                        data-key-property="{{filters.urgency.keyField}}"
+                        data-items="filters.urgency.items"
+                        data-on-change="onFilterChanged(filters.urgency)"
+                        data-freetext="false"
+                        data-replace-spaces-with-dashes="false"
+                        data-min-length="filters.urgency.minLength"
+                        data-placeholder="{{filters.urgency.placeholder}}"
+                        data-max-results-to-show="0"
+                ></sd-tag-input>
+            </div>
+        </div>
+    </toggle-box-next>
+
+    <toggle-box-next data-title="filters.states.label"
+                     data-style="'circle'"
+                     ng-if="filters.states.enabled"
+    >
+        <div class="sda-report-filters__filter">
+            <div class="sda-report-filters__exclude">
+                <label translate>Exclude</label>
+                <span sd-switch
+                      ng-model="filters.states.exclude"
+                      ng-change="onFilterChanged(filters.states)"
+                ></span>
+            </div>
+            <div class="form__row">
+                <sd-tag-input
+                        ng-model="filters.states.selected"
+                        data-field="{{filters.states.labelField}}"
+                        data-key-property="{{filters.states.keyField}}"
+                        data-items="filters.states.items"
+                        data-on-change="onFilterChanged(filters.states)"
+                        data-freetext="false"
+                        data-replace-spaces-with-dashes="false"
+                        data-min-length="filters.states.minLength"
+                        data-placeholder="{{filters.states.placeholder}}"
+                        data-max-results-to-show="0"
+                ></sd-tag-input>
+            </div>
+
+            <div class="form__row">
+                <div class="sd-line-input sd-line-input--is-select">
+                    <label class="sd-line-input__label" translate>Rewrites</label>
+                    <select class="sd-line-input__select"
+                            ng-model="params.rewrites"
+                    >
+                        <option value="include" translate>Include Rewrites</option>
+                        <option value="exclude" translate>Exclude Rewrites</option>
+                        <option value="only" translate>Rewrites Only</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </toggle-box-next>
 </div>
