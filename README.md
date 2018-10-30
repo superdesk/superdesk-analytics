@@ -91,8 +91,9 @@ cd server/scripts && ./install-highcharts-export-server.sh
 ```
 This will automatically accept the end user licence, and use a specific version of highcharts
 * ACCEPT_HIGHCHARTS_LICENSE=1
-* HIGHCHARTS_VERSION=6.1.1
+* HIGHCHARTS_VERSION=6.2.0
 * HIGHCHARTS_USE_STYLED=1
+* HIGHCHARTS_MOMENT=1
 
 ### Running the service
 There is a python module to allow running the highcharts export server.
@@ -109,3 +110,26 @@ You can add the service to your Honcho Procfile with the following line:
 ```
 highcharts: python3 -u -m analytics.reports.highcharts_server
 ```
+
+### Configuring Process Workers
+The export server uses a pool of PhantomJs worker threads. You can configure this pool in settings.py
+* HIGHCHARTS_SERVER_WORKERS (defaults to 4) - Number of workers to spawn
+* HIGHCHARTS_SERVER_WORK_LIMIT (defaults to 60) - The pieces of work that can be performed before restarting a phantom process
+* HIGHCHARTS_SERVER_LOG_LEVEL (defaults to 3) - Set the log level. Available options are:
+    * 0 - off
+    * 1 - errors
+    * 2 - warn
+    * 3 - notice
+    * 4 - verbose
+* HIGHCHARTS_SERVER_QUEUE_SIZE (defaults to 10) - how many request can be stored in overflow count when there are not enough
+
+### Rate limiting  Highcharts requests
+The highcharts export server has the ability to rate limit the requests that it receives.
+By default rate limiting is turned off. You can turn it on in your settings.py
+* HIGHCHARTS_SERVER_RATE_LIMIT (defaults to False) - The max requests allowed in one minute
+
+
+## Scheduled Reports
+To enable reports to be periodically scheduled (emailed), you must enable the config in settings.py.
+If this is enabled, then the celery queue entry will be created.
+* ANALYTICS_ENABLE_SCHEDULED_REPORTS (defaults to False) - Enable the emailing of scheduled reports
