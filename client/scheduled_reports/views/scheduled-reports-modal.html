@@ -10,6 +10,7 @@
         </div>
         <div class="modal__body">
             <div class="modal__body-content">
+                <ng-form name="scheduleForm">
                     <div class="form__row form__row--small-padding">
                         <div class="sd-line-input sd-line-input--label-left-auto">
                             <label class="sd-line-input__label sd-line-input__label--hide-required"
@@ -122,31 +123,26 @@
                         <div class="sd-card">
                             <div class="sd-card__content">
                                 <div class="form__row">
-                                    <div class="field keywords sd-line-input sd-line-input--label-left sd-line-input--required"
-                                         ng-class="{'sd-line-input--invalid': scheduleForm.$error.recipients && scheduleForm.$submitted}"
+                                    <div class="sd-line-input sd-line-input--label-left sd-line-input--required"
+                                         ng-class="{'sd-line-input--invalid': scheduleForm.recipients.$error.required}"
                                     >
-                                        <label for="search-keywords"
-                                               class="sd-line-input__label"
-                                               translate
-                                        >
-                                            To:
-                                        </label>
-                                        <div id="search-keywords"
-                                             class="scheduled-reports__email-input"
-                                             sd-meta-words-list
-                                             data-field="recipients"
-                                             data-header="true"
-                                             data-list="emails"
-                                             data-item="schedule"
-                                             data-change="validateRecipients(scheduleForm)"
-                                        ></div>
+                                        <label class="sd-line-input__label" translate>To:</label>
+                                        <div class="sd-line-input__input">
+                                            <sda-email-recipients-input
+                                                    ng-model="schedule.recipients"
+                                                    name="recipients"
+                                                    required
+                                            >
+                                            </sda-email-recipients-input>
+                                        </div>
                                         <span class="sd-line-input__message"
-                                              ng-if="scheduleForm.$error.recipients && scheduleForm.$submitted"
+                                              ng-if="scheduleForm.recipients.$error.required"
                                               translate
                                         >Required
                                         </span>
                                     </div>
                                 </div>
+
                                 <div class="form__row scheduled-reports__subject-row">
                                     <div class="sd-line-input sd-line-input--required sd-line-input--label-left"
                                          ng-class="{'sd-line-input--invalid': scheduleForm.saved_report.$invalid && scheduleForm.$submitted}"
@@ -164,6 +160,7 @@
                                         </span>
                                     </div>
                                 </div>
+
                                 <div class="form__row">
                                     <div class="sd-line-input sd-line-input--label-left">
                                         <label class="sd-line-input__label" translate>Body</label>
@@ -198,6 +195,7 @@
                             </div>
                         </div>
                     </div>
+                </ng-form>
             </div>
         </div>
         <div class="modal__footer">

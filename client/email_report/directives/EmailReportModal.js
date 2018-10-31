@@ -1,4 +1,4 @@
-EmailReportModal.$inject = ['emailReport', 'lodash', 'gettext', 'scheduledReports'];
+EmailReportModal.$inject = ['emailReport', 'lodash', 'gettext'];
 
 /**
  * @ngdoc directive
@@ -9,7 +9,7 @@ EmailReportModal.$inject = ['emailReport', 'lodash', 'gettext', 'scheduledReport
  * @requires gettext
  * @description A directive that renders a modal to send a report via email
  */
-export function EmailReportModal(emailReport, _, gettext, scheduledReports) {
+export function EmailReportModal(emailReport, _, gettext) {
     return {
         template: require('../views/email-report-modal.html'),
         link: function(scope) {
@@ -23,19 +23,10 @@ export function EmailReportModal(emailReport, _, gettext, scheduledReports) {
 
                 scope.report = _.cloneDeep(emailReport.modal.report);
                 scope.email = _.cloneDeep(emailReport.modal.email);
-                scope.emails = [];
 
                 // This next attribute is required for sd-report-preview-proxy
                 // to determine the report type
                 scope.report.report = scope.report.type;
-
-                scheduledReports.fetchEmailList()
-                    .then((emails) => {
-                        scope.emails = emails.map((email) => ({
-                            name: email,
-                            qcode: email,
-                        }));
-                    });
             };
 
             /**
@@ -57,7 +48,6 @@ export function EmailReportModal(emailReport, _, gettext, scheduledReports) {
              */
             scope.sendEmail = (emailForm) => {
                 emailForm.$setSubmitted();
-                scope.validateRecipients(emailForm);
 
                 if (emailForm.$invalid) {
                     return;
@@ -103,20 +93,6 @@ export function EmailReportModal(emailReport, _, gettext, scheduledReports) {
                 {type: 'text/csv', label: gettext('CSV File')},
                 {type: 'application/pdf', label: gettext('PDF File')},
             ];
-
-            /**
-             * @ngdoc method
-             * @name sdEmailReportModal#validateRecipients
-             * @param {Object} emailForm - The DOM form (to set ngModel validitiy)
-             * @description Validates the list of recipients and sets the form as valid/invalid accordingly
-             */
-            scope.validateRecipients = (emailForm) => {
-                if (_.get(scope, 'email.recipients.length', 0) < 1) {
-                    emailForm.$setValidity('recipients', false);
-                } else {
-                    emailForm.$setValidity('recipients', true);
-                }
-            };
 
             init();
         }
