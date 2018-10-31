@@ -5,8 +5,12 @@ describe('searchReport', () => {
 
     beforeEach(window.module(($provide) => {
         // Use the superdesk.config.js/webpack.config.js application config
-        // eslint-disable-next-line no-undef
-        $provide.constant('config', {...__SUPERDESK_CONFIG__, server: {url: ''}});
+        $provide.constant('config', {
+            // eslint-disable-next-line no-undef
+            ...__SUPERDESK_CONFIG__,
+            server: {url: ''},
+            defaultTimezone: 'UTC',
+        });
     }));
 
     beforeEach(window.module('superdesk.core.activity'));
@@ -106,9 +110,9 @@ describe('searchReport', () => {
             must: [{
                 range: {
                     versioncreated: {
-                        lt: '2018-06-30T23:59:59+0100',
-                        gte: '2018-06-01T00:00:00+0100',
-                        time_zone: '+01:00',
+                        lt: '2018-06-30T23:59:59+0000',
+                        gte: '2018-06-01T00:00:00+0000',
+                        time_zone: '+00:00',
                     },
                 },
             }],
@@ -124,7 +128,7 @@ describe('searchReport', () => {
                     versioncreated: {
                         lt: 'now/d',
                         gte: 'now-1d/d',
-                        time_zone: '+01:00',
+                        time_zone: '+00:00',
                     },
                 },
             }],
@@ -140,7 +144,7 @@ describe('searchReport', () => {
                     versioncreated: {
                         lt: 'now/w',
                         gte: 'now-1w/w',
-                        time_zone: '+01:00',
+                        time_zone: '+00:00',
                     },
                 },
             }],
@@ -156,7 +160,7 @@ describe('searchReport', () => {
                     versioncreated: {
                         lt: 'now/M',
                         gte: 'now-1M/M',
-                        time_zone: '+01:00',
+                        time_zone: '+00:00',
                     },
                 },
             }],
@@ -178,9 +182,9 @@ describe('searchReport', () => {
             must: [{
                 range: {
                     versioncreated: {
-                        lt: '2018-06-30T23:59:59+0100',
-                        gte: '2018-06-01T00:00:00+0100',
-                        time_zone: '+01:00',
+                        lt: '2018-06-30T23:59:59+0000',
+                        gte: '2018-06-01T00:00:00+0000',
+                        time_zone: '+00:00',
                     },
                 },
             }],
@@ -196,7 +200,7 @@ describe('searchReport', () => {
                     versioncreated: {
                         lt: 'now/d',
                         gte: 'now-1d/d',
-                        time_zone: '+01:00',
+                        time_zone: '+00:00',
                     },
                 },
             }],
@@ -212,7 +216,7 @@ describe('searchReport', () => {
                     versioncreated: {
                         lt: 'now/w',
                         gte: 'now-1w/w',
-                        time_zone: '+01:00',
+                        time_zone: '+00:00',
                     },
                 },
             }],
@@ -228,7 +232,7 @@ describe('searchReport', () => {
                     versioncreated: {
                         lt: 'now/M',
                         gte: 'now-1M/M',
-                        time_zone: '+01:00',
+                        time_zone: '+00:00',
                     },
                 },
             }],
