@@ -79,6 +79,7 @@ export function AnalyticsContainer() {
 
                     // Deselect any saved report
                     savedReports.selectReport({});
+                    $scope.clearSavedReportForSchedule();
                 };
 
                 /**
