@@ -186,6 +186,24 @@ export function SearchReport(_, config, moment, api, $q, gettext, gettextCatalog
      * @description Filters our null values from the report parameters
      */
     const filterNullParams = (params) => {
+        // If states filter is provided as an array
+        // Then convert it to boolean attributes here
+        if (Array.isArray(_.get(params, 'must.states')) && params.must.states.length > 0) {
+            const states = params.must.states;
+
+            params.must.states = {};
+            states.forEach((state) => {
+                params.must.states[state] = true;
+            });
+        } else if (Array.isArray(_.get(params, 'must_not.states')) && params.must_not.states.length > 0) {
+            const states = params.must_not.states;
+
+            params.must_not.states = {};
+            states.forEach((state) => {
+                params.must_not.states[state] = true;
+            });
+        }
+
         params.must = _.pickBy(params.must || {}, filterValues);
         params.must_not = _.pickBy(params.must_not || {}, filterValues);
         params.chart = _.pickBy(params.chart || {}, filterValues);
@@ -291,6 +309,23 @@ export function SearchReport(_, config, moment, api, $q, gettext, gettextCatalog
         if (value) {
             query[must].push({exists: {field: 'rewrite_of'}});
         }
+    };
+
+    this._includeRewrites = (query, params) => {
+        const rewrites = params.rewrites || 'include';
+
+        if (rewrites === 'include') {
+            return;
+        }
+
+        const must = rewrites === 'only' ? 'must' : 'must_not';
+
+        query[must].push({
+            and: [
+                {term: {state: 'published'}},
+                {exists: {field: 'rewrite_of'}},
+            ],
+        });
     };
 
     this._setRepos = (query, params) => {
@@ -420,6 +455,7 @@ export function SearchReport(_, config, moment, api, $q, gettext, gettextCatalog
         this._setSize(query, params);
         this._setSort(query, params);
         this._filterDates(query, params);
+        this._includeRewrites(query, params);
 
         ['must', 'must_not'].forEach((must) => {
             _.forEach(params[must], (filter, field) => {

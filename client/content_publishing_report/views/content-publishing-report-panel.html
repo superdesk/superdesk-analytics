@@ -67,6 +67,8 @@
                 ></div>
                 <div sda-source-filters
                      ng-if="currentTab === 'filters'"
+                     data-params="currentParams.params"
+                     data-run-query="runQuery"
                 ></div>
                 <div ng-show="currentTab==='chartOptions'"
                      ng-include="'chart-form-options.html'"

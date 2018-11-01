@@ -259,6 +259,21 @@ class BaseReportService(SearchService):
                 'exists': {'field': 'rewrite_of'}
             })
 
+    def _es_include_rewrites(self, query, params):
+        rewrites = params.get('rewrites') or 'include'
+
+        if rewrites == 'include':
+            return
+
+        must = 'must' if rewrites == 'only' else 'must_not'
+
+        query[must].append({
+            "and": [
+                {"term": {"state": "published"}},
+                {"exists": {"field": "rewrite_of"}}
+            ]
+        })
+
     def _es_set_repos(self, query, params):
         query['repo'] = ','.join([
             repo
@@ -340,6 +355,7 @@ class BaseReportService(SearchService):
         self._es_set_size(query, params)
         self._es_set_sort(query, params)
         self._es_filter_dates(query, params)
+        self._es_include_rewrites(query, params)
 
         for must in ['must', 'must_not']:
             for field, filters in (params.get(must) or {}).items():
