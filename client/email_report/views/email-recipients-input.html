@@ -1,0 +1,11 @@
+<sd-tag-input
+        ng-if="emails.ready"
+        ng-model="emails.selected"
+        data-field="name"
+        data-items="emails.list"
+        data-on-change="setValueFromSelected()"
+        data-freetext="freetext || true"
+        data-replace-spaces-with-dashes="false"
+        data-placeholder="{{:: 'Search emails' | translate}}"
+        data-max-results-to-show="0"
+></sd-tag-input>

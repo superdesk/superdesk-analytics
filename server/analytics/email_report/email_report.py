@@ -86,7 +86,7 @@ class EmailReportResource(Resource):
                     'schema': {
                         'body': {
                             'type': 'string',
-                            'required': True
+                            'required': False
                         },
                         'template': {
                             'type': 'string',
@@ -101,7 +101,7 @@ class EmailReportResource(Resource):
                     'schema': {
                         'body': {
                             'type': 'string',
-                            'required': True
+                            'required': False
                         },
                         'template': {
                             'type': 'string',
@@ -201,8 +201,8 @@ class EmailReportService(BaseService):
                 'subject': email.get('subject'),
                 'sender': email.get('sender') or app.config['ADMINS'][0],
                 'recipients': email.get('recipients'),
-                'text_body': txt.get('body'),
-                'html_body': html.get('body'),
+                'text_body': txt.get('body') or '',
+                'html_body': html.get('body') or '',
                 'attachments': attachments,
                 'txt_template': txt.get('template'),
                 'html_template': html.get('template')
@@ -217,8 +217,8 @@ def send_email_report(
     subject,
     sender,
     recipients,
-    text_body,
-    html_body,
+    text_body='',
+    html_body='',
     cc=None,
     bcc=None,
     attachments=None,

@@ -21,4 +21,5 @@ import * as directives from './directives';
 angular.module('superdesk.analytics.email_report', [])
     .service('emailReport', svc.EmailReportService)
 
-    .directive('sdaEmailReportModal', directives.EmailReportModal);
+    .directive('sdaEmailReportModal', directives.EmailReportModal)
+    .directive('sdaEmailRecipientsInput', directives.EmailRecipientsInput);

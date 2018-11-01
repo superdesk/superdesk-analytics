@@ -22,16 +22,8 @@ export function ScheduledReportsModal(_, savedReports, scheduledReports, notify,
                 scope.schedule = _.cloneDeep(scope.currentSchedule);
                 scope.savedReports = [];
                 scope.submitting = false;
-                scope.emails = [];
 
                 this.fetchSavedReports();
-                scheduledReports.fetchEmailList()
-                    .then((emails) => {
-                        scope.emails = emails.map((email) => ({
-                            name: email,
-                            qcode: email,
-                        }));
-                    });
             };
 
             /**
@@ -88,7 +80,6 @@ export function ScheduledReportsModal(_, savedReports, scheduledReports, notify,
              */
             scope.save = (scheduleForm, schedule) => {
                 scheduleForm.$setSubmitted();
-                scope.validateRecipients(scheduleForm);
 
                 if (scheduleForm.$invalid) {
                     return;
@@ -113,20 +104,6 @@ export function ScheduledReportsModal(_, savedReports, scheduledReports, notify,
                             gettext('Failed to save the Report Schedule!')
                         ));
                     });
-            };
-
-            /**
-             * @ngdoc method
-             * @name sdScheduledReportsModal#validateRecipients
-             * @param {Object} scheduleForm - The DOM form (to set ngModel validity)
-             * @description Validates the list of recipients and sets the form as valid/invalid accordingly
-             */
-            scope.validateRecipients = (scheduleForm) => {
-                if (_.get(scope.schedule, 'recipients.length', 0) < 1) {
-                    scheduleForm.$setValidity('recipients', false);
-                } else {
-                    scheduleForm.$setValidity('recipients', true);
-                }
             };
 
             this.init();
