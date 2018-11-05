@@ -46,8 +46,11 @@ describe('sd-chart-container', () => {
         scope = $rootScope.$new();
         scope.reportConfigs = {charts: configs};
 
-        // Use double div here as sd-chart-container replaces the element, and requires a root element
-        const element = $compile('<div><div sd-chart-container></div></div>')(scope);
+        // Mock sd-analytics-container by providing sdAnalyticsContainerController onto a fake parent element
+        const elem = angular.element('<fake-parent><div sd-chart-container></div></fake-parent>');
+
+        elem.data('$sdAnalyticsContainerController', {});
+        const element = $compile(elem)(scope);
 
         $rootScope.$digest();
         $timeout.flush(5000);

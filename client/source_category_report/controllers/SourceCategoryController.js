@@ -1,5 +1,3 @@
-import {generateSubtitle} from '../../utils';
-
 SourceCategoryController.$inject = [
     '$scope',
     'gettext',
@@ -11,6 +9,7 @@ SourceCategoryController.$inject = [
     'sourceCategoryChart',
     'savedReports',
     '$q',
+    'chartConfig',
 ];
 
 /**
@@ -26,6 +25,7 @@ SourceCategoryController.$inject = [
  * @requires sourceCategoryChart
  * @requires savedReports
  * @requires $q
+ * @requires chartConfig
  * @description Controller for Source/Category reports
  */
 export function SourceCategoryController(
@@ -38,7 +38,8 @@ export function SourceCategoryController(
     notify,
     sourceCategoryChart,
     savedReports,
-    $q
+    $q,
+    chartConfig
 ) {
     /**
      * @ngdoc method
@@ -255,7 +256,9 @@ export function SourceCategoryController(
      * @return {String}
      * @description Based on the date filters, returns the placeholder to use for the subtitle
      */
-    $scope.generateSubtitlePlaceholder = () => generateSubtitle(moment, config, $scope.currentParams.params);
+    $scope.generateSubtitlePlaceholder = () => chartConfig.generateSubtitleForDates(
+        _.get($scope, 'currentParams.params') || {}
+    );
 
     /**
      * @ngdoc method

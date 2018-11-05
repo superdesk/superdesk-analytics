@@ -1,64 +1,26 @@
+import {mockAll} from '../../tests/mocks';
+
 describe('chartConfig', () => {
     let chartConfig;
     let $rootScope;
-    let metadata;
-    let $q;
     let config;
-    let desks;
-    let userList;
 
     beforeEach(window.module('angularMoment'));
     beforeEach(window.module('superdesk.apps.users'));
     beforeEach(window.module('superdesk.apps.authoring.metadata'));
     beforeEach(window.module('superdesk.apps.desks'));
     beforeEach(window.module('superdesk.core.notify'));
+    beforeEach(window.module('superdesk.analytics.search'));
     beforeEach(window.module('superdesk.analytics.charts'));
 
-    beforeEach(inject((_$rootScope_, _chartConfig_, _metadata_, _$q_, _desks_, _userList_) => {
+    beforeEach(inject((_$rootScope_, _chartConfig_) => {
         $rootScope = _$rootScope_;
         chartConfig = _chartConfig_;
-        metadata = _metadata_;
-        $q = _$q_;
-        desks = _desks_;
-        userList = _userList_;
-
-        metadata.values = {
-            categories: [
-                {qcode: 'a', name: 'Advisories'},
-                {qcode: 'b', name: 'Basketball'},
-                {qcode: 'c', name: 'Cricket'},
-            ],
-            urgency: [
-                {qcode: 1, name: 1},
-                {qcode: 2, name: 2},
-                {qcode: 3, name: 3},
-                {qcode: 4, name: 4},
-                {qcode: 5, name: 5},
-            ],
-            genre: [
-                {qcode: 'Article', name: 'Article (news)'},
-                {qcode: 'Sidebar', name: 'Sidebar'},
-                {qcode: 'Factbox', name: 'Factbox'},
-            ]
-        };
-        spyOn(metadata, 'initialize').and.returnValue($q.when(metadata));
-
-        spyOn(desks, 'fetchDesks').and.returnValue($q.when({
-            _items: [
-                {_id: 'desk1', name: 'Politic Desk'},
-                {_id: 'desk2', name: 'Sports Desk'},
-                {_id: 'desk3', name: 'System Desk'},
-            ],
-        }));
-
-        spyOn(userList, 'getAll').and.returnValue($q.when([
-            {_id: 'user1', display_name: 'first user'},
-            {_id: 'user2', display_name: 'second user'},
-            {_id: 'user3', display_name: 'last user'},
-        ]));
 
         config = {};
     }));
+
+    mockAll();
 
     const genSingleChart = (chartId, chartType) => {
         const chart = chartConfig.newConfig(chartId, chartType);
@@ -639,6 +601,7 @@ describe('chartConfig', () => {
                         killed: 'Killed',
                         corrected: 'Corrected',
                         updated: 'Updated',
+                        recalled: 'Recalled',
                     },
                 },
             });

@@ -1,0 +1,18 @@
+<div class="form__row form__row--no-padding">
+    <label class="form-label form-label--light" translate>Date Filter</label>
+
+    <p ng-if="dateFilter === 'yesterday'" translate>Yesterday</p>
+    <p ng-if="dateFilter === 'last_week'" translate>Last Week</p>
+    <p ng-if="dateFilter === 'last_month'" translate>Last Month</p>
+
+    <div ng-if="dateFilter === 'range'">
+        <p><span translate>From:</span> {{startDate}}</p>
+        <p><span translate>To:</span> {{endDate}}</p>
+    </div>
+
+    <p ng-if="dateFilter === 'day'">{{date}}</p>
+
+    <p ng-if="dateFilter === 'relative'">
+        <span translate>Last</span> {{hours}} <span translate>hours</span>
+    </p>
+</div>

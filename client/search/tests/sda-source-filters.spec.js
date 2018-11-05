@@ -1,16 +1,18 @@
+import {mockAll} from '../../tests/mocks';
+
 describe('sda-source-filters', () => {
     let $compile;
     let $rootScope;
-    let $q;
     let scope;
     let isoScope;
     let fields;
     let params;
-    let runQuery;
     let element;
     let userList;
     let desks;
     let metadata;
+    let searchReport;
+    let ingestSources;
 
     beforeEach(window.module(($provide) => {
         // Use the superdesk.config.js/webpack.config.js application config
@@ -26,86 +28,38 @@ describe('sda-source-filters', () => {
     beforeEach(window.module('superdesk.apps.users'));
     beforeEach(window.module('superdesk.apps.desks'));
     beforeEach(window.module('angularMoment'));
-    beforeEach(window.module('superdesk.analytics'));
+    beforeEach(window.module('superdesk.analytics.search'));
 
-    beforeEach(inject((_$compile_, _$rootScope_, _$q_, _userList_, _desks_, _metadata_) => {
+    beforeEach(inject((_$compile_, _$rootScope_) => {
         $compile = _$compile_;
         $rootScope = _$rootScope_;
-        $q = _$q_;
+    }));
+
+    beforeEach(inject((_userList_, _desks_, _metadata_, _searchReport_, _ingestSources_) => {
         userList = _userList_;
         desks = _desks_;
         metadata = _metadata_;
-    }));
+        searchReport = _searchReport_;
+        ingestSources = _ingestSources_;
 
-    beforeEach(() => {
         fields = undefined;
         params = {
             must: {},
             must_not: {},
         };
-        runQuery = jasmine.createSpy().and.returnValue(
-            $q.when({groups: {aap: 1, test: 2}})
-        );
+    }));
 
-        spyOn(userList, 'getAll').and.returnValue(
-            $q.when([{
-                _id: 'user1',
-                display_name: 'User 1',
-            }, {
-                _id: 'user2',
-                display_name: 'User 2',
-            }])
-        );
-
-        spyOn(desks, 'fetchDesks').and.returnValue(
-            $q.when({
-                _items: [{
-                    _id: 'desk1',
-                    name: 'Desk 1',
-                }, {
-                    _id: 'desk2',
-                    name: 'Desk 2',
-                }]
-            })
-        );
-
-        spyOn(metadata, 'initialize').and.returnValue($q.when());
-        metadata.values = {
-            categories: [{
-                qcode: 'cat1',
-                name: 'Cat 1',
-            }, {
-                qcode: 'cat2',
-                name: 'Cat 2',
-            }],
-            genre: [{
-                qcode: 'gen1',
-                name: 'Gen 1',
-            }, {
-                qcode: 'gen2',
-                name: 'Gen 2',
-            }],
-            urgency: [{
-                qcode: 1,
-                name: 1,
-            }, {
-                qcode: 2,
-                name: 2,
-            }],
-        };
-    });
+    mockAll();
 
     const compileElement = () => {
         scope = $rootScope.$new();
         scope.fields = fields;
         scope.params = params;
-        scope.runQuery = runQuery;
 
         element = $compile(
             `<div sda-source-filters
                   data-fields="fields"
                   data-params="params"
-                  data-run-query="runQuery"
             ></div>`
         )(scope);
 
@@ -117,15 +71,19 @@ describe('sda-source-filters', () => {
         fields = ['sources'];
         compileElement();
 
-        expect(runQuery).toHaveBeenCalledWith({
-            aggs: {group: {field: 'source'}},
-            repos: {
-                ingest: false,
-                archive: false,
-                published: true,
-                archived: true,
-            }
-        });
+        expect(searchReport.query).toHaveBeenCalledWith(
+            'content_publishing_report',
+            {
+                aggs: {group: {field: 'source'}},
+                repos: {
+                    ingest: false,
+                    archive: false,
+                    published: true,
+                    archived: true,
+                }
+            },
+            true
+        );
         expect(element.html()).toContain('filters.sources.label');
         expect(isoScope.filters.sources.items).toEqual([{
             _id: 'aap',
@@ -267,69 +225,96 @@ describe('sda-source-filters', () => {
         compileElement();
         expect(userList.getAll).toHaveBeenCalled();
         expect(element.html()).toContain('filters.users.label');
-        expect(isoScope.filters.users.items).toEqual([{
-            _id: 'user1',
-            display_name: 'User 1'
-        }, {
-            _id: 'user2',
-            display_name: 'User 2',
-        }]);
+        expect(isoScope.filters.users.items).toEqual([
+            {_id: 'user1', display_name: 'first user'},
+            {_id: 'user3', display_name: 'last user'},
+            {_id: 'user2', display_name: 'second user'},
+        ]);
         expect(isoScope.filters.users.selected).toEqual([]);
         expect(isoScope.filters.users.exclude).toBe(false);
 
         params = {must: {users: ['user1']}};
         compileElement();
-        expect(isoScope.filters.users.selected).toEqual([{
-            _id: 'user1',
-            display_name: 'User 1',
-        }]);
+        expect(isoScope.filters.users.selected).toEqual([
+            {_id: 'user1', display_name: 'first user'},
+        ]);
         expect(isoScope.filters.users.exclude).toBe(false);
 
         params = {must_not: {users: ['user2']}};
         compileElement();
-        expect(isoScope.filters.users.selected).toEqual([{
-            _id: 'user2',
-            display_name: 'User 2',
-        }]);
+        expect(isoScope.filters.users.selected).toEqual([
+            {_id: 'user2', display_name: 'second user'},
+        ]);
         expect(isoScope.filters.users.exclude).toBe(true);
     });
 
     it('loads list of desks', () => {
         fields = [];
         compileElement();
-        expect(desks.fetchDesks).not.toHaveBeenCalled();
+        expect(desks.initialize).not.toHaveBeenCalled();
         expect(element.html()).not.toContain('filters.desks.label');
         expect(isoScope.filters.desks.items).toEqual([]);
 
         fields = ['desks'];
         compileElement();
-        expect(desks.fetchDesks).toHaveBeenCalled();
+        expect(desks.initialize).toHaveBeenCalled();
         expect(element.html()).toContain('filters.desks.label');
-        expect(isoScope.filters.desks.items).toEqual([{
-            _id: 'desk1',
-            name: 'Desk 1'
-        }, {
-            _id: 'desk2',
-            name: 'Desk 2',
-        }]);
+        expect(isoScope.filters.desks.items).toEqual([
+            {_id: 'desk1', name: 'Politic Desk'},
+            {_id: 'desk2', name: 'Sports Desk'},
+            {_id: 'desk3', name: 'System Desk'},
+        ]);
         expect(isoScope.filters.desks.selected).toEqual([]);
         expect(isoScope.filters.desks.exclude).toBe(false);
 
         params = {must: {desks: ['desk1']}};
         compileElement();
-        expect(isoScope.filters.desks.selected).toEqual([{
-            _id: 'desk1',
-            name: 'Desk 1',
-        }]);
+        expect(isoScope.filters.desks.selected).toEqual([
+            {_id: 'desk1', name: 'Politic Desk'},
+        ]);
         expect(isoScope.filters.desks.exclude).toBe(false);
 
         params = {must_not: {desks: ['desk2']}};
         compileElement();
-        expect(isoScope.filters.desks.selected).toEqual([{
-            _id: 'desk2',
-            name: 'Desk 2',
-        }]);
+        expect(isoScope.filters.desks.selected).toEqual([
+            {_id: 'desk2', name: 'Sports Desk'}
+        ]);
         expect(isoScope.filters.desks.exclude).toBe(true);
+    });
+
+    it('loads list of stages', () => {
+        fields = [];
+        compileElement();
+        expect(desks.initialize).not.toHaveBeenCalled();
+        expect(element.html()).not.toContain('filters.stages.label');
+        expect(isoScope.filters.stages.items).toEqual([]);
+
+        fields = ['stages'];
+        compileElement();
+        expect(desks.initialize).toHaveBeenCalled();
+        expect(element.html()).toContain('filters.stages.label');
+        expect(isoScope.filters.stages.items).toEqual([
+            {_id: 'stage1', name: 'Politic Desk/Stage 1'},
+            {_id: 'stage2', name: 'Politic Desk/Stage 2'},
+            {_id: 'stage3', name: 'Sports Desk/Stage 3'},
+        ]);
+        expect(isoScope.filters.stages.selected).toEqual([]);
+        expect(isoScope.filters.stages.exclude).toBe(false);
+
+        params = {must: {stages: ['stage1']}};
+        compileElement();
+        expect(isoScope.filters.stages.selected).toEqual([
+            {_id: 'stage1', name: 'Politic Desk/Stage 1'}
+        ]);
+        expect(isoScope.filters.stages.exclude).toBe(false);
+
+        params = {must_not: {stages: ['stage2', 'stage3']}};
+        compileElement();
+        expect(isoScope.filters.stages.selected).toEqual([
+            {_id: 'stage2', name: 'Politic Desk/Stage 2'},
+            {_id: 'stage3', name: 'Sports Desk/Stage 3'},
+        ]);
+        expect(isoScope.filters.stages.exclude).toBe(true);
     });
 
     it('loads list of categories', () => {
@@ -343,30 +328,27 @@ describe('sda-source-filters', () => {
         compileElement();
         expect(metadata.initialize).toHaveBeenCalled();
         expect(element.html()).toContain('filters.categories.label');
-        expect(isoScope.filters.categories.items).toEqual([{
-            qcode: 'cat1',
-            name: 'Cat 1'
-        }, {
-            qcode: 'cat2',
-            name: 'Cat 2',
-        }]);
+        expect(isoScope.filters.categories.items).toEqual([
+            {qcode: 'a', name: 'Advisories'},
+            {qcode: 'b', name: 'Basketball'},
+            {qcode: 'c', name: 'Cricket'},
+        ]);
         expect(isoScope.filters.categories.selected).toEqual([]);
         expect(isoScope.filters.categories.exclude).toBe(false);
 
-        params = {must: {categories: ['cat1']}};
+        params = {must: {categories: ['a']}};
         compileElement();
-        expect(isoScope.filters.categories.selected).toEqual([{
-            qcode: 'cat1',
-            name: 'Cat 1',
-        }]);
+        expect(isoScope.filters.categories.selected).toEqual([
+            {qcode: 'a', name: 'Advisories'},
+        ]);
         expect(isoScope.filters.categories.exclude).toBe(false);
 
-        params = {must_not: {categories: ['cat2']}};
+        params = {must_not: {categories: ['b', 'c']}};
         compileElement();
-        expect(isoScope.filters.categories.selected).toEqual([{
-            qcode: 'cat2',
-            name: 'Cat 2',
-        }]);
+        expect(isoScope.filters.categories.selected).toEqual([
+            {qcode: 'b', name: 'Basketball'},
+            {qcode: 'c', name: 'Cricket'},
+        ]);
         expect(isoScope.filters.categories.exclude).toBe(true);
     });
 
@@ -381,30 +363,27 @@ describe('sda-source-filters', () => {
         compileElement();
         expect(metadata.initialize).toHaveBeenCalled();
         expect(element.html()).toContain('filters.genre.label');
-        expect(isoScope.filters.genre.items).toEqual([{
-            qcode: 'gen1',
-            name: 'Gen 1'
-        }, {
-            qcode: 'gen2',
-            name: 'Gen 2',
-        }]);
+        expect(isoScope.filters.genre.items).toEqual([
+            {qcode: 'Article', name: 'Article (news)'},
+            {qcode: 'Factbox', name: 'Factbox'},
+            {qcode: 'Sidebar', name: 'Sidebar'},
+        ]);
         expect(isoScope.filters.genre.selected).toEqual([]);
         expect(isoScope.filters.genre.exclude).toBe(false);
 
-        params = {must: {genre: ['gen1']}};
+        params = {must: {genre: ['Article']}};
         compileElement();
-        expect(isoScope.filters.genre.selected).toEqual([{
-            qcode: 'gen1',
-            name: 'Gen 1',
-        }]);
+        expect(isoScope.filters.genre.selected).toEqual([
+            {qcode: 'Article', name: 'Article (news)'},
+        ]);
         expect(isoScope.filters.genre.exclude).toBe(false);
 
-        params = {must_not: {genre: ['gen2']}};
+        params = {must_not: {genre: ['Sidebar', 'Factbox']}};
         compileElement();
-        expect(isoScope.filters.genre.selected).toEqual([{
-            qcode: 'gen2',
-            name: 'Gen 2',
-        }]);
+        expect(isoScope.filters.genre.selected).toEqual([
+            {qcode: 'Factbox', name: 'Factbox'},
+            {qcode: 'Sidebar', name: 'Sidebar'},
+        ]);
         expect(isoScope.filters.genre.exclude).toBe(true);
     });
 
@@ -419,30 +398,29 @@ describe('sda-source-filters', () => {
         compileElement();
         expect(metadata.initialize).toHaveBeenCalled();
         expect(element.html()).toContain('filters.urgency.label');
-        expect(isoScope.filters.urgency.items).toEqual([{
-            qcode: 1,
-            name: 1
-        }, {
-            qcode: 2,
-            name: 2,
-        }]);
+        expect(isoScope.filters.urgency.items).toEqual([
+            {qcode: 1, name: 1},
+            {qcode: 2, name: 2},
+            {qcode: 3, name: 3},
+            {qcode: 4, name: 4},
+            {qcode: 5, name: 5},
+        ]);
         expect(isoScope.filters.urgency.selected).toEqual([]);
         expect(isoScope.filters.urgency.exclude).toBe(false);
 
         params = {must: {urgency: [1]}};
         compileElement();
-        expect(isoScope.filters.urgency.selected).toEqual([{
-            qcode: 1,
-            name: 1,
-        }]);
+        expect(isoScope.filters.urgency.selected).toEqual([
+            {qcode: 1, name: 1},
+        ]);
         expect(isoScope.filters.urgency.exclude).toBe(false);
 
-        params = {must_not: {urgency: [2]}};
+        params = {must_not: {urgency: [2, 4]}};
         compileElement();
-        expect(isoScope.filters.urgency.selected).toEqual([{
-            qcode: 2,
-            name: 2,
-        }]);
+        expect(isoScope.filters.urgency.selected).toEqual([
+            {qcode: 2, name: 2},
+            {qcode: 4, name: 4},
+        ]);
         expect(isoScope.filters.urgency.exclude).toBe(true);
     });
 
@@ -450,19 +428,12 @@ describe('sda-source-filters', () => {
         fields = [];
         compileElement();
         expect(element.html()).not.toContain('filters.states.label');
-        expect(isoScope.filters.states.items).toEqual([{
-            qcode: 'published',
-            name: 'Published',
-        }, {
-            qcode: 'killed',
-            name: 'Killed',
-        }, {
-            qcode: 'corrected',
-            name: 'Corrected',
-        }, {
-            qcode: 'recalled',
-            name: 'Recalled',
-        }]);
+        expect(isoScope.filters.states.items).toEqual([
+            {qcode: 'published', name: 'Published'},
+            {qcode: 'killed', name: 'Killed'},
+            {qcode: 'corrected', name: 'Corrected'},
+            {qcode: 'recalled', name: 'Recalled'},
+        ]);
 
         fields = ['states'];
         compileElement();
@@ -472,21 +443,52 @@ describe('sda-source-filters', () => {
 
         params = {must: {states: ['killed']}};
         compileElement();
-        expect(isoScope.filters.states.selected).toEqual([{
-            qcode: 'killed',
-            name: 'Killed',
-        }]);
+        expect(isoScope.filters.states.selected).toEqual([
+            {qcode: 'killed', name: 'Killed'},
+        ]);
         expect(isoScope.filters.states.exclude).toBe(false);
 
         params = {must_not: {states: ['corrected', 'recalled']}};
         compileElement();
-        expect(isoScope.filters.states.selected).toEqual([{
-            qcode: 'corrected',
-            name: 'Corrected',
-        }, {
-            qcode: 'recalled',
-            name: 'Recalled',
-        }]);
+        expect(isoScope.filters.states.selected).toEqual([
+            {qcode: 'corrected', name: 'Corrected'},
+            {qcode: 'recalled', name: 'Recalled'},
+        ]);
         expect(isoScope.filters.states.exclude).toBe(true);
+    });
+
+    it('loads list of ingest providers', () => {
+        fields = [];
+        compileElement();
+        expect(ingestSources.initialize).not.toHaveBeenCalled();
+        expect(element.html()).not.toContain('filters.ingest_providers.label');
+        expect(isoScope.filters.ingest_providers.items).toEqual([]);
+
+        fields = ['ingest_providers'];
+        compileElement();
+        expect(ingestSources.initialize).toHaveBeenCalled();
+        expect(element.html()).toContain('filters.ingest_providers.label');
+        expect(isoScope.filters.ingest_providers.items).toEqual([
+            {_id: 'ing1', name: 'Ingest 1'},
+            {_id: 'ing2', name: 'Ingest 2'},
+            {_id: 'ing3', name: 'Ingest 3'},
+        ]);
+        expect(isoScope.filters.ingest_providers.selected).toEqual([]);
+        expect(isoScope.filters.ingest_providers.exclude).toBe(false);
+
+        params = {must: {ingest_providers: ['ing1']}};
+        compileElement();
+        expect(isoScope.filters.ingest_providers.selected).toEqual([
+            {_id: 'ing1', name: 'Ingest 1'},
+        ]);
+        expect(isoScope.filters.ingest_providers.exclude).toBe(false);
+
+        params = {must_not: {ingest_providers: ['ing2', 'ing3']}};
+        compileElement();
+        expect(isoScope.filters.ingest_providers.selected).toEqual([
+            {_id: 'ing2', name: 'Ingest 2'},
+            {_id: 'ing3', name: 'Ingest 3'},
+        ]);
+        expect(isoScope.filters.ingest_providers.exclude).toBe(true);
     });
 });

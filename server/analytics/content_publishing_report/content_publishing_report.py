@@ -152,39 +152,7 @@ class ContentPublishingReportService(BaseReportService):
             return 'Published Stories per {}'.format(group_title)
 
         def gen_subtitle():
-            if chart.get('subtitle'):
-                return chart['subtitle']
-
-            dates = params.get('dates') or {}
-            date_filter = dates.get('filter')
-
-            if date_filter == 'range':
-                start = datetime.strptime(dates.get('start'), '%Y-%m-%d')
-                end = datetime.strptime(dates.get('end'), '%Y-%m-%d')
-
-                return '{} - {}'.format(
-                    start.strftime('%B %-d, %Y'),
-                    end.strftime('%B %-d, %Y')
-                )
-            elif date_filter == 'yesterday':
-                return (datetime.today() - timedelta(days=1))\
-                    .strftime('%A %-d %B %Y')
-            elif date_filter == 'last_week':
-                week = datetime.today() - timedelta(weeks=1)
-                start = week - timedelta(days=week.weekday() + 1)
-                end = start + timedelta(days=6)
-
-                return '{} - {}'.format(
-                    start.strftime('%B %-d, %Y'),
-                    end.strftime('%B %-d, %Y')
-                )
-            elif date_filter == 'last_month':
-                first = datetime.today().replace(day=1)
-                month = first - timedelta(days=1)
-
-                return month.strftime('%B %Y')
-
-            return None
+            return chart_config.gen_subtitle_for_dates(params)
 
         chart_config.get_title = gen_title
         chart_config.get_subtitle = gen_subtitle

@@ -9,6 +9,7 @@ ScheduledReportsList.$inject = [
     'moment',
     'emailReport',
     '$q',
+    '$rootScope',
 ];
 
 /**
@@ -24,6 +25,7 @@ ScheduledReportsList.$inject = [
  * @requires gettext
  * @requires emailReport
  * @requires $q
+ * @requires $rootScope
  * @description A directive that renders the list of scheduled report cards
  */
 export function ScheduledReportsList(
@@ -36,7 +38,8 @@ export function ScheduledReportsList(
     gettext,
     moment,
     emailReport,
-    $q
+    $q,
+    $rootScope
 ) {
     return {
         template: require('../views/scheduled-reports-list.html'),
@@ -66,6 +69,26 @@ export function ScheduledReportsList(
                 scope.$on('scheduled_reports:update', angular.bind(this, this.loadSchedulesAndReports));
                 scope.$watch('currentSavedReport', angular.bind(this, this.loadSchedulesAndReports));
                 scope.$watch('currentReport', angular.bind(this, this.loadSchedulesAndReports));
+
+                // If a SavedReport gets updated, then reload the ScheduledReports
+                $rootScope.$on('savedreports:update', angular.bind(this, this.onSavedReportsUpdate));
+            };
+
+            /**
+             * @ngdoc method
+             * @name sdScheduledReportsList#onSavedReportsUpdate
+             * @param {object} event - The websocket event object
+             * @param {object} data - The websocket data (saved report details)
+             * @description Reload all ScheduledReports when a SavedReport gets updated
+             */
+            this.onSavedReportsUpdate = function(event, data) {
+                const reportType = _.get(data, 'report_type');
+
+                if (reportType !== _.get(scope, 'currentReport.id')) {
+                    return;
+                }
+
+                this.loadSchedulesAndReports();
             };
 
             /**

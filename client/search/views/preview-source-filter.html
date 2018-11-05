@@ -1,0 +1,15 @@
+<div ng-if="flags.ready"
+     ng-repeat="field in enabledFields"
+>
+    <div class="form__row form__row--no-padding" ng-if="field.enabled">
+        <label class="form-label form-label--light">
+            <span ng-if="field.exclude" translate>Exclude</span> {{field.label}}
+        </label>
+        <p>{{field.viewValue}}</p>
+    </div>
+</div>
+
+<div class="form__row form__row--no-padding" ng-if="rewrites">
+    <label class="form-label form-label--light" translate>Rewrites</label>
+    <p>{{rewrites}}</p>
+</div>

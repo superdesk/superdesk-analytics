@@ -18,8 +18,12 @@ def step_impl_then_get_charts(context, total_count):
     data = get_json_data(context.response)
     int_count = int(total_count)
     report = (data.get('_items') or [{}])[0]
+    num_reports = len(report.get('highcharts'))
 
-    assert int_count == len(report.get('highcharts'))
+    assert int_count == num_reports, 'Number of charts not equal. {} != {}'.format(
+        int_count,
+        num_reports
+    )
 
     if context.text:
         try:

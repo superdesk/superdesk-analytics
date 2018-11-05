@@ -67,7 +67,6 @@ export default angular.module('superdesk.analytics', [
     .directive('sdAfterRender', directive.AfterRender)
     .directive('sdReportDropdown', directive.ReportDropdown)
     .directive('sdConvertToNumber', directive.ConvertToNumber)
-    .directive('sdaSourceFilters', directive.SourceFilters)
 
     .run(cacheIncludedTemplates)
 

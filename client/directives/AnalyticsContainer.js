@@ -49,7 +49,8 @@ export function AnalyticsContainer() {
                 const init = () => {
                     // Set the Report based on URL parameters
                     $scope.changeReport(
-                        _.find($scope.reports, ['id', $location.search().report]) || $scope.reports[0]
+                        _.find($scope.reports, ['id', $location.search().report]) || $scope.reports[0],
+                        false
                     );
                 };
 
@@ -57,9 +58,10 @@ export function AnalyticsContainer() {
                  * @ngdoc method
                  * @name sdAnalyticsContainer#changeReport
                  * @param {object} report - The registered report to change to
+                 * @param {Boolean} deselectSavedReport - Deselects SavedReport if true (false on initial load)
                  * @description Changes the current report
                  */
-                $scope.changeReport = (report) => {
+                $scope.changeReport = (report, deselectSavedReport = true) => {
                     // If the report type has not changed, then don't do anything
                     if (_.get(report, 'id') === _.get($scope.currentReport, 'id')) {
                         return;
@@ -78,8 +80,10 @@ export function AnalyticsContainer() {
                     }
 
                     // Deselect any saved report
-                    savedReports.selectReport({});
-                    $scope.clearSavedReportForSchedule();
+                    if (deselectSavedReport) {
+                        savedReports.selectReport({});
+                        $scope.clearSavedReportForSchedule();
+                    }
                 };
 
                 /**
