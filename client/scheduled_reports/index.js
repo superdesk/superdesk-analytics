@@ -28,7 +28,7 @@ cacheIncludedTemplates.$inject = ['$templateCache'];
  * @description Module providing directives/service to manage scheduling of reports
  */
 angular.module('superdesk.analytics.scheduled_reports', [])
-    .directive('sdReportPreviewProxy', directives.ReportPreviewProxy)
+    .directive('sdaReportPreviewProxy', directives.ReportPreviewProxy)
     .directive('sdScheduledReportsList', directives.ScheduledReportsList)
     .directive('sdScheduledReportsModal', directives.ScheduledReportsModal)
     .directive('sdReportScheduleInput', directives.ReportScheduleInput)

@@ -1,4 +1,4 @@
-Chart.$inject = ['chartManager', '$timeout'];
+Chart.$inject = ['chartManager', '$timeout', '$sce'];
 
 /**
  * @ngdoc directive
@@ -8,7 +8,7 @@ Chart.$inject = ['chartManager', '$timeout'];
  * @requires $timeout
  * @description A directive that renders a Highcharts instance given its config
  */
-export function Chart(chartManager, $timeout) {
+export function Chart(chartManager, $timeout, $sce) {
     return {
         scope: {config: '<'},
         template: require('../views/chart.html'),
@@ -67,6 +67,17 @@ export function Chart(chartManager, $timeout) {
              */
             scope.downloadAsCSV = function() {
                 chartManager.downloadCSV(scope.config.id, 'chart.csv');
+            };
+
+            /**
+             * @ngdoc method
+             * @name sdChart#getHtml
+             * @param {string} html - String to convert to html nodes
+             * @return {HTMLElement}
+             * @description This allows table data cells to contain html nodes
+             */
+            scope.getHtml = function(html) {
+                return $sce.trustAsHtml(html);
             };
         },
     };

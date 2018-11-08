@@ -1,4 +1,5 @@
-import {getErrorMessage, generateSubtitle} from '../../utils';
+import {getErrorMessage} from '../../utils';
+import {DATE_FILTERS} from '../../search/directives/DateFilters';
 
 PublishingPerformanceReportController.$inject = [
     '$scope',
@@ -54,6 +55,13 @@ export function PublishingPerformanceReportController(
      */
     this.init = () => {
         $scope.currentTab = 'parameters';
+        $scope.dateFilters = [
+            DATE_FILTERS.YESTERDAY,
+            DATE_FILTERS.LAST_WEEK,
+            DATE_FILTERS.LAST_MONTH,
+            DATE_FILTERS.RANGE,
+        ];
+
         this.initDefaultParams();
         savedReports.selectReportFromURL();
 
@@ -184,9 +192,7 @@ export function PublishingPerformanceReportController(
      * @return {String}
      * @description Returns the subtitle to use for the Highcharts config based on the date parameters
      */
-    $scope.generateSubtitle = () => generateSubtitle(
-        moment,
-        config,
+    $scope.generateSubtitle = () => chartConfig.generateSubtitleForDates(
         _.get($scope, 'currentParams.params') || {}
     );
 

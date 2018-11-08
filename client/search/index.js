@@ -9,6 +9,7 @@
  */
 
 import * as svc from './services';
+import * as directives from './directives';
 
 /**
  * @ngdoc module
@@ -18,4 +19,10 @@ import * as svc from './services';
  * @description Analytics Report Search
  */
 angular.module('superdesk.analytics.search', [])
-    .service('searchReport', svc.SearchReport);
+    .service('searchReport', svc.SearchReport)
+
+    .directive('sdaSourceFilters', directives.SourceFilters)
+    .directive('sdaDateFilters', directives.DateFilters)
+
+    .directive('sdaPreviewDateFilter', directives.PreviewDateFilter)
+    .directive('sdaPreviewSourceFilter', directives.PreviewSourceFilter);

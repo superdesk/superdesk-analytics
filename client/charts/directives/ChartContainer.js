@@ -9,5 +9,11 @@ export function ChartContainer() {
         replace: true,
         require: '^sdAnalyticsContainer',
         template: require('../views/chart-container.html'),
+        link: function(scope, element) {
+            // Scroll to the top when the report configs change
+            scope.$watch('reportConfigs.charts', () => {
+                element.parent().scrollTop(0);
+            });
+        },
     };
 }

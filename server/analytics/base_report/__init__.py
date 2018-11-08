@@ -296,6 +296,7 @@ class BaseReportService(SearchService):
         start_date = params.get('start_date') or dates.get('start')
         end_date = params.get('end_date') or dates.get('end')
         date = params.get('date') or dates.get('date')
+        relative = dates.get('relative')
 
         time_zone = self.get_utc_offset()
         lt = None
@@ -316,6 +317,9 @@ class BaseReportService(SearchService):
         elif date_filter == 'last_month':
             lt = 'now/M'
             gte = 'now-1M/M'
+        elif date_filter == 'relative':
+            lt = 'now'
+            gte = 'now-{}h'.format(relative)
 
         if lt is not None and gte is not None:
             query['must'].append({

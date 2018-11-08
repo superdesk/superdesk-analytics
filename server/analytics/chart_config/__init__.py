@@ -14,6 +14,7 @@ from superdesk import get_resource_service
 from analytics.common import get_cv_by_qcode
 
 from copy import deepcopy
+from datetime import datetime, timedelta
 
 
 class ChartConfig:
@@ -580,3 +581,49 @@ class ChartConfig:
         :return dict: id/qcode to name map
         """
         return self._get_translations(field).get('names') or {}
+
+    def gen_subtitle_for_dates(self, params):
+        chart = params.get('chart') or {}
+
+        if chart.get('subtitle'):
+            return chart['subtitle']
+
+        dates = params.get('dates') or {}
+        date_filter = dates.get('filter')
+
+        if date_filter == 'range':
+            start = datetime.strptime(dates.get('start'), '%Y-%m-%d')
+            end = datetime.strptime(dates.get('end'), '%Y-%m-%d')
+
+            return '{} - {}'.format(
+                start.strftime('%B %-d, %Y'),
+                end.strftime('%B %-d, %Y')
+            )
+
+        elif date_filter == 'yesterday':
+            return (datetime.today() - timedelta(days=1)) \
+                .strftime('%A %-d %B %Y')
+        elif date_filter == 'last_week':
+            week = datetime.today() - timedelta(weeks=1)
+            start = week - timedelta(days=week.weekday() + 1)
+            end = start + timedelta(days=6)
+
+            return '{} - {}'.format(
+                start.strftime('%B %-d, %Y'),
+                end.strftime('%B %-d, %Y')
+            )
+        elif date_filter == 'last_month':
+            first = datetime.today().replace(day=1)
+            month = first - timedelta(days=1)
+
+            return month.strftime('%B %Y')
+        elif date_filter == 'day':
+            date = params.get('date') or dates.get('date')
+
+            return date.strftime('%A %-d %B %Y')
+        elif date_filter == 'relative':
+            hours = dates.get('relative')
+
+            return 'Last {} hours'.format(hours)
+
+        return None

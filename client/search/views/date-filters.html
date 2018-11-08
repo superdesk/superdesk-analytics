@@ -1,0 +1,110 @@
+<div class="form__row">
+    <div class="sd-line-input sd-line-input--no-margin">
+        <label class="sd-line-input__label" translate>Date Filters</label>
+        <div class="flex-grid flex-grid--boxed-small flex-grid--wrap-items flex-grid--small-2">
+            <button sd-check
+                    ng-if="enabled.yesterday"
+                    data-type="radio"
+                    ng-model="params.dates.filter"
+                    ng-value="yesterday"
+                    data-label-position="inside"
+                    ng-click="onFilterChange()"
+            >{{:: 'Yesterday' | translate }}</button>
+            <button sd-check
+                    ng-if="enabled.last_week"
+                    data-type="radio"
+                    ng-model="params.dates.filter"
+                    ng-value="last_week"
+                    data-label-position="inside"
+                    ng-click="onFilterChange()"
+            >{{:: 'Last Week' | translate }}</button>
+            <button sd-check
+                    ng-if="enabled.last_month"
+                    data-type="radio"
+                    ng-model="params.dates.filter"
+                    ng-value="last_month"
+                    data-label-position="inside"
+                    ng-click="onFilterChange()"
+            >{{:: 'Last Month' | translate }}</button>
+            <button sd-check
+                    ng-if="enabled.range"
+                    data-type="radio"
+                    ng-model="params.dates.filter"
+                    ng-value="range"
+                    data-label-position="inside"
+                    ng-click="onFilterChange()"
+            >{{:: 'Range' | translate }}</button>
+            <button sd-check
+                    ng-if="enabled.relative"
+                    data-type="radio"
+                    ng-model="params.dates.filter"
+                    ng-value="relative"
+                    data-label-position="inside"
+                    ng-click="onFilterChange()"
+            >{{:: 'Relative' | translate }}</button>
+            <button sd-check
+                    ng-if="enabled.day"
+                    data-type="radio"
+                    ng-model="params.dates.filter"
+                    ng-value="day"
+                    data-label-position="inside"
+                    ng-click="onFilterChange()"
+            >{{:: 'Day' | translate }}</button>
+        </div>
+    </div>
+</div>
+
+<div class="form__row" ng-if="params.dates.filter === 'range'">
+    <fieldset class="report-parameters">
+        <div class="multiple">
+            <div class="field">
+                <label translate>
+                    From
+                </label>
+                <div sd-datepicker
+                     ng-model="params.dates.start"
+                     data-on-change="onDatesChange()"
+                ></div>
+            </div>
+
+            <div class="field">
+                <label translate>
+                    To
+                </label>
+                <div sd-datepicker
+                     ng-model="params.dates.end"
+                     data-on-change="onDatesChange()"
+                ></div>
+            </div>
+        </div>
+    </fieldset>
+</div>
+
+<div class="form__row" ng-if="params.dates.filter === 'day'">
+    <fieldset class="report-parameters">
+        <div class="multiple">
+            <div class="field">
+                <label translate>
+                    Date
+                </label>
+                <div sd-datepicker
+                     ng-model="params.dates.date"
+                     data-on-change="onDatesChange()"
+                ></div>
+            </div>
+        </div>
+    </fieldset>
+</div>
+
+<div class="form__row" ng-if="params.dates.filter === 'relative'">
+    <div class="sd-line-input sd-line-input--is-select">
+        <label class="sd-line-input__label" translate>Last</label>
+        <select class="sd-line-input__select"
+                ng-model="params.dates.relative"
+        >
+            <option ng-repeat="n in [].constructor(maxRange) track by $index+1"
+                    value="{{$index+1}}"
+            >{{$index+1 + ' hours' | translate}}</option>
+        </select>
+    </div>
+</div>

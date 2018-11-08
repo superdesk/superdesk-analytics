@@ -43,57 +43,6 @@ export function formatDate(moment, config, dateTime, format = 'LL') {
 
 /**
  * @ngdoc method
- * @name Analytics#generateSubtitle
- * @param {Object} moment
- * @param {Object} config
- * @param {Object} params
- * @returns {String}
- * @description Returns a subtitle for a chart based on the supplied date filter and start/end dates
- */
-export function generateSubtitle(moment, config, params) {
-    if (_.get(params, 'chart.subtitle')) {
-        return params.chart.subtitle;
-    }
-
-    const dateFilter = _.get(params, 'date_filter') || _.get(params, 'dates.filter');
-
-    if (dateFilter === 'range') {
-        const start = _.get(params, 'start_date') || _.get(params, 'dates.start');
-        const end = _.get(params, 'end_date') || _.get(params, 'dates.end');
-
-        if (moment(start, config.model.dateformat).isValid() &&
-            moment(end, config.model.dateformat).isValid()
-        ) {
-            return formatDate(moment, config, start) +
-                ' - ' +
-                formatDate(moment, config, end);
-        }
-    } else if (dateFilter === 'yesterday') {
-        return moment()
-            .subtract(1, 'days')
-            .format('dddd Do MMMM YYYY');
-    } else if (dateFilter === 'last_week') {
-        const startDate = moment()
-            .subtract(1, 'weeks')
-            .startOf('week')
-            .format('LL');
-        const endDate = moment()
-            .subtract(1, 'weeks')
-            .endOf('week')
-            .format('LL');
-
-        return startDate + ' - ' + endDate;
-    } else if (dateFilter === 'last_month') {
-        return moment()
-            .subtract(1, 'months')
-            .format('MMMM YYYY');
-    }
-
-    return null;
-}
-
-/**
- * @ngdoc method
  * @name Analytics#getErrorMessage
  * @param {Object|String} error - The API response, containing the error message
  * @param {String} defaultMessage - The default string to return

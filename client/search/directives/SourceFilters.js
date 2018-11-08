@@ -6,11 +6,12 @@ SourceFilters.$inject = [
     'metadata',
     'gettextCatalog',
     'searchReport',
+    'ingestSources',
 ];
 
 /**
  * @ngdoc directive
- * @module superdesk.apps.analytics
+ * @module superdesk.analytics.search
  * @name sdaSourceFilters
  * @requires lodash
  * @requires $q
@@ -19,6 +20,7 @@ SourceFilters.$inject = [
  * @requires metadata
  * @requires gettextCatalog
  * @requires searchReport
+ * @requires ingestSources
  * @description A directive that provides desk, user, source and metadata filters for reports
  */
 export function SourceFilters(
@@ -28,14 +30,14 @@ export function SourceFilters(
     desks,
     metadata,
     gettextCatalog,
-    searchReport
+    searchReport,
+    ingestSources
 ) {
     return {
-        template: require('../views/report-fitlers.html'),
+        template: require('../views/source-fitlers.html'),
         scope: {
             fields: '=?',
             params: '=',
-            runQuery: '=',
         },
         link: function(scope) {
             /**
@@ -59,6 +61,8 @@ export function SourceFilters(
                         'sources',
                         'urgency',
                         'states',
+                        'ingest_providers',
+                        'stages',
                     ];
                 }
 
@@ -112,15 +116,19 @@ export function SourceFilters(
              * @description Load the list of sources from published and archived collections
              */
             this.loadSources = () => (
-                scope.runQuery({
-                    aggs: {group: {field: 'source'}},
-                    repos: {
-                        ingest: false,
-                        archive: false,
-                        published: true,
-                        archived: true,
-                    }
-                })
+                searchReport.query(
+                    'content_publishing_report',
+                    {
+                        aggs: {group: {field: 'source'}},
+                        repos: {
+                            ingest: false,
+                            archive: false,
+                            published: true,
+                            archived: true,
+                        }
+                    },
+                    true
+                )
                     .then((data) => (
                         _.map(
                             Object.keys(_.get(data, 'groups') || {}),
@@ -227,8 +235,8 @@ export function SourceFilters(
                     selected: [],
                     exclude: false,
                     enabled: false,
-                    fetch: () => desks.fetchDesks(),
-                    receive: (data) => _.get(data, 'desks._items') || [],
+                    fetch: () => desks.initialize(),
+                    receive: () => _.get(desks, 'desks._items') || [],
                 },
                 users: {
                     name: 'users',
@@ -316,7 +324,50 @@ export function SourceFilters(
                     enabled: false,
                     fetch: () => $q.when(),
                     receive: () => scope.filters.states.items,
-                }
+                },
+                ingest_providers: {
+                    name: 'ingest_providers',
+                    label: gettextCatalog.getString('Ingest Providers'),
+                    placeholder: gettextCatalog.getString('Search ') + gettextCatalog.getString('Ingest Providers'),
+                    keyField: '_id',
+                    labelField: 'name',
+                    source: 'ingest_providers',
+                    items: [],
+                    selected: [],
+                    exclude: false,
+                    enabled: false,
+                    fetch: () => ingestSources.initialize(),
+                    receive: () => _.get(ingestSources, 'providers') || []
+                },
+                stages: {
+                    name: 'stages',
+                    label: gettextCatalog.getString('Stages'),
+                    placeholder: gettextCatalog.getString('Search ') + gettextCatalog.getString('Stages'),
+                    keyField: '_id',
+                    labelField: 'name',
+                    source: 'desks',
+                    items: [],
+                    selected: [],
+                    exclude: false,
+                    enabled: false,
+                    fetch: () => desks.initialize(),
+                    receive: () => {
+                        const deskStages = [];
+
+                        _.forEach((desks.deskStages), (stages, deskId) => {
+                            const deskName = _.get(desks.deskLookup, `[${deskId}].name`) || '';
+
+                            deskStages.push(
+                                ...stages.map((stage) => ({
+                                    _id: stage._id,
+                                    name: deskName + '/' + stage.name
+                                }))
+                            );
+                        });
+
+                        return deskStages;
+                    }
+                },
             };
 
             this.init();

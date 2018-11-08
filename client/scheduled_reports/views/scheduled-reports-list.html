@@ -40,7 +40,7 @@
                     </div>
                 </div>
 
-                <div class="sd-card__content">
+                <div class="sd-card__content" style="height: 400px; overflow: auto">
                     <div class="form__row">
                         <p>{{schedule.description}}</p>
                     </div>
@@ -72,15 +72,15 @@
                         <p>{{schedule._report.name}}</p>
                     </div>
 
-                    <div sd-toggle-box data-title="Report Parameters"
-                         data-open="false"
-                         data-style="circle"
+                    <toggle-box-next title="'Report Parameters'"
+                                     data-style="'circle'"
                     >
-                        <div sd-report-preview-proxy
+                        <div sda-report-preview-proxy
                              data-report="schedule._report"
                         ></div>
-                    </div>
+                    </toggle-box-next>
                 </div>
+
                 <div class="sd-card__footer sd-grid-item__text-label">
                     {{'Last Run: ' + getLastRunDescription(schedule) | translate}}
                 </div>

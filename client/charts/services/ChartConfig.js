@@ -11,6 +11,8 @@ ChartConfig.$inject = [
     'userList',
     'desks',
     'metadata',
+    '$interpolate',
+    'ingestSources',
 ];
 
 /**
@@ -27,6 +29,8 @@ ChartConfig.$inject = [
  * @param userList
  * @param desks
  * @param metadata
+ * @param $interpolate
+ * @param ingestSources
  * @description Highchart Config generator
  */
 export function ChartConfig(
@@ -39,7 +43,9 @@ export function ChartConfig(
     $q,
     userList,
     desks,
-    metadata
+    metadata,
+    $interpolate,
+    ingestSources
 ) {
     const self = this;
 
@@ -722,13 +728,13 @@ export function ChartConfig(
         const promises = [];
         const translateField = {
             'task.desk': () => {
-                promises.push(desks.fetchDesks()
-                    .then((data) => {
+                promises.push(desks.initialize()
+                    .then(() => {
                         self.setTranslation(
                             'task.desk',
                             gettext('Desk'),
                             _.fromPairs(_.map(
-                                _.get(data, '_items') || [],
+                                _.get(desks, 'desks._items') || [],
                                 (desk) => [_.get(desk, '_id'), _.get(desk, 'name')]
                             ))
                         );
@@ -795,6 +801,7 @@ export function ChartConfig(
                         killed: gettext('Killed'),
                         corrected: gettext('Corrected'),
                         updated: gettext('Updated'),
+                        recalled: gettext('Recalled'),
                     }
                 );
             },
@@ -802,6 +809,51 @@ export function ChartConfig(
                 self.setTranslation(
                     'source',
                     gettext('Source')
+                );
+            },
+            ingest_providers: () => {
+                promises.push(ingestSources.initialize()
+                    .then(() => {
+                        self.setTranslation(
+                            'ingest_providers',
+                            gettext('Ingest Providers'),
+                            _.fromPairs(
+                                _.map(
+                                    _.get(ingestSources, 'providers') || [],
+                                    (item) => [_.get(item, '_id'), _.get(item, 'name')]
+                                )
+                            )
+                        );
+                    })
+                );
+            },
+            stages: () => {
+                promises.push(desks.initialize()
+                    .then(() => {
+                        const deskStages = [];
+
+                        _.forEach((desks.deskStages), (stages, deskId) => {
+                            const deskName = _.get(desks.deskLookup, `[${deskId}].name`) || '';
+
+                            deskStages.push(
+                                ...stages.map((stage) => ({
+                                    _id: stage._id,
+                                    name: deskName + '/' + stage.name
+                                }))
+                            );
+                        });
+
+                        self.setTranslation(
+                            'stages',
+                            gettext('Stages'),
+                            _.fromPairs(
+                                _.map(
+                                    deskStages,
+                                    (item) => [_.get(item, '_id'), _.get(item, 'name')]
+                                )
+                            )
+                        );
+                    })
                 );
             },
         };
@@ -830,45 +882,65 @@ export function ChartConfig(
     /**
      * @ngdoc method
      * @name ChartConfig#generateSubtitleForDates
-     * @param {Object} report - The params for the report
+     * @param {Object} params - The params for the report
      * @return {String}
      * @description Generates a subtitle string based on the dates of the report
      */
-    self.generateSubtitleForDates = (report) => {
-        const dateFilter = _.get(report, 'date_filter') || _.get(report, 'dates.filter');
-
-        if (dateFilter === 'range') {
-            const start = _.get(report, 'start_date') || _.get(report, 'dates.start');
-            const end = _.get(report, 'end_date') || _.get(report, 'dates.end');
-
-            if (moment(start, config.model.dateformat).isValid() &&
-                moment(end, config.model.dateformat).isValid()
-            ) {
-                return formatDate(moment, config, start) +
-                    ' - ' +
-                    formatDate(moment, config, end);
-            }
-        } else if (dateFilter === 'yesterday') {
-            return moment()
-                .subtract(1, 'days')
-                .format('dddd Do MMMM YYYY');
-        } else if (dateFilter === 'last_week') {
-            const startDate = moment()
-                .subtract(1, 'weeks')
-                .startOf('week')
-                .format('LL');
-            const endDate = moment()
-                .subtract(1, 'weeks')
-                .endOf('week')
-                .format('LL');
-
-            return startDate + ' - ' + endDate;
-        } else if (dateFilter === 'last_month') {
-            return moment()
-                .subtract(1, 'months')
-                .format('MMMM YYYY');
+    self.generateSubtitleForDates = (params) => {
+        if (_.get(params, 'chart.subtitle')) {
+            return params.chart.subtitle;
         }
 
-        return null;
+        const filters = {
+            range: () => {
+                const start = _.get(params, 'start_date') || _.get(params, 'dates.start');
+                const end = _.get(params, 'end_date') || _.get(params, 'dates.end');
+
+                if (moment(start, config.model.dateformat).isValid() &&
+                    moment(end, config.model.dateformat).isValid()
+                ) {
+                    return formatDate(moment, config, start) +
+                        ' - ' +
+                        formatDate(moment, config, end);
+                }
+            },
+            yesterday: () => (
+                moment()
+                    .subtract(1, 'days')
+                    .format('dddd Do MMMM YYYY')
+            ),
+            last_week: () => {
+                const startDate = moment()
+                    .subtract(1, 'weeks')
+                    .startOf('week')
+                    .format('LL');
+                const endDate = moment()
+                    .subtract(1, 'weeks')
+                    .endOf('week')
+                    .format('LL');
+
+                return startDate + ' - ' + endDate;
+            },
+            last_month: () => (
+                moment()
+                    .subtract(1, 'months')
+                    .format('MMMM YYYY')
+            ),
+            day: () => (
+                moment(_.get(params, 'date') || _.get(params, 'dates.date'))
+                    .format('dddd Do MMMM YYYY')
+            ),
+            relative: () => (
+                $interpolate(
+                    gettext('Last {{hours}} hours')
+                )({hours: _.get(params, 'dates.relative')})
+            ),
+        };
+
+        const dateFilter = _.get(params, 'date_filter') || _.get(params, 'dates.filter');
+
+        return _.get(filters, dateFilter) ?
+            filters[dateFilter]() :
+            null;
     };
 }

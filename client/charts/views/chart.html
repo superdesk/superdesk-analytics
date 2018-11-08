@@ -32,7 +32,8 @@
             </thead>
             <tbody>
                 <tr ng-repeat="row in config.rows">
-                    <td ng-repeat="val in row track by $index">{{val}}</td>
+                    <td ng-repeat="val in row track by $index" ng-bind-html="getHtml(val)">
+                    </td>
                 </tr>
             </tbody>
         </table>

@@ -1,6 +1,4 @@
-import {generateSubtitle} from '../../utils';
-
-SourceCategoryChart.$inject = ['lodash', 'gettext', 'moment', 'config', '$interpolate'];
+SourceCategoryChart.$inject = ['lodash', 'gettext', 'moment', 'config', '$interpolate', 'chartConfig'];
 
 /**
  * @ngdoc service
@@ -11,9 +9,10 @@ SourceCategoryChart.$inject = ['lodash', 'gettext', 'moment', 'config', '$interp
  * @requires moment
  * @requires config
  * @requires $interpolate
+ * @requires chartConfig
  * @description Source/Category chart generation service
  */
-export function SourceCategoryChart(_, gettext, moment, config, $interpolate) {
+export function SourceCategoryChart(_, gettext, moment, config, $interpolate, chartConfig) {
     /**
      * @ngdoc method
      * @name SourceCategoryChart#getCategories
@@ -71,11 +70,7 @@ export function SourceCategoryChart(_, gettext, moment, config, $interpolate) {
      * @returns {string}
      * @description Returns the subtitle to use for the chart
      */
-    const getSubtitle = function(report) {
-        return {
-            text: report.subtitle || generateSubtitle(moment, config, report),
-        };
-    };
+    const getSubtitle = (report) => chartConfig.generateSubtitleForDates(report);
 
     /**
      * @ngdoc method

@@ -31,6 +31,35 @@
         </div>
     </toggle-box-next>
 
+    <toggle-box-next data-title="filters.stages.label"
+                     data-style="'circle'"
+                     ng-if="filters.stages.enabled"
+    >
+        <div class="sda-report-filters__filter">
+            <div class="sda-report-filters__exclude">
+                <label translate>Exclude</label>
+                <span sd-switch
+                      ng-model="filters.stages.exclude"
+                      ng-change="onFilterChanged(filters.stages)"
+                ></span>
+            </div>
+            <div class="form__row">
+                <sd-tag-input
+                        ng-model="filters.stages.selected"
+                        data-field="{{filters.stages.labelField}}"
+                        data-key-property="{{filters.stages.keyField}}"
+                        data-items="filters.stages.items"
+                        data-on-change="onFilterChanged(filters.stages)"
+                        data-freetext="false"
+                        data-replace-spaces-with-dashes="false"
+                        data-min-length="filters.stages.minLength"
+                        data-placeholder="{{filters.stages.placeholder}}"
+                        data-max-results-to-show="0"
+                ></sd-tag-input>
+            </div>
+        </div>
+    </toggle-box-next>
+
     <toggle-box-next data-title="filters.users.label"
                      data-style="'circle'"
                      ng-if="filters.users.enabled"
@@ -53,6 +82,63 @@
                         data-freetext="false"
                         data-replace-spaces-with-dashes="false"
                         data-placeholder="{{filters.users.placeholder}}"
+                        data-max-results-to-show="0"
+                ></sd-tag-input>
+            </div>
+        </div>
+    </toggle-box-next>
+
+    <toggle-box-next data-title="filters.sources.label"
+                     data-style="'circle'"
+                     ng-if="filters.sources.enabled"
+    >
+        <div class="sda-report-filters__filter">
+            <div class="sda-report-filters__exclude">
+                <label translate>Exclude</label>
+                <span sd-switch
+                      ng-model="filters.sources.exclude"
+                      ng-change="onFilterChanged(filters.sources)"
+                ></span>
+            </div>
+            <div class="form__row">
+                <sd-tag-input
+                        ng-model="filters.sources.selected"
+                        data-field="{{filters.sources.labelField}}"
+                        data-key-property="{{filters.sources.keyField}}"
+                        data-items="filters.sources.items"
+                        data-on-change="onFilterChanged(filters.sources)"
+                        data-freetext="false"
+                        data-replace-spaces-with-dashes="false"
+                        data-placeholder="{{filters.sources.placeholder}}"
+                        data-max-results-to-show="0"
+                ></sd-tag-input>
+            </div>
+        </div>
+    </toggle-box-next>
+
+    <toggle-box-next data-title="filters.ingest_providers.label"
+                     data-style="'circle'"
+                     ng-if="filters.ingest_providers.enabled"
+    >
+        <div class="sda-report-filters__filter">
+            <div class="sda-report-filters__exclude">
+                <label translate>Exclude</label>
+                <span sd-switch
+                      ng-model="filters.ingest_providers.exclude"
+                      ng-change="onFilterChanged(filters.ingest_providers)"
+                ></span>
+            </div>
+            <div class="form__row">
+                <sd-tag-input
+                        ng-model="filters.ingest_providers.selected"
+                        data-field="{{filters.ingest_providers.labelField}}"
+                        data-key-property="{{filters.ingest_providers.keyField}}"
+                        data-items="filters.ingest_providers.items"
+                        data-on-change="onFilterChanged(filters.ingest_providers)"
+                        data-freetext="false"
+                        data-replace-spaces-with-dashes="false"
+                        data-min-length="filters.ingest_providers.minLength"
+                        data-placeholder="{{filters.ingest_providers.placeholder}}"
                         data-max-results-to-show="0"
                 ></sd-tag-input>
             </div>
@@ -109,34 +195,6 @@
                         data-freetext="false"
                         data-replace-spaces-with-dashes="false"
                         data-placeholder="{{filters.genre.placeholder}}"
-                        data-max-results-to-show="0"
-                ></sd-tag-input>
-            </div>
-        </div>
-    </toggle-box-next>
-
-    <toggle-box-next data-title="filters.sources.label"
-                     data-style="'circle'"
-                     ng-if="filters.sources.enabled"
-    >
-        <div class="sda-report-filters__filter">
-            <div class="sda-report-filters__exclude">
-                <label translate>Exclude</label>
-                <span sd-switch
-                      ng-model="filters.sources.exclude"
-                      ng-change="onFilterChanged(filters.sources)"
-                ></span>
-            </div>
-            <div class="form__row">
-                <sd-tag-input
-                        ng-model="filters.sources.selected"
-                        data-field="{{filters.sources.labelField}}"
-                        data-key-property="{{filters.sources.keyField}}"
-                        data-items="filters.sources.items"
-                        data-on-change="onFilterChanged(filters.sources)"
-                        data-freetext="false"
-                        data-replace-spaces-with-dashes="false"
-                        data-placeholder="{{filters.sources.placeholder}}"
                         data-max-results-to-show="0"
                 ></sd-tag-input>
             </div>

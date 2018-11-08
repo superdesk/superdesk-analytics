@@ -158,8 +158,9 @@ export function SearchReport(_, config, moment, api, $q, gettext, gettextCatalog
         const startDate = _.get(params, 'start_date') || _.get(params, 'dates.start');
         const endDate = _.get(params, 'end_date') || _.get(params, 'dates.end');
         const date = _.get(params, 'date') || _.get(params, 'dates.date');
+        const relative = _.get(params, 'dates.relative');
 
-        return {dateFilter, startDate, endDate, date};
+        return {dateFilter, startDate, endDate, date, relative};
     };
 
     /**
@@ -347,7 +348,7 @@ export function SearchReport(_, config, moment, api, $q, gettext, gettextCatalog
     };
 
     this._filterDates = (query, params) => {
-        const {dateFilter, startDate, endDate, date} = getFilterAndDates(params);
+        const {dateFilter, startDate, endDate, date, relative} = getFilterAndDates(params);
 
         if (!dateFilter) {
             return;
@@ -377,6 +378,10 @@ export function SearchReport(_, config, moment, api, $q, gettext, gettextCatalog
         case 'last_month':
             lt = 'now/M';
             gte = 'now-1M/M';
+            break;
+        case 'relative':
+            lt = 'now';
+            gte = `now-${relative}h`;
             break;
         }
 
