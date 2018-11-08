@@ -77,7 +77,8 @@ export function Chart(chartManager, $timeout, $sce) {
              * @description This allows table data cells to contain html nodes
              */
             scope.getHtml = function(html) {
-                return $sce.trustAsHtml(html);
+                // Make sure to force html to be a string (statistics are numbers after all)
+                return $sce.trustAsHtml('' + html);
             };
         },
     };

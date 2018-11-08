@@ -541,7 +541,7 @@ export function ChartConfig(
             const xAxis = this.getXAxisConfig();
             const seriesData = this.getSeriesData();
 
-            const headers = [xAxis.title.text, gettext('Published Stories')];
+            const headers = [xAxis.title.text, this.getYAxisTitle()];
             const tableRows = [];
             const {data, field} = this.getParent();
 
@@ -713,6 +713,146 @@ export function ChartConfig(
     );
 
     /**
+     * @ngdoc propery
+     * @name fieldTranslations
+     * @type {Object}
+     * @description Externally editable map of functions for field name & values translations
+     */
+    self.fieldTranslations = {
+        'task.desk': () => (
+            desks.initialize()
+                .then(() => {
+                    self.setTranslation(
+                        'task.desk',
+                        gettext('Desk'),
+                        _.fromPairs(_.map(
+                            _.get(desks, 'desks._items') || [],
+                            (desk) => [_.get(desk, '_id'), _.get(desk, 'name')]
+                        ))
+                    );
+                })
+        ),
+        'task.user': () => (
+            userList.getAll()
+                .then((users) => {
+                    self.setTranslation(
+                        'task.user',
+                        gettext('User'),
+                        _.fromPairs(_.map(
+                            users || [],
+                            (user) => [_.get(user, '_id'), _.get(user, 'display_name')]
+                        ))
+                    );
+                })
+        ),
+        'anpa_category.qcode': () => (
+            metadata.initialize()
+                .then(() => {
+                    self.setTranslation(
+                        'anpa_category.qcode',
+                        gettext('Category'),
+                        _.fromPairs(_.map(
+                            _.get(metadata, 'values.categories') || [],
+                            (item) => [_.get(item, 'qcode'), _.get(item, 'name')]
+                        ))
+                    );
+                })
+        ),
+        'genre.qcode': () => (
+            metadata.initialize()
+                .then(() => {
+                    self.setTranslation(
+                        'genre.qcode',
+                        gettext('Genre'),
+                        _.fromPairs(_.map(
+                            _.get(metadata, 'values.genre') || [],
+                            (item) => [_.get(item, 'qcode'), _.get(item, 'name')]
+                        ))
+                    );
+                })
+        ),
+        urgency: () => (
+            metadata.initialize()
+                .then(() => {
+                    self.setTranslation(
+                        'urgency',
+                        gettextCatalog.getString('Urgency'),
+                        _.fromPairs(_.map(
+                            _.get(metadata, 'values.urgency') || [],
+                            (item) => [_.get(item, 'qcode'), _.get(item, 'name')]
+                        ))
+                    );
+                })
+        ),
+        state: () => {
+            self.setTranslation(
+                'state',
+                gettext('State'),
+                {
+                    published: gettext('Published'),
+                    killed: gettext('Killed'),
+                    corrected: gettext('Corrected'),
+                    updated: gettext('Updated'),
+                    recalled: gettext('Recalled'),
+                }
+            );
+
+            return null;
+        },
+        source: () => {
+            self.setTranslation(
+                'source',
+                gettext('Source')
+            );
+
+            return null;
+        },
+        ingest_providers: () => (
+            ingestSources.initialize()
+                .then(() => {
+                    self.setTranslation(
+                        'ingest_providers',
+                        gettext('Ingest Providers'),
+                        _.fromPairs(
+                            _.map(
+                                _.get(ingestSources, 'providers') || [],
+                                (item) => [_.get(item, '_id'), _.get(item, 'name')]
+                            )
+                        )
+                    );
+                })
+        ),
+        stages: () => (
+            desks.initialize()
+                .then(() => {
+                    const deskStages = [];
+
+                    _.forEach((desks.deskStages), (stages, deskId) => {
+                        const deskName = _.get(desks.deskLookup, `[${deskId}].name`) || '';
+
+                        deskStages.push(
+                            ...stages.map((stage) => ({
+                                _id: stage._id,
+                                name: deskName + '/' + stage.name
+                            }))
+                        );
+                    });
+
+                    self.setTranslation(
+                        'stages',
+                        gettext('Stages'),
+                        _.fromPairs(
+                            _.map(
+                                deskStages,
+                                (item) => [_.get(item, '_id'), _.get(item, 'name')]
+                            )
+                        )
+                    );
+                })
+        ),
+    };
+
+    /**
      * @ngdoc method
      * @name ChartConfig#loadTranslations
      * @param {Array} fields - Array of field names to load translations for
@@ -726,142 +866,15 @@ export function ChartConfig(
         }
 
         const promises = [];
-        const translateField = {
-            'task.desk': () => {
-                promises.push(desks.initialize()
-                    .then(() => {
-                        self.setTranslation(
-                            'task.desk',
-                            gettext('Desk'),
-                            _.fromPairs(_.map(
-                                _.get(desks, 'desks._items') || [],
-                                (desk) => [_.get(desk, '_id'), _.get(desk, 'name')]
-                            ))
-                        );
-                    }));
-            },
-            'task.user': () => {
-                promises.push(userList.getAll()
-                    .then((users) => {
-                        self.setTranslation(
-                            'task.user',
-                            gettext('User'),
-                            _.fromPairs(_.map(
-                                users || [],
-                                (user) => [_.get(user, '_id'), _.get(user, 'display_name')]
-                            ))
-                        );
-                    }));
-            },
-            'anpa_category.qcode': () => {
-                promises.push(metadata.initialize()
-                    .then(() => {
-                        self.setTranslation(
-                            'anpa_category.qcode',
-                            gettext('Category'),
-                            _.fromPairs(_.map(
-                                _.get(metadata, 'values.categories') || [],
-                                (item) => [_.get(item, 'qcode'), _.get(item, 'name')]
-                            ))
-                        );
-                    }));
-            },
-            'genre.qcode': () => {
-                promises.push(metadata.initialize()
-                    .then(() => {
-                        self.setTranslation(
-                            'genre.qcode',
-                            gettext('Genre'),
-                            _.fromPairs(_.map(
-                                _.get(metadata, 'values.genre') || [],
-                                (item) => [_.get(item, 'qcode'), _.get(item, 'name')]
-                            ))
-                        );
-                    }));
-            },
-            urgency: () => {
-                promises.push(metadata.initialize()
-                    .then(() => {
-                        self.setTranslation(
-                            'urgency',
-                            gettextCatalog.getString('Urgency'),
-                            _.fromPairs(_.map(
-                                _.get(metadata, 'values.urgency') || [],
-                                (item) => [_.get(item, 'qcode'), _.get(item, 'name')]
-                            ))
-                        );
-                    }));
-            },
-            state: () => {
-                self.setTranslation(
-                    'state',
-                    gettext('State'),
-                    {
-                        published: gettext('Published'),
-                        killed: gettext('Killed'),
-                        corrected: gettext('Corrected'),
-                        updated: gettext('Updated'),
-                        recalled: gettext('Recalled'),
-                    }
-                );
-            },
-            source: () => {
-                self.setTranslation(
-                    'source',
-                    gettext('Source')
-                );
-            },
-            ingest_providers: () => {
-                promises.push(ingestSources.initialize()
-                    .then(() => {
-                        self.setTranslation(
-                            'ingest_providers',
-                            gettext('Ingest Providers'),
-                            _.fromPairs(
-                                _.map(
-                                    _.get(ingestSources, 'providers') || [],
-                                    (item) => [_.get(item, '_id'), _.get(item, 'name')]
-                                )
-                            )
-                        );
-                    })
-                );
-            },
-            stages: () => {
-                promises.push(desks.initialize()
-                    .then(() => {
-                        const deskStages = [];
-
-                        _.forEach((desks.deskStages), (stages, deskId) => {
-                            const deskName = _.get(desks.deskLookup, `[${deskId}].name`) || '';
-
-                            deskStages.push(
-                                ...stages.map((stage) => ({
-                                    _id: stage._id,
-                                    name: deskName + '/' + stage.name
-                                }))
-                            );
-                        });
-
-                        self.setTranslation(
-                            'stages',
-                            gettext('Stages'),
-                            _.fromPairs(
-                                _.map(
-                                    deskStages,
-                                    (item) => [_.get(item, '_id'), _.get(item, 'name')]
-                                )
-                            )
-                        );
-                    })
-                );
-            },
-        };
 
         fields.forEach(
             (field) => {
-                if (_.get(translateField, field)) {
-                    translateField[field]();
+                if (_.get(self.fieldTranslations, field)) {
+                    const promise = self.fieldTranslations[field]();
+
+                    if (promise !== null) {
+                        promises.push(promise);
+                    }
                 }
             }
         );

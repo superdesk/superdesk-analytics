@@ -36,11 +36,23 @@ export function ReportsProvider(_) {
      * @name ReportsProvider#$get
      * @description Returns the sorted list of registered Reports
      */
-    this.$get = ['privileges', function(privileges) {
+    this.$get = ['privileges', '$rootScope', function(privileges, $rootScope) {
+        const filterReport = (report) => {
+            // Filter this report if the user does not have the correct privileges
+            if (!privileges.userHasPrivileges(report.privileges)) {
+                return false;
+            }
+
+            // Filter this report if the required features are not enabled in Superdesk
+            return _.every(report.required_features || [], (feature) => (
+                Object.keys($rootScope.features).indexOf(feature) > -1
+            ));
+        };
+
         return _.sortBy(
             _.filter(
                 _.values(reports),
-                (report) => privileges.userHasPrivileges(report.privileges)
+                filterReport
             ),
             'priority'
         );

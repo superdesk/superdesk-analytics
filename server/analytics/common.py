@@ -20,7 +20,8 @@ report_types = [
     'track_activity_report',
     'mission_report',
     'content_publishing_report',
-    'publishing_performance_report'
+    'publishing_performance_report',
+    'planning_usage_report'
 ]
 
 REPORT_TYPES = namedtuple('REPORT_TYPES', [
@@ -31,7 +32,8 @@ REPORT_TYPES = namedtuple('REPORT_TYPES', [
     'TRACK_ACTIVITY',
     'MISSION',
     'CONTENT_PUBLISHING',
-    'PUBLISHING_PERFORMANCE'
+    'PUBLISHING_PERFORMANCE',
+    'PLANNING_USAGE'
 ])(*report_types)
 
 mime_types = [
@@ -89,6 +91,8 @@ def get_report_service(report_type):
         return get_resource_service('content_publishing_report')
     elif report_type == REPORT_TYPES.PUBLISHING_PERFORMANCE:
         return get_resource_service('publishing_performance_report')
+    elif report_type == REPORT_TYPES.PLANNING_USAGE:
+        return get_resource_service('planning_usage_report')
 
     return None
 
