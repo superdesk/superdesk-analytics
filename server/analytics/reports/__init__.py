@@ -118,7 +118,9 @@ def generate_html(options):
     thead = '<tr><th>{}</th></tr>'.format('</th><th>'.join(headers))
     tbody = ''
     for row in rows:
-        tbody += '<tr><td>{}</td></tr>'.format('</td><td>'.join(row))
+        tbody += '<tr><td>{}</td></tr>'.format(
+            '</td><td>'.join([str(td) for td in row])
+        )
 
     return '''
 <div>

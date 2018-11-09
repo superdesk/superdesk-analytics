@@ -386,7 +386,7 @@ class ChartConfig:
         x_axis = self.get_x_axis_config()
         series_data = self.get_series_data()
 
-        headers = [x_axis['title']['text'], 'Published Stories']
+        headers = [x_axis['title']['text'], self.get_y_axis_title()]
         table_rows = []
         parent = self.get_parent()
 

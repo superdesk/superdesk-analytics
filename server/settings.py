@@ -136,7 +136,8 @@ INSTALLED_APPS.extend([
 ])
 
 INSTALLED_PLUGINS = [
-    'analytics'
+    'analytics',
+    'planning'
 ]
 
 INSTALLED_APPS.extend(INSTALLED_PLUGINS)

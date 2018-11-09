@@ -25,6 +25,7 @@ from flask import current_app as app
 
 class BaseReportService(SearchService):
     exclude_stages_with_global_read_off = True
+    date_filter_field = 'versioncreated'
 
     def get_stages_to_exclude(self):
         """
@@ -285,7 +286,7 @@ class BaseReportService(SearchService):
         query['size'] = params.get('size') or 0
 
     def _es_set_sort(self, query, params):
-        query['sort'] = params.get('sort') or [{'versioncreated': 'desc'}]
+        query['sort'] = params.get('sort') or [{self.date_filter_field: 'desc'}]
 
     def _es_filter_dates(self, query, params):
         dates = params.get('dates') or {}
@@ -324,7 +325,7 @@ class BaseReportService(SearchService):
         if lt is not None and gte is not None:
             query['must'].append({
                 'range': {
-                    'versioncreated': {
+                    self.date_filter_field: {
                         'lt': lt,
                         'gte': gte,
                         'time_zone': time_zone
