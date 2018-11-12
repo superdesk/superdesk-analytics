@@ -151,14 +151,16 @@ class PlanningUsageReportService(BaseReportService):
         args = self._get_request_or_lookup(req, **lookup)
         query = self.generate_elastic_query(args)['source']
         query['aggs'] = self._get_aggregations()
+        types = ['events', 'planning', 'assignments']
 
         hits = self.elastic.es.search(
             body=query,
-            index=es_utils.get_index(),
-            doc_type=['events', 'planning', 'assignments']
+            index=es_utils.get_index(types),
+            doc_type=types,
+            params={}
         )
 
-        docs = self.elastic._parse_hits(hits, 'ingest')  # any resource with item schema will do
+        docs = self._get_docs(hits)
 
         if args['return_type'] == 'highcharts_config':
             report = self.generate_highcharts_config(docs, args)
