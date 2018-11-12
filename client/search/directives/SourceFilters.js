@@ -237,6 +237,7 @@ export function SourceFilters(
                     enabled: false,
                     fetch: () => desks.initialize(),
                     receive: () => _.get(desks, 'desks._items') || [],
+                    minLength: 1,
                 },
                 users: {
                     name: 'users',
@@ -251,6 +252,7 @@ export function SourceFilters(
                     enabled: false,
                     fetch: () => userList.getAll(),
                     receive: (data) => _.get(data, 'users') || [],
+                    minLength: 1,
                 },
                 categories: {
                     name: 'categories',
@@ -265,6 +267,7 @@ export function SourceFilters(
                     enabled: false,
                     fetch: () => metadata.initialize(),
                     receive: () => _.get(metadata, 'values.categories') || [],
+                    minLength: 1,
                 },
                 genre: {
                     name: 'genre',
@@ -279,6 +282,7 @@ export function SourceFilters(
                     enabled: false,
                     fetch: () => metadata.initialize(),
                     receive: () => _.get(metadata, 'values.genre') || [],
+                    minLength: 1,
                 },
                 sources: {
                     name: 'sources',
@@ -293,6 +297,7 @@ export function SourceFilters(
                     enabled: false,
                     fetch: () => this.loadSources(),
                     receive: (data) => _.get(data, 'sources') || [],
+                    minLength: 1,
                 },
                 urgency: {
                     name: 'urgency',
@@ -324,6 +329,7 @@ export function SourceFilters(
                     enabled: false,
                     fetch: () => $q.when(),
                     receive: () => scope.filters.states.items,
+                    minLength: 1,
                 },
                 ingest_providers: {
                     name: 'ingest_providers',
@@ -337,7 +343,11 @@ export function SourceFilters(
                     exclude: false,
                     enabled: false,
                     fetch: () => ingestSources.initialize(),
-                    receive: () => _.get(ingestSources, 'providers') || []
+                    receive: () => _.filter(
+                        _.get(ingestSources, 'providers') || [],
+                        (provider) => !_.get(provider, 'search_provider')
+                    ),
+                    minLength: 1,
                 },
                 stages: {
                     name: 'stages',
@@ -366,7 +376,8 @@ export function SourceFilters(
                         });
 
                         return deskStages;
-                    }
+                    },
+                    minLength: 1,
                 },
             };
 
