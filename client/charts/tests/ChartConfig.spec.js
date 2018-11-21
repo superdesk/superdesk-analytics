@@ -51,6 +51,28 @@ describe('chartConfig', () => {
         return config;
     };
 
+    const defaultConfig = {
+        credits: {enabled: false},
+        exporting: {
+            fallbackToExportServer: false,
+            error: jasmine.any(Function),
+            buttons: {
+                contextButton: {
+                    menuItems: [
+                        'printChart',
+                        'downloadPNG',
+                        'downloadJPEG',
+                        'downloadSVG',
+                        'downloadPDF',
+                        'downloadCSV',
+                    ],
+                },
+            },
+        },
+        fullHeight: false,
+        time: {useUTC: true},
+    };
+
     it('can generate single series', () => {
         const chart = genSingleChart('cid', 'bar');
 
@@ -61,58 +83,40 @@ describe('chartConfig', () => {
 
         expect(genConfig(chart)).toEqual({
             id: 'cid',
-            type: 'bar',
+            type: 'highcharts',
             chart: {
-                type: 'bar',
                 zoomType: 'y',
             },
             title: {text: 'Charts'},
             subtitle: {text: 'For Today'},
-            xAxis: {
+            xAxis: [{
                 title: {text: 'Category'},
                 categories: ['Basketball', 'Advisories', 'Cricket'],
-            },
-            yAxis: {
+                type: 'category',
+                allowDecimals: false,
+            }],
+            yAxis: [{
                 title: {text: 'Published Stories'},
                 stackLabels: {enabled: false},
                 allowDecimals: false,
-            },
+            }],
             legend: {enabled: false},
             tooltip: {
                 headerFormat: '{point.x}: {point.y}',
                 pointFormat: '',
             },
             plotOptions: {
-                bar: {
-                    colorByPoint: true,
-                    dataLabels: {enabled: true},
-                },
-                column: {
-                    colorByPoint: true,
-                    dataLabels: {enabled: true},
-                },
+                series: {dataLabels: {enabled: true}},
+                bar: {colorByPoint: true},
+                column: {colorByPoint: true},
             },
             series: [{
-                name: 'Published Stories',
+                name: 'Category',
                 data: [4, 3, 1],
+                type: 'bar',
+                xAxis: 0,
             }],
-            credits: {enabled: false},
-            exporting: {
-                fallbackToExportServer: false,
-                error: jasmine.any(Function),
-                buttons: {
-                    contextButton: {
-                        menuItems: [
-                            'printChart',
-                            'downloadPNG',
-                            'downloadJPEG',
-                            'downloadSVG',
-                            'downloadPDF',
-                            'downloadCSV',
-                        ],
-                    },
-                },
-            },
+            ...defaultConfig,
         });
     });
 
@@ -121,24 +125,32 @@ describe('chartConfig', () => {
 
         chart.sortOrder = 'asc';
         genConfig(chart);
-        expect(config.xAxis).toEqual({
+        expect(config.xAxis).toEqual([{
             title: {text: 'Category'},
             categories: ['Cricket', 'Advisories', 'Basketball'],
-        });
+            type: 'category',
+            allowDecimals: false,
+        }]);
         expect(config.series).toEqual([{
-            name: 'Published Stories',
+            name: 'Category',
             data: [1, 3, 4],
+            type: 'bar',
+            xAxis: 0,
         }]);
 
         chart.sortOrder = 'desc';
         genConfig(chart);
-        expect(config.xAxis).toEqual({
+        expect(config.xAxis).toEqual([{
             title: {text: 'Category'},
             categories: ['Basketball', 'Advisories', 'Cricket'],
-        });
+            type: 'category',
+            allowDecimals: false,
+        }]);
         expect(config.series).toEqual([{
-            name: 'Published Stories',
+            name: 'Category',
             data: [4, 3, 1],
+            type: 'bar',
+            xAxis: 0,
         }]);
     });
 
@@ -151,22 +163,21 @@ describe('chartConfig', () => {
         expect(chart.isMultiSource()).toBe(true);
         expect(genConfig(chart)).toEqual({
             id: 'cid',
-            type: 'column',
-            chart: {
-                type: 'column',
-                zoomType: 'x',
-            },
+            type: 'highcharts',
+            chart: {zoomType: 'x'},
             title: {text: 'Charts'},
             subtitle: {text: 'For Today'},
-            xAxis: {
+            xAxis: [{
                 title: {text: 'Category'},
                 categories: ['Cricket', 'Basketball', 'Advisories'],
-            },
-            yAxis: {
+                type: 'category',
+                allowDecimals: false,
+            }],
+            yAxis: [{
                 title: {text: 'Published Stories'},
                 stackLabels: {enabled: true},
                 allowDecimals: false,
-            },
+            }],
             legend: {
                 enabled: true,
                 title: {text: 'Urgency'},
@@ -176,42 +187,33 @@ describe('chartConfig', () => {
                 pointFormat: '',
             },
             plotOptions: {
-                bar: {
-                    stacking: 'normal',
-                    colorByPoint: false,
-                },
-                column: {
-                    stacking: 'normal',
-                    colorByPoint: false,
-                },
+                series: {dataLabels: {enabled: false}},
+                bar: {colorByPoint: false},
+                column: {colorByPoint: false},
             },
             series: [{
                 name: '1',
                 data: [2, 1, 1],
+                xAxis: 0,
+                type: 'column',
+                stacking: 'normal',
+                stack: 0,
             }, {
                 name: '3',
                 data: [1, 2, 1],
+                xAxis: 0,
+                type: 'column',
+                stacking: 'normal',
+                stack: 0,
             }, {
                 name: '5',
                 data: [1, 0, 0],
+                xAxis: 0,
+                type: 'column',
+                stacking: 'normal',
+                stack: 0,
             }],
-            credits: {enabled: false},
-            exporting: {
-                fallbackToExportServer: false,
-                error: jasmine.any(Function),
-                buttons: {
-                    contextButton: {
-                        menuItems: [
-                            'printChart',
-                            'downloadPNG',
-                            'downloadJPEG',
-                            'downloadSVG',
-                            'downloadPDF',
-                            'downloadCSV',
-                        ],
-                    },
-                },
-            },
+            ...defaultConfig,
         });
     });
 
@@ -220,36 +222,64 @@ describe('chartConfig', () => {
 
         chart.sortOrder = 'asc';
         genConfig(chart);
-        expect(config.xAxis).toEqual({
+        expect(config.xAxis).toEqual([{
             title: {text: 'Category'},
             categories: ['Advisories', 'Basketball', 'Cricket'],
-        });
+            type: 'category',
+            allowDecimals: false,
+        }]);
         expect(config.series).toEqual([{
             name: '1',
             data: [1, 1, 2],
+            type: 'bar',
+            xAxis: 0,
+            stacking: 'normal',
+            stack: 0,
         }, {
             name: '3',
             data: [1, 2, 1],
+            type: 'bar',
+            xAxis: 0,
+            stacking: 'normal',
+            stack: 0,
         }, {
             name: '5',
             data: [0, 0, 1],
+            type: 'bar',
+            xAxis: 0,
+            stacking: 'normal',
+            stack: 0,
         }]);
 
         chart.sortOrder = 'desc';
         genConfig(chart);
-        expect(config.xAxis).toEqual({
+        expect(config.xAxis).toEqual([{
             title: {text: 'Category'},
             categories: ['Cricket', 'Basketball', 'Advisories'],
-        });
+            type: 'category',
+            allowDecimals: false,
+        }]);
         expect(config.series).toEqual([{
             name: '1',
             data: [2, 1, 1],
+            type: 'bar',
+            xAxis: 0,
+            stacking: 'normal',
+            stack: 0,
         }, {
             name: '3',
             data: [1, 2, 1],
+            type: 'bar',
+            xAxis: 0,
+            stacking: 'normal',
+            stack: 0,
         }, {
             name: '5',
             data: [1, 0, 0],
+            type: 'bar',
+            xAxis: 0,
+            stacking: 'normal',
+            stack: 0,
         }]);
     });
 
@@ -264,13 +294,17 @@ describe('chartConfig', () => {
             chart: {type: 'column'},
             title: 'Tables',
             subtitle: 'For Today',
-            xAxis: {
+            xAxis: [{
                 title: {text: 'Category'},
                 categories: ['Basketball', 'Advisories', 'Cricket'],
-            },
+                type: 'category',
+                allowDecimals: false,
+            }],
             series: [{
-                name: 'Published Stories',
+                name: 'Category',
                 data: [4, 3, 1],
+                xAxis: 0,
+                type: 'column',
             }],
             headers: ['Category', 'Published Stories'],
             rows: [
@@ -286,13 +320,17 @@ describe('chartConfig', () => {
 
         chart.sortOrder = 'asc';
         genConfig(chart);
-        expect(config.xAxis).toEqual({
+        expect(config.xAxis).toEqual([{
             title: {text: 'Category'},
             categories: ['Cricket', 'Advisories', 'Basketball'],
-        });
+            type: 'category',
+            allowDecimals: false,
+        }]);
         expect(config.series).toEqual([{
-            name: 'Published Stories',
+            name: 'Category',
             data: [1, 3, 4],
+            xAxis: 0,
+            type: 'column',
         }]);
         expect(config.rows).toEqual([
             ['Cricket', 1],
@@ -302,13 +340,17 @@ describe('chartConfig', () => {
 
         chart.sortOrder = 'desc';
         genConfig(chart);
-        expect(config.xAxis).toEqual({
+        expect(config.xAxis).toEqual([{
             title: {text: 'Category'},
             categories: ['Basketball', 'Advisories', 'Cricket'],
-        });
+            type: 'category',
+            allowDecimals: false,
+        }]);
         expect(config.series).toEqual([{
-            name: 'Published Stories',
+            name: 'Category',
             data: [4, 3, 1],
+            xAxis: 0,
+            type: 'column',
         }]);
         expect(config.rows).toEqual([
             ['Basketball', 4],
@@ -330,19 +372,33 @@ describe('chartConfig', () => {
             chart: {type: 'column'},
             title: 'Tables',
             subtitle: 'For Today',
-            xAxis: {
+            xAxis: [{
                 title: {text: 'Category'},
                 categories: ['Cricket', 'Basketball', 'Advisories'],
-            },
+                type: 'category',
+                allowDecimals: false,
+            }],
             series: [{
                 name: '1',
                 data: [2, 1, 1],
+                xAxis: 0,
+                type: 'column',
+                stacking: 'normal',
+                stack: 0,
             }, {
                 name: '3',
                 data: [1, 2, 1],
+                xAxis: 0,
+                type: 'column',
+                stacking: 'normal',
+                stack: 0,
             }, {
                 name: '5',
                 data: [1, 0, 0],
+                xAxis: 0,
+                type: 'column',
+                stacking: 'normal',
+                stack: 0,
             }],
             headers: ['Category', '1', '3', '5', 'Total Stories'],
             rows: [
@@ -358,19 +414,33 @@ describe('chartConfig', () => {
 
         chart.sortOrder = 'asc';
         genConfig(chart);
-        expect(config.xAxis).toEqual({
+        expect(config.xAxis).toEqual([{
             title: {text: 'Category'},
             categories: ['Advisories', 'Basketball', 'Cricket'],
-        });
+            type: 'category',
+            allowDecimals: false,
+        }]);
         expect(config.series).toEqual([{
             name: '1',
             data: [1, 1, 2],
+            xAxis: 0,
+            type: 'column',
+            stacking: 'normal',
+            stack: 0,
         }, {
             name: '3',
             data: [1, 2, 1],
+            xAxis: 0,
+            type: 'column',
+            stacking: 'normal',
+            stack: 0,
         }, {
             name: '5',
             data: [0, 0, 1],
+            xAxis: 0,
+            type: 'column',
+            stacking: 'normal',
+            stack: 0,
         }]);
         expect(config.rows).toEqual([
             ['Advisories', 1, 1, 0, 2],
@@ -380,75 +450,39 @@ describe('chartConfig', () => {
 
         chart.sortOrder = 'desc';
         genConfig(chart);
-        expect(config.xAxis).toEqual({
+        expect(config.xAxis).toEqual([{
             title: {text: 'Category'},
             categories: ['Cricket', 'Basketball', 'Advisories'],
-        });
+            type: 'category',
+            allowDecimals: false,
+        }]);
         expect(config.series).toEqual([{
             name: '1',
             data: [2, 1, 1],
+            xAxis: 0,
+            type: 'column',
+            stacking: 'normal',
+            stack: 0,
         }, {
             name: '3',
             data: [1, 2, 1],
+            xAxis: 0,
+            type: 'column',
+            stacking: 'normal',
+            stack: 0,
         }, {
             name: '5',
             data: [1, 0, 0],
+            xAxis: 0,
+            type: 'column',
+            stacking: 'normal',
+            stack: 0,
         }]);
         expect(config.rows).toEqual([
             ['Cricket', 2, 1, 1, 4],
             ['Basketball', 1, 2, 0, 3],
             ['Advisories', 1, 1, 0, 2],
         ]);
-    });
-
-    it('can change chart functionality', () => {
-        const chart = genSingleChart('cid', 'bar');
-
-        chart.title = 'Charts';
-        chart.subtitle = 'For Today';
-
-        expect(chart.isMultiSource()).toBe(false);
-
-        chart.getTitle = () => `${chart.title} - Testing`;
-        chart.getSubtitle = () => `${chart.subtitle} - Test 2`;
-
-        chart.getSourceName = (group) => {
-            switch (group) {
-            case 'anpa_category.qcode':
-                return 'Category';
-            case 'genre.qcode':
-                return 'Genre';
-            case 'source':
-                return 'Source';
-            case 'urgency':
-                return 'Urgency';
-            default:
-                return group;
-            }
-        };
-
-        chart.getSourceTitles = (sourceType, dataKeys) => (
-            dataKeys.map((qcode) => {
-                switch (qcode) {
-                case 'a':
-                    return 'Advisories';
-                case 'b':
-                    return 'Basketball';
-                case 'c':
-                    return 'Cricket';
-                default:
-                    return qcode;
-                }
-            })
-        );
-
-        genConfig(chart);
-        expect(config.title).toEqual({text: 'Charts - Testing'});
-        expect(config.subtitle).toEqual({text: 'For Today - Test 2'});
-        expect(config.xAxis).toEqual({
-            title: {text: 'Category'},
-            categories: ['Basketball', 'Advisories', 'Cricket'],
-        });
     });
 
     describe('chart text translations', () => {
@@ -470,11 +504,6 @@ describe('chartConfig', () => {
                         c: 'Cricket',
                     },
                 },
-            });
-
-            expect(chart.getXAxisConfig()).toEqual({
-                title: {text: 'Category'},
-                categories: ['Basketball', 'Advisories', 'Cricket'],
             });
         });
 
@@ -499,11 +528,6 @@ describe('chartConfig', () => {
                     },
                 },
             });
-
-            expect(chart.getXAxisConfig()).toEqual({
-                title: {text: 'Urgency'},
-                categories: [1, 3, 5],
-            });
         });
 
         it('translates genre.qcode', () => {
@@ -524,11 +548,6 @@ describe('chartConfig', () => {
                         Factbox: 'Factbox',
                     },
                 },
-            });
-
-            expect(chart.getXAxisConfig()).toEqual({
-                title: {text: 'Genre'},
-                categories: ['Article (news)', 'Sidebar', 'Factbox'],
             });
         });
 
@@ -551,11 +570,6 @@ describe('chartConfig', () => {
                     },
                 },
             });
-
-            expect(chart.getXAxisConfig()).toEqual({
-                title: {text: 'Desk'},
-                categories: ['Sports Desk', 'Politic Desk', 'System Desk'],
-            });
         });
 
         it('translates task.user', () => {
@@ -576,11 +590,6 @@ describe('chartConfig', () => {
                         user3: 'last user',
                     },
                 },
-            });
-
-            expect(chart.getXAxisConfig()).toEqual({
-                title: {text: 'User'},
-                categories: ['last user', 'second user', 'first user'],
             });
         });
 
@@ -605,11 +614,6 @@ describe('chartConfig', () => {
                     },
                 },
             });
-
-            expect(chart.getXAxisConfig()).toEqual({
-                title: {text: 'State'},
-                categories: ['Updated', 'Published', 'Killed'],
-            });
         });
 
         it('translates source', () => {
@@ -626,11 +630,6 @@ describe('chartConfig', () => {
                     title: 'Source',
                     names: {},
                 },
-            });
-
-            expect(chart.getXAxisConfig()).toEqual({
-                title: {text: 'Source'},
-                categories: ['ap', 'aap', 'ftp'],
             });
         });
     });

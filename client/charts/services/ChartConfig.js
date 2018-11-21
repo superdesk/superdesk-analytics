@@ -1,4 +1,5 @@
 import {formatDate} from '../../utils';
+import {SDChart} from '../SDChart';
 
 ChartConfig.$inject = [
     'lodash',
@@ -154,6 +155,15 @@ export function ChartConfig(
             return this.sources.length > 1;
         }
 
+        getSource(index) {
+            const source = this.sources[index] || {};
+
+            return {
+                field: _.get(source, 'field') || '',
+                data: _.get(source, 'data') || {},
+            };
+        }
+
         /**
          * @ngdoc method
          * @name HighchartConfig#getParent
@@ -161,10 +171,7 @@ export function ChartConfig(
          * @description Returns the parent data source's field and data attributes
          */
         getParent() {
-            return {
-                field: _.get(this.sources, '[0].field') || '',
-                data: _.get(this.sources, '[0].data') || {},
-            };
+            return this.getSource(0);
         }
 
         /**
@@ -174,10 +181,7 @@ export function ChartConfig(
          * @description Returns the child data source's field and data attributes
          */
         getChild() {
-            return {
-                field: _.get(this.sources, '[1].field') || '',
-                data: _.get(this.sources, '[1].data') || {},
-            };
+            return this.getSource(1);
         }
 
         /**
@@ -192,32 +196,12 @@ export function ChartConfig(
 
         /**
          * @ngdoc method
-         * @name HighchartConfig#getTitleConfig
-         * @return {Object}
-         * @description Returns the title config to use for the chart
-         */
-        getTitleConfig() {
-            return {text: this.getTitle()};
-        }
-
-        /**
-         * @ngdoc method
          * @name HighchartConfig#getSubtitle
          * @return {string}
          * @description Returns the subtitle string to use for the chart
          */
         getSubtitle() {
             return this.subtitle;
-        }
-
-        /**
-         * @ngdoc method
-         * @name HighchartConfig#getSubtitleConfig
-         * @return {Object}
-         * @description Returns the subtitle config to use for the chart
-         */
-        getSubtitleConfig() {
-            return {text: this.getSubtitle()};
         }
 
         /**
@@ -229,50 +213,6 @@ export function ChartConfig(
          */
         getSourceName(field) {
             return self.getTranslationTitle(field);
-        }
-
-        /**
-         * @ngdoc method
-         * @name HighchartConfig#getXAxisConfig
-         * @return {Object}
-         * @description Returns the title and categories config for the X Axis
-         */
-        getXAxisConfig() {
-            const {field, data} = this.getParent();
-
-            return {
-                title: {text: this.getXAxisTitle()},
-                categories: this.getSourceTitles(
-                    field,
-                    this.getSortedKeys(data)
-                ),
-            };
-        }
-
-        /**
-         * @ngdoc method
-         * @name HighchartConfig#getXAxisTitle
-         * @return {string}
-         * @description Returns the title for the X Axis (defaults to primary data field name)
-         */
-        getXAxisTitle() {
-            const {field} = this.getParent();
-
-            return this.getSourceName(field);
-        }
-
-        /**
-         * @ngdoc method
-         * @name HighchartConfig#getYAxisConfig
-         * @return {Object}
-         * @description Returns the title and stack config for the Y Axis
-         */
-        getYAxisConfig() {
-            return {
-                title: {text: this.getYAxisTitle()},
-                stackLabels: {enabled: this.isMultiSource()},
-                allowDecimals: false,
-            };
         }
 
         /**
@@ -358,139 +298,6 @@ export function ChartConfig(
 
         /**
          * @ngdoc method
-         * @name HighchartConfig#getSeriesData
-         * @return {Object}
-         * @description Returns the Highcharts config for the series data
-         */
-        getSeriesData() {
-            return !this.isMultiSource() ?
-                this.getSingleSeriesData() :
-                this.getMultiSeriesData();
-        }
-
-        /**
-         * @ngdoc method
-         * @name HighchartConfig#getSingleSeriesData
-         * @return {Object}
-         * @description Returns the name and data attributes for single series data
-         */
-        getSingleSeriesData() {
-            const {data} = this.getParent();
-
-            return [{
-                name: this.getYAxisTitle(),
-                data: _.map(
-                    this.getSortedKeys(data),
-                    (source) => _.get(data, source) || 0
-                ),
-            }];
-        }
-
-        /**
-         * @ngdoc method
-         * @name HighchartConfig#getMultiSeriesData
-         * @return {Object}
-         * @description Returns the name and data attributes for stacked series data
-         */
-        getMultiSeriesData() {
-            const {data: parentData} = this.getParent();
-            const {data: childData, field: childType} = this.getChild();
-
-            return Object.keys(childData).map(
-                (child) => ({
-                    name: '' + this.getSourceTitle(childType, child),
-                    data: _.map(
-                        this.getSortedKeys(parentData),
-                        (parent) => _.get(parentData, `['${parent}']['${child}']`) || 0
-                    ),
-                })
-            );
-        }
-
-        /**
-         * @ngdoc method
-         * @name HighchartConfig#getLegend
-         * @return {Object}
-         * @description Returns the config for the Highcharts legend
-         */
-        getLegend() {
-            if (!this.isMultiSource()) {
-                return {enabled: false};
-            }
-
-            const {field} = this.getChild();
-
-            return {
-                enabled: true,
-                title: {text: this.getSourceName(field)},
-            };
-        }
-
-        /**
-         * @ngdoc method
-         * @name HighchartConfig#getPlotOptions
-         * @return {Object}
-         * @description Returns the config for the Highcharts plot options
-         */
-        getPlotOptions() {
-            if (!this.isMultiSource()) {
-                return {
-                    bar: {
-                        colorByPoint: true,
-                        dataLabels: {enabled: true},
-                    },
-                    column: {
-                        colorByPoint: true,
-                        dataLabels: {enabled: true},
-                    },
-                };
-            }
-
-            return {
-                bar: {
-                    stacking: 'normal',
-                    colorByPoint: false,
-                },
-                column: {
-                    stacking: 'normal',
-                    colorByPoint: false,
-                },
-            };
-        }
-
-        /**
-         * @ngdoc method
-         * @name HighchartConfig#getTooltip
-         * @return {Object}
-         * @description Returns the config for the Highcharts tooltip options
-         */
-        getTooltip() {
-            return !this.isMultiSource() ? {
-                // Show the tooltip on the one line
-                headerFormat: '{point.x}: {point.y}',
-                pointFormat: '',
-            } : {
-                // Show the tooltip on the one line
-                headerFormat: '{series.name}/{point.x}: {point.y}',
-                pointFormat: '',
-            };
-        }
-
-        /**
-         * @ngdoc method
-         * @name HighchartConfig#getChart
-         * @return {Object}
-         * @description Returns the type and zoomType config for the Highcharts chart options
-         */
-        getChart() {
-            return {
-                type: this.chartType,
-                zoomType: this.chartType === 'bar' ? 'y' : 'x',
-            };
-        }
-
-        /**
-         * @ngdoc method
          * @name HighchartConfig#addSource
          * @param {string} field - The sources field attribute (i.e. anpa_category.qcode)
          * @param {Object} data - An object containing the source data
@@ -516,112 +323,77 @@ export function ChartConfig(
          * @description Generates and returns the Highcharts config
          */
         genHighchartsConfig() {
-            return {
+            const configType = this.chartType === 'table' ? 'table' : 'highcharts';
+            const chart = new SDChart.Chart({
                 id: this.id,
-                type: this.chartType,
-                chart: this.getChart(),
-                title: this.getTitleConfig(),
-                subtitle: this.getSubtitleConfig(),
-                xAxis: this.getXAxisConfig(),
-                yAxis: this.getYAxisConfig(),
-                legend: this.getLegend(),
-                tooltip: this.getTooltip(),
-                plotOptions: this.getPlotOptions(),
-                series: this.getSeriesData(),
-            };
-        }
-
-        /**
-         * @ngdoc method
-         * @name HighchartConfig#genSingleTableConfig
-         * @return {Object}
-         * @description Generates and returns config for a single column table
-         */
-        genSingleTableConfig() {
-            const xAxis = this.getXAxisConfig();
-            const seriesData = this.getSeriesData();
-
-            const headers = [xAxis.title.text, this.getYAxisTitle()];
-            const tableRows = [];
-            const {data, field} = this.getParent();
-
-            _.forEach(this.getSortedKeys(data) || [], (group) => {
-                tableRows.push([
-                    this.getSourceTitle(field, group),
-                    data[group] || 0
-                ]);
-            });
-
-            return {
-                id: this.id,
-                type: 'table',
-                chart: {type: 'column'},
-                xAxis: xAxis,
-                series: seriesData,
-                headers: headers,
-                rows: tableRows,
+                chartType: configType,
                 title: this.getTitle(),
                 subtitle: this.getSubtitle(),
+                defaultConfig: self.defaultConfig,
+            });
+
+            chart.translations = self.translations;
+            chart.tooltipPoint = '';
+
+            const parent = this.getParent();
+
+            const axisOptions = {
+                type: 'category',
+                defaultChartType: this.chartType === 'table' ? 'column' : this.chartType,
+                yTitle: this.getYAxisTitle(),
+                xTitle: chart.getTranslationTitle(parent.field),
+                categoryField: parent.field,
+                categories: this.getSortedKeys(parent.data),
             };
-        }
 
-        /**
-         * @ngdoc method
-         * @name HighchartConfig#genSingleTableConfig
-         * @return {Object}
-         * @description Generates and returns config for a double column table
-         */
-        genMultiTableConfig() {
-            const xAxis = this.getXAxisConfig();
-            const seriesData = this.getSeriesData();
-            const {field, data} = this.getParent();
+            if (!this.isMultiSource()) {
+                chart.tooltipHeader = '{point.x}: {point.y}';
+                chart.dataLabels = true;
+                chart.colourByPoint = true;
 
-            const headers = [xAxis.title.text].concat(
-                seriesData.map((series) => series.name),
-                gettext('Total Stories')
-            );
+                chart.addAxis()
+                    .setOptions({
+                        ...axisOptions,
+                        stackLabels: false,
+                    })
+                    .addSeries()
+                    .setOptions({
+                        field: parent.field,
+                        data: _.map(
+                            this.getSortedKeys(parent.data),
+                            (source) => _.get(parent.data, source) || 0
+                        ),
+                    });
+            } else {
+                const child = this.getChild();
 
-            const tableRows = (this.getSortedKeys(data) || []).map(
-                (group) => [this.getSourceTitle(field, group)]
-            );
+                chart.legendTitle = this.getSourceName(child.field);
+                chart.tooltipHeader = '{series.name}/{point.x}: {point.y}';
+                chart.dataLabels = false;
+                chart.colourByPoint = false;
 
-            seriesData.forEach((series) => {
-                series.data.forEach((count, index) => {
-                    tableRows[index].push(count);
+                const axis = chart.addAxis()
+                    .setOptions({
+                        ...axisOptions,
+                        stackLabels: true,
+                    });
+
+                Object.keys(child.data).forEach((group) => {
+                    axis.addSeries()
+                        .setOptions({
+                            field: child.field,
+                            name: group,
+                            stack: 0,
+                            stackType: 'normal',
+                            data: _.map(
+                                this.getSortedKeys(parent.data),
+                                (parentKey) => _.get(parent.data, `['${parentKey}']['${group}']`) || 0
+                            ),
+                        });
                 });
-            });
+            }
 
-            tableRows.forEach((row) => {
-                row.push(
-                    _.sum(
-                        _.drop(row)
-                    )
-                );
-            });
-
-            return {
-                id: this.id,
-                type: 'table',
-                chart: {type: 'column'},
-                xAxis: xAxis,
-                series: seriesData,
-                headers: headers,
-                rows: tableRows,
-                title: this.getTitle(),
-                subtitle: this.getSubtitle(),
-            };
-        }
-
-        /**
-         * @ngdoc method
-         * @name HighchartConfig#genTableConfig
-         * @return {Object}
-         * @description Generates and returns config for either a single or double column table
-         */
-        genTableConfig() {
-            return !this.isMultiSource() ?
-                this.genSingleTableConfig() :
-                this.genMultiTableConfig();
+            return chart.genConfig();
         }
 
         /**
@@ -633,16 +405,7 @@ export function ChartConfig(
         genConfig() {
             return this.loadTranslations()
                 .then(() => {
-                    if (this.chartType === 'table') {
-                        this.config = this.genTableConfig();
-                    } else {
-                        this.config = Object.assign(
-                            {},
-                            self.defaultConfig,
-                            this.genHighchartsConfig()
-                        );
-                    }
-
+                    this.config = this.genHighchartsConfig();
                     return this.config;
                 });
         }

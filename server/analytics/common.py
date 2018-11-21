@@ -11,30 +11,10 @@
 from superdesk import get_resource_service
 from collections import namedtuple
 from subprocess import check_call, PIPE
+from flask import current_app as app
+import pytz
+from datetime import datetime
 
-report_types = [
-    'activity_report',
-    'content_quota_report',
-    'processed_items_report',
-    'source_category_report',
-    'track_activity_report',
-    'mission_report',
-    'content_publishing_report',
-    'publishing_performance_report',
-    'planning_usage_report'
-]
-
-REPORT_TYPES = namedtuple('REPORT_TYPES', [
-    'ACTIVITY',
-    'CONTENT_QUOTA',
-    'PROCESSED_ITEMS',
-    'SOURCE_CATEGORY',
-    'TRACK_ACTIVITY',
-    'MISSION',
-    'CONTENT_PUBLISHING',
-    'PUBLISHING_PERFORMANCE',
-    'PLANNING_USAGE'
-])(*report_types)
 
 mime_types = [
     'image/png',
@@ -74,27 +54,20 @@ def get_mime_type_extension(mimetype):
         return 'html'
 
 
-def get_report_service(report_type):
-    if report_type == REPORT_TYPES.ACTIVITY:
-        return get_resource_service('activity_report')
-    elif report_type == REPORT_TYPES.CONTENT_QUOTA:
-        return get_resource_service('content_quota_report')
-    elif report_type == REPORT_TYPES.PROCESSED_ITEMS:
-        return get_resource_service('processed_items_report')
-    elif report_type == REPORT_TYPES.SOURCE_CATEGORY:
-        return get_resource_service('source_category_report')
-    elif report_type == REPORT_TYPES.TRACK_ACTIVITY:
-        return get_resource_service('track_activity_report')
-    elif report_type == REPORT_TYPES.MISSION:
-        return get_resource_service('mission_report')
-    elif report_type == REPORT_TYPES.CONTENT_PUBLISHING:
-        return get_resource_service('content_publishing_report')
-    elif report_type == REPORT_TYPES.PUBLISHING_PERFORMANCE:
-        return get_resource_service('publishing_performance_report')
-    elif report_type == REPORT_TYPES.PLANNING_USAGE:
-        return get_resource_service('planning_usage_report')
+registered_reports = {}
 
-    return None
+
+def register_report(report_type, report_endpoint):
+    registered_reports[report_type] = report_endpoint
+
+
+def get_report_service(report_type):
+    try:
+        return get_resource_service(
+            registered_reports[report_type]
+        )
+    except KeyError:
+        return None
 
 
 def is_highcharts_installed():
@@ -112,3 +85,36 @@ def get_cv_by_qcode(name, field=None):
         for item in cvs.get('items') or []
         if item.get('is_active', True)
     }
+
+
+def get_elastic_version():
+    return app.data.elastic.es.info()['version']['number']
+
+
+def get_weekstart_offset_hr():
+    """Calculates the offset in hours for the configured start of the week
+
+    This method is used with elasticsearch to provide an offset for histogram queries
+    where the default buckets for week are based on the week starting on a Monday.
+
+    :return: Week start offset in hours relative to Monday
+    """
+    offset = 0
+
+    start_of_week = app.config.get('START_OF_WEEK') or 0
+    if start_of_week == 0:
+        offset -= 24
+    elif start_of_week > 1:
+        offset += (start_of_week - 1) * 24
+
+    return offset
+
+
+def get_utc_offset_in_minutes(utc_datetime):
+    """Calculates the UTC Offset in minutes for the supplied datetime instance
+
+    :param datetime utc_datetime: The date/time instance used to calculate utc offset
+    :return: UTC Offset in minutes
+    """
+    timezone = pytz.timezone(app.config['DEFAULT_TIMEZONE'])
+    return timezone.utcoffset(utc_datetime).total_seconds() / 60

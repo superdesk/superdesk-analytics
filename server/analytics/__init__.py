@@ -26,7 +26,7 @@ from analytics.email_report import init_app as init_email_report
 from analytics.planning_usage_report import init_app as init_planning_usage_report
 
 from analytics.commands import SendScheduledReports  # noqa
-from analytics.common import is_highcharts_installed
+from analytics.common import is_highcharts_installed, register_report
 from superdesk.celery_app import celery
 from superdesk.default_settings import celery_queue, crontab
 
@@ -68,6 +68,7 @@ def init_app(app):
     endpoint_name = 'activity_report'
     service = ActivityReportService(endpoint_name, backend=superdesk.get_backend())
     ActivityReportResource(endpoint_name, app=app, service=service)
+    register_report('activity_report', 'activity_report')
 
     endpoint_name = 'saved_activity_reports'
     service = SavedActivityReportService(endpoint_name, backend=superdesk.get_backend())
@@ -76,18 +77,22 @@ def init_app(app):
     endpoint_name = 'track_activity_report'
     service = TrackActivityService(endpoint_name, backend=superdesk.get_backend())
     TrackActivityResource(endpoint_name, app=app, service=service)
+    register_report('track_activity_report', 'track_activity_report')
 
     endpoint_name = 'processed_items_report'
     service = ProcessedItemsService(endpoint_name, backend=superdesk.get_backend())
     ProcessedItemsResource(endpoint_name, app=app, service=service)
+    register_report('processed_items_report', 'processed_items_report')
 
     endpoint_name = 'content_quota_report'
     service = ContentQuotaReportService(endpoint_name, backend=superdesk.get_backend())
     ContentQuotaReportResource(endpoint_name, app=app, service=service)
+    register_report('content_quota_report', 'content_quota_report')
 
     endpoint_name = 'source_category_report'
     service = SourceCategoryReportService(endpoint_name, backend=superdesk.get_backend())
     SourceCategoryReportResource(endpoint_name, app=app, service=service)
+    register_report('source_category_report', 'source_category_report')
 
     endpoint_name = 'scheduled_reports'
     service = ScheduledReportsService(endpoint_name, backend=superdesk.get_backend())

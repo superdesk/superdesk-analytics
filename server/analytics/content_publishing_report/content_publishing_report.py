@@ -13,8 +13,6 @@ from superdesk.resource import Resource
 from analytics.base_report import BaseReportService
 from analytics.chart_config import ChartConfig
 
-from datetime import datetime, timedelta
-
 
 class ContentPublishingReportResource(Resource):
     """Content Publishing Report schema
@@ -52,25 +50,22 @@ class ContentPublishingReportService(BaseReportService):
 
         return query
 
-    def run_query(self, request, params):
-        aggs = params.pop('aggs', None)
+    def get_aggregations(self, params, args):
+        aggs = params.get('aggs') or {}
 
         if not aggs or not (aggs.get('group') or {}).get('field'):
-            self.aggregations = ContentPublishingReportService.aggregations
-            return super().run_query(request, params)
+            return ContentPublishingReportService.aggregations
 
-        self.aggregations = {
+        aggregations = {
             'parent': self._get_aggregation_query(aggs['group'])
         }
 
         if aggs.get('subgroup'):
-            self.aggregations['parent']['aggs'] = {
+            aggregations['parent']['aggs'] = {
                 'child': self._get_aggregation_query(aggs['subgroup'])
             }
 
-        docs = super().run_query(request, params)
-
-        return docs
+        return aggregations
 
     def generate_report(self, docs, args):
         """Returns the publishing statistics
@@ -78,7 +73,7 @@ class ContentPublishingReportService(BaseReportService):
         :param docs: document used for generating the statistics
         :return dict: report
         """
-        agg_buckets = self.get_aggregation_buckets(getattr(docs, 'hits'))
+        agg_buckets = self.get_aggregation_buckets(getattr(docs, 'hits'), ['parent'])
 
         report = {'groups': {}}
 
@@ -152,7 +147,7 @@ class ContentPublishingReportService(BaseReportService):
             return 'Published Stories per {}'.format(group_title)
 
         def gen_subtitle():
-            return chart_config.gen_subtitle_for_dates(params)
+            return ChartConfig.gen_subtitle_for_dates(params)
 
         chart_config.get_title = gen_title
         chart_config.get_subtitle = gen_subtitle

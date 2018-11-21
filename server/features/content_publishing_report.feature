@@ -99,26 +99,29 @@ Feature: Content Publishing Report
             "groups": {"a": 2, "b": 3, "c": 4},
             "highcharts": [{
                 "id": "content_publishing",
-                "type": "bar",
-                "chart": {
-                    "type": "bar",
-                    "zoomType": "y"
-                },
+                "type": "highcharts",
+                "chart": {"zoomType": "y"},
                 "title": {"text": "Published Stories per Category"},
-                "subtitle": {"text": null},
-                "xAxis": {
+                "xAxis": [{
+                    "allowDecimals": false,
+                    "type": "category",
                     "title": {"text": "Category"},
                     "categories": ["Domestic Sports", "National", "Advisories"]
-                },
-                "yAxis": {
+                }],
+                "yAxis": [{
                     "title": {"text": "Published Stories"},
                     "stackLabels": {"enabled": false},
                     "allowDecimals": false
-                },
+                }],
                 "series": [{
-                    "name": "Published Stories",
-                    "data": [4, 3, 2]
-                }]
+                    "name": "Category",
+                    "data": [4, 3, 2],
+                    "type": "bar",
+                    "xAxis": 0
+                }],
+                "credits": {"enabled": false},
+                "fullHeight": false,
+                "time": {"useUTC": true}
             }]
         }]}
         """
@@ -137,47 +140,85 @@ Feature: Content Publishing Report
             "subgroups": {"1": 4, "3": 4, "5": 1},
             "highcharts": [{
                 "id": "content_publishing",
-                "type": "bar",
-                "chart": {
-                    "type": "bar",
-                    "zoomType": "y"
-                },
+                "type": "highcharts",
+                "chart": {"zoomType": "y"},
                 "title": {"text": "Published Stories per Category with Urgency breakdown"},
-                "subtitle": {"text": null},
-                "xAxis": {
+                "xAxis": [{
+                    "allowDecimals": false,
+                    "type": "category",
                     "title": {"text": "Category"},
                     "categories": ["Domestic Sports", "National", "Advisories"]
-                },
-                "yAxis": {
+                }],
+                "yAxis": [{
                     "title": {"text": "Published Stories"},
                     "stackLabels": {"enabled": true},
                     "allowDecimals": false
-                },
-                "series": [
-                    {"name": "1", "data": [2, 1, 1]},
-                    {"name": "3", "data": [1, 2, 1]},
-                    {"name": "5", "data": [1, 0, 0]}
-                ]
+                }],
+                "series": [{
+                    "name": "1",
+                    "data": [2, 1, 1],
+                    "type": "bar",
+                    "stack": 0,
+                    "stacking": "normal",
+                    "xAxis": 0
+                }, {
+                    "name": "3",
+                    "data": [1, 2, 1],
+                    "type": "bar",
+                    "stack": 0,
+                    "stacking": "normal",
+                    "xAxis": 0
+                }, {
+                    "name": "5",
+                    "data": [1, 0, 0],
+                    "type": "bar",
+                    "stack": 0,
+                    "stacking": "normal",
+                    "xAxis": 0
+                }],
+                "credits": {"enabled": false},
+                "fullHeight": false,
+                "time": {"useUTC": true}
             }]
         }]}
         """
 
     @auth
+    @wip
     Scenario: Generate sorted stacked source highcharts config for Content Published
         When we get "/content_publishing_report?params={"chart": {"sort_order": "asc"}}&aggs={"group": {"field": "anpa_category.qcode"}, "subgroup": {"field": "urgency"}}&return_type=highcharts_config"
         Then we get list with 1 items
         """
         {"_items": [{
             "highcharts": [{
-                "xAxis": {
+                "xAxis": [{
+                    "allowDecimals": false,
+                    "type": "category",
                     "title": {"text": "Category"},
                     "categories": ["National", "Advisories", "Domestic Sports"]
-                },
-                "series": [
-                    {"name": "1", "data": [1, 1, 2]},
-                    {"name": "3", "data": [1, 2, 1]},
-                    {"name": "5", "data": [0, 0, 1]}
-                ]
+                }],
+                "series": [{
+                    "name": "1",
+                    "data": [1, 1, 2],
+                    "type": "bar",
+                    "stack": 0,
+                    "stacking": "normal",
+                    "xAxis": 0
+                }, {
+                    "name": "3",
+                    "data": [1, 2, 1],
+                    "type": "bar",
+                    "stack": 0,
+                    "stacking": "normal",
+                    "xAxis": 0
+                }, {
+                    "name": "5",
+                    "data": [0, 0, 1],
+                    "type": "bar",
+                    "stack": 0,
+                    "stacking": "normal",
+                    "xAxis": 0
+                }]
             }]
         }]}
         """
@@ -186,15 +227,35 @@ Feature: Content Publishing Report
         """
         {"_items": [{
             "highcharts": [{
-                "xAxis": {
+                "xAxis": [{
+                    "allowDecimals": false,
+                    "type": "category",
                     "title": {"text": "Category"},
                     "categories": ["Advisories", "Domestic Sports", "National"]
-                },
-                "series": [
-                    {"name": "1", "data": [2, 1, 1]},
-                    {"name": "3", "data": [1, 2, 1]},
-                    {"name": "5", "data": [1, 0, 0]}
-                ]
+                }],
+                "series": [{
+                    "name": "1",
+                    "data": [2, 1, 1],
+                    "type": "bar",
+                    "stack": 0,
+                    "stacking": "normal",
+                    "xAxis": 0
+                }, {
+                    "name": "3",
+                    "data": [1, 2, 1],
+                    "type": "bar",
+                    "stack": 0,
+                    "stacking": "normal",
+                    "xAxis": 0
+                }, {
+                    "name": "5",
+                    "data": [1, 0, 0],
+                    "type": "bar",
+                    "stack": 0,
+                    "stacking": "normal",
+                    "xAxis": 0
+                }]
             }]
         }]}
         """
+

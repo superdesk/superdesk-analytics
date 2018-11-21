@@ -27,27 +27,29 @@ class PlanningUsageReportResource(Resource):
 
 
 class PlanningUsageReportService(BaseReportService):
+    repos = ['events', 'planning', 'assignments']
     date_filter_field = '_created'
-
-    def _get_aggregations(self):
-        return {
-            'events': {
-                'filter': {'term': {'type': 'event'}},
-                'aggs': {'users': {'terms': {'field': 'original_creator'}}}
-            },
-            'planning': {
-                'filter': {'term': {'type': 'planning'}},
-                'aggs': {'users': {'terms': {'field': 'original_creator'}}}
-            },
-            'assignments': {
-                'filter': {'term': {'type': 'assignment'}},
-                'aggs': {'users': {'terms': {'field': 'original_creator'}}}
-            },
-            'coverages': {
-                'nested': {'path': 'coverages'},
-                'aggs': {'users': {'terms': {'field': 'coverages.original_creator'}}}
-            }
+    aggregations = {
+        'events': {
+            'filter': {'term': {'type': 'event'}},
+            'aggs': {'users': {'terms': {'field': 'original_creator'}}}
+        },
+        'planning': {
+            'filter': {'term': {'type': 'planning'}},
+            'aggs': {'users': {'terms': {'field': 'original_creator'}}}
+        },
+        'assignments': {
+            'filter': {'term': {'type': 'assignment'}},
+            'aggs': {'users': {'terms': {'field': 'original_creator'}}}
+        },
+        'coverages': {
+            'nested': {'path': 'coverages'},
+            'aggs': {'users': {'terms': {'field': 'coverages.original_creator'}}}
         }
+    }
+
+    def _get_filters(self, repos, invisible_stages):
+        return None
 
     def generate_report(self, docs, args):
         """
@@ -147,35 +149,6 @@ class PlanningUsageReportService(BaseReportService):
 
         return users_with_planning
 
-    def get(self, req, **lookup):
-        args = self._get_request_or_lookup(req, **lookup)
-        query = self.generate_elastic_query(args)['source']
-        query['aggs'] = self._get_aggregations()
-        types = ['events', 'planning', 'assignments']
-
-        hits = self.elastic.es.search(
-            body=query,
-            index=es_utils.get_index(types),
-            doc_type=types,
-            params={}
-        )
-
-        docs = self._get_docs(hits)
-
-        if args['return_type'] == 'highcharts_config':
-            report = self.generate_highcharts_config(docs, args)
-        elif args['return_type'] == MIME_TYPES.CSV:
-            report = self.generate_csv(docs, args)
-        elif args['return_type'] == MIME_TYPES.HTML:
-            report = self.generate_html(docs, args)
-        else:
-            report = self.generate_report(docs, args)
-
-        if 'include_items' in args and int(args['include_items']):
-            report['_items'] = list(docs)
-
-        return ListCursor([report])
-
     def generate_highcharts_config(self, docs, args):
         params = args.get('params') or {}
 
@@ -196,7 +169,7 @@ class PlanningUsageReportService(BaseReportService):
             return 'Planning Module Usage'
 
         def gen_subtitle():
-            return chart_config.gen_subtitle_for_dates(params)
+            return ChartConfig.gen_subtitle_for_dates(params)
 
         def get_y_axis_title():
             return 'Items Created'
