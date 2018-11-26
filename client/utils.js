@@ -66,3 +66,18 @@ export const getErrorMessage = (error, defaultMessage) => {
 
     return defaultMessage;
 };
+
+/**
+ * @ngdoc method
+ * @name Analytics#getUtcOffsetInMinutes
+ * @param {moment} utcDatetime The moment date/time instance used to calculate utc offset
+ * @param {String} timezone - The timezone name
+ * @param {Function} moment - The moment js module
+ * @return {Number}
+ * @description Calculates the UTC Offset in minutes for the supplied datetime instance
+ */
+export const getUtcOffsetInMinutes = (utcDatetime, timezone, moment) => (
+    moment(utcDatetime)
+        .tz(timezone)
+        .utcOffset()
+);

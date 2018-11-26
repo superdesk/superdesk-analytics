@@ -8,19 +8,17 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-from flask import json
-from eve.utils import ParsedRequest
+from flask import json, current_app as app
+from eve_elastic.elastic import set_filters
 
-from superdesk import get_resource_service
+from superdesk import get_resource_service, es_utils
 from superdesk.utils import ListCursor
 from superdesk.utc import utcnow, get_timezone_offset
 from superdesk.errors import SuperdeskApiError
 
 from apps.search import SearchService
 
-from analytics.common import MIME_TYPES
-
-from flask import current_app as app
+from analytics.common import MIME_TYPES, get_elastic_version, get_weekstart_offset_hr
 
 
 class BaseReportService(SearchService):
@@ -82,27 +80,70 @@ class BaseReportService(SearchService):
 
         return buckets
 
-    def get_parsed_request(self, params):
-        """
-        Intercept the request args to proxy the request to the search endpoint
-        """
-        # Make sure the source is well formed before constructing the request
-        # This is because the search endpoint required source["query"]["filtered"] to be defined
-        source = params.get('source') or {}
-        if 'query' not in source:
-            source['query'] = {'filtered': {}}
+    def get_aggregations(self, params, args):
+        return self.aggregations
 
-        request = ParsedRequest()
-        request.args = {
-            'source': json.dumps(source),
-            'repo': params.get('repo'),
-            'aggregations': 1
+    def _get_histogram_aggregation(self, interval, args, aggregations):
+        params = args.get('params') or {}
+        lt, gte, time_zone = self._es_get_date_filters(params)
+
+        # If the interval is weekly, then offset the buckets by the
+        # starting day of the week, based on app.config['START_OF_WEEK']
+        offset = 0 if interval != 'week' else get_weekstart_offset_hr()
+
+        aggs = {
+            'dates': {
+                'date_histogram': {
+                    'field': 'versioncreated',
+                    'interval': interval,
+                    'time_zone': time_zone,
+                    'min_doc_count': 0,
+                    'offset': '{}h'.format(offset),
+                    'extended_bounds': {
+                        'min': gte,
+                        'max': lt
+                    }
+                },
+                'aggs': aggregations
+            }
         }
 
-        if params.get('aggs'):
-            request.args['aggs'] = json.dumps(params['aggs'])
+        if get_elastic_version().startswith('1.'):
+            aggs['dates']['date_histogram']['pre_zone_adjust_large_interval'] = True
 
-        return request
+        return aggs
+
+    def get_histogram_interval(self, args):
+        histogram = (args.get('params') or {}).get('histogram') or {}
+        return histogram.get('interval')
+
+    def get_histogram_interval_ms(self, args):
+        interval = self.get_histogram_interval(args)
+
+        hours = 1
+        if interval == 'daily':
+            hours = 24
+        elif interval == 'weekly':
+            hours = 168
+
+        return 3600000 * hours  # (milliseconds in an hour) * number of hours
+
+    def get_histogram_aggregation(self, aggs, params, args):
+        interval = self.get_histogram_interval(args)
+
+        if not interval:
+            return aggs
+
+        if interval == 'hourly':
+            return self._get_histogram_aggregation('hour', args, aggs)
+        elif interval == 'weekly':
+            return self._get_histogram_aggregation('week', args, aggs)
+
+        return self._get_histogram_aggregation('day', args, aggs)
+
+    def get_request_aggregations(self, params, args):
+        aggs = self.get_aggregations(params, args)
+        return self.get_histogram_aggregation(aggs, params, args)
 
     def _get_request_or_lookup(self, req, **lookup):
         # Get the args as a dictionary from either the request or lookup object
@@ -153,8 +194,47 @@ class BaseReportService(SearchService):
 
         return args
 
-    def run_query(self, request, params):
-        return super().get(request, lookup=None)
+    def run_query(self, params, args):
+        query = params.get('source') or {}
+        if 'query' not in query:
+            query['query'] = {'filtered': {}}
+
+        aggs = self.get_request_aggregations(params, args)
+        if aggs:
+            query['aggs'] = aggs
+
+        types = params.get('repo')
+        if not types:
+            types = self.repos.copy()
+        else:
+            types = types.split(',')
+            # If the repos array is still empty after filtering, then return the default repos
+            types = [repo for repo in types if repo in self.repos] or self.repos.copy()
+
+        excluded_stages = self.get_stages_to_exclude()
+        filters = self._get_filters(types, excluded_stages)
+
+        # if the system has a setting value for the maximum search depth then apply the filter
+        if not app.settings['MAX_SEARCH_DEPTH'] == -1:
+            query['terminate_after'] = app.settings['MAX_SEARCH_DEPTH']
+
+        if filters:
+            set_filters(query, filters)
+
+        hits = self.elastic.es.search(
+            body=query,
+            index=es_utils.get_index(types),
+            doc_type=types,
+            params={}
+        )
+        docs = self._get_docs(hits)
+
+        for resource in types:
+            response = {app.config['ITEMS']: [doc for doc in docs if doc['_type'] == resource]}
+            getattr(app, 'on_fetched_resource')(resource, response)
+            getattr(app, 'on_fetched_resource_%s' % resource)(response)
+
+        return docs
 
     def get(self, req, **lookup):
         args = self._get_request_or_lookup(req, **lookup)
@@ -175,8 +255,7 @@ class BaseReportService(SearchService):
         else:
             raise SuperdeskApiError.badRequestError('source/query not provided')
 
-        request = self.get_parsed_request(params)
-        docs = self.run_query(request, params)
+        docs = self.run_query(params, args)
 
         if args['return_type'] == 'highcharts_config':
             report = self.generate_highcharts_config(docs, args)
@@ -288,11 +367,11 @@ class BaseReportService(SearchService):
     def _es_set_sort(self, query, params):
         query['sort'] = params.get('sort') or [{self.date_filter_field: 'desc'}]
 
-    def _es_filter_dates(self, query, params):
+    def _es_get_date_filters(self, params):
         dates = params.get('dates') or {}
         date_filter = params.get('date_filter') or dates.get('filter')
         if not date_filter:
-            return
+            return None, None, None
 
         start_date = params.get('start_date') or dates.get('start')
         end_date = params.get('end_date') or dates.get('end')
@@ -321,6 +400,11 @@ class BaseReportService(SearchService):
         elif date_filter == 'relative':
             lt = 'now'
             gte = 'now-{}h'.format(relative)
+
+        return lt, gte, time_zone
+
+    def _es_filter_dates(self, query, params):
+        lt, gte, time_zone = self._es_get_date_filters(params)
 
         if lt is not None and gte is not None:
             query['must'].append({
@@ -364,6 +448,13 @@ class BaseReportService(SearchService):
 
         for must in ['must', 'must_not']:
             for field, filters in (params.get(must) or {}).items():
+                if isinstance(filters, list) and len(filters) < 1:
+                    continue
+                elif isinstance(filters, bool) and not filters:
+                    continue
+                elif filters is None:
+                    continue
+
                 values = self._es_get_filter_values(filters)
                 func = query_funcs.get(field)
 

@@ -12,7 +12,7 @@ Feature: Planning Usage Report
         }]
         """
         Then we get OK response
-        When we get "/planning_usage_report?params={}"
+        When we get "/planning_usage_report?params={"min": 0}"
         Then we get list with 1 items
         """
         {"_items": [{
@@ -44,7 +44,7 @@ Feature: Planning Usage Report
         }]
         """
         Then we get OK response
-        When we get "/planning_usage_report?params={}"
+        When we get "/planning_usage_report?params={"min": 0}"
         Then we get list with 1 items
         """
         {"_items": [{
@@ -76,7 +76,7 @@ Feature: Planning Usage Report
         }
         """
         Then we get OK response
-        When we get "/planning_usage_report?params={}"
+        When we get "/planning_usage_report?params={"min": 0}"
         Then we get list with 1 items
         """
         {"_items": [{
@@ -116,7 +116,7 @@ Feature: Planning Usage Report
         }
         """
         Then we get OK response
-        When we get "/planning_usage_report?params={}"
+        When we get "/planning_usage_report?params={"min": 0}"
         Then we get list with 1 items
         """
         {"_items": [{

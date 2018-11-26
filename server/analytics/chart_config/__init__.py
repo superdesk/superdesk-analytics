@@ -12,8 +12,8 @@
 from superdesk import get_resource_service
 
 from analytics.common import get_cv_by_qcode
+from analytics.chart_config import SDChart
 
-from copy import deepcopy
 from datetime import datetime, timedelta
 
 
@@ -90,14 +90,6 @@ class ChartConfig:
 
         return self.title
 
-    def get_title_config(self):
-        """Generates the title config to use for the chart
-
-        :return dict: Highcharts.title config
-        """
-
-        return {'text': self.get_title()}
-
     def get_subtitle(self):
         """Generates the subtitle string to use for the chart
 
@@ -105,14 +97,6 @@ class ChartConfig:
         """
 
         return self.subtitle
-
-    def get_subtitle_config(self):
-        """Generates the subtitle config to use for the chart
-
-        :return dict: Highcharts.subtitle config
-        """
-
-        return {'text': self.get_subtitle()}
 
     def get_source_name(self, field):
         """Generates the name for the given source
@@ -122,42 +106,6 @@ class ChartConfig:
         """
         return self._get_translation_title(field)
 
-    def get_x_axis_config(self):
-        """Generates the title and categories config for the X Axis
-
-        :return dict: Highcharts.xAxis config
-        """
-
-        parent = self.get_parent()
-        return {
-            'title': {'text': self.get_x_axis_title()},
-            'categories': self.get_source_titles(
-                parent['field'],
-                self.get_sorted_keys(parent['data'])
-            )
-        }
-
-    def get_x_axis_title(self):
-        """Generates the title for the X Axis (defaults to primary data field name)
-
-        :return str: The title for the X Axis
-        """
-
-        parent = self.get_parent()
-        return self.get_source_name(parent['field'])
-
-    def get_y_axis_config(self):
-        """Generates the title and stack config for the Y Axis
-
-        :return dict: Highcharts.yAxis config
-        """
-
-        return {
-            'title': {'text': self.get_y_axis_title()},
-            'stackLabels': {'enabled': self.is_multi_source()},
-            'allowDecimals': False
-        }
-
     def get_y_axis_title(self):
         """Generates the title for the Y Axis (defaults to 'Published Stories')
 
@@ -165,19 +113,6 @@ class ChartConfig:
         """
 
         return 'Published Stories'
-
-    def get_source_titles(self, field, keys):
-        """Generates the list of titles used for the data sources
-
-        :param str field: The field attribute of the source (i.e. anpa_category.qcode)
-        :param list[str] keys: An array of key values for the data sources
-        :return list[str]: Names of the source data
-        """
-        names = self._get_translation_names(field)
-        return [
-            names.get(qcode) or qcode
-            for qcode in keys
-        ]
 
     def get_source_title(self, field, qcode):
         """Generates the name for the specific data source
@@ -229,122 +164,6 @@ class ChartConfig:
             )
         ]
 
-    def get_series_data(self):
-        """Generates the Highcharts config for the series data
-
-        :return dict: Highcharts.series config
-        """
-
-        return self.get_single_series_data() if not self.is_multi_source() \
-            else self.get_multi_series_data()
-
-    def get_single_series_data(self):
-        """Generates the name and data attributes for single series data
-
-        :return dict: Highcharts.series config for a single series
-        """
-
-        parent = self.get_parent()
-
-        return [{
-            'name': self.get_y_axis_title(),
-            'data': [parent['data'][key] for key in self.get_sorted_keys(parent['data'])]
-        }]
-
-    def get_multi_series_data(self):
-        """Generates the name and data attributes for stacked series data
-
-        :return dict: Highcharts.series config for stacked series
-        """
-
-        parent = self.get_parent()
-        child = self.get_child()
-
-        series = []
-
-        for childKey in child['data'].keys():
-            series.append({
-                'name': str(self.get_source_title(child['field'], childKey)),
-                'data': [
-                    counts.get(childKey) or 0
-                    for counts in [
-                        parent['data'][key] for key in self.get_sorted_keys(parent['data'])
-                    ]
-                ]
-            })
-
-        return series
-
-    def get_legend(self):
-        """Generates the config for the Highcharts legend
-
-        :return dict: Highcharts.legend config
-        """
-
-        if not self.is_multi_source():
-            return {'enabled': False}
-
-        child = self.get_child()
-
-        return {
-            'enabled': True,
-            'title': {'text': self.get_source_name(child['field'])}
-        }
-
-    def get_plot_options(self):
-        """Generates the config for the Highcharts plot options
-
-        :return dict: Highcharts.plotOptions config
-        """
-
-        if not self.is_multi_source():
-            return {
-                'bar': {
-                    'colorByPoint': True,
-                    'dataLabels': {'enabled': True}
-                },
-                'column': {
-                    'colorByPoint': True,
-                    'dataLabels': {'enabled': True}
-                }
-            }
-
-        return {
-            'bar': {
-                'stacking': 'normal',
-                'colorByPoint': False
-            },
-            'column': {
-                'stacking': 'normal',
-                'colorByPoint': False
-            }
-        }
-
-    def get_tooltip(self):
-        """Generates the config for the Highcharts tooltip options
-
-        :return dict: Highcharts.tooltip config
-        """
-
-        return {
-            'headerFormat': '{point.x}: {point.y}',
-            'pointFormat': ''
-        } if not self.is_multi_source() else {
-            'headerFormat': '{series.name}/{point.x}: {point.y}',
-            'pointFormat': ''
-        }
-
-    def get_chart(self):
-        """Generates the type and zoomType config for the Highcharts chart options
-
-        :return dict: Highcharts.chart config
-        """
-
-        return {
-            'type': self.chart_type,
-            'zoomType': 'y' if self.chart_type == 'bar' else 'x'
-        }
-
     def add_source(self, field, data):
         """Adds the provided sources field and data to this chart config
 
@@ -362,114 +181,79 @@ class ChartConfig:
 
         :return dict: Highcharts config
         """
+        config_type = 'table' if self.chart_type == 'table' else 'highcharts'
+        chart = SDChart.Chart(
+            self.id,
+            chart_type=config_type,
+            title=self.get_title(),
+            subtitle=self.get_subtitle(),
+            default_config=self.defaultConfig
+        )
 
-        return {
-            'id': self.id,
-            'type': self.chart_type,
-            'chart': self.get_chart(),
-            'title': self.get_title_config(),
-            'subtitle': self.get_subtitle_config(),
-            'xAxis': self.get_x_axis_config(),
-            'yAxis': self.get_y_axis_config(),
-            'legend': self.get_legend(),
-            'tooltip': self.get_tooltip(),
-            'plotOptions': self.get_plot_options(),
-            'series': self.get_series_data()
-        }
+        chart.translations = self.translations
+        chart.tooltip_point = ''
 
-    def gen_single_table_config(self):
-        """Generates and returns config for a single column table
-
-        :return dict: Single column table config
-        """
-
-        x_axis = self.get_x_axis_config()
-        series_data = self.get_series_data()
-
-        headers = [x_axis['title']['text'], self.get_y_axis_title()]
-        table_rows = []
         parent = self.get_parent()
 
-        for group in self.get_sorted_keys(parent['data']) or []:
-            table_rows.append([
-                self.get_source_title(parent['field'], group),
-                parent['data'].get(group) or 0
-            ])
-
-        return {
-            'id': self.id,
-            'type': 'table',
-            'chart': {'type': 'column'},
-            'xAxis': x_axis,
-            'series': series_data,
-            'headers': headers,
-            'rows': table_rows,
-            'title': self.get_title(),
-            'subtitle': self.get_subtitle()
+        axis_options = {
+            'type': 'category',
+            'default_chart_type': 'column' if self.chart_type == 'table' else self.chart_type,
+            'y_title': self.get_y_axis_title(),
+            'x_title': chart.get_translation_title(parent['field']),
+            'category_field': parent['field'],
+            'categories': self.get_sorted_keys(parent['data']),
         }
 
-    def gen_multi_table_config(self):
-        """Generates and returns config for a double column table
+        if not self.is_multi_source():
+            chart.tooltip_header = '{point.x}: {point.y}'
+            chart.data_labels = True
+            chart.colour_by_point = True
+            axis_options['stack_labels'] = False
 
-        :return dict: Double column table config
-        """
+            axis = chart.add_axis() \
+                .set_options(**axis_options)
 
-        x_axis = self.get_x_axis_config()
-        series_data = self.get_series_data()
-        parent = self.get_parent()
-
-        headers = [x_axis['title']['text']]
-        headers.extend([series['name'] for series in series_data])
-        headers.append('Total Stories')
-
-        table_rows = [
-            [self.get_source_title(parent['field'], group)]
-            for group in self.get_sorted_keys(parent['data']) or []
-        ]
-
-        for series in series_data:
-            for index, count in enumerate(series['data'], start=0):
-                table_rows[index].append(count)
-
-        for row in table_rows:
-            row.append(
-                sum(int(count) for count in row[1:])
+            axis.add_series().set_options(
+                field=parent['field'],
+                data=[
+                    parent['data'][key]
+                    for key in self.get_sorted_keys(parent['data'])
+                ]
             )
+        else:
+            child = self.get_child()
+            chart.legend_title = self.get_source_name(child['field'])
+            chart.tooltip_header = '{series.name}/{point.x}: {point.y}'
+            chart.data_labels = False
+            chart.colour_by_point = False
+            axis_options['stack_labels'] = True
 
-        return {
-            'id': self.id,
-            'type': 'table',
-            'chart': {'type': 'column'},
-            'xAxis': x_axis,
-            'series': series_data,
-            'headers': headers,
-            'rows': table_rows,
-            'title': self.get_title(),
-            'subtitle': self.get_subtitle()
-        }
+            axis = chart.add_axis() \
+                .set_options(**axis_options)
 
-    def gen_table_config(self):
-        """Generates and returns config for either a single or double column table
+            for child_key in child['data'].keys():
+                axis.add_series().set_options(
+                    field=child['field'],
+                    name=child_key,
+                    stack=0,
+                    stackType='normal',
+                    data=[
+                        counts.get(child_key) or 0
+                        for counts in [
+                            parent['data'][key] for key in self.get_sorted_keys(parent['data'])
+                        ]
+                    ]
+                )
 
-        :return dict: Table config for either single or double column
-        """
-
-        return self.gen_single_table_config() if not self.is_multi_source() \
-            else self.gen_multi_table_config()
+        return chart.gen_config()
 
     def gen_config(self):
         """High level function to generates the Highcharts/Table config based on chart options
 
         :return dict: Highchart or Table config
         """
-        self.config = deepcopy(ChartConfig.defaultConfig)
-
         self.load_translations()
-
-        if self.chart_type == 'table':
-            self.config.update(self.gen_table_config())
-        else:
-            self.config.update(self.gen_highcharts_config())
+        self.config = self.gen_highcharts_config()
 
         return self.config
 
@@ -582,7 +366,8 @@ class ChartConfig:
         """
         return self._get_translations(field).get('names') or {}
 
-    def gen_subtitle_for_dates(self, params):
+    @staticmethod
+    def gen_subtitle_for_dates(params):
         chart = params.get('chart') or {}
 
         if chart.get('subtitle'):
