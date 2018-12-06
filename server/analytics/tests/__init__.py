@@ -16,7 +16,8 @@ class TestCase(_TestCase):
 
     def setUp(self):
         config = {
-            'INSTALLED_APPS': ['analytics']
+            'INSTALLED_APPS': ['analytics'],
+            'STATISTICS_MONGO_DBNAME': 'sptests_statistics'
         }
         update_config(config)
         self.app = get_app(config)

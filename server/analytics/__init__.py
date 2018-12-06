@@ -24,6 +24,7 @@ from analytics.content_publishing_report import init_app as init_content_publish
 from analytics.publishing_performance_report import init_app as init_publishing_performance_report
 from analytics.email_report import init_app as init_email_report
 from analytics.planning_usage_report import init_app as init_planning_usage_report
+from analytics.stats import init_app as init_stats
 
 from analytics.commands import SendScheduledReports  # noqa
 from analytics.common import is_highcharts_installed, register_report
@@ -134,6 +135,7 @@ def init_app(app):
     init_publishing_performance_report(app)
     init_email_report(app)
     init_planning_usage_report(app)
+    init_stats(app)
 
     # If this app is for testing, then create an endpoint for the base reporting service
     # so the core searching/aggregation functionality can be tested

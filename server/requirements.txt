@@ -6,5 +6,5 @@ flake8-docstrings
 wooper
 requests
 requests-mock
-git+git://github.com/superdesk/superdesk-core.git@master#egg=Superdesk-Core
+-e git://github.com/superdesk/superdesk-core.git@master#egg=Superdesk_Core
 git+git://github.com/superdesk/superdesk-planning.git@master#egg=superdesk-planning
