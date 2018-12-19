@@ -81,3 +81,96 @@ export const getUtcOffsetInMinutes = (utcDatetime, timezone, moment) => (
         .tz(timezone)
         .utcOffset()
 );
+
+export const ITEM_OPERATIONS = {
+    CREATE: 'create',
+    FETCH: 'fetch',
+    DUPLICATED_FROM: 'duplicated_from',
+    UPDATE: 'update',
+    PUBLISH: 'publish',
+    PUBLISH_SCHEDULED: 'publish_scheduled',
+    DESCHEDULE: 'deschedule',
+    PUBLISH_EMBARGO: 'publish_embargo',
+    REWRITE: 'rewrite',
+    CORRECT: 'correct',
+    LINK: 'link',
+    UNLINK: 'unlink',
+    KILL: 'kill',
+    TAKEDOWN: 'takedown',
+    SPIKE: 'spike',
+    UNSPIKE: 'unspike',
+    MOVE: 'move',
+    MOVE_FROM: 'move_from',
+    MOVE_TO: 'move_to',
+    DUPLICATE: 'duplicate',
+    ITEM_LOCK: 'item_lock',
+    ITEM_UNLOCK: 'item_unlock',
+    MARK: 'mark',
+    UNMARK: 'unmark',
+    EXPORT_HIGHLIGHT: 'export_highlight',
+    CREATE_HIGHLIGHT: 'create_highlight',
+    ADD_FEATUREMEDIA: 'add_featuremedia',
+    CHANGE_IMAGE_POI: 'change_image_poi',
+    UPDATE_FEATUREMEDIA_POI: 'update_featuremedia_poi',
+    REMOVE_FEATUREMEDIA: 'remove_featuremedia',
+    UPDATE_FEATUREMEDIA_IMAGE: 'update_featuremedia_image',
+};
+
+export const ENTER_DESK_OPERATIONS = [
+    ITEM_OPERATIONS.CREATE,
+    ITEM_OPERATIONS.FETCH,
+    ITEM_OPERATIONS.DUPLICATED_FROM,
+    ITEM_OPERATIONS.MOVE_TO,
+    ITEM_OPERATIONS.DESCHEDULE,
+    ITEM_OPERATIONS.UNSPIKE
+];
+
+export const EXIT_DESK_OPERATIONS = [
+    ITEM_OPERATIONS.PUBLISH,
+    ITEM_OPERATIONS.SPIKE,
+    ITEM_OPERATIONS.MOVE_FROM,
+    ITEM_OPERATIONS.PUBLISH_SCHEDULED,
+    ITEM_OPERATIONS.PUBLISH_EMBARGO,
+];
+
+export const FEATUREMEDIA_OPERATIONS = [
+    ITEM_OPERATIONS.ADD_FEATUREMEDIA,
+    ITEM_OPERATIONS.CHANGE_IMAGE_POI,
+    ITEM_OPERATIONS.UPDATE_FEATUREMEDIA_POI,
+    ITEM_OPERATIONS.UPDATE_FEATUREMEDIA_IMAGE,
+    ITEM_OPERATIONS.REMOVE_FEATUREMEDIA,
+];
+
+export const getTranslatedOperations = (gettext) => ({
+    create: gettext('Create'),
+    fetch: gettext('Fetch'),
+    duplicated_from: gettext('Duplicated From'),
+    update: gettext('Update'),
+    publish: gettext('Publish'),
+    publish_scheduled: gettext('Publish Scheduled'),
+    deschedule: gettext('Deschedule'),
+    publish_embargo: gettext('Publish Embargo'),
+    rewrite: gettext('Rewrite'),
+    correct: gettext('Correct'),
+    link: gettext('Link'),
+    unlink: gettext('Unlink'),
+    kill: gettext('Kill'),
+    takedown: gettext('Takedown'),
+    spike: gettext('Spike'),
+    unspike: gettext('Unspike'),
+    move: gettext('Move'),
+    move_from: gettext('Move From'),
+    move_to: gettext('Move To'),
+    duplicate: gettext('Duplicate'),
+    item_lock: gettext('Item Lock'),
+    item_unlock: gettext('Item Unlock'),
+    mark: gettext('Mark'),
+    unmark: gettext('Unmark'),
+    export_highlight: gettext('Export Highlight'),
+    create_highlight: gettext('Create Highlight'),
+    add_featuremedia: gettext('Add Featuremedia'),
+    change_image_poi: gettext('Change Image POI'),
+    update_featuremedia_poi: gettext('Update Featuremedia POI'),
+    remove_featuremedia: gettext('Remove Featuremedia'),
+    update_featuremedia_image: gettext('Update Featuremedia Image'),
+});

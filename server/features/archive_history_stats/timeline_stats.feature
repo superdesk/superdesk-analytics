@@ -687,8 +687,10 @@ Feature: Archive Timeline Stats
         """
         {"timeline": [
             {"operation": "create"},
-            {"operation": "move"},
-            {"operation": "move"}
+            {"operation": "move_from"},
+            {"operation": "move_to"},
+            {"operation": "move_from"},
+            {"operation": "move_to"}
         ]}
         """
 
@@ -884,7 +886,8 @@ Feature: Archive Timeline Stats
         """
         {"timeline": [
             {"operation": "create"},
-            {"operation": "move"},
+            {"operation": "move_from"},
+            {"operation": "move_to"},
             {"operation": "update"},
             {"operation": "change_image_poi"}
         ]}

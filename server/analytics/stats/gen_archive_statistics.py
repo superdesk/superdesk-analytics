@@ -223,7 +223,32 @@ class GenArchiveStatistics(Command):
         if history.get('original_item_id'):
             entry['original_item_id'] = history['original_item_id']
 
-        item['updates']['stats'][STAT_TYPE.TIMELINE].append(entry)
+        if entry['operation'] != OPERATION.MOVE:
+            item['updates']['stats'][STAT_TYPE.TIMELINE].append(entry)
+        else:
+            # Remove the new task details from the MOVE_FROM operation
+            # Task will later be calculated from the previous history item
+            task = entry.pop('task', {
+                'user': history.get('user_id'),
+                'desk': None,
+                'stage': None
+            })
+
+            entry['task'] = {
+                'user': history.get('user_id'),
+                'desk': None,
+                'stage': None
+            }
+            entry['operation'] = OPERATION.MOVE_FROM
+            item['updates']['stats'][STAT_TYPE.TIMELINE].append(entry)
+
+            # Copy the original history entry for the MOVE_TO entry
+            # Assign the new task details to this entry
+            entry = deepcopy(entry)
+            entry['operation'] = OPERATION.MOVE_TO
+            entry['task'] = task
+            entry['_auto_generated'] = True
+            item['updates']['stats'][STAT_TYPE.TIMELINE].append(entry)
 
     def set_operation(self, history):
         if history['operation'] == OPERATION.UPDATE and \
@@ -356,6 +381,10 @@ class GenArchiveStatistics(Command):
 
             new_timeline.append(entry)
 
+            # Use a copy of entry after adding to the timeline
+            # So that any changes from here do not modify the existing timeline entry
+            entry = deepcopy(entry)
+
             operation = entry.get('operation')
             operation_created = entry.get('operation_created')
 
@@ -459,21 +488,7 @@ class GenArchiveStatistics(Command):
         operation = entry.get('operation')
         operation_created = entry.get('operation_created')
 
-        if operation == OPERATION.MOVE:
-            # Finish off current desk (only if it is not from personal workspace)
-            if updates['_current_task'] is not None and updates['_current_task'].get('desk'):
-                updates['_current_task']['exited'] = operation_created
-                updates['_current_task']['exited_operation'] = operation
-                updates['_current_task']['duration'] = (
-                    updates['_current_task']['exited'] - updates['_current_task']['entered']
-                ).total_seconds()
-                stats[STAT_TYPE.DESK_TRANSITIONS].append(updates['_current_task'])
-
-            # Create entry for new desk
-            updates['_current_task'] = deepcopy(task)
-            updates['_current_task']['entered'] = operation_created
-            updates['_current_task']['entered_operation'] = operation
-        elif operation in ENTER_DESK_OPERATIONS:
+        if operation in ENTER_DESK_OPERATIONS:
             updates['_current_task'] = deepcopy(task)
 
             if operation == OPERATION.CREATE and updates.get('rewrite_of'):

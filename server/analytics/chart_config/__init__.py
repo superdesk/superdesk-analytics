@@ -403,12 +403,17 @@ class ChartConfig:
 
             return month.strftime('%B %Y')
         elif date_filter == 'day':
-            date = params.get('date') or dates.get('date')
+            date_str = params.get('date') or dates.get('date')
+            date = datetime.strptime(date_str, '%Y-%m-%d')
 
             return date.strftime('%A %-d %B %Y')
         elif date_filter == 'relative':
             hours = dates.get('relative')
 
             return 'Last {} hours'.format(hours)
+        elif date_filter == 'relative_days':
+            days = dates.get('relative_days')
+
+            return 'Last {} days'.format(days)
 
         return None

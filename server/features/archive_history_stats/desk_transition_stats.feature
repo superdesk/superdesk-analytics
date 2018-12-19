@@ -152,8 +152,8 @@ Feature: Desk Transition Stats
         Then we get stats
         """
         {"desk_transitions": [
-            {"entered_operation": "create", "exited_operation": "move"},
-            {"entered_operation": "move", "exited_operation": "spike"}
+            {"entered_operation": "create", "exited_operation": "move_from"},
+            {"entered_operation": "move_to", "exited_operation": "spike"}
         ]}
         """
 

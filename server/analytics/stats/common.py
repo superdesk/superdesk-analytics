@@ -42,6 +42,8 @@ operation = [
     'spike',
     'unspike',
     'move',
+    'move_from',
+    'move_to',
 
     'duplicate',
     'item_lock',
@@ -79,6 +81,8 @@ OPERATION = namedtuple('OPERATION', [
     'SPIKE',
     'UNSPIKE',
     'MOVE',
+    'MOVE_FROM',
+    'MOVE_TO',
 
     'DUPLICATE',
     'ITEM_LOCK',
@@ -101,7 +105,7 @@ ENTER_DESK_OPERATIONS = [
     OPERATION.CREATE,
     OPERATION.FETCH,
     OPERATION.DUPLICATED_FROM,
-    OPERATION.MOVE,
+    OPERATION.MOVE_TO,
     OPERATION.DESCHEDULE,
     OPERATION.UNSPIKE
 ]
@@ -109,7 +113,7 @@ ENTER_DESK_OPERATIONS = [
 EXIT_DESK_OPERATIONS = [
     OPERATION.PUBLISH,
     OPERATION.SPIKE,
-    OPERATION.MOVE,
+    OPERATION.MOVE_FROM,
     OPERATION.PUBLISH_SCHEDULED,
     OPERATION.PUBLISH_EMBARGO
 ]

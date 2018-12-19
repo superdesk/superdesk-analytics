@@ -24,6 +24,7 @@ from analytics.common import MIME_TYPES, get_elastic_version, get_weekstart_offs
 class BaseReportService(SearchService):
     exclude_stages_with_global_read_off = True
     date_filter_field = 'versioncreated'
+    histogram_source_field = 'versioncreated'
 
     def get_stages_to_exclude(self):
         """
@@ -94,7 +95,7 @@ class BaseReportService(SearchService):
         aggs = {
             'dates': {
                 'date_histogram': {
-                    'field': 'versioncreated',
+                    'field': self.histogram_source_field,
                     'interval': interval,
                     'time_zone': time_zone,
                     'min_doc_count': 0,
@@ -194,6 +195,9 @@ class BaseReportService(SearchService):
 
         return args
 
+    def get_elastic_index(self, types):
+        return es_utils.get_index(types)
+
     def run_query(self, params, args):
         query = params.get('source') or {}
         if 'query' not in query:
@@ -221,9 +225,11 @@ class BaseReportService(SearchService):
         if filters:
             set_filters(query, filters)
 
+        index = self.get_elastic_index(types)
+
         hits = self.elastic.es.search(
             body=query,
-            index=es_utils.get_index(types),
+            index=index,
             doc_type=types,
             params={}
         )
@@ -377,6 +383,7 @@ class BaseReportService(SearchService):
         end_date = params.get('end_date') or dates.get('end')
         date = params.get('date') or dates.get('date')
         relative = dates.get('relative')
+        relative_days = dates.get('relative_days')
 
         time_zone = self.get_utc_offset()
         lt = None
@@ -400,6 +407,9 @@ class BaseReportService(SearchService):
         elif date_filter == 'relative':
             lt = 'now'
             gte = 'now-{}h'.format(relative)
+        elif date_filter == 'relative_days':
+            lt = 'now'
+            gte = 'now-{}d'.format(relative_days)
 
         return lt, gte, time_zone
 

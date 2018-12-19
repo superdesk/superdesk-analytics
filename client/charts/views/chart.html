@@ -26,8 +26,11 @@
     <div class="sd-chart__table-content" ng-if="config.rows.length > 0">
         <table>
             <thead>
+                <tr ng-if="config.top_headers">
+                    <th ng-repeat="header in config.top_headers track by $index" colspan="{{header.colspan || 1}}" rowspan="{{header.rowspan || 1}}">{{header.text}}</th>
+                </tr>
                 <tr>
-                    <th ng-repeat="header in config.headers">{{header}}</th>
+                    <th ng-repeat="header in config.headers track by $index">{{header}}</th>
                 </tr>
             </thead>
             <tbody>
