@@ -35,14 +35,6 @@
                     ng-click="onFilterChange()"
             >{{:: 'Range' | translate }}</button>
             <button sd-check
-                    ng-if="enabled.relative"
-                    data-type="radio"
-                    ng-model="params.dates.filter"
-                    ng-value="relative"
-                    data-label-position="inside"
-                    ng-click="onFilterChange()"
-            >{{:: 'Relative' | translate }}</button>
-            <button sd-check
                     ng-if="enabled.day"
                     data-type="radio"
                     ng-model="params.dates.filter"
@@ -50,11 +42,27 @@
                     data-label-position="inside"
                     ng-click="onFilterChange()"
             >{{:: 'Day' | translate }}</button>
+            <button sd-check
+                    ng-if="enabled.relative"
+                    data-type="radio"
+                    ng-model="params.dates.filter"
+                    ng-value="relative"
+                    data-label-position="inside"
+                    ng-click="onFilterChange()"
+            >{{:: 'Relative Hrs' | translate }}</button>
+            <button sd-check
+                    ng-if="enabled.relative_days"
+                    data-type="radio"
+                    ng-model="params.dates.filter"
+                    ng-value="relative_days"
+                    data-label-position="inside"
+                    ng-click="onFilterChange()"
+            >{{:: 'Relative Days' | translate }}</button>
         </div>
     </div>
 </div>
 
-<div class="form__row" ng-if="params.dates.filter === 'range'">
+<div class="form__row form__row--no-padding" ng-if="params.dates.filter === 'range'">
     <fieldset class="report-parameters">
         <div class="multiple">
             <div class="field">
@@ -80,7 +88,7 @@
     </fieldset>
 </div>
 
-<div class="form__row" ng-if="params.dates.filter === 'day'">
+<div class="form__row form__row--no-padding" ng-if="params.dates.filter === 'day'">
     <fieldset class="report-parameters">
         <div class="multiple">
             <div class="field">
@@ -96,7 +104,7 @@
     </fieldset>
 </div>
 
-<div class="form__row" ng-if="params.dates.filter === 'relative'">
+<div class="form__row form__row--no-padding" ng-if="params.dates.filter === 'relative'">
     <div class="sd-line-input sd-line-input--is-select">
         <label class="sd-line-input__label" translate>Last</label>
         <select class="sd-line-input__select"
@@ -105,6 +113,19 @@
             <option ng-repeat="n in [].constructor(maxRange) track by $index+1"
                     value="{{$index+1}}"
             >{{$index+1 + ' hours' | translate}}</option>
+        </select>
+    </div>
+</div>
+
+<div class="form__row form__row--no-padding" ng-if="params.dates.filter === 'relative_days'">
+    <div class="sd-line-input sd-line-input--is-select">
+        <label class="sd-line-input__label" translate>Last</label>
+        <select class="sd-line-input__select"
+                ng-model="params.dates.relative_days"
+        >
+            <option ng-repeat="n in [].constructor(maxRelativeDays) track by $index+1"
+                    value="{{$index+1}}"
+            >{{$index+1 + ' days' | translate}}</option>
         </select>
     </div>
 </div>

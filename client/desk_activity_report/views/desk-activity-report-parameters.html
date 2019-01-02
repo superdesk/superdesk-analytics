@@ -1,0 +1,42 @@
+<div class="sd-alert sd-alert--hollow" translate>
+    Generate a report showing activity on a desk.
+</div>
+
+<div class="form__row form__row--no-padding">
+    <div class="sd-line-input sd-line-input--is-select sd-line-input--required"
+         ng-class="{'sd-line-input--invalid': form.deskError}"
+    >
+        <label class="sd-line-input__label" translate>Desk</label>
+        <select ng-model="currentParams.params.desk" required>
+            <option value="" disabled></option>
+            <option ng-repeat="desk in desks" value="{{desk._id}}">{{desk.name}}</option>
+        </select>
+        <div ng-if="form.deskError"
+             class="sd-line-input__message"
+        >{{form.deskError | translate}}</div>
+    </div>
+</div>
+
+<div class="form__row form__row--no-padding">
+    <div class="sd-line-input sd-line-input--is-select">
+        <label class="sd-line-input__label" translate>Interval</label>
+        <select ng-model="currentParams.params.histogram.interval" ng-change="onIntervalChanged()">
+            <option value="hourly" translate>Hourly</option>
+            <option value="daily" translate>Daily</option>
+        </select>
+    </div>
+</div>
+
+<div sda-date-filters
+     data-filters="dateFilters"
+     data-params="currentParams.params"
+     data-on-filter-change="updateChartConfig"
+     data-on-dates-change="updateChartConfig"
+     data-max-range="24"
+></div>
+
+<div class="sd-line-input sd-line-input--invalid sd-line-input--no-label">
+    <div ng-if="form.datesError" class="sd-line-input__message">
+        {{form.datesError | translate}}
+    </div>
+</div>

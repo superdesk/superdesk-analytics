@@ -11,7 +11,7 @@
 
 from superdesk import get_resource_service, json
 from superdesk.services import BaseService
-from superdesk.resource import Resource, not_indexed
+from superdesk.resource import Resource, not_indexed, not_analyzed, not_enabled
 from superdesk.metadata.item import metadata_schema, FORMAT, ITEM_TYPE, ITEM_STATE, \
     SCHEDULE_SETTINGS
 from superdesk.metadata.utils import item_url
@@ -28,6 +28,7 @@ class ArchiveStatisticsResource(Resource):
     item_methods = ['GET', 'PATCH', 'DELETE']
     resource_methods = ['GET', 'POST']
     datasource = {
+        'source': 'archive_statistics',
         'search_backend': 'elastic',
     }
 
@@ -72,8 +73,30 @@ class ArchiveStatisticsResource(Resource):
                             },
                             'update': {
                                 'type': 'dict',
-                                'mapping': not_indexed
+                                'mapping': not_enabled
                             }
+                        }
+                    },
+                    'mapping': {
+                        'type': 'nested',
+                        'properties': {
+                            'history_id': not_indexed,
+                            'related_history_id': not_indexed,
+                            'operation': {'type': 'string'},
+                            'operation_created': {'type': 'date'},
+                            ITEM_STATE: {'type': 'string'},
+                            'pubstatus': {'type': 'string'},
+                            'word_count': {'type': 'integer'},
+                            'par_count': {'type': 'integer'},
+                            'task': {
+                                'type': 'object',
+                                'properties': {
+                                    'user': not_analyzed,
+                                    'desk': not_analyzed,
+                                    'stage': not_analyzed
+                                }
+                            },
+                            'update': not_enabled
                         }
                     }
                 },
@@ -91,6 +114,19 @@ class ArchiveStatisticsResource(Resource):
                             'exited_operation': {'type': 'string'},
                             'duration': {'type': 'integer'},
                         }
+                    },
+                    'mapping': {
+                        'type': 'nested',
+                        'properties': {
+                            'user': not_analyzed,
+                            'desk': not_analyzed,
+                            'stage': not_analyzed,
+                            'entered': {'type': 'date'},
+                            'entered_operation': {'type': 'string'},
+                            'exited': {'type': 'date'},
+                            'exited_operation': {'type': 'string'},
+                            'duration': {'type': 'integer'}
+                        }
                     }
                 },
                 STAT_TYPE.FEATUREMEDIA_UPDATES: {
@@ -100,7 +136,7 @@ class ArchiveStatisticsResource(Resource):
                         'schema': {
                             'related_history_id': {
                                 'type': 'string',
-                                'mapping': not_indexed
+                                'mapping': not_analyzed
                             },
                             'operation': {'type': 'string'},
                             'operation_created': {'type': 'datetime'},
@@ -122,8 +158,30 @@ class ArchiveStatisticsResource(Resource):
                             },
                             'poi': {
                                 'type': 'dict',
-                                'mapping': not_indexed
+                                'mapping': not_enabled
                             }
+                        }
+                    },
+                    'mapping': {
+                        'type': 'nested',
+                        'properties': {
+                            'related_history_id': not_analyzed,
+                            'operation': {'type': 'string'},
+                            'operation_created': {'type': 'date'},
+                            ITEM_STATE: {'type': 'string'},
+                            'pubstatus': {'type': 'string'},
+                            'word_count': {'type': 'integer'},
+                            'par_count': {'type': 'integer'},
+                            'task': {
+                                'type': 'object',
+                                'properties': {
+                                    'user': not_analyzed,
+                                    'desk': not_analyzed,
+                                    'stage': not_analyzed
+                                }
+                            },
+                            'renditions': not_enabled,
+                            'poi': not_enabled
                         }
                     }
                 },
@@ -144,16 +202,18 @@ class ArchiveStatisticsResource(Resource):
         'subject': metadata_schema['subject'],
         'genre': metadata_schema['genre'],
         'company_codes': metadata_schema['company_codes'],
+
         ITEM_TYPE: metadata_schema[ITEM_TYPE],
         'abstract': metadata_schema['abstract'],
         'headline': metadata_schema['headline'],
-        'slugline': metadata_schema['slugline'],
+        'slugline': {'type': 'string'},
         'anpa_take_key': metadata_schema['anpa_take_key'],
         'keywords': metadata_schema['keywords'],
         'word_count': metadata_schema['word_count'],
         'paragraph_count': metadata_schema['word_count'],
         'priority': metadata_schema['priority'],
         'urgency': metadata_schema['urgency'],
+
         ITEM_STATE: metadata_schema[ITEM_STATE],
         'pubstatus': metadata_schema['pubstatus'],
         'flags': metadata_schema['flags'],
@@ -164,7 +224,7 @@ class ArchiveStatisticsResource(Resource):
         'rewrite_of': ARCHIVE_SCHEMA_FIELDS['rewrite_of'],
         'rewritten_by': ARCHIVE_SCHEMA_FIELDS['rewritten_by'],
         'original_id': ARCHIVE_SCHEMA_FIELDS['original_id'],
-        SCHEDULE_SETTINGS: ARCHIVE_SCHEMA_FIELDS['original_id'],
+        SCHEDULE_SETTINGS: ARCHIVE_SCHEMA_FIELDS[SCHEDULE_SETTINGS],
         'task': {
             'type': 'dict',
             'schema': {

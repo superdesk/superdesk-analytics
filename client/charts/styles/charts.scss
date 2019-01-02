@@ -35,12 +35,14 @@
 .sd-chart__table {
     display: block;
     background-color: white;
-    overflow: hidden;
 
     .sd-chart__table-header {
-        position: relative;
         text-align: center;
         padding: 1rem 0 2rem 0;
+
+        position: sticky;
+        top: 0;
+        background-color: $white;
     }
 
     .sd-chart__table-header-options {
@@ -51,10 +53,33 @@
 
     .sd-chart__table-content {
         display: block;
-        overflow: auto;
 
         th {
             text-transform: uppercase;
+            position: sticky;
+            background-color: $white;
+        }
+
+        thead {
+            tr:first-child {
+                th {
+                    top: 58px;
+                }
+            }
+
+            tr:nth-child(2) {
+                th {
+                    top: 102px;
+                }
+            }
+        }
+
+        tr:nth-child(odd) {
+            background-color: $grayLighter;
+        }
+
+        tr:hover {
+            background-color: #cee6fa;
         }
     }
 }

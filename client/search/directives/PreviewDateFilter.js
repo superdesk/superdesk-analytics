@@ -30,6 +30,8 @@ export function PreviewDateFilter(moment, config) {
                 scope.date = formatDate(moment, config, date);
             } else if (scope.dateFilter === 'relative') {
                 scope.hours = _.get(params, 'dates.relative');
+            } else if (scope.dateFilter === 'relative_days') {
+                scope.days = _.get(params, 'dates.relative_days');
             }
         }
     };

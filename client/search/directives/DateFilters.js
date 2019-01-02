@@ -6,6 +6,7 @@ export const DATE_FILTERS = {
     LAST_MONTH: 'last_month',
     RANGE: 'range',
     RELATIVE: 'relative',
+    RELATIVE_DAYS: 'relative_days',
     DAY: 'day',
 };
 
@@ -28,9 +29,10 @@ export function DateFilters() {
         scope: {
             params: '=',
             filters: '=?',
-            onFilterChange: '=?',
+            _onFilterChange: '=?onFilterChange',
             onDatesChange: '=?',
             maxRange: '=?',
+            maxRelativeDays: '=?'
         },
         link: function(scope) {
             /**
@@ -54,6 +56,30 @@ export function DateFilters() {
                 if (angular.isUndefined(scope.maxRange) && scope.enabled.relative) {
                     scope.maxRange = 72;
                 }
+
+                if (angular.isUndefined(scope.maxRelativeDays) && scope.enabled.relative_days) {
+                    scope.maxRelativeDays = 31;
+                }
+            };
+
+            scope.$watch('filters', this.init);
+
+            scope.onFilterChange = () => {
+                if (scope.params.dates.filter !== 'range') {
+                    delete scope.params.dates.start;
+                    delete scope.params.dates.end;
+                }
+                if (scope.params.dates.filter !== 'relative') {
+                    delete scope.params.dates.relative;
+                }
+                if (scope.params.dates.filter !== 'relative_days') {
+                    delete scope.params.dates.relative_days;
+                }
+                if (scope.params.dates.filter !== 'day') {
+                    delete scope.params.dates.date;
+                }
+
+                scope._onFilterChange();
             };
 
             this.init();

@@ -16,8 +16,6 @@ from superdesk.default_settings import crontab
 from .archive_statistics import ArchiveStatisticsResource, ArchiveStatisticsService
 from .gen_archive_statistics import GenArchiveStatistics
 
-from datetime import timedelta
-
 
 def init_app(app):
     if not app.config.get('STATISTICS_MONGO_DBNAME'):

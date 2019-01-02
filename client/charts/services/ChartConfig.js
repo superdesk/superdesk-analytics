@@ -711,6 +711,11 @@ export function ChartConfig(
                     gettext('Last {{hours}} hours')
                 )({hours: _.get(params, 'dates.relative')})
             ),
+            relative_days: () => (
+                $interpolate(
+                    gettext('Last {{days}} days')
+                )({days: _.get(params, 'dates.relative_days')})
+            )
         };
 
         const dateFilter = _.get(params, 'date_filter') || _.get(params, 'dates.filter');

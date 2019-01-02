@@ -53,4 +53,12 @@ describe('sda-preview-date-filter', () => {
         compileElement({filter: 'relative', relative: '72'});
         expect(element.html()).toContain('<span translate="">Last</span> 72 <span translate="">hours</span>');
     });
+
+    it('render for "relative_days"', () => {
+        compileElement({filter: 'relative_days', relative_days: 7});
+        expect(element.html()).toContain('<span translate="">Last</span> 7 <span translate="">days</span>');
+
+        compileElement({filter: 'relative_days', relative_days: '3'});
+        expect(element.html()).toContain('<span translate="">Last</span> 3 <span translate="">days</span>');
+    });
 });
