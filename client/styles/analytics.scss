@@ -282,8 +282,6 @@
 }
 
 .sda-report-filters {
-    padding-bottom: 20rem;
-
     &__filter {
         margin-top: -1.5rem;
     }
@@ -291,6 +289,10 @@
     &__exclude {
         display: flex;
         justify-content: flex-end;
+    }
+
+    &--padding-bottom {
+        padding-bottom: 20rem;
     }
 }
 

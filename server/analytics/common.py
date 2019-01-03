@@ -14,6 +14,7 @@ from subprocess import check_call, PIPE
 from flask import current_app as app
 import pytz
 from datetime import datetime
+from math import floor
 
 
 mime_types = [
@@ -118,3 +119,30 @@ def get_utc_offset_in_minutes(utc_datetime):
     """
     timezone = pytz.timezone(app.config['DEFAULT_TIMEZONE'])
     return timezone.utcoffset(utc_datetime).total_seconds() / 60
+
+
+def seconds_to_human_readable(seconds):
+    """Converts seconds to a human readable format
+
+    :param float seconds: Seconds to convert
+    :return string: Human readable duration
+    """
+    if seconds >= 86400:
+        if floor(seconds / 86400) == 1:
+            return '1 day'
+
+        return '{} days'.format(floor(seconds / 86400))
+    elif seconds >= 3600:
+        if floor(seconds / 3600) == 1:
+            return '1 hour'
+
+        return '{} hours'.format(floor(seconds / 3600))
+    elif seconds >= 60:
+        if floor(seconds / 60) == 1:
+            return '1 minute'
+
+        return '{} minutes'.format(floor(seconds / 60))
+    elif floor(seconds) == 1:
+        return '1 second'
+
+    return '{} seconds'.format(floor(seconds))

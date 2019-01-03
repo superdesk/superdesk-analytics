@@ -1,0 +1,36 @@
+<div class="sd-alert sd-alert--hollow" translate>
+    Generate a report showing average and maximum time it took to produce content per desk.
+</div>
+
+<div sda-date-filters
+     data-filters="dateFilters"
+     data-params="currentParams.params"
+     data-on-filter-change="onFilterChanged"
+     data-on-dates-change="updateChartConfig"
+     data-max-range="31"
+     data-form="form"
+></div>
+
+<div class="form__row">
+    <div class="sd-line-input sd-line-input--no-margin">
+        <label class="sd-line-input__label" translate>Included Statistics</label>
+        <div class="flex-grid flex-grid--boxed-small flex-grid--wrap-items flex-grid--small-2">
+            <button sd-check
+                    ng-model="currentParams.params.stats.min"
+                    data-label-position="inside"
+            >{{:: 'Minimum' | translate}}</button>
+            <button sd-check
+                    ng-model="currentParams.params.stats.avg"
+                    data-label-position="inside"
+            >{{:: 'Average' | translate}}</button>
+            <button sd-check
+                    ng-model="currentParams.params.stats.max"
+                    data-label-position="inside"
+            >{{:: 'Maximum' | translate}}</button>
+            <button sd-check
+                    ng-model="currentParams.params.stats.sum"
+                    data-label-position="inside"
+            >{{:: 'Sum' | translate}}</button>
+        </div>
+    </div>
+</div>

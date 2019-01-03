@@ -1,5 +1,12 @@
-DateFilters.$inject = [];
+DateFilters.$inject = ['gettext', 'moment', '$interpolate', 'config'];
 
+/**
+ * @ngdoc property
+ * @module superdesk.analytics.search
+ * @name DATE_FILTERS
+ * @type {Object}
+ * @description Available date filters
+ */
 export const DATE_FILTERS = {
     YESTERDAY: 'yesterday',
     LAST_WEEK: 'last_week',
@@ -10,6 +17,13 @@ export const DATE_FILTERS = {
     DAY: 'day',
 };
 
+/**
+ * @ngdoc property
+ * @module superdesk.analytics.search
+ * @name DEFAULT_FILTERS
+ * @type {Array<String>}
+ * @description Default date filters
+ */
 export const DEFAULT_FILTERS = [
     DATE_FILTERS.YESTERDAY,
     DATE_FILTERS.LAST_WEEK,
@@ -21,9 +35,13 @@ export const DEFAULT_FILTERS = [
  * @ngdoc directive
  * @module superdesk.analytics.search
  * @name sdaDateFilters
+ * @requires gettext
+ * @requires moment
+ * @requires $interpolate
+ * @requires config
  * @description A directive that provides date filters for reports
  */
-export function DateFilters() {
+export function DateFilters(gettext, moment, $interpolate, config) {
     return {
         template: require('../views/date-filters.html'),
         scope: {
@@ -32,7 +50,8 @@ export function DateFilters() {
             _onFilterChange: '=?onFilterChange',
             onDatesChange: '=?',
             maxRange: '=?',
-            maxRelativeDays: '=?'
+            maxRelativeDays: '=?',
+            form: '=',
         },
         link: function(scope) {
             /**
@@ -53,7 +72,7 @@ export function DateFilters() {
                     }
                 );
 
-                if (angular.isUndefined(scope.maxRange) && scope.enabled.relative) {
+                if (angular.isUndefined(scope.maxRange)) {
                     scope.maxRange = 72;
                 }
 
@@ -64,6 +83,11 @@ export function DateFilters() {
 
             scope.$watch('filters', this.init);
 
+            /**
+             * @ngdoc method
+             * @name sdaDateFilters#onFilterChange
+             * @description Updates date parameters when filter changes
+             */
             scope.onFilterChange = () => {
                 if (scope.params.dates.filter !== 'range') {
                     delete scope.params.dates.start;
@@ -81,6 +105,50 @@ export function DateFilters() {
 
                 scope._onFilterChange();
             };
+
+            /**
+             * @ngdoc method
+             * @name sdaDateFilters#validateParams
+             * @param {Object} params - Scopes parameters
+             * @description Validates the date parameters and populates the form.datesError
+             */
+            const validate = (params) => {
+                scope.form.datesError = null;
+
+                const dates = _.get(params, 'dates');
+                const dateFilter = _.get(dates, 'filter');
+
+                if (dateFilter === 'range') {
+                    if (!dates.start) {
+                        scope.form.datesError = gettext('Start date is required');
+                    } else if (!dates.end) {
+                        scope.form.datesError = gettext('End date is required');
+                    } else {
+                        let range = moment(dates.end, config.model.dateformat)
+                            .diff(moment(dates.start, config.model.dateformat), 'days');
+
+                        if (range > scope.maxRange) {
+                            scope.form.datesError = $interpolate(
+                                gettext('Range cannot be greater than {{max}} days')
+                            )({max: scope.maxRange});
+                        } else if (moment(dates.start, config.model.dateformat).isAfter(moment(), 'days')) {
+                            scope.form.datesError = gettext('Start date cannot be greater than today');
+                        } else if (moment(dates.end, config.model.dateformat).isAfter(moment(), 'days')) {
+                            scope.form.datesError = gettext('End date cannot be greater than today');
+                        }
+                    }
+                } else if (dateFilter === 'relative_days' && !dates.relative_days) {
+                    scope.form.datesError = gettext('Number of days is required');
+                } else if (dateFilter === 'day' && !dates.date) {
+                    scope.form.datesError = gettext('Date field is required');
+                } else if (dateFilter === 'relative' && !dates.relative) {
+                    scope.form.datesError = gettext('Number of hours is required');
+                }
+            };
+
+            if (angular.isDefined(scope.form)) {
+                scope.$watch('params', validate, true);
+            }
 
             this.init();
         },

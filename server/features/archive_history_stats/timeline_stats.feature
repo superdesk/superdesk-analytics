@@ -358,7 +358,7 @@ Feature: Archive Timeline Stats
         Then we get OK response
         When we publish "#archive._id#" with "publish" type and "published" state
         """
-        {"publish_schedule": "2019-01-01T02:00:00+0000"}
+        {"publish_schedule": "2029-01-01T02:00:00+0000"}
         """
         Then we get OK response
         When we post to "/archive/#archive._id#/unlock" with success
@@ -387,7 +387,7 @@ Feature: Archive Timeline Stats
         """
 
     @auth
-    Scenario: Emargo publish history stats
+    Scenario: Embargo publish history stats
         When we post to "/archive" with success
         """
         {
@@ -412,7 +412,7 @@ Feature: Archive Timeline Stats
         Then we get OK response
         When we publish "#archive._id#" with "publish" type and "published" state
         """
-        {"embargo": "2019-01-01T02:00:00+0000"}
+        {"embargo": "2029-01-01T02:00:00+0000"}
         """
         Then we get OK response
         When we post to "/archive/#archive._id#/unlock" with success

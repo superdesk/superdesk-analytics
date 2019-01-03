@@ -257,6 +257,13 @@ class ChartConfig:
 
         return self.config
 
+    @staticmethod
+    def get_translations(fields):
+        chart = ChartConfig('tmp', 'chart')
+        for field in fields:
+            chart.load_translations_for_field(field)
+        return chart.translations
+
     def load_translations(self, parent_field=None, child_field=None):
         """Loads data for translating id/qcode to display names
 
@@ -271,64 +278,64 @@ class ChartConfig:
             child = self.get_child()
             child_field = child['field']
 
-        def load_translations_for_field(field):
-            # If a translation for this field has already been loaded
-            # then don't bother re-loading the translation for it
-            if field in self.translations:
-                return
+        self.load_translations_for_field(parent_field)
+        self.load_translations_for_field(child_field)
 
-            elif field == 'task.desk':
-                self._set_translation(
-                    'task.desk',
-                    'Desk',
-                    {
-                        str(desk.get('_id')): desk.get('name')
-                        for desk in list(get_resource_service('desks').get(req=None, lookup={}))
-                    }
-                )
-            elif field == 'task.user':
-                self._set_translation(
-                    'task.user',
-                    'User',
-                    {
-                        str(user.get('_id')): user.get('display_name')
-                        for user in list(get_resource_service('users').get(req=None, lookup={}))
-                    }
-                )
-            elif field == 'anpa_category.qcode':
-                self._set_translation(
-                    'anpa_category.qcode',
-                    'Category',
-                    get_cv_by_qcode('categories', 'name')
-                )
-            elif field == 'genre.qcode':
-                self._set_translation(
-                    'genre.qcode',
-                    'Genre',
-                    get_cv_by_qcode('genre', 'name')
-                )
-            elif field == 'urgency':
-                self._set_translation(
-                    'urgency',
-                    'Urgency',
-                    get_cv_by_qcode('urgency', 'name')
-                )
-            elif field == 'state':
-                self._set_translation(
-                    'state',
-                    'State',
-                    {
-                        'published': 'Published',
-                        'killed': 'Killed',
-                        'corrected': 'Corrected',
-                        'updated': 'Updated'
-                    }
-                )
-            elif field == 'source':
-                self._set_translation('source', 'Source')
+    def load_translations_for_field(self, field):
+        # If a translation for this field has already been loaded
+        # then don't bother re-loading the translation for it
+        if field in self.translations:
+            return
 
-        load_translations_for_field(parent_field)
-        load_translations_for_field(child_field)
+        elif field == 'task.desk':
+            self._set_translation(
+                'task.desk',
+                'Desk',
+                {
+                    str(desk.get('_id')): desk.get('name')
+                    for desk in list(get_resource_service('desks').get(req=None, lookup={}))
+                }
+            )
+        elif field == 'task.user':
+            self._set_translation(
+                'task.user',
+                'User',
+                {
+                    str(user.get('_id')): user.get('display_name')
+                    for user in list(get_resource_service('users').get(req=None, lookup={}))
+                }
+            )
+        elif field == 'anpa_category.qcode':
+            self._set_translation(
+                'anpa_category.qcode',
+                'Category',
+                get_cv_by_qcode('categories', 'name')
+            )
+        elif field == 'genre.qcode':
+            self._set_translation(
+                'genre.qcode',
+                'Genre',
+                get_cv_by_qcode('genre', 'name')
+            )
+        elif field == 'urgency':
+            self._set_translation(
+                'urgency',
+                'Urgency',
+                get_cv_by_qcode('urgency', 'name')
+            )
+        elif field == 'state':
+            self._set_translation(
+                'state',
+                'State',
+                {
+                    'published': 'Published',
+                    'killed': 'Killed',
+                    'corrected': 'Corrected',
+                    'updated': 'Updated'
+                }
+            )
+        elif field == 'source':
+            self._set_translation('source', 'Source')
 
     def _set_translation(self, field, title, names=None):
         """Saves the provided field translations

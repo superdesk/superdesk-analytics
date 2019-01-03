@@ -2,7 +2,10 @@
     <div class="sd-loader"></div>
 </div>
 
-<div ng-if="flags.ready" class="sda-report-filters">
+<div ng-if="flags.ready"
+     class="sda-report-filters"
+     ng-class="{'sda-report-filters--padding-bottom': paddingBottom}"
+>
     <toggle-box-next data-title="filters.desks.label"
                      data-style="'circle'"
                      ng-if="filters.desks.enabled"
@@ -273,6 +276,64 @@
                         <option value="only" translate>Rewrites Only</option>
                     </select>
                 </div>
+            </div>
+        </div>
+    </toggle-box-next>
+
+    <toggle-box-next data-title="filters.stats_desk_transition_enter.label"
+                     data-style="'circle'"
+                     ng-if="filters.stats_desk_transition_enter.enabled"
+    >
+        <div class="sda-report-filters__filter">
+            <div class="sda-report-filters__exclude">
+                <label translate>Exclude</label>
+                <span sd-switch
+                      ng-model="filters.stats_desk_transition_enter.exclude"
+                      ng-change="onFilterChanged(filters.stats_desk_transition_enter)"
+                ></span>
+            </div>
+            <div class="form__row">
+                <sd-tag-input
+                        ng-model="filters.stats_desk_transition_enter.selected"
+                        data-field="{{filters.stats_desk_transition_enter.labelField}}"
+                        data-key-property="{{filters.stats_desk_transition_enter.keyField}}"
+                        data-items="filters.stats_desk_transition_enter.items"
+                        data-on-change="onFilterChanged(filters.stats_desk_transition_enter)"
+                        data-freetext="false"
+                        data-replace-spaces-with-dashes="false"
+                        data-min-length="filters.stats_desk_transition_enter.minLength"
+                        data-placeholder="{{filters.stats_desk_transition_enter.placeholder}}"
+                        data-max-results-to-show="0"
+                ></sd-tag-input>
+            </div>
+        </div>
+    </toggle-box-next>
+
+    <toggle-box-next data-title="filters.stats_desk_transition_exit.label"
+                     data-style="'circle'"
+                     ng-if="filters.stats_desk_transition_exit.enabled"
+    >
+        <div class="sda-report-filters__filter">
+            <div class="sda-report-filters__exclude">
+                <label translate>Exclude</label>
+                <span sd-switch
+                      ng-model="filters.stats_desk_transition_exit.exclude"
+                      ng-change="onFilterChanged(filters.stats_desk_transition_exit)"
+                ></span>
+            </div>
+            <div class="form__row">
+                <sd-tag-input
+                        ng-model="filters.stats_desk_transition_exit.selected"
+                        data-field="{{filters.stats_desk_transition_exit.labelField}}"
+                        data-key-property="{{filters.stats_desk_transition_exit.keyField}}"
+                        data-items="filters.stats_desk_transition_exit.items"
+                        data-on-change="onFilterChanged(filters.stats_desk_transition_exit)"
+                        data-freetext="false"
+                        data-replace-spaces-with-dashes="false"
+                        data-min-length="filters.stats_desk_transition_exit.minLength"
+                        data-placeholder="{{filters.stats_desk_transition_exit.placeholder}}"
+                        data-max-results-to-show="0"
+                ></sd-tag-input>
             </div>
         </div>
     </toggle-box-next>

@@ -23,10 +23,14 @@ export class Chart {
      * @param {String} [options.tooltipHeader] - The tooltip header format
      * @param {String} [options.tooltipPoint] - The tooltip point format
      * @param {Boolean} [options.dataLabels=false] - Enable/Disable data labels
+     * @param {String} [options.dataLabelFormat] - Data label format
      * @param {Boolean} [options.colourByPoint=false] - One colour per series or one colour per point
      * @param {Boolean} [options.fullHeight=false] - Forces the chart to render full height
      * @param {Object} [options.defaultConfig={}] - Default config options for this chart
      * @param {String} [options.zoomType] - The zoom type applied to highcharts
+     * @param {Object} [options.translations={}] - Field name & values translations
+     * @param {Function} [options.dataLabelFormatter] - Callback function to dynamically generate data labels
+     * @param {Function} [options.tooltipFormatter] - Callback function to dynamically generate tooltips
      * @description Initialise the data for the chart config
      */
     constructor(options) {
@@ -48,6 +52,10 @@ export class Chart {
 
         if (!('defaultConfig' in options)) {
             options.defaultConfig = {};
+        }
+
+        if (!('translations' in options)) {
+            options.translations = {};
         }
 
         /**
@@ -148,6 +156,14 @@ export class Chart {
 
         /**
          * @ngdoc property
+         * @name SDChart.Chart#dataLabelFormat
+         * @type {String}
+         * @description Data label format
+         */
+        this.dataLabelFormat = options.dataLabelFormat;
+
+        /**
+         * @ngdoc property
          * @name SDChart.Chart#colourByPoint
          * @type {Boolean}
          * @description One colour per series or one colour per point
@@ -190,15 +206,31 @@ export class Chart {
          * @type {Object}
          * @description Field name & values translations
          */
-        this.translations = {};
+        this.translations = options.translations;
 
         /**
          * @ngdoc property
-         * @name @SDChart.Chart#defaultConfig
+         * @name SDChart.Chart#defaultConfig
          * @type {Object}
          * @description Default config options for this chart
          */
         this.defaultConfig = options.defaultConfig;
+
+        /**
+         * @ngdoc property
+         * @name SDChart.Chart#dataLabelFormatter
+         * @type {Function}
+         * @description Callback function to dynamically generate data labels
+         */
+        this.dataLabelFormatter = options.dataLabelFormatter;
+
+        /**
+         * @ngdoc property
+         * @name SDChart.Chart#tooltipFormatter
+         * @type {Function}
+         * @description Callback function to dynamically generate tooltips
+         */
+        this.tooltipFormatter = options.tooltipFormatter;
     }
 
     /**
@@ -299,6 +331,10 @@ export class Chart {
             config.tooltip.pointFormat = this.tooltipPoint;
         }
 
+        if (this.tooltipFormatter !== undefined) {
+            config.tooltip.formatter = this.tooltipFormatter;
+        }
+
         return config;
     }
 
@@ -323,6 +359,12 @@ export class Chart {
             }
 
             config.plotOptions.series.dataLabels.enabled = this.dataLabels;
+
+            if (this.dataLabelFormatter !== undefined) {
+                config.plotOptions.series.dataLabels.formatter = this.dataLabelFormatter;
+            } else if (this.dataLabelFormat !== undefined) {
+                config.plotOptions.series.dataLabels.format = this.dataLabelFormat;
+            }
         }
 
         if (this.colourByPoint !== undefined) {

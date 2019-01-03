@@ -118,6 +118,14 @@ export class Axis {
          * @description Array of axis series data
          */
         this.series = [];
+
+        /**
+         * @ngdoc property
+         * @name SDChart.Axis#yAxisLabelFormatter
+         * @type {Function}
+         * @description Callback function to dynamically generate y-axis labels
+         */
+        this.yAxisLabelFormatter = undefined;
     }
 
     /**
@@ -226,6 +234,14 @@ export class Axis {
 
         if (this.yTitle !== undefined) {
             axisConfig.title = {text: this.yTitle};
+        }
+
+        if (this.yAxisLabelFormatter !== undefined) {
+            if (!axisConfig.labels) {
+                axisConfig.labels = {};
+            }
+
+            axisConfig.labels.formatter = this.yAxisLabelFormatter;
         }
 
         return axisConfig;

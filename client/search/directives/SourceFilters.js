@@ -1,9 +1,148 @@
+import {
+    ENTER_DESK_OPERATIONS,
+    EXIT_DESK_OPERATIONS,
+    getTranslatedOperations,
+} from '../../utils';
+
+/**
+ * @ngdoc property
+ * @module superdesk.analytics.search
+ * @name SOURCE_FILTERS
+ * @type {Object}
+ * @description Available source filters
+ */
+export const SOURCE_FILTERS = {
+    DESKS: 'desks',
+    USERS: 'users',
+    CATEGORIES: 'categories',
+    GENRE: 'genre',
+    SOURCES: 'sources',
+    URGENCY: 'urgency',
+    STATES: 'states',
+    INGEST_PROVIDERS: 'ingest_providers',
+    STAGES: 'stages',
+    STATS: {
+        DESK_TRANSITIONS: {
+            ENTER: 'stats_desk_transition_enter',
+            EXIT: 'stats_desk_transition_exit',
+        }
+    }
+};
+
+/**
+ * @ngdoc property
+ * @module superdesk.analytics.search
+ * @name SOURCE_FILTER_FIELDS
+ * @type {Object}
+ * @description Field configs for each filter in SOURCE_FILTERS
+ */
+export const SOURCE_FILTER_FIELDS = {
+    [SOURCE_FILTERS.DESKS]: {
+        paramName: SOURCE_FILTERS.DESKS,
+        keyField: '_id',
+        labelField: 'name',
+        source: 'desks',
+        field: 'task.desk',
+    },
+    [SOURCE_FILTERS.USERS]: {
+        paramName: SOURCE_FILTERS.USERS,
+        keyField: '_id',
+        labelField: 'display_name',
+        source: 'users',
+        field: 'task.user',
+    },
+    [SOURCE_FILTERS.CATEGORIES]: {
+        paramName: SOURCE_FILTERS.CATEGORIES,
+        keyField: 'qcode',
+        labelField: 'name',
+        source: 'metadata',
+        field: 'anpa_category.qcode',
+    },
+    [SOURCE_FILTERS.GENRE]: {
+        paramName: SOURCE_FILTERS.GENRE,
+        keyField: 'qcode',
+        labelField: 'name',
+        source: 'metadata',
+        field: 'genre.qcode',
+    },
+    [SOURCE_FILTERS.SOURCES]: {
+        paramName: SOURCE_FILTERS.SOURCES,
+        keyField: '_id',
+        labelField: 'name',
+        source: 'sources',
+        field: 'source',
+    },
+    [SOURCE_FILTERS.URGENCY]: {
+        paramName: SOURCE_FILTERS.URGENCY,
+        keyField: 'qcode',
+        labelField: 'name',
+        source: 'metadata',
+        field: 'urgency',
+    },
+    [SOURCE_FILTERS.STATES]: {
+        paramName: SOURCE_FILTERS.STATES,
+        keyField: 'qcode',
+        labelField: 'name',
+        source: null,
+        field: 'state',
+    },
+    [SOURCE_FILTERS.INGEST_PROVIDERS]: {
+        paramName: SOURCE_FILTERS.INGEST_PROVIDERS,
+        keyField: '_id',
+        labelField: 'name',
+        source: 'ingest_providers',
+        field: 'ingest_providers',
+    },
+    [SOURCE_FILTERS.STAGES]: {
+        paramName: SOURCE_FILTERS.STAGES,
+        keyField: '_id',
+        labelField: 'name',
+        source: 'desks',
+        field: 'stages',
+    },
+    [SOURCE_FILTERS.STATS.DESK_TRANSITIONS.ENTER]: {
+        paramName: 'desk_transitions.enter',
+        keyField: 'operation',
+        labelField: 'name',
+        source: null,
+        field: 'desk_transitions.enter',
+    },
+    [SOURCE_FILTERS.STATS.DESK_TRANSITIONS.EXIT]: {
+        paramName: 'desk_transitions.exit',
+        keyField: 'operation',
+        labelField: 'name',
+        source: null,
+        field: 'desk_transitions.exit',
+    },
+};
+
+/**
+ * @ngdoc proprety
+ * @module superdesk.analytics.search
+ * @name DEFAULT_SOURCE_FILTERS
+ * @type {Array<String>}
+ * @description Default list of source filters
+ */
+export const DEFAULT_SOURCE_FILTERS = [
+    SOURCE_FILTERS.DESKS,
+    SOURCE_FILTERS.USERS,
+    SOURCE_FILTERS.CATEGORIES,
+    SOURCE_FILTERS.GENRE,
+    SOURCE_FILTERS.SOURCES,
+    SOURCE_FILTERS.URGENCY,
+    SOURCE_FILTERS.STATES,
+    SOURCE_FILTERS.INGEST_PROVIDERS,
+    SOURCE_FILTERS.STAGES,
+];
+
+
 SourceFilters.$inject = [
     'lodash',
     '$q',
     'userList',
     'desks',
     'metadata',
+    'gettext',
     'gettextCatalog',
     'searchReport',
     'ingestSources',
@@ -18,6 +157,7 @@ SourceFilters.$inject = [
  * @requires userList
  * @requires desks
  * @requires metadata
+ * @requires gettext
  * @requires gettextCatalog
  * @requires searchReport
  * @requires ingestSources
@@ -29,6 +169,7 @@ export function SourceFilters(
     userList,
     desks,
     metadata,
+    gettext,
     gettextCatalog,
     searchReport,
     ingestSources
@@ -38,6 +179,7 @@ export function SourceFilters(
         scope: {
             fields: '=?',
             params: '=',
+            paddingBottom: '=?',
         },
         link: function(scope) {
             /**
@@ -53,17 +195,11 @@ export function SourceFilters(
                 }
 
                 if (angular.isUndefined(scope.fields)) {
-                    scope.fields = [
-                        'desks',
-                        'users',
-                        'categories',
-                        'genre',
-                        'sources',
-                        'urgency',
-                        'states',
-                        'ingest_providers',
-                        'stages',
-                    ];
+                    scope.fields = DEFAULT_SOURCE_FILTERS;
+                }
+
+                if (angular.isUndefined(scope.paddingBottom)) {
+                    scope.paddingBottom = true;
                 }
 
                 const loaders = {};
@@ -172,12 +308,12 @@ export function SourceFilters(
             this.onParamsChanged = (filter, newParams) => {
                 let selected = [];
 
-                if (_.get(newParams, `must[${filter.name}].length`, 0) > 0) {
+                if (_.get(newParams, `must[${filter.paramName}].length`, 0) > 0) {
                     filter.exclude = false;
-                    selected = newParams.must[filter.name];
-                } else if (_.get(newParams, `must_not[${filter.name}].length`, 0) > 0) {
+                    selected = _.get(newParams.must, filter.paramName);
+                } else if (_.get(newParams, `must_not[${filter.paramName}].length`, 0) > 0) {
                     filter.exclude = true;
-                    selected = newParams.must_not[filter.name];
+                    selected = _.get(newParams.must_not, filter.paramName);
                 }
 
                 filter.selected = filter.items.filter(
@@ -201,18 +337,18 @@ export function SourceFilters(
                         scope.params.must = {};
                     }
 
-                    scope.params.must[filter.name] = values;
-                    if (_.get(scope, `params.must_not[${filter.name}]`)) {
-                        delete scope.params.must_not[filter.name];
+                    _.set(scope.params.must, filter.paramName, values);
+                    if (_.get(scope, `params.must_not[${filter.paramName}]`)) {
+                        _.unset(scope.params.must_not, filter.paramName);
                     }
                 } else {
                     if (!_.get(scope, 'params.must_not')) {
                         scope.params.must_not = {};
                     }
 
-                    scope.params.must_not[filter.name] = values;
-                    if (_.get(scope, `params.must[${filter.name}]`)) {
-                        delete scope.params.must[filter.name];
+                    _.set(scope.params.must_not, filter.paramName, values);
+                    if (_.get(scope, `params.must[${filter.paramName}]`)) {
+                        _.unset(scope.params.must, filter.paramName);
                     }
                 }
             };
@@ -224,13 +360,10 @@ export function SourceFilters(
              * @description The list of available filters and their configuration for usage
              */
             scope.filters = {
-                desks: {
-                    name: 'desks',
+                [SOURCE_FILTERS.DESKS]: {
+                    ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.DESKS],
                     label: gettextCatalog.getString('Desks'),
                     placeholder: gettextCatalog.getString('Search ') + gettextCatalog.getString('Desks'),
-                    keyField: '_id',
-                    labelField: 'name',
-                    source: 'desks',
                     items: [],
                     selected: [],
                     exclude: false,
@@ -239,13 +372,10 @@ export function SourceFilters(
                     receive: () => _.get(desks, 'desks._items') || [],
                     minLength: 1,
                 },
-                users: {
-                    name: 'users',
+                [SOURCE_FILTERS.USERS]: {
+                    ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.USERS],
                     label: gettextCatalog.getString('Users'),
                     placeholder: gettextCatalog.getString('Search ') + gettextCatalog.getString('Users'),
-                    keyField: '_id',
-                    labelField: 'display_name',
-                    source: 'users',
                     items: [],
                     selected: [],
                     exclude: false,
@@ -254,13 +384,10 @@ export function SourceFilters(
                     receive: (data) => _.get(data, 'users') || [],
                     minLength: 1,
                 },
-                categories: {
-                    name: 'categories',
+                [SOURCE_FILTERS.CATEGORIES]: {
+                    ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.CATEGORIES],
                     label: gettextCatalog.getString('Categories'),
                     placeholder: gettextCatalog.getString('Search ') + gettextCatalog.getString('Categories'),
-                    keyField: 'qcode',
-                    labelField: 'name',
-                    source: 'metadata',
                     items: [],
                     selected: [],
                     exclude: false,
@@ -269,13 +396,10 @@ export function SourceFilters(
                     receive: () => _.get(metadata, 'values.categories') || [],
                     minLength: 1,
                 },
-                genre: {
-                    name: 'genre',
+                [SOURCE_FILTERS.GENRE]: {
+                    ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.GENRE],
                     label: gettextCatalog.getString('Genre'),
                     placeholder: gettextCatalog.getString('Search ') + gettextCatalog.getString('Genre'),
-                    keyField: 'qcode',
-                    labelField: 'name',
-                    source: 'metadata',
                     items: [],
                     selected: [],
                     exclude: false,
@@ -284,13 +408,10 @@ export function SourceFilters(
                     receive: () => _.get(metadata, 'values.genre') || [],
                     minLength: 1,
                 },
-                sources: {
-                    name: 'sources',
+                [SOURCE_FILTERS.SOURCES]: {
+                    ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.SOURCES],
                     label: gettextCatalog.getString('Source'),
                     placeholder: gettextCatalog.getString('Search ') + gettextCatalog.getString('Source'),
-                    keyField: '_id',
-                    labelField: 'name',
-                    source: 'sources',
                     items: [],
                     selected: [],
                     exclude: false,
@@ -299,13 +420,10 @@ export function SourceFilters(
                     receive: (data) => _.get(data, 'sources') || [],
                     minLength: 1,
                 },
-                urgency: {
-                    name: 'urgency',
+                [SOURCE_FILTERS.URGENCY]: {
+                    ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.URGENCY],
                     label: gettextCatalog.getString('Urgency'),
                     placeholder: gettextCatalog.getString('Search ') + gettextCatalog.getString('Urgency'),
-                    keyField: 'qcode',
-                    labelField: 'name',
-                    source: 'metadata',
                     items: [],
                     selected: [],
                     exclude: false,
@@ -314,13 +432,10 @@ export function SourceFilters(
                     receive: () => (_.get(metadata, 'values.urgency') || []),
                     minLength: 1,
                 },
-                states: {
-                    name: 'states',
+                [SOURCE_FILTERS.STATES]: {
+                    ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.STATES],
                     label: gettextCatalog.getString('Content State'),
                     placeholder: gettextCatalog.getString('Search ') + gettextCatalog.getString('Content State'),
-                    keyField: 'qcode',
-                    labelField: 'name',
-                    source: null,
                     items: searchReport.filterItemStates(
                         ['published', 'killed', 'corrected', 'recalled']
                     ),
@@ -331,13 +446,10 @@ export function SourceFilters(
                     receive: () => scope.filters.states.items,
                     minLength: 1,
                 },
-                ingest_providers: {
-                    name: 'ingest_providers',
+                [SOURCE_FILTERS.INGEST_PROVIDERS]: {
+                    ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.INGEST_PROVIDERS],
                     label: gettextCatalog.getString('Ingest Providers'),
                     placeholder: gettextCatalog.getString('Search ') + gettextCatalog.getString('Ingest Providers'),
-                    keyField: '_id',
-                    labelField: 'name',
-                    source: 'ingest_providers',
                     items: [],
                     selected: [],
                     exclude: false,
@@ -349,13 +461,10 @@ export function SourceFilters(
                     ),
                     minLength: 1,
                 },
-                stages: {
-                    name: 'stages',
+                [SOURCE_FILTERS.STAGES]: {
+                    ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.STAGES],
                     label: gettextCatalog.getString('Stages'),
                     placeholder: gettextCatalog.getString('Search ') + gettextCatalog.getString('Stages'),
-                    keyField: '_id',
-                    labelField: 'name',
-                    source: 'desks',
                     items: [],
                     selected: [],
                     exclude: false,
@@ -379,6 +488,48 @@ export function SourceFilters(
                     },
                     minLength: 1,
                 },
+                [SOURCE_FILTERS.STATS.DESK_TRANSITIONS.ENTER]: {
+                    ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.STATS.DESK_TRANSITIONS.ENTER],
+                    label: gettextCatalog.getString('Enter Desk Actions'),
+                    placeholder: gettextCatalog.getString('Search ') + gettextCatalog.getString('Enter Actions'),
+                    items: [],
+                    selected: [],
+                    exclude: false,
+                    enabled: false,
+                    fetch: () => $q.when(),
+                    receive: () => {
+                        const operationTranslations = getTranslatedOperations(gettext);
+
+                        return ENTER_DESK_OPERATIONS.map(
+                            (operation) => ({
+                                operation: operation,
+                                name: operationTranslations[operation],
+                            })
+                        );
+                    },
+                    minLength: 1,
+                },
+                [SOURCE_FILTERS.STATS.DESK_TRANSITIONS.EXIT]: {
+                    ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.STATS.DESK_TRANSITIONS.EXIT],
+                    label: gettextCatalog.getString('Exit Desk Actions'),
+                    placeholder: gettextCatalog.getString('Search ') + gettextCatalog.getString('Exit Actions'),
+                    items: [],
+                    selected: [],
+                    exclude: false,
+                    enabled: false,
+                    fetch: () => $q.when(),
+                    receive: () => {
+                        const operationTranslations = getTranslatedOperations(gettext);
+
+                        return EXIT_DESK_OPERATIONS.map(
+                            (operation) => ({
+                                operation: operation,
+                                name: operationTranslations[operation],
+                            })
+                        );
+                    },
+                    minLength: 1,
+                }
             };
 
             this.init();

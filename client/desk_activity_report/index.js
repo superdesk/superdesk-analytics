@@ -45,5 +45,6 @@ angular.module('superdesk.analytics.desk-activity-report', [])
             priority: 600,
             privileges: {desk_activity_report: 1},
             allowScheduling: true,
+            required_features: ['desk_activity_report'],
         });
     }]);

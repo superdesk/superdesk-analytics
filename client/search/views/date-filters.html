@@ -62,50 +62,45 @@
     </div>
 </div>
 
-<div class="form__row form__row--no-padding" ng-if="params.dates.filter === 'range'">
-    <fieldset class="report-parameters">
-        <div class="multiple">
-            <div class="field">
-                <label translate>
-                    From
-                </label>
-                <div sd-datepicker
-                     ng-model="params.dates.start"
-                     data-on-change="onDatesChange()"
-                ></div>
-            </div>
-
-            <div class="field">
-                <label translate>
-                    To
-                </label>
-                <div sd-datepicker
-                     ng-model="params.dates.end"
-                     data-on-change="onDatesChange()"
-                ></div>
-            </div>
-        </div>
-    </fieldset>
+<div class="form__row form__row--flex"
+     ng-if="params.dates.filter === 'range'"
+     ng-class="{'form__row--no-padding': form.submitted && form.datesError}"
+>
+    <div class="form__row-item">
+        <label class="form-label" translate>From</label>
+        <div sd-datepicker
+             ng-model="params.dates.start"
+             data-on-change="onDatesChange()"
+        ></div>
+    </div>
+    <div class="form__row-item">
+        <label class="form-label" translate>To</label>
+        <div sd-datepicker
+             ng-model="params.dates.end"
+             data-on-change="onDatesChange()"
+        ></div>
+    </div>
 </div>
 
-<div class="form__row form__row--no-padding" ng-if="params.dates.filter === 'day'">
-    <fieldset class="report-parameters">
-        <div class="multiple">
-            <div class="field">
-                <label translate>
-                    Date
-                </label>
-                <div sd-datepicker
-                     ng-model="params.dates.date"
-                     data-on-change="onDatesChange()"
-                ></div>
-            </div>
-        </div>
-    </fieldset>
+
+<div ng-if="params.dates.filter === 'day'"
+     class="form__row"
+     ng-class="{'form__row--no-padding': form.submitted && form.datesError}"
+>
+    <label class="form-label" translate>Date</label>
+    <div sd-datepicker
+         ng-model="params.dates.date"
+         data-on-change="onDatesChange()"
+    ></div>
 </div>
 
-<div class="form__row form__row--no-padding" ng-if="params.dates.filter === 'relative'">
-    <div class="sd-line-input sd-line-input--is-select">
+<div ng-if="params.dates.filter === 'relative'"
+     class="form__row"
+     ng-class="{'form__row--no-padding': form.submitted && form.datesError}"
+>
+    <div class="sd-line-input sd-line-input--is-select"
+         ng-class="{'sd-line-input--invalid': form.submitted && form.datesError}"
+    >
         <label class="sd-line-input__label" translate>Last</label>
         <select class="sd-line-input__select"
                 ng-model="params.dates.relative"
@@ -114,11 +109,19 @@
                     value="{{$index+1}}"
             >{{$index+1 + ' hours' | translate}}</option>
         </select>
+        <div ng-if="form.submitted && form.datesError" class="sd-line-input__message">
+            {{form.datesError | translate}}
+        </div>
     </div>
 </div>
 
-<div class="form__row form__row--no-padding" ng-if="params.dates.filter === 'relative_days'">
-    <div class="sd-line-input sd-line-input--is-select">
+<div ng-if="params.dates.filter === 'relative_days'"
+     class="form__row"
+     ng-class="{'form__row--no-padding': form.submitted && form.datesError}"
+>
+    <div class="sd-line-input sd-line-input--is-select"
+         ng-class="{'sd-line-input--invalid': form.submitted && form.datesError}"
+    >
         <label class="sd-line-input__label" translate>Last</label>
         <select class="sd-line-input__select"
                 ng-model="params.dates.relative_days"
@@ -127,5 +130,16 @@
                     value="{{$index+1}}"
             >{{$index+1 + ' days' | translate}}</option>
         </select>
+        <div ng-if="form.submitted && form.datesError" class="sd-line-input__message">
+            {{form.datesError | translate}}
+        </div>
+    </div>
+</div>
+
+<div ng-if="form.submitted && form.datesError && ['relative', 'relative_days'].indexOf(params.dates.filter) < 0"
+     class="sd-line-input sd-line-input--invalid sd-line-input--no-label"
+>
+    <div class="sd-line-input__message">
+        {{form.datesError | translate}}
     </div>
 </div>
