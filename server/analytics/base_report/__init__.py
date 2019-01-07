@@ -427,22 +427,54 @@ class BaseReportService(SearchService):
                 }
             })
 
+    def _get_es_query_funcs(self):
+        return {
+            'desks': {
+                'query': self._es_filter_desks,
+                'values': self._es_get_filter_values
+            },
+            'users': {
+                'query': self._es_filter_users,
+                'values': self._es_get_filter_values
+            },
+            'categories': {
+                'query': self._es_filter_categories,
+                'values': self._es_get_filter_values
+            },
+            'sources': {
+                'query': self._es_filter_sources,
+                'values': self._es_get_filter_values
+            },
+            'genre': {
+                'query': self._es_filter_genre,
+                'values': self._es_get_filter_values
+            },
+            'urgency': {
+                'query': self._es_filter_urgencies,
+                'values': self._es_get_filter_values
+            },
+            'ingest_providers': {
+                'query': self._es_filter_ingest_providers,
+                'values': self._es_get_filter_values
+            },
+            'stages': {
+                'query': self._es_filter_stages,
+                'values': self._es_get_filter_values
+            },
+            'states': {
+                'query': self._es_filter_states,
+                'values': self._es_get_filter_values
+            },
+            'rewrites': {
+                'query': self._es_filter_rewrites,
+                'values': self._es_get_filter_values
+            },
+        }
+
     def generate_elastic_query(self, args):
         params = args.get('params') or {}
 
-        query_funcs = {
-            'desks': self._es_filter_desks,
-            'users': self._es_filter_users,
-            'categories': self._es_filter_categories,
-            'sources': self._es_filter_sources,
-            'genre': self._es_filter_genre,
-            'urgency': self._es_filter_urgencies,
-            'ingest_providers': self._es_filter_ingest_providers,
-            'stages': self._es_filter_stages,
-            'states': self._es_filter_states,
-            'rewrites': self._es_filter_rewrites
-        }
-
+        query_funcs = self._get_es_query_funcs()
         query = {
             'must': [],
             'must_not': [],
@@ -465,8 +497,10 @@ class BaseReportService(SearchService):
                 elif filters is None:
                     continue
 
-                values = self._es_get_filter_values(filters)
-                func = query_funcs.get(field)
+                funcs = query_funcs.get(field)
+
+                values = filters if not funcs.get('values') else funcs['values'](filters)
+                func = funcs.get('query')
 
                 if (isinstance(values, list) and len(values) < 1) or not func:
                     continue

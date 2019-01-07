@@ -11,7 +11,8 @@
 
 from superdesk.tests import TestCase
 
-from analytics.common import get_weekstart_offset_hr, get_utc_offset_in_minutes
+from analytics.common import get_weekstart_offset_hr, get_utc_offset_in_minutes,\
+    seconds_to_human_readable
 
 from datetime import datetime
 
@@ -50,3 +51,27 @@ class CommonTestCase(TestCase):
             get_utc_offset_in_minutes(datetime(2018, 10, 10)),
             660
         )
+
+    def test_seconds_to_human_readable(self):
+        # Seconds
+        self.assertEqual(seconds_to_human_readable(1), '1 second')
+        self.assertEqual(seconds_to_human_readable(1.5), '1 second')
+        self.assertEqual(seconds_to_human_readable(10), '10 seconds')
+
+        # Minutes
+        self.assertEqual(seconds_to_human_readable(60), '1 minute')
+        self.assertEqual(seconds_to_human_readable(90), '1 minute')
+        self.assertEqual(seconds_to_human_readable(120), '2 minutes')
+        self.assertEqual(seconds_to_human_readable(150), '2 minutes')
+
+        # Hours
+        self.assertEqual(seconds_to_human_readable(3600), '1 hour')
+        self.assertEqual(seconds_to_human_readable(5400), '1 hour')
+        self.assertEqual(seconds_to_human_readable(7200), '2 hours')
+        self.assertEqual(seconds_to_human_readable(9000), '2 hours')
+
+        # Days
+        self.assertEqual(seconds_to_human_readable(86400), '1 day')
+        self.assertEqual(seconds_to_human_readable(129600), '1 day')
+        self.assertEqual(seconds_to_human_readable(172800), '2 days')
+        self.assertEqual(seconds_to_human_readable(216000), '2 days')

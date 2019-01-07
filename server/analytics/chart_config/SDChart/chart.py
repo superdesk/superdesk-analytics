@@ -31,10 +31,12 @@ class Chart:
             - ``tooltip_header (str)``: The tooltip header format
             - ``tooltip_pointer (str)``: The tooltip point format
             - ``data_labels (bool=False)``: Enable/Disable data labels
+            - ``data_label_format (str)``: Data label format
             - ``colour_by_point (bool=False)``: One colour per series or one colour per point
             - ``full_height (bool=False)``: Forces the chart to render full height
             - ``default_config (dict={})``: Default config options for this chart
             - ``zoom_type (str)``: The zoom type applied to highcharts
+            - ``translations (dict={})``: Field name & values translations
         """
 
         self.id = chart_id
@@ -58,6 +60,7 @@ class Chart:
         self.legend_title = None
         self.colour_by_point = None
         self.zoom_type = None
+        self.data_label_format = None
 
         self.set_options(**kwargs)
 
@@ -145,6 +148,9 @@ class Chart:
                 config['plotOptions']['series']['dataLabels'] = {}
 
             config['plotOptions']['series']['dataLabels']['enabled'] = self.data_labels
+
+            if self.data_label_format:
+                config['plotOptions']['series']['dataLabels']['format'] = self.data_label_format
 
         if self.colour_by_point is not None:
             if 'bar' not in config['plotOptions']:

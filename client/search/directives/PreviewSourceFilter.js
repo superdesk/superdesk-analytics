@@ -1,3 +1,6 @@
+import {SOURCE_FILTERS, SOURCE_FILTER_FIELDS} from './SourceFilters';
+
+
 PreviewSourceFilter.$inject = ['lodash', 'chartConfig', 'gettext', 'gettextCatalog'];
 
 /**
@@ -16,9 +19,17 @@ export function PreviewSourceFilter(_, chartConfig, gettext, gettextCatalog) {
         link: function(scope) {
             scope.flags = {ready: false};
             const params = _.get(scope, 'report.params') || {};
+            const paramNames = Object.keys(SOURCE_FILTER_FIELDS).map(
+                (field) => SOURCE_FILTER_FIELDS[field].paramName
+            );
 
-            const mustFields = Object.keys(_.get(params, 'must') || {});
-            const mustNotFields = Object.keys(_.get(params, 'must_not') || {});
+            const mustFields = paramNames.filter(
+                (field) => _.get(params.must || {}, field)
+            );
+            const mustNotFields = paramNames.filter(
+                (field) => _.get(params.must_not || {}, field)
+            );
+
             const uniqueFields = _.uniq(_.concat(mustFields, mustNotFields));
 
             const init = () => {
@@ -33,8 +44,8 @@ export function PreviewSourceFilter(_, chartConfig, gettext, gettextCatalog) {
                             const translations = chartConfig.getTranslationNames(filter.field);
 
                             let values = !filter.exclude ?
-                                _.get(params, `must[${filter.name}]`) :
-                                _.get(params, `must_not[${filter.name}]`);
+                                _.get(params, `must[${filter.paramName}]`) :
+                                _.get(params, `must_not[${filter.paramName}]`);
 
                             if (!Array.isArray(values)) {
                                 values = Object.keys(values).filter((value) => values[value]);
@@ -93,77 +104,79 @@ export function PreviewSourceFilter(_, chartConfig, gettext, gettextCatalog) {
             };
 
             const filters = {
-                desks: {
-                    name: 'desks',
-                    field: 'task.desk',
-                    source: 'desks',
+                [SOURCE_FILTERS.DESKS]: {
+                    ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.DESKS],
                     label: gettextCatalog.getString('Desks'),
                     enabled: uniqueFields.indexOf('desks') > -1,
-                    exclude: isExcluded('desks'),
+                    exclude: isExcluded(SOURCE_FILTERS.DESKS),
                 },
-                users: {
-                    name: 'users',
-                    field: 'task.user',
-                    source: 'users',
+                [SOURCE_FILTERS.USERS]: {
+                    ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.USERS],
                     label: gettextCatalog.getString('Users'),
                     enabled: uniqueFields.indexOf('users') > -1,
-                    exclude: isExcluded('users'),
+                    exclude: isExcluded(SOURCE_FILTERS.USERS),
                 },
-                categories: {
-                    name: 'categories',
-                    field: 'anpa_category.qcode',
-                    source: 'metadata',
+                [SOURCE_FILTERS.CATEGORIES]: {
+                    ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.CATEGORIES],
                     label: gettextCatalog.getString('Categories'),
                     enabled: uniqueFields.indexOf('categories') > -1,
-                    exclude: isExcluded('categories'),
+                    exclude: isExcluded(SOURCE_FILTERS.CATEGORIES),
                 },
-                genre: {
-                    name: 'genre',
-                    field: 'genre.qcode',
-                    source: 'metadata',
+                [SOURCE_FILTERS.GENRE]: {
+                    ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.GENRE],
                     label: gettextCatalog.getString('Genre'),
                     enabled: uniqueFields.indexOf('genre') > -1,
-                    exclude: isExcluded('genre'),
+                    exclude: isExcluded(SOURCE_FILTERS.GENRE),
                 },
-                sources: {
-                    name: 'sources',
-                    field: 'source',
-                    source: 'sources',
+                [SOURCE_FILTERS.SOURCES]: {
+                    ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.SOURCES],
                     label: gettextCatalog.getString('Sources'),
                     enabled: uniqueFields.indexOf('sources') > -1,
-                    exclude: isExcluded('sources'),
+                    exclude: isExcluded(SOURCE_FILTERS.SOURCES),
                 },
-                urgency: {
-                    name: 'urgency',
-                    field: 'urgency',
-                    source: 'metadata',
+                [SOURCE_FILTERS.URGENCY]: {
+                    ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.URGENCY],
                     label: gettextCatalog.getString('Urgency'),
                     enabled: uniqueFields.indexOf('urgency') > -1,
-                    exclude: isExcluded('urgency'),
+                    exclude: isExcluded(SOURCE_FILTERS.URGENCY),
                 },
-                states: {
-                    name: 'states',
-                    field: 'state',
-                    source: null,
+                [SOURCE_FILTERS.STATES]: {
+                    ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.STATES],
                     label: gettextCatalog.getString('States'),
                     enabled: uniqueFields.indexOf('states') > -1,
-                    exclude: isExcluded('states'),
+                    exclude: isExcluded(SOURCE_FILTERS.STATES),
                 },
-                ingest_providers: {
-                    name: 'ingest_providers',
-                    field: 'ingest_providers',
-                    source: 'ingest_providers',
+                [SOURCE_FILTERS.INGEST_PROVIDERS]: {
+                    ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.INGEST_PROVIDERS],
                     label: gettextCatalog.getString('Ingest Providers'),
                     enabled: uniqueFields.indexOf('ingest_providers') > -1,
-                    exclude: isExcluded('ingest_providers'),
+                    exclude: isExcluded(SOURCE_FILTERS.INGEST_PROVIDERS),
                 },
-                stages: {
-                    name: 'stages',
-                    field: 'stages',
-                    source: 'desks',
+                [SOURCE_FILTERS.STAGES]: {
+                    ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.STAGES],
                     label: gettextCatalog.getString('Stages'),
                     enabled: uniqueFields.indexOf('stages') > -1,
-                    exclude: isExcluded('stages'),
+                    exclude: isExcluded(SOURCE_FILTERS.STAGES),
+                },
+                [SOURCE_FILTERS.STATS.DESK_TRANSITIONS.ENTER]: {
+                    ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.STATS.DESK_TRANSITIONS.ENTER],
+                    label: gettextCatalog.getString('Enter Desk Actions'),
+                    enabled: uniqueFields.indexOf(
+                        SOURCE_FILTER_FIELDS[SOURCE_FILTERS.STATS.DESK_TRANSITIONS.ENTER].paramName
+                    ) > -1,
+                    exclude: isExcluded(
+                        SOURCE_FILTER_FIELDS[SOURCE_FILTERS.STATS.DESK_TRANSITIONS.ENTER].paramName
+                    ),
+                },
+                [SOURCE_FILTERS.STATS.DESK_TRANSITIONS.EXIT]: {
+                    ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.STATS.DESK_TRANSITIONS.EXIT],
+                    label: gettextCatalog.getString('Exit Desk Actions'),
+                    enabled: uniqueFields.indexOf(
+                        SOURCE_FILTER_FIELDS[SOURCE_FILTERS.STATS.DESK_TRANSITIONS.EXIT].paramName
+                    ) > -1,
+                    exclude: isExcluded(
+                        SOURCE_FILTER_FIELDS[SOURCE_FILTERS.STATS.DESK_TRANSITIONS.EXIT].paramName
+                    ),
                 },
             };
 

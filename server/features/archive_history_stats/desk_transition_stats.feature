@@ -246,7 +246,7 @@ Feature: Desk Transition Stats
         """
         When we publish "#archive._id#" with "publish" type and "published" state
         """
-        {"publish_schedule": "2019-01-01T02:00:00+0000"}
+        {"publish_schedule": "2029-01-01T02:00:00+0000"}
         """
         Then we get OK response
         When we patch "/archive/#archive._id#"

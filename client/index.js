@@ -30,6 +30,7 @@ import './publishing_performance_report';
 import './email_report';
 import './planning_usage_report';
 import './desk_activity_report';
+import './production_time_report';
 
 angular.module('superdesk.analytics.reports', [])
     .provider('reports', svc.ReportsProvider);
@@ -63,6 +64,7 @@ export default angular.module('superdesk.analytics', [
     'superdesk.analytics.publishing-performance-report',
     'superdesk.analytics.planning-usage-report',
     'superdesk.analytics.desk-activity-report',
+    'superdesk.analytics.production-time-report',
     'superdesk-ui'
 ])
     .service('analyticsWidgetSettings', svc.AnalyticsWidgetSettings)

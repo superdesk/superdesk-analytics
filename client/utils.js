@@ -1,12 +1,12 @@
 
 /**
  * @ngdoc method
- * @name Analytics#formatDateForServer
+ * @name analytics.utils#formatDateForServer
  * @param {Object} moment
  * @param {Object} config
  * @param {String} date
  * @param {Number} addDays
- * @returns {String}|null
+ * @returns {String|null}
  * @description Format given date for use with API calls
 */
 export function formatDateForServer(moment, config, date, addDays = 0) {
@@ -29,7 +29,7 @@ export function formatDateForServer(moment, config, date, addDays = 0) {
 
 /**
  * @ngdoc method
- * @name Analytics#formatDate
+ * @name analytics.utils#formatDate
  * @param {Function} moment
  * @param {Object} config
  * @param {String} dateTime
@@ -43,7 +43,7 @@ export function formatDate(moment, config, dateTime, format = 'LL') {
 
 /**
  * @ngdoc method
- * @name Analytics#getErrorMessage
+ * @name analytics.utils#getErrorMessage
  * @param {Object|String} error - The API response, containing the error message
  * @param {String} defaultMessage - The default string to return
  * @returns {String} string containing the error message
@@ -69,7 +69,7 @@ export const getErrorMessage = (error, defaultMessage) => {
 
 /**
  * @ngdoc method
- * @name Analytics#getUtcOffsetInMinutes
+ * @name analytics.utils#getUtcOffsetInMinutes
  * @param {moment} utcDatetime The moment date/time instance used to calculate utc offset
  * @param {String} timezone - The timezone name
  * @param {Function} moment - The moment js module
@@ -82,6 +82,12 @@ export const getUtcOffsetInMinutes = (utcDatetime, timezone, moment) => (
         .utcOffset()
 );
 
+/**
+ * @ngdoc property
+ * @name analytics.utils#ITEM_OPERATIONS
+ * @type {Object}
+ * @description Available item operations from stat collection
+ */
 export const ITEM_OPERATIONS = {
     CREATE: 'create',
     FETCH: 'fetch',
@@ -116,6 +122,12 @@ export const ITEM_OPERATIONS = {
     UPDATE_FEATUREMEDIA_IMAGE: 'update_featuremedia_image',
 };
 
+/**
+ * @ngdoc property
+ * @name analytics.utils#ENTER_DESK_OPERATIONS
+ * @type {Array<String>}
+ * @description Item operations associated with content moving onto a desk
+ */
 export const ENTER_DESK_OPERATIONS = [
     ITEM_OPERATIONS.CREATE,
     ITEM_OPERATIONS.FETCH,
@@ -125,6 +137,12 @@ export const ENTER_DESK_OPERATIONS = [
     ITEM_OPERATIONS.UNSPIKE
 ];
 
+/**
+ * @ngdoc property
+ * @name analytics.utils#EXIT_DESK_OPERATIONS
+ * @type {Array<String>}
+ * @description Item operations associated with content moving off a desk
+ */
 export const EXIT_DESK_OPERATIONS = [
     ITEM_OPERATIONS.PUBLISH,
     ITEM_OPERATIONS.SPIKE,
@@ -133,6 +151,12 @@ export const EXIT_DESK_OPERATIONS = [
     ITEM_OPERATIONS.PUBLISH_EMBARGO,
 ];
 
+/**
+ * @ngdoc property
+ * @name analytics#.utilsEXIT_DESK_OPERATIONS
+ * @type {Array<String>}
+ * @description Item operations associated with changes to featuremedia
+ */
 export const FEATUREMEDIA_OPERATIONS = [
     ITEM_OPERATIONS.ADD_FEATUREMEDIA,
     ITEM_OPERATIONS.CHANGE_IMAGE_POI,
@@ -141,6 +165,13 @@ export const FEATUREMEDIA_OPERATIONS = [
     ITEM_OPERATIONS.REMOVE_FEATUREMEDIA,
 ];
 
+/**
+ * @ngdoc method
+ * @name analytics.utils#getTranslatedOperations
+ * @param {Function} gettext
+ * @return {Object}
+ * @description Returns translated names for item operations
+ */
 export const getTranslatedOperations = (gettext) => ({
     create: gettext('Create'),
     fetch: gettext('Fetch'),
@@ -174,3 +205,46 @@ export const getTranslatedOperations = (gettext) => ({
     remove_featuremedia: gettext('Remove Featuremedia'),
     update_featuremedia_image: gettext('Update Featuremedia Image'),
 });
+
+/**
+ * @ngdoc method
+ * @name analytics.utils#secondsToHumanReadable
+ * @param {Number} seconds
+ * @param {Function} gettext
+ * @param {Function} $interpolate
+ * @return {String}
+ * @description Converts seconds to a human readable format
+ */
+export const secondsToHumanReadable = (seconds, gettext, $interpolate) => {
+    if (seconds >= 86400) {
+        if (Math.floor(seconds / 86400) === 1) {
+            return gettext('1 day');
+        }
+
+        return $interpolate(
+            gettext('{{days}} days')
+        )({days: Math.floor(seconds / 86400)});
+    } else if (seconds >= 3600) {
+        if (Math.floor(seconds / 3600) === 1) {
+            return gettext('1 hour');
+        }
+
+        return $interpolate(
+            gettext('{{hours}} hours')
+        )({hours: Math.floor(seconds / 3600)});
+    } else if (seconds >= 60) {
+        if (Math.floor(seconds / 60) === 1) {
+            return gettext('1 minute');
+        }
+
+        return $interpolate(
+            gettext('{{minutes}} minutes')
+        )({minutes: Math.floor(seconds / 60)});
+    } else if (Math.floor(seconds) === 1) {
+        return gettext('1 second');
+    }
+
+    return $interpolate(
+        gettext('{{seconds}} seconds')
+    )({seconds: Math.floor(seconds)});
+};
