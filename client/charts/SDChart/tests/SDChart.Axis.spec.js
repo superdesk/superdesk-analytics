@@ -17,9 +17,15 @@ describe('SDChart.Axis', () => {
             xAxis: [{
                 type: 'linear',
                 allowDecimals: false,
+                title: {text: undefined},
             }],
             yAxis: [{
                 allowDecimals: false,
+                title: {text: undefined},
+                labels: {
+                    enabled: true,
+                    format: '{value}',
+                },
             }],
             series: [],
         }));
@@ -32,6 +38,7 @@ describe('SDChart.Axis', () => {
             xAxis: [{
                 type: 'datetime',
                 allowDecimals: false,
+                title: {text: undefined},
             }],
         }));
 
@@ -54,6 +61,7 @@ describe('SDChart.Axis', () => {
                 type: 'linear',
                 allowDecimals: false,
                 categories: ['cat1', 'cat2', 'cat3'],
+                title: {text: undefined},
             }],
         }));
 
@@ -63,9 +71,15 @@ describe('SDChart.Axis', () => {
             xAxis: [{
                 type: 'linear',
                 allowDecimals: true,
+                title: {text: undefined},
             }],
             yAxis: [{
                 allowDecimals: true,
+                title: {text: undefined},
+                labels: {
+                    enabled: true,
+                    format: '{value}',
+                },
             }],
         }));
 
@@ -75,6 +89,11 @@ describe('SDChart.Axis', () => {
             yAxis: [{
                 allowDecimals: false,
                 stackLabels: {enabled: false},
+                title: {text: undefined},
+                labels: {
+                    enabled: true,
+                    format: '{value}',
+                },
             }],
         }));
 
@@ -84,6 +103,11 @@ describe('SDChart.Axis', () => {
             yAxis: [{
                 allowDecimals: false,
                 stackLabels: {enabled: true},
+                title: {text: undefined},
+                labels: {
+                    enabled: true,
+                    format: '{value}',
+                },
             }],
         }));
 
@@ -103,6 +127,10 @@ describe('SDChart.Axis', () => {
             yAxis: [{
                 allowDecimals: false,
                 title: {text: 'Test Y Title'},
+                labels: {
+                    enabled: true,
+                    format: '{value}',
+                },
             }],
         }));
     });

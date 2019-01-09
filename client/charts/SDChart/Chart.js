@@ -31,6 +31,10 @@ export class Chart {
      * @param {Object} [options.translations={}] - Field name & values translations
      * @param {Function} [options.dataLabelFormatter] - Callback function to dynamically generate data labels
      * @param {Function} [options.tooltipFormatter] - Callback function to dynamically generate tooltips
+     * @param {Function} [options.onPointClick] - Callback function when a point is clicked
+     * @param {Object} [options.dataLabelConfig] - Custom config for dataLabels
+     * @params {Boolean} [options.invertAxes=false] - Invert the X and Y axes
+     * @params {Function} [options.legendFormatter] - Callback function to dynamically generate legend labels
      * @description Initialise the data for the chart config
      */
     constructor(options) {
@@ -56,6 +60,10 @@ export class Chart {
 
         if (!('translations' in options)) {
             options.translations = {};
+        }
+
+        if (!('invertAxes' in options)) {
+            options.invertAxes = false;
         }
 
         /**
@@ -231,6 +239,38 @@ export class Chart {
          * @description Callback function to dynamically generate tooltips
          */
         this.tooltipFormatter = options.tooltipFormatter;
+
+        /**
+         * @ngdoc property
+         * @name SDChart.Chart#onPointClick
+         * @type {Function}
+         * @description Callback function when a point is clicked
+         */
+        this.onPointClick = options.onPointClick;
+
+        /**
+         * @ngdoc property
+         * @name SDChart.Chart#dataLabelConfig
+         * @type {Object}
+         * @description Custom config for the data labels
+         */
+        this.dataLabelConfig = options.dataLabelConfig;
+
+        /**
+         * @ngdoc property
+         * @name SDChart.Chart#invertAxes
+         * @type {Boolean}
+         * @description Invert the X and Y axes
+         */
+        this.invertAxes = options.invertAxes;
+
+        /**
+         * @ngdoc property
+         * @name SDChart.Chart#legendFormatter
+         * @type {Function}
+         * @description Callback function to dynamically generate legend labels
+         */
+        this.legendFormatter = options.legendFormatter;
     }
 
     /**
@@ -309,6 +349,11 @@ export class Chart {
             config.legend.title = {text: this.legendTitle};
         }
 
+        if (this.legendFormatter !== undefined) {
+            config.legend.labelFormatter = this.legendFormatter;
+            config.legend.useHTML = true;
+        }
+
         return config;
     }
 
@@ -333,6 +378,7 @@ export class Chart {
 
         if (this.tooltipFormatter !== undefined) {
             config.tooltip.formatter = this.tooltipFormatter;
+            config.tooltip.useHTML = true;
         }
 
         return config;
@@ -340,16 +386,18 @@ export class Chart {
 
     /**
      * @ngdoc method
-     * @name SDChart.Chart#genPlotConfig
-     * @param {Object} config
-     * @description Sets the plot options config to use for the chart
+     * @name SDChart.Chart#genPlotLabelConfig
+     * @param {object} config
+     * @description Sets the plot label configs
      */
-    genPlotConfig(config) {
-        if (!get(config, 'plotOptions')) {
-            config.plotOptions = {};
-        }
+    genPlotLabelConfig(config) {
+        if (this.dataLabelConfig !== undefined) {
+            if (!get(config, 'plotOptions.series')) {
+                config.plotOptions.series = {};
+            }
 
-        if (this.dataLabels !== undefined) {
+            config.plotOptions.series.dataLabels = this.dataLabelConfig;
+        } else if (this.dataLabels !== undefined) {
             if (!get(config, 'plotOptions.series')) {
                 config.plotOptions.series = {};
             }
@@ -366,6 +414,20 @@ export class Chart {
                 config.plotOptions.series.dataLabels.format = this.dataLabelFormat;
             }
         }
+    }
+
+    /**
+     * @ngdoc method
+     * @name SDChart.Chart#genPlotConfig
+     * @param {Object} config
+     * @description Sets the plot options config to use for the chart
+     */
+    genPlotConfig(config) {
+        if (!get(config, 'plotOptions')) {
+            config.plotOptions = {};
+        }
+
+        this.genPlotLabelConfig(config);
 
         if (this.colourByPoint !== undefined) {
             if (!get(config, 'plotOptions.bar')) {
@@ -378,6 +440,17 @@ export class Chart {
 
             config.plotOptions.bar.colorByPoint = this.colourByPoint;
             config.plotOptions.column.colorByPoint = this.colourByPoint;
+        }
+
+        if (this.onPointClick !== undefined) {
+            if (!get(config, 'plotOptions.series')) {
+                config.plotOptions.series = {};
+            }
+
+            config.plotOptions.series.cursor = 'pointer';
+            config.plotOptions.series.point = {
+                events: {click: this.onPointClick}
+            };
         }
 
         return config;
@@ -413,6 +486,10 @@ export class Chart {
 
         if (this.fullHeight !== undefined) {
             config.fullHeight = this.fullHeight;
+        }
+
+        if (this.invertAxes) {
+            config.chart.inverted = this.invertAxes;
         }
 
         if (this.axis.length < 1 || this.axis.length > 1) {

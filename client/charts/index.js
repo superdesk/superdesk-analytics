@@ -14,12 +14,13 @@ import * as directives from './directives';
 
 var Highcharts = require('highcharts/js/highcharts');
 
-require('highcharts/highcharts-more')(Highcharts);
+require('highcharts/js/highcharts-more')(Highcharts);
 require('highcharts/js/modules/exporting')(Highcharts);
 require('highcharts/js/modules/data')(Highcharts);
 require('highcharts/js/modules/export-data')(Highcharts);
 require('highcharts/js/modules/offline-exporting')(Highcharts);
 require('highcharts/js/modules/no-data-to-display')(Highcharts);
+require('highcharts/js/modules/xrange')(Highcharts);
 
 function cacheIncludedTemplates($templateCache) {
     $templateCache.put(

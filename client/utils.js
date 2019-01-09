@@ -176,7 +176,7 @@ export const getTranslatedOperations = (gettext) => ({
     create: gettext('Create'),
     fetch: gettext('Fetch'),
     duplicated_from: gettext('Duplicated From'),
-    update: gettext('Update'),
+    update: gettext('Save'),
     publish: gettext('Publish'),
     publish_scheduled: gettext('Publish Scheduled'),
     deschedule: gettext('Deschedule'),
@@ -247,4 +247,32 @@ export const secondsToHumanReadable = (seconds, gettext, $interpolate) => {
     return $interpolate(
         gettext('{{seconds}} seconds')
     )({seconds: Math.floor(seconds)});
+};
+
+
+/**
+ * @ngdoc method
+ * @module analytics.utils#compileAndGetHTML
+ * @param {Function} $compile - Angular function to compile directive
+ * @param {Object} scope - Scope used to generate temporary scope from
+ * @param {String} template - The string to compile
+ * @param {Object} data - The data to store on the new temporary scope
+ * @return {String}
+ * @description Compiles the provided template with a temporary scope, and returns the generated html
+ */
+export const compileAndGetHTML = ($compile, scope, template, data = {}) => {
+    const tmpScope = scope.$new();
+
+    Object.keys(data).forEach((key) => {
+        tmpScope[key] = data[key];
+    });
+
+    let element = $compile(template)(tmpScope);
+
+    tmpScope.$apply();
+    const html = element[0].innerHTML;
+
+    tmpScope.$destroy();
+
+    return html;
 };

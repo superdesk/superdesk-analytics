@@ -703,7 +703,7 @@ export function ChartConfig(
                     .format('MMMM YYYY')
             ),
             day: () => (
-                moment(_.get(params, 'date') || _.get(params, 'dates.date'))
+                moment(_.get(params, 'date') || _.get(params, 'dates.date'), config.model.dateformat)
                     .format('dddd Do MMMM YYYY')
             ),
             relative: () => (

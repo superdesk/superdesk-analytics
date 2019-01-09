@@ -99,6 +99,10 @@ describe('chartConfig', () => {
                 title: {text: 'Published Stories'},
                 stackLabels: {enabled: false},
                 allowDecimals: false,
+                labels: {
+                    enabled: true,
+                    format: '{value}',
+                },
             }],
             legend: {enabled: false},
             tooltip: {
@@ -177,6 +181,10 @@ describe('chartConfig', () => {
                 title: {text: 'Published Stories'},
                 stackLabels: {enabled: true},
                 allowDecimals: false,
+                labels: {
+                    enabled: true,
+                    format: '{value}',
+                },
             }],
             legend: {
                 enabled: true,
