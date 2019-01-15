@@ -12,13 +12,13 @@ from superdesk import Command, command, get_resource_service, Option
 from superdesk.logging import logger
 from superdesk.utc import utcnow
 from superdesk.metadata.item import ITEM_STATE, ITEM_TYPE, FORMAT, SCHEDULE_SETTINGS, \
-    CONTENT_STATE, ASSOCIATIONS, CONTENT_TYPE, PUBLISH_SCHEDULE, EMBARGO
+    CONTENT_STATE, PUBLISH_SCHEDULE, EMBARGO
 from superdesk.text_utils import get_par_count
 from superdesk.celery_task_utils import get_lock_id
 from superdesk.lock import lock, unlock
 
-from analytics.stats.common import STAT_TYPE, OPERATION, \
-    ENTER_DESK_OPERATIONS, EXIT_DESK_OPERATIONS
+from analytics.stats.common import STAT_TYPE, OPERATION
+from analytics.stats import featuremedia_updates, desk_transitions
 
 from eve.utils import config
 from copy import deepcopy
@@ -34,21 +34,6 @@ class GenArchiveStatistics(Command):
 
     def run(self, max_days=3, item_id=None, chunk_size=1000):
         now_utc = utcnow()
-
-        logger.info(
-            'Starting to generate archive statistics: {}. max_days={}. item_id={}. chunk_size={}'
-            .format(
-                now_utc,
-                max_days,
-                item_id,
-                chunk_size
-            )
-        )
-
-        lock_name = get_lock_id('analytics', 'gen_archive_statistics')
-        if not lock(lock_name, expire=610):
-            logger.info('Generate archive statistics task is already running.')
-            return
 
         # If we're generating stats for a single item, then
         # don't set max_days, as we want to process all history records
@@ -67,6 +52,21 @@ class GenArchiveStatistics(Command):
         except (ValueError, TypeError):
             chunk_size = 1000
         chunk_size = None if chunk_size <= 0 else chunk_size
+
+        logger.info(
+            'Starting to generate archive statistics: {}. gte={}. item_id={}. chunk_size={}'
+            .format(
+                now_utc,
+                gte,
+                item_id,
+                chunk_size
+            )
+        )
+
+        lock_name = get_lock_id('analytics', 'gen_archive_statistics')
+        if not lock(lock_name, expire=610):
+            logger.info('Generate archive statistics task is already running.')
+            return
 
         items_processed = 0
         failed_ids = []
@@ -174,13 +174,15 @@ class GenArchiveStatistics(Command):
 
             items[entry_id]['updates'].update(item)
 
+            def _set_timeline_processed(entry):
+                entry['_processed'] = True
+                return entry
+
             items[entry_id]['updates']['stats'].update({
-                STAT_TYPE.TIMELINE: item['stats'].get(STAT_TYPE.TIMELINE)
-                or [],
-                STAT_TYPE.DESK_TRANSITIONS: item['stats'].get(STAT_TYPE.DESK_TRANSITIONS)
-                or [],
-                STAT_TYPE.FEATUREMEDIA_UPDATES: item['stats'].get(STAT_TYPE.FEATUREMEDIA_UPDATES)
-                or [],
+                STAT_TYPE.TIMELINE: [
+                    _set_timeline_processed(entry)
+                    for entry in item['stats'].get(STAT_TYPE.TIMELINE) or []
+                ]
             })
 
         for history_item in history_items:
@@ -331,6 +333,21 @@ class GenArchiveStatistics(Command):
                 ))
                 failed_ids.extend(failed_ids)
 
+    def _store_update_fields(self, entry):
+        update = {}
+
+        if entry.get('operation') in [OPERATION.ITEM_LOCK, OPERATION.ITEM_UNLOCK]:
+            # If the entry belongs to a lock, store the lock information
+            update = entry.get('update') or {}
+
+        desk_transitions.store_update_fields(entry, update)
+        featuremedia_updates.store_update_fields(entry, update)
+
+        if update:
+            entry['update'] = update
+        else:
+            entry.pop('update', None)
+
     def gen_stats_from_timeline(self, item):
         item.setdefault('updates', {})
         updates = item['updates']
@@ -342,11 +359,8 @@ class GenArchiveStatistics(Command):
             return
 
         new_timeline = []
-
-        # Clear the desk and featuremedia stats
-        # as we'll recalculate them here
-        stats[STAT_TYPE.DESK_TRANSITIONS] = []
-        stats[STAT_TYPE.FEATUREMEDIA_UPDATES] = []
+        desk_transitions.init(stats)
+        featuremedia_updates.init(stats)
 
         try:
             entries = sorted(
@@ -374,7 +388,8 @@ class GenArchiveStatistics(Command):
                 continue
 
             # Remove the update attribute before adding to the timeline
-            update = entry.pop('update', {})
+            update = entry.get('update') or {}
+            self._store_update_fields(entry)
 
             # Update the paragraph count from this history entry
             self.update_par_count_from_timeline_entry(entry, updates, update)
@@ -396,29 +411,22 @@ class GenArchiveStatistics(Command):
                     not updates.get('firstcreated'):
                 updates['firstcreated'] = operation_created
 
-            self.gen_desk_transition_stats(entry, updates, stats)
-            self.gen_featuremedia_update_stats(entry, new_timeline, updates, update, stats)
+            desk_transitions.process(entry, new_timeline, updates, update, stats)
+            featuremedia_updates.process(entry, new_timeline, updates, update, stats)
 
-        num_desk_transitions = len(stats.get(STAT_TYPE.DESK_TRANSITIONS) or [])
-        if num_desk_transitions < 1:
-            stats[STAT_TYPE.DESK_TRANSITIONS] = None
-            updates['num_desk_transitions'] = 0
-        else:
-            updates['num_desk_transitions'] = num_desk_transitions
-
-        num_featuremedia_updates = len(stats.get(STAT_TYPE.FEATUREMEDIA_UPDATES) or [])
-        if num_featuremedia_updates < 1:
-            stats[STAT_TYPE.FEATUREMEDIA_UPDATES] = None
-            updates['num_featuremedia_updates'] = 0
-        else:
-            updates['num_featuremedia_updates'] = num_featuremedia_updates
+        desk_transitions.complete(stats, updates)
+        featuremedia_updates.complete(stats, updates)
 
         if updates.get('firstpublished') and updates.get('firstcreated'):
             updates['time_to_first_publish'] = (
                 updates['firstpublished'] - updates['firstcreated']
             ).total_seconds()
 
-        stats[STAT_TYPE.TIMELINE] = new_timeline
+        def _remove_tmp_fields(entry):
+            entry.pop('_processed', None)
+            return entry
+
+        stats[STAT_TYPE.TIMELINE] = [_remove_tmp_fields(entry) for entry in new_timeline]
 
         for key in list(updates.keys()):
             if key.startswith('_'):
@@ -480,147 +488,6 @@ class GenArchiveStatistics(Command):
 
         if 'original_par_count' not in updates and entry['par_count'] > 0:
             updates['original_par_count'] = entry['par_count']
-
-    def gen_desk_transition_stats(self, entry, updates, stats):
-        updates.setdefault('_current_task', None)
-
-        task = entry.get('task') or {}
-        operation = entry.get('operation')
-        operation_created = entry.get('operation_created')
-
-        if operation in ENTER_DESK_OPERATIONS:
-            updates['_current_task'] = deepcopy(task)
-
-            if operation == OPERATION.CREATE and updates.get('rewrite_of'):
-                updates['_current_task']['entered_operation'] = OPERATION.REWRITE
-            else:
-                updates['_current_task']['entered_operation'] = operation
-
-            updates['_current_task']['entered'] = operation_created
-        elif operation in EXIT_DESK_OPERATIONS and updates['_current_task'] is not None:
-            if not updates['_current_task'].get('user') and task.get('user'):
-                updates['_current_task']['user'] = task['user']
-
-            updates['_current_task']['exited'] = operation_created
-            updates['_current_task']['exited_operation'] = operation
-            updates['_current_task']['duration'] = (
-                updates['_current_task']['exited'] - updates['_current_task']['entered']
-            ).total_seconds()
-
-            if updates['_current_task'].get('entered_operation') == OPERATION.MOVE and \
-                    updates['_current_task'].get('exited_operation') == OPERATION.PUBLISH and \
-                    updates['_current_task']['duration'] < 3:
-                pass
-            else:
-                stats[STAT_TYPE.DESK_TRANSITIONS].append(updates['_current_task'])
-
-            updates['_current_task'] = None
-
-    def gen_featuremedia_update_stats(self, entry, new_timeline, updates, update, stats):
-        operation = entry.get('operation')
-
-        updates.setdefault('_featuremedia', None)
-        updates.setdefault('_published', False)
-
-        item_type = updates.get('type') or 'text'
-
-        if entry.get('_auto_generated', False):
-            entry['update'] = update
-
-        def add_media_operation(name, media=None):
-            if operation == name:
-                return
-
-            media_operation = deepcopy(entry)
-            media_operation['_auto_generated'] = True
-            media_operation['operation'] = name
-
-            if media is not None:
-                media_operation['update'] = {
-                    ASSOCIATIONS: {
-                        'featuremedia': media
-                    }
-                }
-
-            new_timeline.append(media_operation)
-
-            if updates['_published'] and not operation == OPERATION.PUBLISH:
-                stats[STAT_TYPE.FEATUREMEDIA_UPDATES].append(media_operation)
-
-        if item_type == CONTENT_TYPE.TEXT:
-            # Calculate featuremedia stats
-            associations = update.get(ASSOCIATIONS) or None
-
-            # If there are no associations in this update, then media has not changed
-            if associations is None:
-                return
-
-            media = associations.get('featuremedia') or None
-
-            # If there is no featuremedia, then don't calculate any timeline entries
-            if media is None and updates['_featuremedia'] is None:
-                return
-
-            if media is None or not media.get('_id'):
-                # If featuremedia is removed
-                if updates['_featuremedia'] is not None:
-                    updates['_featuremedia'] = None
-
-                    add_media_operation(OPERATION.REMOVE_FEATUREMEDIA, media)
-            else:
-                if updates['_featuremedia'] is None:
-                    updates['_featuremedia'] = media
-
-                    add_media_operation(OPERATION.ADD_FEATUREMEDIA, media)
-                elif media.get('_id') != updates['_featuremedia'].get('_id'):
-                    updates['_featuremedia'] = media
-
-                    add_media_operation(OPERATION.UPDATE_FEATUREMEDIA_IMAGE, media)
-
-                elif self.renditions_changed(updates['_featuremedia'], media):
-                    updates['_featuremedia'] = media
-
-                    add_media_operation(OPERATION.UPDATE_FEATUREMEDIA_POI, media)
-        elif item_type == CONTENT_TYPE.PICTURE:
-            if updates['_featuremedia'] is None:
-                updates['_featuremedia'] = deepcopy(update)
-            elif self.renditions_changed(updates['_featuremedia'], update):
-                updates['_featuremedia'] = update
-
-                add_media_operation(OPERATION.CHANGE_IMAGE_POI, update)
-
-    def renditions_changed(self, original, updates):
-        def poi_changed(original_poi, updated_poi):
-            if original_poi.get('x') != updated_poi.get('x') or \
-                    original_poi.get('y') != updated_poi.get('y'):
-                return True
-            return False
-
-        if poi_changed(original.get('poi') or {}, updates.get('poi') or {}):
-            return True
-
-        original_renditions = original.get('renditions') or {}
-        updated_renditions = updates.get('renditions') or {}
-
-        if original_renditions.keys() != updated_renditions.keys():
-            return True
-
-        attribs = ['width', 'height', 'media', 'CropLeft', 'CropRight', 'CropTop', 'CropBottom']
-
-        for key, original_rendition in original_renditions.items():
-            updated_rendition = updated_renditions[key]
-
-            if poi_changed(
-                original_rendition.get('poi') or {},
-                updated_rendition.get('poi') or {}
-            ):
-                return True
-
-            for attrib in attribs:
-                if original_rendition.get(attrib) != updated_rendition.get(attrib):
-                    return True
-
-        return False
 
 
 command('analytics:gen_archive_statistics', GenArchiveStatistics())

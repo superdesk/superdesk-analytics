@@ -9,7 +9,7 @@
 # at https://www.sourcefabric.org/superdesk/license
 
 from superdesk.tests.steps import when, then, assert_200, get_json_data, json,\
-    fail_and_print_body, apply_placeholders
+    fail_and_print_body, apply_placeholders, json_match
 
 from analytics.stats.gen_archive_statistics import GenArchiveStatistics
 
@@ -129,7 +129,7 @@ def step_impl_then_get_stats_for_item(context):
                                 subkey,
                                 expected_stats[key]
                             )
-                            assert expected_stats[key][subkey] == subvalue,\
+                            assert json_match(subvalue, expected_stats[key][subkey]),\
                                 'stats.{}[{}].{}.{} {} != {}\nEntry={}'.format(
                                 stat_type,
                                 stat_index,

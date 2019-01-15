@@ -582,7 +582,7 @@ export function UserActivityReportController(
                 userTimelines[userId] = {
                     data: [],
                     colour: colourIndex,
-                    name: $scope.usersById[userId].display_name
+                    name: _.get($scope.usersById, userId, {}).display_name || ''
                 };
 
                 // Increase the colourIndex so the next unique user
@@ -629,7 +629,7 @@ export function UserActivityReportController(
 
             tooltips[timestamp].data = {
                 timestamp: timestamp,
-                userName: $scope.usersById[tooltip.user].display_name,
+                userName: _.get($scope.usersById, tooltip.user, {}).display_name || '',
                 operations: tooltip.operations,
             };
         });

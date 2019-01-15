@@ -37,7 +37,16 @@ $colors: #7cb5ec #434348 #90ed7d #f7a35c #8085e9 #f15c80 #e4d354 #2b908f #f45b5b
     display: block;
     background-color: white;
 
+    .clickable {
+        cursor: pointer;
+
+        &:hover {
+            border: 1px solid #9bb3ff;
+        }
+    }
+
     .sd-chart__table-header {
+        z-index: 1000;
         text-align: center;
         padding: 1rem 0 2rem 0;
 
@@ -55,16 +64,22 @@ $colors: #7cb5ec #434348 #90ed7d #f7a35c #8085e9 #f15c80 #e4d354 #2b908f #f45b5b
     .sd-chart__table-content {
         display: block;
 
+        table {
+            border-top: none;
+        }
+
         th {
             text-transform: uppercase;
             position: sticky;
             background-color: $white;
+            z-index: 1000;
         }
 
         thead {
             tr:first-child {
                 th {
                     top: 58px;
+                    border-top: 1px solid $sd-tableBorderColor;
                 }
             }
 
@@ -81,6 +96,15 @@ $colors: #7cb5ec #434348 #90ed7d #f7a35c #8085e9 #f15c80 #e4d354 #2b908f #f45b5b
 
         tr:hover {
             background-color: #cee6fa;
+        }
+
+        td {
+            vertical-align: middle;
+        }
+
+        .no-vert-padding {
+            padding-top: 0;
+            padding-bottom: 0;
         }
     }
 }

@@ -259,6 +259,27 @@
             }
         }
     }
+
+    .open-preview .sd-preview-panel {
+        width: 560px;
+
+        .sd-item-preview {
+            position: absolute;
+            top: 0;
+            right: 0;
+            left: 0;
+            bottom: 0;
+        }
+
+        .preview-layout .content-item-preview {
+            width: 100%;
+            top: 0;
+        }
+
+        .shift-preview__toggle {
+            display: none;
+        }
+    }
 }
 
 // Hack so that content is not rendered underneath the workqueue
