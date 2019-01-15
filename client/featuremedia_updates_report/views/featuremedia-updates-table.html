@@ -1,0 +1,53 @@
+<div class="sd-chart__container" ng-if="reportConfigs.charts.length > 0">
+    <div class="sd-chart__chart">
+        <div class="sd-chart__table sd-shadow--z2">
+            <div class="sd-chart__table-header">
+                <div class="sd-chart__table-header-title" ng-if="reportConfigs.title">
+                    <span>{{reportConfigs.title | translate}}</span>
+                </div>
+                <div class="sd-chart__table-header-subtitle" ng-if="reportConfigs.subtitle">
+                    <span>{{reportConfigs.subtitle | translate}}</span>
+                </div>
+            </div>
+            <div class="sd-chart__table-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th translate>Date</th>
+                            <th translate>Creator</th>
+                            <th translate>Slugline</th>
+                            <th translate>Original Image</th>
+                            <th translate>Featuremedia History</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item in itemUpdates track by $index">
+                            <td>{{item.date}}</td>
+                            <td>{{item.creator}}</td>
+                            <td class="clickable" ng-click="onSluglineClicked(item)">
+                                <a data-sd-tooltip="{{:: 'View Latest Item Version' | translate}}" data-flow="up">
+                                    {{item.slugline}}
+                                </a>
+                            </td>
+                            <td class="clickable" ng-click="onOriginalClicked(item)">
+                                <a data-sd-tooltip="{{:: 'View Original Image' | translate}}" data-flow="up">
+                                    {{item.original.headline || item.original.alt_text}}
+                                </a>
+                            </td>
+                            <td class="no-vert-padding">
+                                <ul class="simple-list simple-list--dotted no-vert-padding">
+                                    <li ng-repeat="update in item.updates track by $index"
+                                        class="simple-list__item clickable"
+                                        ng-click="onUpdateClicked(item, update)"
+                                    >
+                                        <a translate>{{update.date}} - {{update.operation}} by {{update.user}}</a>
+                                    </li>
+                                </ul>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

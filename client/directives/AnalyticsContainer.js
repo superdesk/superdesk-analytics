@@ -11,13 +11,16 @@
  * @requires $timeout
  * @requires emailReport
  * @required savedReports
+ * @required api
+ * @required desks
+ * @required metadata
  * @description A directive that encapsulates the entire analytics module view
  */
 export function AnalyticsContainer() {
     return {
         controllerAs: 'analytics',
         controller: ['$scope', '$location', 'pageTitle', 'gettext', 'lodash', 'reports', '$rootScope', '$timeout',
-            'emailReport', 'savedReports',
+            'emailReport', 'savedReports', 'api', 'desks', 'metadata',
             function AnalyticsContainerController(
                 $scope,
                 $location,
@@ -28,7 +31,10 @@ export function AnalyticsContainer() {
                 $rootScope,
                 $timeout,
                 emailReport,
-                savedReports
+                savedReports,
+                api,
+                desks,
+                metadata
             ) {
                 const defaultReportConfigs = {charts: []};
 
@@ -40,6 +46,10 @@ export function AnalyticsContainer() {
                 $scope.reportConfigs = $scope.reportConfigs || _.cloneDeep(defaultReportConfigs);
                 $scope.currentPanel = 'advanced';
                 $scope.emailModal = emailReport.modal;
+                $scope.preview = {
+                    item: null,
+                    type: null,
+                };
 
                 /**
                  * @ngdoc method
@@ -52,6 +62,10 @@ export function AnalyticsContainer() {
                         _.find($scope.reports, ['id', $location.search().report]) || $scope.reports[0],
                         false
                     );
+
+                    // Initialise desk and metadata for archive previews
+                    desks.initialize();
+                    metadata.initialize();
                 };
 
                 /**
@@ -211,6 +225,32 @@ export function AnalyticsContainer() {
                  */
                 $scope.changePanel = (panelName) => {
                     $scope.currentPanel = panelName;
+                };
+
+                /**
+                 * @ngdoc method
+                 * @name sdAnalyticsContainer#closePreview
+                 * @description Closes the preview panel
+                 */
+                $scope.closePreview = () => {
+                    $scope.preview = {
+                        item: null,
+                        type: null,
+                    };
+                };
+
+                /**
+                 * @ngdoc
+                 * @name sdAnalyticsContainer#openPreview
+                 * @param {Object} item - The item to preview
+                 * @param {String} type - The type of the item (used with sda-archive-preview-proxy)
+                 * @description Opens the preview panel with the appropriate preview directive based on type
+                 */
+                $scope.openPreview = (item, type = 'archive') => {
+                    $scope.preview = {
+                        item: item,
+                        type: type,
+                    };
                 };
 
                 init();

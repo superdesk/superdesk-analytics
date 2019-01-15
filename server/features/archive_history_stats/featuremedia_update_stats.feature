@@ -72,13 +72,71 @@ Feature: Featuremedia Stats
         """
 
     @auth
+    Scenario: Generating stats with PUBLISH_ASSOCIATED_ITEMS=True is currently not supported
+        When we post to "/archive" with success
+        """
+        {
+            "_id": "item1", "guid": "item1",
+            "type": "text", "headline": "show my content", "version": 0,
+            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID#"}
+        }
+        """
+        When we patch "/archive/item1"
+        """
+        {
+            "associations": {
+                "featuremedia": {
+                    "_id": "bike",
+                    "poi": {"x": 0.75, "y": 0.4}
+                }
+            },
+            "state": "in_progress"
+        }
+        """
+        Then we get OK response
+        When we publish "item1" with "publish" type and "published" state
+        Then we get OK response
+        When we generate stats from archive history
+        When we get "/archive_statistics/item1"
+        Then we get stats
+        """
+        {
+            "timeline": [
+                {"operation": "create"},
+                {"operation": "update"},
+                {"operation": "add_featuremedia"},
+                {"operation": "publish"}
+            ],
+            "featuremedia_updates": [{"operation": "publish"}]
+        }
+        """
+        Given config update
+        """
+        {"PUBLISH_ASSOCIATED_ITEMS": true}
+        """
+        And empty "archive_statistics"
+        When we generate stats from archive history
+        And we get "/archive_statistics/item1"
+        Then we get stats
+        """
+        {
+            "timeline": [
+                {"operation": "create"},
+                {"operation": "update"},
+                {"operation": "publish"}
+            ],
+            "featuremedia_updates": null
+        }
+        """
+
+    @auth
     Scenario: Featuremedia stats are stored after parent item is published
         When we post to "/archive" with success
         """
         {
             "_id": "item1", "guid": "item1",
             "type": "text", "headline": "show my content", "version": 0,
-            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID"}
+            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID#"}
         }
         """
         When we patch "/archive/item1"
@@ -181,8 +239,647 @@ Feature: Featuremedia Stats
                 {"operation": "remove_featuremedia"}
             ],
             "featuremedia_updates": [
+                {"operation": "publish"},
                 {"operation": "update_featuremedia_image"},
                 {"operation": "update_featuremedia_poi"},
+                {"operation": "remove_featuremedia"}
+            ]
+        }
+        """
+
+    @auth
+    Scenario: Change featuremedia poi
+        When we post to "/archive" with success
+        """
+        {
+            "_id": "item1", "guid": "item1",
+            "type": "text", "headline": "show my content", "version": 0,
+            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID#"}
+        }
+        """
+        When we patch "/archive/item1"
+        """
+        {
+            "associations": {
+                "featuremedia": {
+                    "_id": "bike",
+                    "poi": {"x": 0.75, "y": 0.4}
+                }
+            },
+            "state": "in_progress"
+        }
+        """
+        Then we get OK response
+        When we publish "item1" with "publish" type and "published" state
+        Then we get OK response
+        When we publish "item1" with "correct" type and "corrected" state
+        """
+        {
+            "associations": {
+                "featuremedia": {
+                    "_id": "bike",
+                    "poi": {"x": 0.35, "y": 0.45},
+                    "headline": "bike vroom",
+                    "alt_text": "bike",
+                    "description_text": "a nice motor-bike"
+                }
+            }
+        }
+        """
+        Then we get OK response
+        When we generate stats from archive history
+        And we get "/archive_statistics/item1"
+        Then we get stats
+        """
+        {
+            "timeline": [
+                {"operation": "create"},
+                {"operation": "update"},
+                {"operation": "add_featuremedia", "update": {
+                    "associations": {
+                        "featuremedia": {
+                            "_id": "bike",
+                            "poi": {"x": 0.75, "y": 0.4}
+                        }
+                    }
+                }},
+                {"operation": "publish"},
+                {"operation": "correct"},
+                {"operation": "update_featuremedia_poi", "update": {
+                    "associations": {
+                        "featuremedia": {
+                            "_id": "bike",
+                            "poi": {"x": 0.35, "y": 0.45}
+                        }
+                    }
+                }}
+            ],
+            "featuremedia_updates": [
+                {"operation": "publish", "update": {
+                    "associations": {
+                        "featuremedia": {
+                            "_id": "bike",
+                            "poi": {"x": 0.75, "y": 0.4}
+                        }
+                    }
+                }},
+                {"operation": "update_featuremedia_poi", "update": {
+                    "associations": {
+                        "featuremedia": {
+                            "_id": "bike",
+                            "poi": {"x": 0.35, "y": 0.45}
+                        }
+                    }
+                }}
+            ]
+        }
+        """
+
+    @auth
+    Scenario: Change featuremedia poi - iteratively
+        When we post to "/archive" with success
+        """
+        {
+            "_id": "item1", "guid": "item1",
+            "type": "text", "headline": "show my content", "version": 0,
+            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID#"}
+        }
+        """
+        When we patch "/archive/item1"
+        """
+        {
+            "associations": {
+                "featuremedia": {
+                    "_id": "bike",
+                    "poi": {"x": 0.75, "y": 0.4}
+                }
+            },
+            "state": "in_progress"
+        }
+        """
+        Then we get OK response
+        When we generate stats from archive history
+        And we get "/archive_statistics/item1"
+        Then we get stats
+        """
+        {
+            "timeline": [
+                {"operation": "create"},
+                {"operation": "update"},
+                {"operation": "add_featuremedia", "update": {
+                    "associations": {
+                        "featuremedia": {
+                            "_id": "bike",
+                            "poi": {"x": 0.75, "y": 0.4}
+                        }
+                    }
+                }}
+            ],
+            "featuremedia_updates": null
+        }
+        """
+        When we publish "item1" with "publish" type and "published" state
+        Then we get OK response
+        When we generate stats from archive history
+        And we get "/archive_statistics/item1"
+        Then we get stats
+        """
+        {
+            "timeline": [
+                {"operation": "create"},
+                {"operation": "update"},
+                {"operation": "add_featuremedia", "update": {
+                    "associations": {
+                        "featuremedia": {
+                            "_id": "bike",
+                            "poi": {"x": 0.75, "y": 0.4}
+                        }
+                    }
+                }},
+                {"operation": "publish"}
+            ],
+            "featuremedia_updates": [
+                {"operation": "publish", "update": {
+                    "associations": {
+                        "featuremedia": {
+                            "_id": "bike",
+                            "poi": {"x": 0.75, "y": 0.4}
+                        }
+                    }
+                }}
+            ]
+        }
+        """
+        When we publish "item1" with "correct" type and "corrected" state
+        """
+        {
+            "associations": {
+                "featuremedia": {
+                    "_id": "bike",
+                    "poi": {"x": 0.35, "y": 0.45},
+                    "headline": "bike vroom",
+                    "alt_text": "bike",
+                    "description_text": "a nice motor-bike"
+                }
+            }
+        }
+        """
+        Then we get OK response
+        When we generate stats from archive history
+        And we get "/archive_statistics/item1"
+        Then we get stats
+        """
+        {
+            "timeline": [
+                {"operation": "create"},
+                {"operation": "update"},
+                {"operation": "add_featuremedia", "update": {
+                    "associations": {
+                        "featuremedia": {
+                            "_id": "bike",
+                            "poi": {"x": 0.75, "y": 0.4}
+                        }
+                    }
+                }},
+                {"operation": "publish"},
+                {"operation": "correct"},
+                {"operation": "update_featuremedia_poi", "update": {
+                    "associations": {
+                        "featuremedia": {
+                            "_id": "bike",
+                            "poi": {"x": 0.35, "y": 0.45}
+                        }
+                    }
+                }}
+            ],
+            "featuremedia_updates": [
+                {"operation": "publish", "update": {
+                    "associations": {
+                        "featuremedia": {
+                            "_id": "bike",
+                            "poi": {"x": 0.75, "y": 0.4}
+                        }
+                    }
+                }},
+                {"operation": "update_featuremedia_poi", "update": {
+                    "associations": {
+                        "featuremedia": {
+                            "_id": "bike",
+                            "poi": {"x": 0.35, "y": 0.45}
+                        }
+                    }
+                }}
+            ]
+        }
+        """
+
+    @auth
+    Scenario: Change featuremedia image
+        When we post to "/archive" with success
+        """
+        {
+            "_id": "item1", "guid": "item1",
+            "type": "text", "headline": "show my content", "version": 0,
+            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID#"}
+        }
+        """
+        When we patch "/archive/item1"
+        """
+        {
+            "associations": {
+                "featuremedia": {
+                    "_id": "bike",
+                    "poi": {"x": 0.75, "y": 0.4}
+                }
+            },
+            "state": "in_progress"
+        }
+        """
+        Then we get OK response
+        When we publish "item1" with "publish" type and "published" state
+        Then we get OK response
+        When we publish "item1" with "correct" type and "corrected" state
+        """
+        {
+            "associations": {
+                "featuremedia": {
+                    "_id": "bike2",
+                    "poi": {"x": 0.705, "y": 0.405},
+                    "headline": "bike2 vroom",
+                    "alt_text": "bike2",
+                    "description_text": "a nice motor-bike 2"
+                }
+            }
+        }
+        """
+        Then we get OK response
+        When we generate stats from archive history
+        And we get "/archive_statistics/item1"
+        Then we get stats
+        """
+        {
+            "timeline": [
+                {"operation": "create"},
+                {"operation": "update"},
+                {"operation": "add_featuremedia", "update": {
+                    "associations": {
+                        "featuremedia": {
+                            "_id": "bike",
+                            "poi": {"x": 0.75, "y": 0.4}
+                        }
+                    }
+                }},
+                {"operation": "publish"},
+                {"operation": "correct"},
+                {"operation": "update_featuremedia_image", "update": {
+                    "associations": {
+                        "featuremedia": {
+                            "_id": "bike2",
+                            "poi": {"x": 0.705, "y": 0.405}
+                        }
+                    }
+                }}
+            ],
+            "featuremedia_updates": [
+                {"operation": "publish", "update": {
+                    "associations": {
+                        "featuremedia": {
+                            "_id": "bike",
+                            "poi": {"x": 0.75, "y": 0.4}
+                        }
+                    }
+                }},
+                {"operation": "update_featuremedia_image", "update": {
+                    "associations": {
+                        "featuremedia": {
+                            "_id": "bike2",
+                            "poi": {"x": 0.705, "y": 0.405}
+                        }
+                    }
+                }}
+            ]
+        }
+        """
+
+    @auth
+    Scenario: Change featuremedia image - iteratively
+        When we post to "/archive" with success
+        """
+        {
+            "_id": "item1", "guid": "item1",
+            "type": "text", "headline": "show my content", "version": 0,
+            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID#"}
+        }
+        """
+        When we patch "/archive/item1"
+        """
+        {
+            "associations": {
+                "featuremedia": {
+                    "_id": "bike",
+                    "poi": {"x": 0.75, "y": 0.4}
+                }
+            },
+            "state": "in_progress"
+        }
+        """
+        Then we get OK response
+        When we generate stats from archive history
+        And we get "/archive_statistics/item1"
+        Then we get stats
+        """
+        {
+            "timeline": [
+                {"operation": "create"},
+                {"operation": "update"},
+                {"operation": "add_featuremedia", "update": {
+                    "associations": {
+                        "featuremedia": {
+                            "_id": "bike",
+                            "poi": {"x": 0.75, "y": 0.4}
+                        }
+                    }
+                }}
+            ],
+            "featuremedia_updates": null
+        }
+        """
+        When we publish "item1" with "publish" type and "published" state
+        Then we get OK response
+        When we generate stats from archive history
+        And we get "/archive_statistics/item1"
+        Then we get stats
+        """
+        {
+            "timeline": [
+                {"operation": "create"},
+                {"operation": "update"},
+                {"operation": "add_featuremedia", "update": {
+                    "associations": {
+                        "featuremedia": {
+                            "_id": "bike",
+                            "poi": {"x": 0.75, "y": 0.4}
+                        }
+                    }
+                }},
+                {"operation": "publish"}
+            ],
+            "featuremedia_updates": [
+                {"operation": "publish", "update": {
+                    "associations": {
+                        "featuremedia": {
+                            "_id": "bike",
+                            "poi": {"x": 0.75, "y": 0.4}
+                        }
+                    }
+                }}
+            ]
+        }
+        """
+        When we publish "item1" with "correct" type and "corrected" state
+        """
+        {
+            "associations": {
+                "featuremedia": {
+                    "_id": "bike2",
+                    "poi": {"x": 0.705, "y": 0.405},
+                    "headline": "bike2 vroom",
+                    "alt_text": "bike2",
+                    "description_text": "a nice motor-bike 2"
+                }
+            }
+        }
+        """
+        Then we get OK response
+        When we generate stats from archive history
+        And we get "/archive_statistics/item1"
+        Then we get stats
+        """
+        {
+            "timeline": [
+                {"operation": "create"},
+                {"operation": "update"},
+                {"operation": "add_featuremedia", "update": {
+                    "associations": {
+                        "featuremedia": {
+                            "_id": "bike",
+                            "poi": {"x": 0.75, "y": 0.4}
+                        }
+                    }
+                }},
+                {"operation": "publish"},
+                {"operation": "correct"},
+                {"operation": "update_featuremedia_image", "update": {
+                    "associations": {
+                        "featuremedia": {
+                            "_id": "bike2",
+                            "poi": {"x": 0.705, "y": 0.405}
+                        }
+                    }
+                }}
+            ],
+            "featuremedia_updates": [
+                {"operation": "publish", "update": {
+                    "associations": {
+                        "featuremedia": {
+                            "_id": "bike",
+                            "poi": {"x": 0.75, "y": 0.4}
+                        }
+                    }
+                }},
+                {"operation": "update_featuremedia_image", "update": {
+                    "associations": {
+                        "featuremedia": {
+                            "_id": "bike2",
+                            "poi": {"x": 0.705, "y": 0.405}
+                        }
+                    }
+                }}
+            ]
+        }
+        """
+
+    @auth
+    Scenario: Remove featuremedia image
+        When we post to "/archive" with success
+        """
+        {
+            "_id": "item1", "guid": "item1",
+            "type": "text", "headline": "show my content", "version": 0,
+            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID#"}
+        }
+        """
+        When we patch "/archive/item1"
+        """
+        {
+            "associations": {
+                "featuremedia": {
+                    "_id": "bike",
+                    "poi": {"x": 0.75, "y": 0.4}
+                }
+            },
+            "state": "in_progress"
+        }
+        """
+        Then we get OK response
+        When we publish "item1" with "publish" type and "published" state
+        Then we get OK response
+        When we publish "item1" with "correct" type and "corrected" state
+        """
+        {
+            "associations": {
+                "featuremedia": null
+            }
+        }
+        """
+        Then we get OK response
+        When we generate stats from archive history
+        And we get "/archive_statistics/item1"
+        Then we get stats
+        """
+        {
+            "timeline": [
+                {"operation": "create"},
+                {"operation": "update"},
+                {"operation": "add_featuremedia", "update": {
+                    "associations": {
+                        "featuremedia": {
+                            "_id": "bike",
+                            "poi": {"x": 0.75, "y": 0.4}
+                        }
+                    }
+                }},
+                {"operation": "publish"},
+                {"operation": "correct"},
+                {"operation": "remove_featuremedia"}
+            ],
+            "featuremedia_updates": [
+                {"operation": "publish", "update": {
+                    "associations": {
+                        "featuremedia": {
+                            "_id": "bike",
+                            "poi": {"x": 0.75, "y": 0.4}
+                        }
+                    }
+                }},
+                {"operation": "remove_featuremedia"}
+            ]
+        }
+        """
+
+    @auth
+    Scenario: Remove featuremedia image - iteratively
+        When we post to "/archive" with success
+        """
+        {
+            "_id": "item1", "guid": "item1",
+            "type": "text", "headline": "show my content", "version": 0,
+            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID#"}
+        }
+        """
+        When we patch "/archive/item1"
+        """
+        {
+            "associations": {
+                "featuremedia": {
+                    "_id": "bike",
+                    "poi": {"x": 0.75, "y": 0.4}
+                }
+            },
+            "state": "in_progress"
+        }
+        """
+        Then we get OK response
+        When we generate stats from archive history
+        And we get "/archive_statistics/item1"
+        Then we get stats
+        """
+        {
+            "timeline": [
+                {"operation": "create"},
+                {"operation": "update"},
+                {"operation": "add_featuremedia", "update": {
+                    "associations": {
+                        "featuremedia": {
+                            "_id": "bike",
+                            "poi": {"x": 0.75, "y": 0.4}
+                        }
+                    }
+                }}
+            ],
+            "featuremedia_updates": null
+        }
+        """
+        When we publish "item1" with "publish" type and "published" state
+        Then we get OK response
+        When we generate stats from archive history
+        And we get "/archive_statistics/item1"
+        Then we get stats
+        """
+        {
+            "timeline": [
+                {"operation": "create"},
+                {"operation": "update"},
+                {"operation": "add_featuremedia", "update": {
+                    "associations": {
+                        "featuremedia": {
+                            "_id": "bike",
+                            "poi": {"x": 0.75, "y": 0.4}
+                        }
+                    }
+                }},
+                {"operation": "publish"}
+            ],
+            "featuremedia_updates": [
+                {"operation": "publish", "update": {
+                    "associations": {
+                        "featuremedia": {
+                            "_id": "bike",
+                            "poi": {"x": 0.75, "y": 0.4}
+                        }
+                    }
+                }}
+            ]
+        }
+        """
+        When we publish "item1" with "correct" type and "corrected" state
+        """
+        {
+            "associations": {
+                "featuremedia": null
+            }
+        }
+        """
+        Then we get OK response
+        When we generate stats from archive history
+        And we get "/archive_statistics/item1"
+        Then we get stats
+        """
+        {
+            "timeline": [
+                {"operation": "create"},
+                {"operation": "update"},
+                {"operation": "add_featuremedia", "update": {
+                    "associations": {
+                        "featuremedia": {
+                            "_id": "bike",
+                            "poi": {"x": 0.75, "y": 0.4}
+                        }
+                    }
+                }},
+                {"operation": "publish"},
+                {"operation": "correct"},
+                {"operation": "remove_featuremedia"}
+            ],
+            "featuremedia_updates": [
+                {"operation": "publish", "update": {
+                    "associations": {
+                        "featuremedia": {
+                            "_id": "bike",
+                            "poi": {"x": 0.75, "y": 0.4}
+                        }
+                    }
+                }},
                 {"operation": "remove_featuremedia"}
             ]
         }

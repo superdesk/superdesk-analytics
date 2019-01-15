@@ -13,6 +13,7 @@ from superdesk import get_resource_service
 
 from analytics.common import get_cv_by_qcode
 from analytics.chart_config import SDChart
+from analytics.stats.common import OPERATION_NAMES
 
 from datetime import datetime, timedelta
 
@@ -336,6 +337,8 @@ class ChartConfig:
             )
         elif field == 'source':
             self._set_translation('source', 'Source')
+        elif field == 'operation':
+            self._set_translation('operation', 'Operation', OPERATION_NAMES)
 
     def _set_translation(self, field, title, names=None):
         """Saves the provided field translations

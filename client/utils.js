@@ -193,17 +193,17 @@ export const getTranslatedOperations = (gettext) => ({
     move_from: gettext('Move From'),
     move_to: gettext('Move To'),
     duplicate: gettext('Duplicate'),
-    item_lock: gettext('Item Lock'),
-    item_unlock: gettext('Item Unlock'),
+    item_lock: gettext('Lock'),
+    item_unlock: gettext('Unlock'),
     mark: gettext('Mark'),
     unmark: gettext('Unmark'),
     export_highlight: gettext('Export Highlight'),
     create_highlight: gettext('Create Highlight'),
     add_featuremedia: gettext('Add Featuremedia'),
-    change_image_poi: gettext('Change Image POI'),
-    update_featuremedia_poi: gettext('Update Featuremedia POI'),
+    change_image_poi: gettext('Change POI'),
+    update_featuremedia_poi: gettext('Change POI'),
     remove_featuremedia: gettext('Remove Featuremedia'),
-    update_featuremedia_image: gettext('Update Featuremedia Image'),
+    update_featuremedia_image: gettext('Change Image'),
 });
 
 /**

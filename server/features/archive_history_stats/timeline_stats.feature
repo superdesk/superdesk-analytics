@@ -44,7 +44,7 @@ Feature: Archive Timeline Stats
         {
             "type": "text",
             "headline": "show my content",
-            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID"},
+            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID#"},
             "version": 0
         }
         """
@@ -89,7 +89,7 @@ Feature: Archive Timeline Stats
         [{
             "type": "text",
             "headline": "show my content",
-            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID"},
+            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID#"},
             "version": 1,
             "state": "fetched"
         }]
@@ -147,7 +147,7 @@ Feature: Archive Timeline Stats
         [{
             "type": "text",
             "headline": "show my content",
-            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID"},
+            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID#"},
             "version": 3,
             "state": "in_progress"
         }]
@@ -255,7 +255,7 @@ Feature: Archive Timeline Stats
         {
             "type": "text",
             "headline": "show my content",
-            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID"},
+            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID#"},
             "version": 0
         }
         """
@@ -278,7 +278,7 @@ Feature: Archive Timeline Stats
         {
             "type": "text",
             "headline": "show my content",
-            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID"},
+            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID#"},
             "version": 0
         }
         """
@@ -339,7 +339,7 @@ Feature: Archive Timeline Stats
         {
             "type": "text",
             "headline": "show my content",
-            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID"},
+            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID#"},
             "version": 0
         }
         """
@@ -393,7 +393,7 @@ Feature: Archive Timeline Stats
         {
             "type": "text",
             "headline": "show my content",
-            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID"},
+            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID#"},
             "version": 0
         }
         """
@@ -441,7 +441,7 @@ Feature: Archive Timeline Stats
         {
             "type": "text",
             "headline": "show my content",
-            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID"},
+            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID#"},
             "version": 0
         }
         """
@@ -524,7 +524,7 @@ Feature: Archive Timeline Stats
         {
             "type": "text",
             "headline": "show my content",
-            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID"},
+            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID#"},
             "version": 0
         }
         """
@@ -573,7 +573,7 @@ Feature: Archive Timeline Stats
         {
             "type": "text",
             "headline": "show my content",
-            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID"},
+            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID#"},
             "version": 0
         }
         """
@@ -619,7 +619,7 @@ Feature: Archive Timeline Stats
         {
             "type": "text",
             "headline": "show my content",
-            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID"},
+            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID#"},
             "version": 0
         }
         """
@@ -664,7 +664,7 @@ Feature: Archive Timeline Stats
         """
         {
             "type": "text", "headline": "show my content", "version": 0,
-            "task": {"user": "#CONTEXT_USER_ID"}
+            "task": {"user": "#CONTEXT_USER_ID#"}
         }
         """
         When we post to "/archive/#archive._id#/move"
@@ -700,7 +700,7 @@ Feature: Archive Timeline Stats
         """
         {
             "type": "text", "headline": "show my content", "version": 0,
-            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID"}
+            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID#"}
         }
         """
         When we post to "/desks" with success
@@ -797,12 +797,16 @@ Feature: Archive Timeline Stats
 
     @auth
     Scenario: Featuremedia history stats
+        Given config update
+        """
+        {"PUBLISH_ASSOCIATED_ITEMS": false}
+        """
         When we post to "/archive" with success
         """
         {
             "_id": "item1", "guid": "item1",
             "type": "text", "headline": "show my content", "version": 0,
-            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID"}
+            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID#"}
         }
         """
         When upload a file "bike.jpg" to "archive" with "bike"

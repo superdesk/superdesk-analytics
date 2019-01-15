@@ -268,7 +268,7 @@ class ArchiveStatisticsService(BaseService):
 
         while True:
             req = ParsedRequest()
-            req.sort = '_created'
+            req.sort = '[("_id", 1)]'
 
             query = {'$and': []}
 

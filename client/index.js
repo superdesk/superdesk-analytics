@@ -32,6 +32,7 @@ import './planning_usage_report';
 import './desk_activity_report';
 import './production_time_report';
 import './user_activity_report';
+import './featuremedia_updates_report';
 
 angular.module('superdesk.analytics.reports', [])
     .provider('reports', svc.ReportsProvider);
@@ -67,6 +68,7 @@ export default angular.module('superdesk.analytics', [
     'superdesk.analytics.desk-activity-report',
     'superdesk.analytics.production-time-report',
     'superdesk.analytics.user-activity-report',
+    'superdesk.analytics.featuremedia-updates-report',
     'superdesk-ui'
 ])
     .service('analyticsWidgetSettings', svc.AnalyticsWidgetSettings)
@@ -75,6 +77,8 @@ export default angular.module('superdesk.analytics', [
     .directive('sdAfterRender', directive.AfterRender)
     .directive('sdReportDropdown', directive.ReportDropdown)
     .directive('sdConvertToNumber', directive.ConvertToNumber)
+    .directive('sdaArchivePreviewProxy', directive.ArchivePreviewProxy)
+    .directive('sdaRenditionsPreview', directive.RenditionsPreview)
 
     .run(cacheIncludedTemplates)
 

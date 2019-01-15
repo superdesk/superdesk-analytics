@@ -33,7 +33,7 @@ Feature: Desk Transition Stats
         {
             "type": "text",
             "headline": "show my content",
-            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID"},
+            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID#"},
             "version": 1, "state": "in_progress"
         }
         """
@@ -59,7 +59,7 @@ Feature: Desk Transition Stats
         [{
             "type": "text",
             "headline": "show my content",
-            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID"},
+            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID#"},
             "version": 1,
             "state": "fetched"
         }]
@@ -98,7 +98,7 @@ Feature: Desk Transition Stats
         {
             "type": "text",
             "headline": "show my content",
-            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID"},
+            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID#"},
             "version": 1, "state": "in_progress"
         }
         """
@@ -133,7 +133,7 @@ Feature: Desk Transition Stats
         """
         {
             "type": "text", "headline": "show my content", "version": 0,
-            "task": {"user": "#CONTEXT_USER_ID", "desk": "#desks._id#", "stage": "#desks.incoming_stage#"}
+            "task": {"user": "#CONTEXT_USER_ID#", "desk": "#desks._id#", "stage": "#desks.incoming_stage#"}
         }
         """
         When we post to "/desks" with success
@@ -164,7 +164,7 @@ Feature: Desk Transition Stats
         {
             "type": "text",
             "headline": "show my content",
-            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID"},
+            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID#"},
             "version": 0
         }
         """
@@ -213,7 +213,7 @@ Feature: Desk Transition Stats
         {
             "type": "text",
             "headline": "show my content",
-            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID"},
+            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID#"},
             "version": 0
         }
         """
@@ -240,7 +240,7 @@ Feature: Desk Transition Stats
         {
             "type": "text",
             "headline": "show my content",
-            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID"},
+            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID#"},
             "version": 1, "state": "in_progress"
         }
         """

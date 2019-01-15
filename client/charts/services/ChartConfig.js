@@ -1,4 +1,4 @@
-import {formatDate} from '../../utils';
+import {formatDate, getTranslatedOperations} from '../../utils';
 import {SDChart} from '../SDChart';
 
 ChartConfig.$inject = [
@@ -613,6 +613,13 @@ export function ChartConfig(
                     );
                 })
         ),
+        operation: () => {
+            self.setTranslation(
+                'operation',
+                gettext('Operation'),
+                getTranslatedOperations(gettext)
+            );
+        }
     };
 
     /**

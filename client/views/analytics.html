@@ -44,7 +44,8 @@
                 </div>
             </div>
 
-            <div class="sd-column-box--2"
+            <div class="sd-column-box--3"
+                 ng-class="{'open-preview': preview.item}"
                  ng-if="currentReport.id"
             >
                 <div class="sd-filters-panel"
@@ -54,8 +55,14 @@
                 <div class="sd-column-box__main-column sd-column-box__main-column__listpanel">
                     <!-- Report View -->
                     <div class="sd-column-box__main-column__items"
-                         ng-if="flags.contentView == 'report'"
+                         ng-if="flags.contentView == 'report' && !currentReport.reportTemplate"
                          ng-include="'analytics-report-basic.html'"
+                     ></div>
+
+                    <!-- Custom Report View -->
+                    <div class="sd-column-box__main-column__items"
+                         ng-if="flags.contentView == 'report' && currentReport.reportTemplate"
+                         ng-include="currentReport.reportTemplate"
                      ></div>
 
                     <!-- Schedule View -->
@@ -67,6 +74,15 @@
                          data-clear-saved-report="clearSavedReportForSchedule"
                          style="display: flex; flex-direction: column;"
                     ></div>
+                </div>
+
+                <div class="sd-preview-panel" ng-show="flags.contentView === 'report'">
+                    <div class="side-panel side-panel--shadow-right preview-layout">
+                        <div sda-archive-preview-proxy
+                             data-preview="preview"
+                             data-close="closePreview"
+                        ></div>
+                    </div>
                 </div>
             </div>
         </div>

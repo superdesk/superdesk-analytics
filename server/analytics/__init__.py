@@ -28,6 +28,7 @@ from analytics.stats import init_app as init_stats
 from analytics.desk_activity_report import init_app as init_desk_activity_report
 from analytics.production_time_report import init_app as init_production_time_report
 from analytics.user_activity_report import init_app as init_user_acitivity_report
+from analytics.featuremedia_updates_report import init_app as init_featuremedia_updates_report
 
 from analytics.commands import SendScheduledReports  # noqa
 from analytics.common import is_highcharts_installed, register_report
@@ -142,6 +143,7 @@ def init_app(app):
     init_desk_activity_report(app)
     init_production_time_report(app)
     init_user_acitivity_report(app)
+    init_featuremedia_updates_report(app)
 
     # If this app is for testing, then create an endpoint for the base reporting service
     # so the core searching/aggregation functionality can be tested
