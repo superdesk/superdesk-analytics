@@ -1,3 +1,5 @@
+$colors: #7cb5ec #434348 #90ed7d #f7a35c #8085e9 #f15c80 #e4d354 #2b908f #f45b5b #91e8e1;
+
 @import '~highcharts/css/highcharts.scss';
 @import '~superdesk-ui-framework/app/styles/_reboot.scss';
 @import '~superdesk-ui-framework/app/styles/variables/_colors.scss';
@@ -28,7 +30,6 @@
 
     .sd-chart__highchart {
         width: 100%;
-        height: 100%;
     }
 }
 
@@ -152,6 +153,37 @@
     fill: $gray;
 }
 
-.highcharts-pie-series .highcharts-point {
+.highcharts-point {
     cursor: pointer;
 }
+
+.highcharts-data-label-color-0 .highcharts-data-label-box {@extend .highcharts-color-0;}
+.highcharts-data-label-color-0.highcharts-data-label text {fill: white;}
+
+.highcharts-data-label-color-1 .highcharts-data-label-box {@extend .highcharts-color-1;}
+.highcharts-data-label-color-1.highcharts-data-label text {fill: white;}
+
+.highcharts-data-label-color-2 .highcharts-data-label-box {@extend .highcharts-color-2;}
+.highcharts-data-label-color-2.highcharts-data-label text {fill: $gray;}
+
+.highcharts-data-label-color-3 .highcharts-data-label-box {@extend .highcharts-color-3;}
+.highcharts-data-label-color-3.highcharts-data-label text {fill: $gray;}
+
+.highcharts-data-label-color-4 .highcharts-data-label-box {@extend .highcharts-color-4;}
+.highcharts-data-label-color-4.highcharts-data-label text {fill: $gray;}
+
+.highcharts-data-label-color-5 .highcharts-data-label-box {@extend .highcharts-color-5;}
+.highcharts-data-label-color-5.highcharts-data-label text {fill: $gray;}
+
+.highcharts-data-label-color-6 .highcharts-data-label-box {@extend .highcharts-color-6;}
+.highcharts-data-label-color-6.highcharts-data-label text {fill: $gray;}
+
+.highcharts-data-label-color-7 .highcharts-data-label-box {@extend .highcharts-color-7;}
+.highcharts-data-label-color-7.highcharts-data-label text {fill: $gray;}
+
+.highcharts-data-label-color-8 .highcharts-data-label-box {@extend .highcharts-color-8;}
+.highcharts-data-label-color-8.highcharts-data-label text {fill: $gray;}
+
+.highcharts-data-label-color-9 .highcharts-data-label-box {@extend .highcharts-color-9;}
+.highcharts-data-label-color-9.highcharts-data-label text {fill: $gray;}
+

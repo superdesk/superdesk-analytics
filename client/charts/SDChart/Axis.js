@@ -126,6 +126,30 @@ export class Axis {
          * @description Callback function to dynamically generate y-axis labels
          */
         this.yAxisLabelFormatter = undefined;
+
+        /**
+         * @ngdoc property
+         * @name SDChart.Axis#yAxisLabelFormat
+         * @type {String}
+         * @description Format to use for the labels on the y axis
+         */
+        this.yAxisLabelFormat = '{value}';
+
+        /**
+         * @ngdoc property
+         * @name SDChart.Axis#xMin
+         * @type {Number}
+         * @description The minimum value on the x axis
+         */
+        this.xMin = undefined;
+
+        /**
+         * @ngdoc property
+         * @name SDChart.Axis#xMax
+         * @type {Number}
+         * @description The maximum value on the x axis
+         */
+        this.xMax = undefined;
     }
 
     /**
@@ -142,6 +166,8 @@ export class Axis {
      * @param {Boolean} [options.stackLabels] - If true, then place labels at the top of stack
      * @param {string} [options.yTitle] - The title used on the y-axis
      * @param {string} [options.xTitle] - The title used on the x-axis
+     * @param {Number} [options.xMin] - The minimum value on the x axis
+     * @param {Number} [options.xMax] - The maximum value on the x axis
      * @return {SDChart.Axis}
      * @description Sets the options for the axis
      */
@@ -207,8 +233,14 @@ export class Axis {
             axisConfig.startOfWeek = this.chart.startOfWeek;
         }
 
-        if (this.xTitle !== undefined) {
-            axisConfig.title = {text: this.xTitle};
+        axisConfig.title = {text: this.xTitle};
+
+        if (this.xMin !== undefined) {
+            axisConfig.min = this.xMin;
+        }
+
+        if (this.xMax !== undefined) {
+            axisConfig.max = this.xMax;
         }
 
         return axisConfig;
@@ -232,16 +264,20 @@ export class Axis {
             axisConfig.stackLabels = {enabled: this.stackLabels};
         }
 
-        if (this.yTitle !== undefined) {
-            axisConfig.title = {text: this.yTitle};
+        axisConfig.title = {text: this.yTitle};
+
+        if (!axisConfig.labels) {
+            axisConfig.labels = {};
         }
 
         if (this.yAxisLabelFormatter !== undefined) {
-            if (!axisConfig.labels) {
-                axisConfig.labels = {};
-            }
-
+            axisConfig.labels.enabled = true;
             axisConfig.labels.formatter = this.yAxisLabelFormatter;
+        } else if (this.yAxisLabelFormat) {
+            axisConfig.labels.enabled = true;
+            axisConfig.labels.format = this.yAxisLabelFormat;
+        } else {
+            axisConfig.labels.enabled = false;
         }
 
         return axisConfig;

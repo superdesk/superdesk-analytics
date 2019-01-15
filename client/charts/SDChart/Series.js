@@ -76,6 +76,22 @@ export class Series {
          * @description The type of stacking to perform (undefined, normal, percentage)
          */
         this.stackType = undefined;
+
+        /**
+         * @ngdoc property
+         * @name SDChart.Series#colourIndex
+         * @type {Number}
+         * @description The colour index to use for this series
+         */
+        this.colourIndex = undefined;
+
+        /**
+         * @ngdoc property
+         * @name SDChart.Series#dataLabelConfig
+         * @type {Object}
+         * @description Config to use for the data labels of this series
+         */
+        this.dataLabelConfig = undefined;
     }
 
     /**
@@ -87,6 +103,7 @@ export class Series {
      * @param {string} [options.name] - The field name for the data
      * @param {Number} [options.stack] - The stack number
      * @param {string} [options.stackType] - The type of stacking to perform
+     * @param {string} [options.colourIndex] - The colour index to use for this series
      * @return {SDChart.Series}
      * @description Sets the options for the series
      */
@@ -144,16 +161,11 @@ export class Series {
 
     /**
      * @ngdoc method
-     * @name SDChart.Series#genConfig
-     * @param {Object} config - The config object
-     * @return {Object}
-     * @description Sets the series config for the axis
+     * @name SDChart.Series#setDataConfig
+     * @param {Object} series
+     * @description Sets the data config for this series
      */
-    genConfig(config) {
-        const series = {
-            xAxis: this.axis.index,
-            type: this.type !== undefined ? this.type : this.axis.defaultChartType || 'bar',
-        };
+    setDataConfig(series) {
         const name = this.getName();
         const data = this.getData();
 
@@ -169,7 +181,15 @@ export class Series {
             series.stacking = this.stackType !== undefined ? this.stackType : 'normal';
             series.stack = this.stack;
         }
+    }
 
+    /**
+     * @ngdoc method
+     * @name SDChart.Series#setPointConfig
+     * @param {Object} series
+     * @description Sets the point config for this series
+     */
+    setPointConfig(series) {
         if (this.axis.pointStart !== undefined) {
             series.pointStart = this.axis.pointStart;
         }
@@ -177,6 +197,40 @@ export class Series {
         if (this.axis.pointInterval !== undefined) {
             series.pointInterval = this.axis.pointInterval;
         }
+    }
+
+    /**
+     * @ngdoc method
+     * @name SDChart.Series#setStyleConfig
+     * @param {Object} series
+     * @description Sets the style config for this series
+     */
+    setStyleConfig(series) {
+        if (this.colourIndex !== undefined) {
+            series.colorIndex = this.colourIndex;
+        }
+
+        if (this.dataLabelConfig !== undefined) {
+            series.dataLabels = this.dataLabelConfig;
+        }
+    }
+
+    /**
+     * @ngdoc method
+     * @name SDChart.Series#genConfig
+     * @param {Object} config - The config object
+     * @return {Object}
+     * @description Sets the series config for the axis
+     */
+    genConfig(config) {
+        const series = {
+            xAxis: this.axis.index,
+            type: this.type !== undefined ? this.type : this.axis.defaultChartType || 'bar',
+        };
+
+        this.setDataConfig(series);
+        this.setPointConfig(series);
+        this.setStyleConfig(series);
 
         return series;
     }

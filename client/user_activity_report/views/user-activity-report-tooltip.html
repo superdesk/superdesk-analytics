@@ -1,0 +1,10 @@
+<div>
+    <span ng-if="item.slugline"><strong translate>Slugline:</strong> {{item.slugline}}<br></span>
+    <span ng-if="item.headline"><strong translate>Headline:</strong> {{item.headline}}<br></span>
+    <strong translate>Times:</strong> {{start}} - {{end}}<br><br>
+    <strong translate>Operations:</strong><br>
+
+    <span ng-repeat="operation in operations track by $index">
+    &nbsp;-&nbsp;{{operation}}<br>
+    </span>
+</div>

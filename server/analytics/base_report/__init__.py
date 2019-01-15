@@ -478,8 +478,7 @@ class BaseReportService(SearchService):
         query = {
             'must': [],
             'must_not': [],
-            'sort': [],
-            'size': 0
+            'sort': []
         }
 
         self._es_set_repos(query, params)
@@ -518,11 +517,15 @@ class BaseReportService(SearchService):
                             },
                         },
                     },
-                },
-                'sort': query['sort'],
-                'size': query['size']
+                }
             }
         }
+
+        if 'size' in query.keys():
+            es_query['source']['size'] = query['size']
+
+        if 'sort' in query.keys():
+            es_query['source']['sort'] = query['sort']
 
         if len(query['repo']) > 0:
             es_query['repo'] = query['repo']
