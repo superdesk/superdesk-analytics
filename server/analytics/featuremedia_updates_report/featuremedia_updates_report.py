@@ -11,7 +11,7 @@
 from superdesk.resource import Resource
 from superdesk.utc import utc_to_local
 
-from analytics.base_report import BaseReportService
+from analytics.stats.stats_report_service import StatsReportService
 from analytics.chart_config import ChartConfig
 
 from flask import current_app as app
@@ -26,7 +26,7 @@ class FeaturemdiaUpdatesReportResource(Resource):
     privileges = {'GET': 'featuremedia_updates_report'}
 
 
-class FeaturemediaUpdatesTimeReportService(BaseReportService):
+class FeaturemediaUpdatesTimeReportService(StatsReportService):
     aggregations = None
     repos = ['archive_statistics']
     date_filter_field = 'versioncreated'
@@ -35,45 +35,9 @@ class FeaturemediaUpdatesTimeReportService(BaseReportService):
         """Disable generating aggregations"""
         return None
 
-    def _get_filters(self, repos, invisible_stages):
-        return None
-
-    def get_elastic_index(self, types):
-        return 'statistics'
-
     def _es_set_size(self, query, params):
         """Disable setting the size"""
-        pass
-
-    def _es_filter_desks(self, query, desks, must, params):
-        query[must].append({
-            'nested': {
-                'path': 'stats.timeline',
-                'query': {
-                    'terms': {'stats.timeline.task.desk': desks}
-                }
-            }
-        })
-
-    def _es_filter_users(self, query, users, must, params):
-        query[must].append({
-            'nested': {
-                'path': 'stats.timeline',
-                'query': {
-                    'terms': {'stats.timeline.task.user': users}
-                }
-            }
-        })
-
-    def _es_filter_stages(self, query, stages, must, params):
-        query[must].append({
-            'nested': {
-                'path': 'stats.timeline',
-                'query': {
-                    'terms': {'stats.timeline.task.stage': stages}
-                }
-            }
-        })
+        query['size'] = 200
 
     def generate_elastic_query(self, args):
         query = super().generate_elastic_query(args)
@@ -176,23 +140,21 @@ class FeaturemediaUpdatesTimeReportService(BaseReportService):
                     user_translations.get(update.get('user')) or ''
                 ))
 
-            row = [
+            rows.append([
                 gen_date_str(item.get('versioncreated')),
                 user_translations.get(item.get('original_creator')) or '',
                 item.get('slugline') or '',
                 original_image.get('headline') or original_image.get('alt_text') or '',
                 '<ul><li>{}</li></ul>'.format('</li><li>'.join(updates))
-            ]
+            ])
 
-            rows.append(row)
-
-        report['highcharts'] = [{
-            'id': 'featuremedia_updates',
-            'type': 'table',
-            'title': title,
-            'subtitle': subtitle,
-            'headers': ['Date', 'Creator', 'Slugline', 'Original Image', 'Featuremedia History'],
-            'rows': rows
-        }]
-
-        return report
+        return {
+            'highcharts': [{
+                'id': 'featuremedia_updates',
+                'type': 'table',
+                'title': title,
+                'subtitle': subtitle,
+                'headers': ['Date', 'Creator', 'Slugline', 'Original Image', 'Featuremedia History'],
+                'rows': rows
+            }]
+        }

@@ -10,7 +10,7 @@
 
 from superdesk.resource import Resource
 
-from analytics.base_report import BaseReportService
+from analytics.stats.stats_report_service import StatsReportService
 from analytics.chart_config import SDChart, ChartConfig
 from analytics.common import seconds_to_human_readable
 
@@ -23,7 +23,7 @@ class ProductionTimeReportResource(Resource):
     privileges = {'GET': 'production_time_report'}
 
 
-class ProductionTimeReportService(BaseReportService):
+class ProductionTimeReportService(StatsReportService):
     aggregations = {
         'operations': {
             'terms': {
@@ -73,90 +73,6 @@ class ProductionTimeReportService(BaseReportService):
                 }
             }
         }
-
-    def _get_filters(self, repos, invisible_stages):
-        return None
-
-    def get_elastic_index(self, types):
-        return 'statistics'
-
-    def _get_es_query_funcs(self):
-        funcs = super()._get_es_query_funcs()
-
-        funcs['desk_transitions'] = {
-            'query': self._es_filter_desk_transitions
-        }
-
-        return funcs
-
-    def _es_filter_desks(self, query, desks, must, params):
-        query[must].append({
-            'nested': {
-                'path': 'stats.desk_transitions',
-                'query': {
-                    'terms': {'stats.desk_transitions.desk': desks}
-                }
-            }
-        })
-
-    def _es_filter_users(self, query, users, must, params):
-        query[must].append({
-            'nested': {
-                'path': 'stats.desk_transitions',
-                'query': {
-                    'terms': {'stats.desk_transitions.user': users}
-                }
-            }
-        })
-
-    def _es_filter_stages(self, query, stages, must, params):
-        query[must].append({
-            'nested': {
-                'path': 'stats.desk_transitions',
-                'query': {
-                    'terms': {'stats.desk_transitions.stage': stages}
-                }
-            }
-        })
-
-    def _es_filter_desk_transitions(self, query, value, must, params):
-        if not isinstance(value, dict):
-            return
-
-        if value.get('min') or value.get('max'):
-            ranges = {}
-
-            if value.get('min'):
-                ranges['gte'] = value['min']
-
-            if value.get('max'):
-                ranges['lte'] = value['ax']
-
-            query[must].append({
-                'range': {
-                    'num_desk_transitions': ranges
-                }
-            })
-
-        if value.get('enter'):
-            query[must].append({
-                'nested': {
-                    'path': 'stats.desk_transitions',
-                    'query': {
-                        'terms': {'stats.desk_transitions.entered_operation': value['enter']}
-                    }
-                }
-            })
-
-        if value.get('exit'):
-            query[must].append({
-                'nested': {
-                    'path': 'stats.desk_transitions',
-                    'query': {
-                        'terms': {'stats.desk_transitions.exited_operation': value['exit']}
-                    }
-                }
-            })
 
     def generate_report(self, docs, args):
         aggregations = getattr(docs, 'hits', {}).get('aggregations') or {}

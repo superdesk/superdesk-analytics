@@ -7,6 +7,8 @@ FeaturemediaUpdatesTable.$inject = [
     'config',
     'api',
     'lodash',
+    'searchReport',
+    'notify',
 ];
 
 /**
@@ -19,6 +21,8 @@ FeaturemediaUpdatesTable.$inject = [
  * @requires config
  * @requires api
  * @requires lodash
+ * @requires searchReport
+ * @requires notify
  * @description Directive to render the interactive featuremedia updates table
  */
 export function FeaturemediaUpdatesTable(
@@ -27,7 +31,9 @@ export function FeaturemediaUpdatesTable(
     moment,
     config,
     api,
-    _
+    _,
+    searchReport,
+    notify
 ) {
     return {
         replace: true,
@@ -105,43 +111,16 @@ export function FeaturemediaUpdatesTable(
 
             /**
              * @ngdoc method
-             * @name sdaFeaturemediaUpdatesTable#loadItem
-             * @param {String} itemId - The ID of the item to load
-             * @return {Promise<Object>} The loaded item
-             * @description Loads the item by ID from either archive, published or archived collections
-             */
-            const loadItem = (itemId) => (
-                api.query('search', {
-                    repo: 'archive,published,archived',
-                    source: {
-                        query: {
-                            filtered: {
-                                filter: {
-                                    or: [
-                                        {term: {_id: itemId}},
-                                        {term: {item_id: itemId}},
-                                    ],
-                                },
-                            },
-                        },
-                        sort: [{versioncreated: 'desc'}],
-                        from: 0,
-                        size: 1,
-                    },
-                })
-                    .then((result) => _.get(result, '_items[0]') || {})
-            );
-
-            /**
-             * @ngdoc method
              * @name sdaFeaturemediaUpdatesTable#onSluglineClicked
              * @param {Object} item - The story item that was clicked
              * @description Loads the item then opens it in the preview
              */
             scope.onSluglineClicked = (item) => {
-                loadItem(_.get(item, '_id'))
+                searchReport.loadArchiveItem(_.get(item, '_id'))
                     .then((newsItem) => {
                         scope.openPreview(newsItem);
+                    }, (error) => {
+                        notify.error(error);
                     });
             };
 
@@ -152,9 +131,11 @@ export function FeaturemediaUpdatesTable(
              * @description Loads the original image then opens the item in the preview
              */
             scope.onOriginalClicked = (item) => {
-                loadItem(_.get(item, 'original._id'))
+                searchReport.loadArchiveItem(_.get(item, 'original._id'))
                     .then((newsItem) => {
                         scope.openPreview(newsItem);
+                    }, (error) => {
+                        notify.error(error);
                     });
             };
 

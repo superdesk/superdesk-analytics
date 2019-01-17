@@ -432,6 +432,19 @@ export function SearchReport(_, config, moment, api, $q, gettext, gettextCatalog
             payload.return_type = args.return_type;
         }
 
+        if (args.size) {
+            payload.size = args.size;
+            payload.max_results = args.size;
+        }
+
+        if (args.page) {
+            payload.page = args.page;
+        }
+
+        if (args.sort) {
+            payload.sort = args.sort;
+        }
+
         return payload;
     };
 
@@ -519,6 +532,47 @@ export function SearchReport(_, config, moment, api, $q, gettext, gettextCatalog
             endpoint,
             asObject ? constructParams(params) : constructQuery(params)
         )
-            .then((items) => $q.when(_.get(items, '_items[0]') || {}));
+            .then(
+                (response) => (
+                    _.get(response, '_items.length', 0) === 1 ?
+                        response._items[0] :
+                        response
+                )
+            );
+    };
+
+    /**
+     * @ngdoc method
+     * @name SearchReport#loadArchiveItem
+     * @param {String} itemId - The ID of the item to load
+     * @return {Promise<Object>} The item or an error
+     * @description Attempts to load an item from archive, published or archived using the provided ID
+     */
+    this.loadArchiveItem = function(itemId) {
+        return api.query('search', {
+            repo: 'archive,published,archived',
+            source: {
+                query: {
+                    filtered: {
+                        filter: {
+                            or: [
+                                {term: {_id: itemId}},
+                                {term: {item_id: itemId}},
+                            ],
+                        },
+                    },
+                },
+                sort: [{versioncreated: 'desc'}],
+                from: 0,
+                size: 1,
+            },
+        })
+            .then((result) => {
+                if (_.get(result, '_items.length') < 1) {
+                    return $q.reject(gettext('Item not found!'));
+                }
+
+                return result._items[0];
+            });
     };
 }

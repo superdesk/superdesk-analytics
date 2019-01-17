@@ -297,6 +297,7 @@ class GenArchiveStatistics(Command):
     def process_timelines(self, items, failed_ids):
         statistics_service = get_resource_service('archive_statistics')
         items_to_create = []
+        rewrites = []
 
         for item_id, item in items.items():
             try:
@@ -305,6 +306,10 @@ class GenArchiveStatistics(Command):
                 logger.exception('Failed to generate stats for item {}'.format(item_id))
                 failed_ids.append(item_id)
                 continue
+
+            if item['updates'].get('rewrite_of') and \
+                    (item['updates'].get('time_to_first_publish') or 0) > 0:
+                rewrites.append(item_id)
 
             if not item['item'].get(config.ID_FIELD):
                 item['updates'][config.ID_FIELD] = item_id
@@ -332,6 +337,34 @@ class GenArchiveStatistics(Command):
                     ', '.join(item_ids)
                 ))
                 failed_ids.extend(failed_ids)
+
+        for item_id in rewrites:
+            item = items[item_id]
+
+            updated_at = item['updates'].get('firstpublished')
+            if not updated_at:
+                logger.warning('Failed {}, updated_at not defined'.format(item_id))
+                continue
+
+            original_id = item['updates'].get('rewrite_of')
+            if not original_id:
+                logger.warning('Failed {}, original_id not defined'.format(item_id))
+                continue
+
+            original = statistics_service.find_one(req=None, _id=original_id)
+            if not original:
+                logger.warning('Failed {}, original not found'.format(item_id))
+                continue
+
+            published_at = original.get('firstpublished')
+            if not published_at:
+                logger.warning('Failed {}, published_at not defined'.format(original_id))
+                continue
+
+            statistics_service.patch(
+                original_id,
+                {'time_to_next_update_publish': (updated_at - published_at).total_seconds()}
+            )
 
     def _store_update_fields(self, entry):
         update = {}

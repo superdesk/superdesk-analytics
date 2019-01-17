@@ -77,8 +77,11 @@ class BaseReportServiceTestCase(TestCase):
                     }
                 },
                 'sort': [{'versioncreated': 'desc'}],
-                'size': 0
-            }
+                'size': 0,
+                'from': 0
+            },
+            'max_results': 0,
+            'page': 1
         })
 
     def test_get_aggregation_buckets(self):
@@ -301,9 +304,12 @@ class BaseReportServiceTestCase(TestCase):
                         'must_not': []
                     }}}},
                     'sort': [{'versioncreated': 'desc'}],
-                    'size': 0
+                    'size': 0,
+                    'from': 0
                 },
-                'repo': 'archived,published'
+                'repo': 'archived,published',
+                'max_results': 0,
+                'page': 1
             })
 
     def test_generate_elastic_query_for_desks(self):
@@ -584,8 +590,11 @@ class BaseReportServiceTestCase(TestCase):
                         'must_not': []
                     }}}},
                     'sort': [{'versioncreated': 'desc'}],
-                    'size': 200
-                }
+                    'size': 200,
+                    'from': 0
+                },
+                'max_results': 200,
+                'page': 1
             })
 
     def test_get_with_request(self):

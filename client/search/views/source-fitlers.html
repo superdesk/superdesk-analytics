@@ -337,4 +337,19 @@
             </div>
         </div>
     </toggle-box-next>
+
+    <toggle-box-next data-title="filters.publish_pars.label"
+                     data-style="'circle'"
+                     ng-if="filters.publish_pars.enabled"
+    >
+        <div class="form__row">
+            <div class="sd-line-input">
+                <label class="sd-line-input__label">{{:: filters.publish_pars.label | translate}}</label>
+                <input type="number"
+                       class="sd-line-input__input"
+                       ng-model="params.must.publish_pars"
+                >
+            </div>
+        </div>
+    </toggle-box-next>
 </div>

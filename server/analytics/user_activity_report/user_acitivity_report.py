@@ -10,7 +10,7 @@
 
 from superdesk.resource import Resource
 
-from analytics.base_report import BaseReportService
+from analytics.stats.stats_report_service import StatsReportService
 
 from eve_elastic.elastic import parse_date
 
@@ -23,7 +23,7 @@ class UserActivityReportResource(Resource):
     privileges = {'GET': 'user_activity_report'}
 
 
-class UserActivityReportService(BaseReportService):
+class UserActivityReportService(StatsReportService):
     repos = ['archive_statistics']
     date_filter_field = 'versioncreated'
 
@@ -31,83 +31,9 @@ class UserActivityReportService(BaseReportService):
         """Disable generating aggregations"""
         return None
 
-    def _get_filters(self, repos, invisible_stages):
-        return None
-
-    def get_elastic_index(self, types):
-        return 'statistics'
-
-    def _get_es_query_funcs(self):
-        funcs = super()._get_es_query_funcs()
-
-        funcs['user_locks'] = {
-            'query': self._es_filter_user_locks
-        }
-
-        return funcs
-
     def _es_set_size(self, query, params):
         """Disable setting the size"""
         pass
-
-    def _es_filter_user_locks(self, query, user, must, params):
-        lt, gte, time_zone = self._es_get_date_filters(params)
-
-        query[must].append({
-            'nested': {
-                'path': 'stats.timeline',
-                'query': {
-                    'bool': {
-                        'must': [
-                            {'term': {'stats.timeline.task.user': user}},
-                            {'terms': {
-                                'stats.timeline.operation': [
-                                    'item_lock',
-                                    'item_unlock'
-                                ]
-                            }},
-                            {'range': {
-                                'stats.timeline.operation_created': {
-                                    'gte': gte,
-                                    'lt': lt,
-                                    'time_zone': time_zone
-                                }
-                            }}
-                        ]
-                    }
-                }
-            }
-        })
-
-    def _es_filter_desks(self, query, desks, must, params):
-        query[must].append({
-            'nested': {
-                'path': 'stats.timeline',
-                'query': {
-                    'terms': {'stats.timeline.task.desk': desks}
-                }
-            }
-        })
-
-    def _es_filter_users(self, query, users, must, params):
-        query[must].append({
-            'nested': {
-                'path': 'stats.timeline',
-                'query': {
-                    'terms': {'stats.timeline.task.user': users}
-                }
-            }
-        })
-
-    def _es_filter_stages(self, query, stages, must, params):
-        query[must].append({
-            'nested': {
-                'path': 'stats.timeline',
-                'query': {
-                    'terms': {'stats.timeline.task.stage': stages}
-                }
-            }
-        })
 
     def generate_report(self, docs, args):
         report = {

@@ -39,7 +39,7 @@
     </div>
 </div>
 
-<div class="form__row">
+<div class="form__row" ng-if="currentParams.params.chart.sort_order">
     <div class="sd-line-input sd-line-input--is-select">
         <label class="sd-line-input__label" translate>Order Categories In:</label>
         <select class="sd-line-input__select"
@@ -49,5 +49,16 @@
             <option value="desc" translate>Descending Order of Stories</option>
             <option value="asc" translate>Ascending Order of Stores</option>
         </select>
+    </div>
+</div>
+
+<div class="form__row" ng-if="currentParams.params.chart.type === 'table'">
+    <div class="sd-line-input">
+        <label class="sd-line-input__label" translate>Page Size</label>
+        <input type="number"
+               min="1"
+               class="sd-line-input__input"
+               ng-model="currentParams.params.size"
+        />
     </div>
 </div>

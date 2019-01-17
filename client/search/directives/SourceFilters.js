@@ -27,6 +27,7 @@ export const SOURCE_FILTERS = {
             EXIT: 'stats_desk_transition_exit',
         },
     },
+    PUBLISH_PARS: 'publish_pars',
 };
 
 /**
@@ -113,6 +114,11 @@ export const SOURCE_FILTER_FIELDS = {
         labelField: 'name',
         source: null,
         field: 'desk_transitions.exit',
+    },
+    [SOURCE_FILTERS.PUBLISH_PARS]: {
+        paramName: SOURCE_FILTERS.PUBLISH_PARS,
+        source: null,
+        field: SOURCE_FILTERS.PUBLISH_PARS,
     },
 };
 
@@ -529,6 +535,15 @@ export function SourceFilters(
                         );
                     },
                     minLength: 1,
+                },
+                [SOURCE_FILTERS.PUBLISH_PARS]: {
+                    ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.PUBLISH_PARS],
+                    label: gettextCatalog.getString('Publish Pars'),
+                    selected: [],
+                    exclude: false,
+                    enabled: false,
+                    fetch: () => $q.when(),
+                    receive: () => [],
                 },
             };
 

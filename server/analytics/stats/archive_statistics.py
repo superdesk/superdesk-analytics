@@ -237,6 +237,10 @@ class ArchiveStatisticsResource(Resource):
         'original_par_count': metadata_schema['word_count'],
         'par_count': metadata_schema['word_count'],
         'time_to_first_publish': {'type': 'integer'},
+        'time_to_next_update_publish': {
+            'type': 'integer',
+            'default': 0
+        },
         'num_desk_transitions': {
             'type': 'integer',
             'default': 0
