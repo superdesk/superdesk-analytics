@@ -31,7 +31,7 @@ export default angular.module('superdesk.analytics.processed-items-widget', [
     'superdesk.apps.authoring.widgets',
     'superdesk.apps.desks',
     'superdesk.apps.workspace',
-    'superdesk.analytics.processed-items-report'
+    'superdesk.analytics.processed-items-report',
 ])
 
     .run(cacheIncludedTemplates)
@@ -48,7 +48,7 @@ export default angular.module('superdesk.analytics.processed-items-widget', [
             template: 'processed_items_widget.html',
             configurationTemplate: 'processed_items_widget_settings.html',
             description: 'This wiget allows you to view the processed items reports',
-            custom: true
+            custom: true,
         });
     }])
 

@@ -1,5 +1,5 @@
 ContentQuotaReportForm.$inject = [
-    'config', 'api', 'session', 'metadata', 'notify', '$rootScope', 'desks', 'contentQuotaReport'
+    'config', 'api', 'session', 'metadata', 'notify', '$rootScope', 'desks', 'contentQuotaReport',
 ];
 
 /**
@@ -21,7 +21,7 @@ export function ContentQuotaReportForm(config, api, session, metadata, notify, $
         scope: {
             form: '=',
             report: '=',
-            forWidget: '@'
+            forWidget: '@',
         },
         link: function(scope, element, attrs, controller) {
             scope.generalTab = 'general';
@@ -91,6 +91,6 @@ export function ContentQuotaReportForm(config, api, session, metadata, notify, $
             };
 
             scope.init();
-        }
+        },
     };
 }

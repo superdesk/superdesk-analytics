@@ -33,7 +33,7 @@ export function ProcessedItemsReportView(api, session, processedItemsChart, $int
                     processedItemsReport = {
                         start_time: processedItemsReport.start_time,
                         end_time: processedItemsReport.end_time,
-                        users: processedItemsReport.users
+                        users: processedItemsReport.users,
                     };
                     scope.generate(processedItemsReport)
                         .then(() => {
@@ -88,6 +88,6 @@ export function ProcessedItemsReportView(api, session, processedItemsChart, $int
                     $interval.cancel(interval);
                 }
             });
-        }
+        },
     };
 }

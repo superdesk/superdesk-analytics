@@ -31,7 +31,7 @@ export default angular.module('superdesk.analytics.content-quota-widget', [
     'superdesk.apps.authoring.widgets',
     'superdesk.apps.desks',
     'superdesk.apps.workspace',
-    'superdesk.analytics.content-quota-report'
+    'superdesk.analytics.content-quota-report',
 ])
 
     .run(cacheIncludedTemplates)
@@ -48,7 +48,7 @@ export default angular.module('superdesk.analytics.content-quota-widget', [
             template: 'content-quota-widget.html',
             configurationTemplate: 'content-quota-widget-settings.html',
             description: 'This wiget allows you to view the content vs quota reports',
-            custom: true
+            custom: true,
         });
     }])
 

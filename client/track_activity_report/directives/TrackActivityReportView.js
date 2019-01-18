@@ -66,6 +66,6 @@ export function TrackActivityReportView(trackActivityReport, trackActivityChart,
                     interval = null;
                 }
             });
-        }
+        },
     };
 }

@@ -77,7 +77,7 @@ export function EmailReportModal(emailReport, _, gettext) {
                 800,
                 1000,
                 1200,
-                1400
+                1400,
             ];
 
             /**
@@ -95,6 +95,6 @@ export function EmailReportModal(emailReport, _, gettext) {
             ];
 
             init();
-        }
+        },
     };
 }

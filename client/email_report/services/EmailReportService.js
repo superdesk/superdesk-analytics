@@ -61,7 +61,7 @@ export function EmailReportService(api, notify, gettext, savedReports, _) {
     this.send = (report, email) => (
         api('email_report').save({}, {
             report: savedReports.convertDatesForServer(report),
-            email: email
+            email: email,
         })
             .then(() => {
                 notify.success(gettext('Report chart emailed!'));

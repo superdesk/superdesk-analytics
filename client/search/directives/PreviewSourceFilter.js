@@ -185,6 +185,6 @@ export function PreviewSourceFilter(_, chartConfig, gettext, gettextCatalog) {
             scope.enabledFields = scope.enabledFieldNames.map((field) => filters[field]);
 
             init();
-        }
+        },
     };
 }

@@ -71,7 +71,7 @@ export function ProductionTimeReportController(
             DATE_FILTERS.RANGE,
             DATE_FILTERS.RELATIVE,
             DATE_FILTERS.RELATIVE_DAYS,
-            DATE_FILTERS.YESTERDAY
+            DATE_FILTERS.YESTERDAY,
         ];
 
         this.initDefaultParams();
@@ -335,7 +335,7 @@ export function ProductionTimeReportController(
                                 gettext,
                                 $interpolate
                             );
-                    }
+                    },
                 });
 
                 const axis = chart.addAxis()
@@ -366,7 +366,7 @@ export function ProductionTimeReportController(
                                 data: _.map(
                                     sortedDeskIds,
                                     (deskId) => _.get(deskStats[deskId], statType) || 0
-                                )
+                                ),
                             });
                     }
                 );

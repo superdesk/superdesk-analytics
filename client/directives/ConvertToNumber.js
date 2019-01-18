@@ -14,6 +14,6 @@ export function ConvertToNumber() {
 
             // Convert the variable from an integer to a string for the input
             ngModel.$formatters.push((value) => ('' + value));
-        }
+        },
     };
 }

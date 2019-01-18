@@ -80,14 +80,14 @@ describe('sda-source-filters', () => {
                     archive: false,
                     published: true,
                     archived: true,
-                }
+                },
             },
             true
         );
         expect(element.html()).toContain('filters.sources.label');
         expect(isoScope.filters.sources.items).toEqual([{
             _id: 'aap',
-            name: 'AAP'
+            name: 'AAP',
         }, {
             _id: 'test',
             name: 'TEST',
@@ -277,7 +277,7 @@ describe('sda-source-filters', () => {
         params = {must_not: {desks: ['desk2']}};
         compileElement();
         expect(isoScope.filters.desks.selected).toEqual([
-            {_id: 'desk2', name: 'Sports Desk'}
+            {_id: 'desk2', name: 'Sports Desk'},
         ]);
         expect(isoScope.filters.desks.exclude).toBe(true);
     });
@@ -304,7 +304,7 @@ describe('sda-source-filters', () => {
         params = {must: {stages: ['stage1']}};
         compileElement();
         expect(isoScope.filters.stages.selected).toEqual([
-            {_id: 'stage1', name: 'Politic Desk/Stage 1'}
+            {_id: 'stage1', name: 'Politic Desk/Stage 1'},
         ]);
         expect(isoScope.filters.stages.exclude).toBe(false);
 

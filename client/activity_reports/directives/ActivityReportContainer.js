@@ -9,7 +9,7 @@ export function ActivityReportContainer() {
         controller: ['gettext', 'pageTitle',
             function ActivityReportContainerController(gettext, pageTitle) {
                 pageTitle.setUrl(gettext('Activity Report'));
-            }
-        ]
+            },
+        ],
     };
 }

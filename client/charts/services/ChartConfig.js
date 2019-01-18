@@ -596,7 +596,7 @@ export function ChartConfig(
                         deskStages.push(
                             ...stages.map((stage) => ({
                                 _id: stage._id,
-                                name: deskName + '/' + stage.name
+                                name: deskName + '/' + stage.name,
                             }))
                         );
                     });
@@ -619,7 +619,7 @@ export function ChartConfig(
                 gettext('Operation'),
                 getTranslatedOperations(gettext)
             );
-        }
+        },
     };
 
     /**
@@ -722,7 +722,7 @@ export function ChartConfig(
                 $interpolate(
                     gettext('Last {{days}} days')
                 )({days: _.get(params, 'dates.relative_days')})
-            )
+            ),
         };
 
         const dateFilter = _.get(params, 'date_filter') || _.get(params, 'dates.filter');

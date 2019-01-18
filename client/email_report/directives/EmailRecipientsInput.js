@@ -116,6 +116,6 @@ export function EmailRecipientsInput(userList, scheduledReports, $q, _) {
             };
 
             this.init();
-        }
+        },
     };
 }

@@ -16,7 +16,7 @@ export function SaveGenerateReport(_, privileges, savedReports) {
             generateReport: '=',
             getReportParams: '=',
             isDirty: '=',
-            _viewSchedule: '=viewSchedule'
+            _viewSchedule: '=viewSchedule',
         },
         link: function(scope, element, attrs, controller) {
             scope.showSaveForm = false;

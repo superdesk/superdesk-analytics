@@ -59,7 +59,7 @@ describe('searchReport', () => {
                     killed: true,
                     corrected: true,
                     recalled: true,
-                }
+                },
             },
         });
 
@@ -429,7 +429,7 @@ describe('searchReport', () => {
                         filter: 'range',
                         start: '01/06/2018',
                         end: '30/06/2018',
-                    }
+                    },
                 },
                 true
             );
@@ -454,7 +454,7 @@ describe('searchReport', () => {
                         filter: 'yesterday',
                         start: '01/06/2018',
                         end: '30/06/2018',
-                    }
+                    },
                 },
                 true
             );
@@ -480,7 +480,7 @@ describe('searchReport', () => {
                         states: {
                             published: true,
                             killed: false,
-                        }
+                        },
                     },
                     must_not: {
                         urgency: [],
@@ -496,7 +496,7 @@ describe('searchReport', () => {
                     dates: {filter: 'yesterday'},
                     must: {
                         users: ['user1', 'user2'],
-                        states: {published: true}
+                        states: {published: true},
                     },
                     must_not: {
                         categories: ['a', 'b'],

@@ -53,8 +53,8 @@ export function ProcessedItemsWidgetSettingsController($scope, api, $rootScope, 
             $or: [
                 {username: {$regex: text, $options: '-i'}},
                 {display_name: {$regex: text, $options: '-i'}},
-                {email: {$regex: text, $options: '-i'}}
-            ]
+                {email: {$regex: text, $options: '-i'}},
+            ],
         };
 
         api.users.query(query).then((users) => {
@@ -88,7 +88,7 @@ export function ProcessedItemsWidgetSettingsController($scope, api, $rootScope, 
         if ($scope.isSelected(user) === false) {
             $scope.widget.configuration.users.push({
                 display_name: user.display_name,
-                _id: user._id
+                _id: user._id,
             });
         }
     };

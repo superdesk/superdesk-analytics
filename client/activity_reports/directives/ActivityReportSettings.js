@@ -14,7 +14,7 @@ export function ActivityReportSettings(desks, metadata) {
         scope: {
             settings: '=',
             widget: '=',
-            step: '='
+            step: '=',
         },
         link: function(scope, element, attrs, controller) {
             desks.initialize().then(() => {
@@ -24,6 +24,6 @@ export function ActivityReportSettings(desks, metadata) {
             metadata.initialize().then(() => {
                 scope.metadata = metadata.values;
             });
-        }
+        },
     };
 }

@@ -9,7 +9,7 @@ export function ContentQuotaReportContainer() {
         controller: ['gettext', 'pageTitle',
             function ContentQuotaReportContainerController(gettext, pageTitle) {
                 pageTitle.setUrl(gettext('Content Quota Report'));
-            }
-        ]
+            },
+        ],
     };
 }

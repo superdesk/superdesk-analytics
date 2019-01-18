@@ -66,7 +66,7 @@ export function ActivityChart(_, chartManager) {
 
         return {
             categories: timestamps,
-            data: data
+            data: data,
         };
     };
 
@@ -82,7 +82,7 @@ export function ActivityChart(_, chartManager) {
 
         return {
             categories,
-            data
+            data,
         };
     };
 
@@ -103,32 +103,32 @@ export function ActivityChart(_, chartManager) {
             id: 'activity',
             type: 'column',
             chart: {
-                type: 'column'
+                type: 'column',
             },
             title: {
-                text: null
+                text: null,
             },
             legend: {
-                enabled: true
+                enabled: true,
             },
             xAxis: {
-                categories: reportData.categories
+                categories: reportData.categories,
             },
             yAxis: {
                 title: {
-                    text: operation
-                }
+                    text: operation,
+                },
             },
             tooltip: {
                 pointFormatter: function() {
                     return '<span style="color:' + this.color + '"></span> ' +
                         '<b>' + operation + ' ' + this.y + '</b>';
-                }
+                },
             },
             series: [{
                 name: getSeriesName(report),
-                data: reportData.data
-            }]
+                data: reportData.data,
+            }],
         }];
     };
 }

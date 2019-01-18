@@ -246,7 +246,7 @@ export function FeaturemediaUpdatesReportController(
         $q.when({
             charts: [report],
             title: $scope.generateTitle(report),
-            subtitle: $scope.generateSubtitle()
+            subtitle: $scope.generateSubtitle(),
         })
     );
 

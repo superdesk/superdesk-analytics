@@ -46,7 +46,7 @@ describe('savedReports', () => {
             {name: 'report1', user: 'user1', is_global: false},
             {name: 'report2', user: 'user1', is_global: true},
             {name: 'report3', user: 'user2', is_global: true},
-            {name: 'report4', user: 'user2', is_global: true}
+            {name: 'report4', user: 'user2', is_global: true},
         ]}));
         let reports;
 
@@ -59,17 +59,17 @@ describe('savedReports', () => {
         expect(apiMock.query).toHaveBeenCalledWith({
             max_results: 200,
             page: 1,
-            where: JSON.stringify({report: 'source_category_report'})
+            where: JSON.stringify({report: 'source_category_report'}),
         });
         expect(reports).toEqual({
             user: [
                 {name: 'report1', user: 'user1', is_global: false},
-                {name: 'report2', user: 'user1', is_global: true}
+                {name: 'report2', user: 'user1', is_global: true},
             ],
             global: [
                 {name: 'report3', user: 'user2', is_global: true},
-                {name: 'report4', user: 'user2', is_global: true}
-            ]
+                {name: 'report4', user: 'user2', is_global: true},
+            ],
         });
     });
 

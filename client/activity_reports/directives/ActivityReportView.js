@@ -17,6 +17,6 @@ export function ActivityReportView(activityChart, $timeout) {
                     scope.chart = activityChart.createChart(activityReport, 'activity-report', 'activity-report');
                 }, 0);
             });
-        }
+        },
     };
 }

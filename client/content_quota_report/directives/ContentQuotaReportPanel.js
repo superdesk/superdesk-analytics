@@ -80,6 +80,6 @@ export function ContentQuotaReportPanel(
             };
 
             scope.init();
-        }
+        },
     };
 }

@@ -9,7 +9,7 @@ export function TrackActivityReportContainer() {
         controller: ['gettext', 'pageTitle',
             function TrackActivityReportContainerController(gettext, pageTitle) {
                 pageTitle.setUrl(gettext('Track Activity Report'));
-            }
-        ]
+            },
+        ],
     };
 }

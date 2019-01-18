@@ -38,7 +38,7 @@ export function ScheduledReportsModal(_, savedReports, scheduledReports, notify,
                 800,
                 1000,
                 1200,
-                1400
+                1400,
             ];
 
             /**

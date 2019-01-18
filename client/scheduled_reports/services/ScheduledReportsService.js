@@ -39,7 +39,7 @@ export function ScheduledReportsService(api, _, session) {
     this.fetchBySavedReport = (savedReportId) => (
         api('scheduled_reports').getAll({
             where: JSON.stringify({
-                saved_report: savedReportId
+                saved_report: savedReportId,
             }),
         })
     );

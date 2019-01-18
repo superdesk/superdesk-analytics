@@ -14,6 +14,6 @@ export function AfterRender($timeout) {
         transclude: false,
         link: function(scope, element, attrs) {
             $timeout(scope.$eval(attrs.sdAfterRender), 0);
-        }
+        },
     };
 }

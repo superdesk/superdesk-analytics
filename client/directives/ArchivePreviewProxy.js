@@ -13,7 +13,7 @@ export function ArchivePreviewProxy($compile, _) {
     return {
         scope: {
             preview: '=',
-            close: '='
+            close: '=',
         },
         link: function(scope, element) {
             /**

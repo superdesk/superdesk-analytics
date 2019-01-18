@@ -10,22 +10,23 @@ export function mockAll() {
 }
 
 export function mockDesks(desks, $q) {
+    // eslint-disable-next-line jasmine/no-unsafe-spy
     spyOn(desks, 'initialize').and.callFake(() => {
         desks.desks = {
             _items: [
                 {_id: 'desk1', name: 'Politic Desk'},
                 {_id: 'desk2', name: 'Sports Desk'},
-                {_id: 'desk3', name: 'System Desk'}
-            ]
+                {_id: 'desk3', name: 'System Desk'},
+            ],
         };
 
         desks.deskStages = {
             desk1: [
                 {_id: 'stage1', name: 'Stage 1'},
-                {_id: 'stage2', name: 'Stage 2'}
+                {_id: 'stage2', name: 'Stage 2'},
             ],
             desk2: [
-                {_id: 'stage3', name: 'Stage 3'}
+                {_id: 'stage3', name: 'Stage 3'},
             ],
             desk3: [],
         };
@@ -41,6 +42,7 @@ export function mockDesks(desks, $q) {
 }
 
 export function mockUsers(userList, $q) {
+    // eslint-disable-next-line jasmine/no-unsafe-spy
     spyOn(userList, 'getAll').and.returnValue(
         $q.when([
             {_id: 'user1', display_name: 'first user'},
@@ -51,6 +53,7 @@ export function mockUsers(userList, $q) {
 }
 
 export function mockMetadata(metadata, $q) {
+    // eslint-disable-next-line jasmine/no-unsafe-spy
     spyOn(metadata, 'initialize').and.callFake(() => {
         metadata.values = {
             categories: [
@@ -69,7 +72,7 @@ export function mockMetadata(metadata, $q) {
                 {qcode: 'Article', name: 'Article (news)'},
                 {qcode: 'Sidebar', name: 'Sidebar'},
                 {qcode: 'Factbox', name: 'Factbox'},
-            ]
+            ],
         };
 
         return $q.when();
@@ -77,6 +80,7 @@ export function mockMetadata(metadata, $q) {
 }
 
 export function mockIngestSources(ingestSources, $q) {
+    // eslint-disable-next-line jasmine/no-unsafe-spy
     spyOn(ingestSources, 'initialize').and.callFake(() => {
         ingestSources.providers = [
             {_id: 'ing1', name: 'Ingest 1'},
@@ -89,6 +93,7 @@ export function mockIngestSources(ingestSources, $q) {
 }
 
 export function mockSearchQuery(searchReport, $q) {
+    // eslint-disable-next-line jasmine/no-unsafe-spy
     spyOn(searchReport, 'query').and.returnValue(
         $q.when({groups: {aap: 1, test: 2}})
     );
