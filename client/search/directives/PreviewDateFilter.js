@@ -33,6 +33,6 @@ export function PreviewDateFilter(moment, config) {
             } else if (scope.dateFilter === 'relative_days') {
                 scope.days = _.get(params, 'dates.relative_days');
             }
-        }
+        },
     };
 }

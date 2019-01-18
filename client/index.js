@@ -69,7 +69,7 @@ export default angular.module('superdesk.analytics', [
     'superdesk.analytics.production-time-report',
     'superdesk.analytics.user-activity-report',
     'superdesk.analytics.featuremedia-updates-report',
-    'superdesk-ui'
+    'superdesk-ui',
 ])
     .service('analyticsWidgetSettings', svc.AnalyticsWidgetSettings)
 

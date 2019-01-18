@@ -449,7 +449,7 @@ export class Chart {
 
             config.plotOptions.series.cursor = 'pointer';
             config.plotOptions.series.point = {
-                events: {click: this.onPointClick}
+                events: {click: this.onPointClick},
             };
         }
 
@@ -566,7 +566,7 @@ export class Chart {
         forEach(axis.getCategories(), (category, index) => {
             rows.push([
                 category,
-                axis.series[0].data[index]
+                axis.series[0].data[index],
             ]);
         });
 

@@ -45,7 +45,7 @@ export function PublishingPerformanceReportPreview(
 
                 chartConfig.loadTranslations([
                     _.get(params, 'aggs.group.field'),
-                    _.get(params, 'aggs.subgroup.field')
+                    _.get(params, 'aggs.subgroup.field'),
                 ])
                     .then(() => {
                         scope.group = chart.getSourceName(_.get(params, 'aggs.group.field'));
@@ -56,6 +56,6 @@ export function PublishingPerformanceReportPreview(
             };
 
             init();
-        }
+        },
     };
 }

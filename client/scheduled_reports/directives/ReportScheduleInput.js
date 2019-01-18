@@ -238,6 +238,6 @@ export function ReportScheduleInput(gettext, _) {
             } else {
                 this.initAsInput();
             }
-        }
+        },
     };
 }

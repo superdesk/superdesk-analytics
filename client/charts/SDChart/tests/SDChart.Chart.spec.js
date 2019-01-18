@@ -26,7 +26,7 @@ describe('SDChart.Chart', () => {
                 title: {text: 'Default Title'},
                 subtitle: {text: 'Default Subtitle'},
                 plotOptions: {series: {shadow: true}},
-            }
+            },
         })).toEqual({
             id: 'test_chart',
             type: 'highcharts',

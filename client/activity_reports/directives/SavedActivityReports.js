@@ -1,6 +1,6 @@
 SavedActivityReports.$inject = [
     '$rootScope', 'api', 'session', 'modal', 'notify', 'gettext', 'asset',
-    '$location', 'desks', 'privileges', 'config', 'savedActivityReports'
+    '$location', 'desks', 'privileges', 'config', 'savedActivityReports',
 ];
 
 /**
@@ -124,6 +124,6 @@ export function SavedActivityReports($rootScope, api, session, modal, notify, ge
             function formatDate(date) {
                 return date ? moment(date).format(config.model.dateformat) : null; // jshint ignore:line
             }
-        }
+        },
     };
 }

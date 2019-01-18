@@ -2,7 +2,7 @@ import {
     getErrorMessage,
     getUtcOffsetInMinutes,
     ENTER_DESK_OPERATIONS,
-    EXIT_DESK_OPERATIONS
+    EXIT_DESK_OPERATIONS,
 } from '../../utils';
 import {DATE_FILTERS} from '../../search/directives/DateFilters';
 import {SDChart} from '../../charts/SDChart';

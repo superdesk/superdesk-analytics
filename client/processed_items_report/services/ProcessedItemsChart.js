@@ -27,8 +27,8 @@ export function ProcessedItemsChart(chartManager, gettext, moment) {
                     processedItemsReport.report[i].processed_items.corrected_items,
                     processedItemsReport.report[i].processed_items.spiked_items,
                     processedItemsReport.report[i].processed_items.killed_items,
-                    processedItemsReport.report[i].processed_items.total_items
-                ]
+                    processedItemsReport.report[i].processed_items.total_items,
+                ],
             });
         }
 
@@ -36,21 +36,21 @@ export function ProcessedItemsChart(chartManager, gettext, moment) {
             id: 'processed-items',
             type: 'column',
             chart: {
-                type: 'column'
+                type: 'column',
             },
             title: {
-                text: startTime.calendar() + ' - ' + endTime.calendar()
+                text: startTime.calendar() + ' - ' + endTime.calendar(),
             },
             xAxis: {
                 categories: [gettext('Published'), gettext('Corrected'), gettext('Spiked'),
-                    gettext('Killed'), gettext('Total')]
+                    gettext('Killed'), gettext('Total')],
             },
             yAxis: {
                 title: {
-                    text: gettext('Items No')
-                }
+                    text: gettext('Items No'),
+                },
             },
-            series: series
+            series: series,
         }];
     };
 }

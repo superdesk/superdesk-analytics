@@ -13,7 +13,7 @@ export function ProcessedItemsReportForm(api, notify, $rootScope, processedItems
         template: require('../views/processed-items-report-form.html'),
         scope: {
             validForm: '=',
-            report: '='
+            report: '=',
         },
         link: function(scope, element, attrs, controller) {
             if (!scope.report) {
@@ -40,8 +40,8 @@ export function ProcessedItemsReportForm(api, notify, $rootScope, processedItems
                     $or: [
                         {username: {$regex: text, $options: '-i'}},
                         {display_name: {$regex: text, $options: '-i'}},
-                        {email: {$regex: text, $options: '-i'}}
-                    ]
+                        {email: {$regex: text, $options: '-i'}},
+                    ],
                 };
 
                 api.users.query(query).then((users) => {
@@ -74,7 +74,7 @@ export function ProcessedItemsReportForm(api, notify, $rootScope, processedItems
                 if (scope.isSelected(user) === false) {
                     scope.report.users.push({
                         display_name: user.display_name,
-                        _id: user._id
+                        _id: user._id,
                     });
                     scope.validateForm();
                 }
@@ -103,6 +103,6 @@ export function ProcessedItemsReportForm(api, notify, $rootScope, processedItems
             scope.validateForm = function() {
                 scope.validForm = scope.processedItemsReportForm.$valid && scope.report.users.length > 0;
             };
-        }
+        },
     };
 }

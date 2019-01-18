@@ -1,6 +1,6 @@
 ActivityReportWidgetController.$inject = [
     '$scope', 'analyticsWidgetSettings', 'notify', 'activityChart', '$interval', '$timeout', '$rootScope',
-    'activityReport', 'activityReportWidgetSettings'
+    'activityReport', 'activityReportWidgetSettings',
 ];
 
 /**

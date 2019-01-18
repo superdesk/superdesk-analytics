@@ -1,5 +1,5 @@
 ActivityReportPanel.$inject = [
-    'desks', 'notify', '$rootScope', 'activityReport', 'activityChart'
+    'desks', 'notify', '$rootScope', 'activityReport', 'activityChart',
 ];
 
 /**
@@ -34,7 +34,7 @@ export function ActivityReportPanel(desks, notify, $rootScope, activityReport, a
                     operation: 'publish',
                     desk: desks.activeDeskId,
                     days: 1,
-                    group_by: {desk: false}
+                    group_by: {desk: false},
                 };
             };
 
@@ -106,6 +106,6 @@ export function ActivityReportPanel(desks, notify, $rootScope, activityReport, a
             scope.$on('activity-report:clear', (event) => {
                 scope.initReport();
             });
-        }
+        },
     };
 }

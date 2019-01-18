@@ -13,7 +13,7 @@ PublishingPerformanceReportController.$inject = [
     'config',
     '$q',
     'chartConfig',
-    '$interpolate'
+    '$interpolate',
 ];
 
 /**

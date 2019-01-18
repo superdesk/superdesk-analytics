@@ -67,7 +67,7 @@ export function PlanningUsageReportController(
                     events: gettext('Events'),
                     planning: gettext('Planning'),
                     coverages: gettext('Coverages'),
-                    assignments: gettext('Assignments')
+                    assignments: gettext('Assignments'),
                 }
             );
 

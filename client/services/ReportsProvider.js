@@ -27,7 +27,7 @@ export function ReportsProvider(_) {
             priority: 1000,
             privileges: {},
             showSidePanel: true,
-            allowScheduling: false
+            allowScheduling: false,
         }, report);
     };
 

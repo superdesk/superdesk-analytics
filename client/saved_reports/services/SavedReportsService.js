@@ -9,7 +9,7 @@ SavedReportsService.$inject = [
     '$location',
     'notify',
     'gettext',
-    '$rootScope'
+    '$rootScope',
 ];
 
 /**
@@ -143,7 +143,7 @@ export function SavedReportsService(
         api('saved_reports').query({
             max_results: 200,
             page: page,
-            where: JSON.stringify({report: reportType})
+            where: JSON.stringify({report: reportType}),
         })
             .then((result) => ({
                 user: _.map(

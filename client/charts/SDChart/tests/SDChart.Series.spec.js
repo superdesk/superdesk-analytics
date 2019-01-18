@@ -63,14 +63,14 @@ describe('SDChart.Series', () => {
             }, {
                 xAxis: 0,
                 type: 'bar',
-            }]
+            }],
         }));
 
         expect(genConfig(
             {},
             [
                 {type: 'column'},
-                {type: 'line'}
+                {type: 'line'},
             ]
         )).toEqual(jasmine.objectContaining({
             series: [{
@@ -79,14 +79,14 @@ describe('SDChart.Series', () => {
             }, {
                 xAxis: 0,
                 type: 'line',
-            }]
+            }],
         }));
 
         expect(genConfig(
             {},
             [
                 {stack: 0, stackType: 'normal'},
-                {stack: 0, stackType: 'normal'}
+                {stack: 0, stackType: 'normal'},
             ]
         )).toEqual(jasmine.objectContaining({
             series: [{
@@ -99,7 +99,7 @@ describe('SDChart.Series', () => {
                 type: 'bar',
                 stack: 0,
                 stacking: 'normal',
-            }]
+            }],
         }));
     });
 
@@ -170,7 +170,7 @@ describe('SDChart.Series', () => {
         axis.addSeries()
             .setOptions({
                 field: 'categories',
-                data: {a: 2, b: 6, c: 10}
+                data: {a: 2, b: 6, c: 10},
             });
 
         expect(chart.genConfig()).toEqual(jasmine.objectContaining({

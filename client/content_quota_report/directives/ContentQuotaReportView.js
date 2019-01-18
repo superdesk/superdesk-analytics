@@ -79,6 +79,6 @@ export function ContentQuotaReportView(contentQuotaReport, contentQuotaChart, $i
                 }
                 resetChart(null);
             });
-        }
+        },
     };
 }

@@ -23,7 +23,7 @@ export function SaveActivityReport($location, asset, api, session, notify, confi
         template: require('../views/save-activity-report.html'),
         scope: {
             form: '=',
-            report: '='
+            report: '=',
         },
         link: function(scope, element, attrs, controller) {
             /**
@@ -72,6 +72,6 @@ export function SaveActivityReport($location, asset, api, session, notify, confi
                 $rootScope.$broadcast('activity-report:clear');
                 $location.url($location.path());
             };
-        }
+        },
     };
 }

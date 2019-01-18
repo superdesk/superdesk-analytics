@@ -9,7 +9,7 @@ export function ProcessedItemsReportContainer() {
         controller: ['gettext', 'pageTitle',
             function ProcessedItemsReportContainerController(gettext, pageTitle) {
                 pageTitle.setUrl(gettext('Processed Items Report'));
-            }
-        ]
+            },
+        ],
     };
 }

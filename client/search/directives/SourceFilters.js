@@ -25,8 +25,8 @@ export const SOURCE_FILTERS = {
         DESK_TRANSITIONS: {
             ENTER: 'stats_desk_transition_enter',
             EXIT: 'stats_desk_transition_exit',
-        }
-    }
+        },
+    },
 };
 
 /**
@@ -261,7 +261,7 @@ export function SourceFilters(
                             archive: false,
                             published: true,
                             archived: true,
-                        }
+                        },
                     },
                     true
                 )
@@ -479,7 +479,7 @@ export function SourceFilters(
                             deskStages.push(
                                 ...stages.map((stage) => ({
                                     _id: stage._id,
-                                    name: deskName + '/' + stage.name
+                                    name: deskName + '/' + stage.name,
                                 }))
                             );
                         });
@@ -529,10 +529,10 @@ export function SourceFilters(
                         );
                     },
                     minLength: 1,
-                }
+                },
             };
 
             this.init();
-        }
+        },
     };
 }

@@ -87,8 +87,8 @@ export function TrackActivityReportPanel(
                     $or: [
                         {username: {$regex: text, $options: '-i'}},
                         {display_name: {$regex: text, $options: '-i'}},
-                        {email: {$regex: text, $options: '-i'}}
-                    ]
+                        {email: {$regex: text, $options: '-i'}},
+                    ],
                 };
 
                 api.users.query(query).then((users) => {
@@ -143,6 +143,6 @@ export function TrackActivityReportPanel(
             };
 
             scope.initalize();
-        }
+        },
     };
 }

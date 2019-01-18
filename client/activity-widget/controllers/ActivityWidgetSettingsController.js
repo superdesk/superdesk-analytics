@@ -33,7 +33,7 @@ export function ActivityWidgetSettingsController($scope, desks, $rootScope, anal
      */
     $scope.setCurrentStep = function() {
         $scope.step = {
-            current: $scope.currentStep || 'operation'
+            current: $scope.currentStep || 'operation',
         };
     };
 

@@ -8,7 +8,7 @@ SavedReportList.$inject = [
     'notify',
     'lodash',
     '$rootScope',
-    '$timeout'
+    '$timeout',
 ];
 
 /**

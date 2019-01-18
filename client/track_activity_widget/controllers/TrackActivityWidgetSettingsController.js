@@ -59,8 +59,8 @@ export function TrackActivityWidgetSettingsController($scope, desks, api, $rootS
             $or: [
                 {username: {$regex: text, $options: '-i'}},
                 {display_name: {$regex: text, $options: '-i'}},
-                {email: {$regex: text, $options: '-i'}}
-            ]
+                {email: {$regex: text, $options: '-i'}},
+            ],
         };
 
         api.users.query(query).then((users) => {

@@ -2,7 +2,7 @@ import {
     getErrorMessage,
     getUtcOffsetInMinutes,
     getTranslatedOperations,
-    compileAndGetHTML
+    compileAndGetHTML,
 } from '../../utils';
 import {DATE_FILTERS} from '../../search/directives/DateFilters';
 import {SOURCE_FILTERS} from '../../search/directives/SourceFilters';
@@ -117,7 +117,7 @@ export function UserActivityReportController(
             params: {
                 dates: {
                     filter: 'day',
-                    date: moment().format(config.model.dateformat)
+                    date: moment().format(config.model.dateformat),
                 },
                 must: {
                     user_locks: null,
@@ -496,7 +496,7 @@ export function UserActivityReportController(
 
         axis.addSeries()
             .setOptions({
-                data: data
+                data: data,
             });
 
         const conf = chart.genConfig();
@@ -582,7 +582,7 @@ export function UserActivityReportController(
                 userTimelines[userId] = {
                     data: [],
                     colour: colourIndex,
-                    name: _.get($scope.usersById, userId, {}).display_name || ''
+                    name: _.get($scope.usersById, userId, {}).display_name || '',
                 };
 
                 // Increase the colourIndex so the next unique user

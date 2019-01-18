@@ -40,6 +40,6 @@ export function ProcessedItemsReportPanel(api, notify, $rootScope, processedItem
 
                 return processedItemsReport.generate(scope.report).then(onSuccess, onFail);
             };
-        }
+        },
     };
 }

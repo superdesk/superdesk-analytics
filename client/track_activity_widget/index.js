@@ -31,7 +31,7 @@ export default angular.module('superdesk.analytics.track-activity-widget', [
     'superdesk.apps.authoring.widgets',
     'superdesk.apps.desks',
     'superdesk.apps.workspace',
-    'superdesk.analytics.track-activity-report'
+    'superdesk.analytics.track-activity-report',
 ])
 
     .run(cacheIncludedTemplates)
@@ -48,7 +48,7 @@ export default angular.module('superdesk.analytics.track-activity-widget', [
             template: 'track-activity-widget.html',
             configurationTemplate: 'track-activity-widget-settings.html',
             description: 'This wiget allows you to view the track activity reports',
-            custom: true
+            custom: true,
         });
     }])
 

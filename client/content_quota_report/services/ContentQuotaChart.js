@@ -61,24 +61,24 @@ export function ContentQuotaChart(_, chartManager) {
             id: 'content_quota',
             type: 'column',
             chart: {
-                type: 'column'
+                type: 'column',
             },
             legend: {
-                enabled: true
+                enabled: true,
             },
             title: {
-                text: title
+                text: title,
             },
             xAxis: {
                 categories: categories,
                 type: 'datetime',
                 title: {
-                    text: gettext('Time intervals')
-                }
+                    text: gettext('Time intervals'),
+                },
             },
             yAxis: {
                 title: {
-                    text: gettext('Number of items')
+                    text: gettext('Number of items'),
                 },
                 plotBands: [{
                     color: '#8cd9b3',
@@ -88,9 +88,9 @@ export function ContentQuotaChart(_, chartManager) {
                     label: {
                         text: gettext('Target Quota'),
                         align: 'left',
-                        x: +10
-                    }
-                }]
+                        x: +10,
+                    },
+                }],
             },
             tooltip: {
                 pointFormatter: function() {
@@ -100,12 +100,12 @@ export function ContentQuotaChart(_, chartManager) {
                         format = span + '<b>' + gettext('Number of items:') + this.y + '</b>';
                     format += '<br/>';
                     return format;
-                }
+                },
             },
             series: [{
                 name: gettext('Number of items per interval'),
-                data: data
-            }]
+                data: data,
+            }],
         }];
     };
 }

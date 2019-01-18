@@ -70,27 +70,27 @@ export function TrackActivityChart(_, moment, desks, chartManager, gettext) {
             type: 'columnrange',
             chart: {
                 type: 'columnrange',
-                inverted: true
+                inverted: true,
             },
             legend: {
-                enabled: true
+                enabled: true,
             },
             title: {
-                text: null
+                text: null,
             },
             xAxis: {
-                categories: categories
+                categories: categories,
             },
             yAxis: {
                 type: 'datetime',
                 title: {
-                    text: gettext('Time')
+                    text: gettext('Time'),
                 },
                 labels: {
                     formatter: function() {
                         return formatTimestamp(this.value);
-                    }
-                }
+                    },
+                },
             },
             tooltip: {
                 pointFormatter: function() {
@@ -107,14 +107,14 @@ export function TrackActivityChart(_, moment, desks, chartManager, gettext) {
                     }
                     format += '<br/>';
                     return format;
-                }
+                },
             },
             series: [{
                 type: 'columnrange',
                 name: seriesName,
                 lineWidth: 1,
-                data: data
-            }]
+                data: data,
+            }],
         }];
     };
 }

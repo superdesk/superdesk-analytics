@@ -28,6 +28,6 @@ export function FeaturemediaUpdatesReportPreview(
                 gettext('Changes to Featuremedia');
 
             scope.subtitle = chartConfig.generateSubtitleForDates(params);
-        }
+        },
     };
 }

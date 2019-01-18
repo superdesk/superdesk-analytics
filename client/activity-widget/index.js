@@ -31,7 +31,7 @@ export default angular.module('superdesk.analytics.activity-report-widget', [
     'superdesk.apps.authoring.widgets',
     'superdesk.apps.desks',
     'superdesk.apps.workspace',
-    'superdesk.analytics.activity-report'
+    'superdesk.analytics.activity-report',
 ])
 
     .run(cacheIncludedTemplates)
