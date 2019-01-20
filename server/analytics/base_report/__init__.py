@@ -9,7 +9,7 @@
 # at https://www.sourcefabric.org/superdesk/license
 
 from flask import json, current_app as app
-from eve_elastic.elastic import set_filters
+from eve_elastic.elastic import set_filters, ElasticCursor
 
 from superdesk import get_resource_service, es_utils
 from superdesk.utils import ListCursor
@@ -46,6 +46,9 @@ class BaseReportService(SearchService):
         """
         Overwrite this method to generate a report based on the aggregation data
         """
+        if args.get('aggs', 1) == 0:
+            return docs
+
         return self.get_aggregation_buckets(docs.hits)
 
     def generate_highcharts_config(self, docs, args):
@@ -275,6 +278,12 @@ class BaseReportService(SearchService):
         if 'include_items' in args and int(args['include_items']):
             report['_items'] = list(docs)
 
+        if isinstance(report, list):
+            return ListCursor(report)
+        elif isinstance(report, ListCursor):
+            return report
+        elif isinstance(report, ElasticCursor):
+            return report
         return ListCursor([report])
 
     def get_utc_offset(self):
@@ -369,6 +378,9 @@ class BaseReportService(SearchService):
 
     def _es_set_size(self, query, params):
         query['size'] = params.get('size') or 0
+
+        if 'page' in params:
+            query['page'] = params['page']
 
     def _es_set_sort(self, query, params):
         query['sort'] = params.get('sort') or [{self.date_filter_field: 'desc'}]
@@ -523,6 +535,11 @@ class BaseReportService(SearchService):
 
         if 'size' in query.keys():
             es_query['source']['size'] = query['size']
+
+            page = query.get('page') or 1
+            es_query['source']['from'] = (page - 1) * query['size']
+            es_query['page'] = query.get('page') or 1
+            es_query['max_results'] = query['size']
 
         if 'sort' in query.keys():
             es_query['source']['sort'] = query['sort']

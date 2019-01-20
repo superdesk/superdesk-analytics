@@ -278,3 +278,65 @@ Feature: Base Analytics Report Service
             }]
         }
         """
+
+    @auth @wip
+    Scenario: Paginate response
+        Given "archived"
+        """
+        [
+            {
+                "_id": "archive1", "_type": "archived", "source": "AAP", "slugline": "1",
+                "task": {"stage": "5b501a511d41c84c0bfced4b", "desk": "5b501a501d41c84c0bfced4a"},
+                "anpa_category": [{"qcode": "A", "name": "Advisories"}, {"qcode": "T", "name": "Transport"}]
+            },
+            {
+                "_id": "archive2", "_type": "archived", "source": "AAP", "slugline": "2",
+                "task": {"stage": "5b501a6f1d41c84c0bfced4c", "desk": "5b501a501d41c84c0bfced4a"},
+                "anpa_category": [{"qcode": "A", "name": "Advisories"}]
+            },
+            {
+                "_id": "archive3", "_type": "archived", "source": "AAP", "slugline": "3",
+                "task": {"stage": "5b501a511d41c84c0bfced4b", "desk": "5b501a501d41c84c0bfced4a"},
+                "anpa_category": [{"qcode": "A", "name": "Advisories"}, {"qcode": "T", "name": "Transport"}]
+            },
+            {
+                "_id": "archive4", "_type": "archived", "source": "AAP", "slugline": "4",
+                "task": {"stage": "5b501a6f1d41c84c0bfced4c", "desk": "5b501a501d41c84c0bfced4a"},
+                "anpa_category": [{"qcode": "A", "name": "Advisories"}]
+            },
+            {
+                "_id": "archive5", "_type": "archived", "source": "AAP", "slugline": "5",
+                "task": {"stage": "5b501a511d41c84c0bfced4b", "desk": "5b501a501d41c84c0bfced4a"},
+                "anpa_category": [{"qcode": "A", "name": "Advisories"}, {"qcode": "T", "name": "Transport"}]
+            },
+            {
+                "_id": "archive6", "_type": "archived", "source": "AAP", "slugline": "6",
+                "task": {"stage": "5b501a6f1d41c84c0bfced4c", "desk": "5b501a501d41c84c0bfced4a"},
+                "anpa_category": [{"qcode": "A", "name": "Advisories"}]
+            }
+        ]
+        """
+        When we get "/analytics_test_report?params={"must": {}, "size": 2, "page": 1, "sort": [{"slugline": "asc"}]}&aggs=0&max_results=2"
+        Then we get list with 6 items
+        """
+        {
+            "_items": [{"_id": "archive1"}, {"_id": "archive2"}],
+            "_meta": {"total": 6, "page": 1, "max_results": 2}
+        }
+        """
+        When we get "/analytics_test_report?params={"must": {}, "size": 2, "page": 2, "sort": [{"slugline": "asc"}]}&aggs=0&max_results=2&page=2"
+        Then we get list with 6 items
+        """
+        {
+            "_items": [{"_id": "archive3"}, {"_id": "archive4"}],
+            "_meta": {"total": 6, "page": 2, "max_results": 2}
+        }
+        """
+        When we get "/analytics_test_report?params={"must": {}, "size": 2, "page": 3, "sort": [{"slugline": "asc"}]}&aggs=0&max_results=2&page=3"
+        Then we get list with 6 items
+        """
+        {
+            "_items": [{"_id": "archive5"}, {"_id": "archive6"}],
+            "_meta": {"total": 6, "page": 3, "max_results": 2}
+        }
+        """

@@ -33,6 +33,7 @@ import './desk_activity_report';
 import './production_time_report';
 import './user_activity_report';
 import './featuremedia_updates_report';
+import './update_time_report';
 
 angular.module('superdesk.analytics.reports', [])
     .provider('reports', svc.ReportsProvider);
@@ -69,6 +70,7 @@ export default angular.module('superdesk.analytics', [
     'superdesk.analytics.production-time-report',
     'superdesk.analytics.user-activity-report',
     'superdesk.analytics.featuremedia-updates-report',
+    'superdesk.analytics.update-time-report',
     'superdesk-ui',
 ])
     .service('analyticsWidgetSettings', svc.AnalyticsWidgetSettings)

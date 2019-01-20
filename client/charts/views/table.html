@@ -1,0 +1,60 @@
+<div class="sd-chart__chart">
+    <div class="sd-chart__table sd-shadow--z2">
+        <div class="sd-chart__table-header sd-chart__table-header--no-padding-bottom">
+            <div class="sd-chart__table-header-title" ng-if="title">
+                <span>{{title | translate}}</span>
+            </div>
+            <div class="sd-chart__table-header-subtitle" ng-if="subtitle">
+                <span>{{subtitle | translate}}</span>
+            </div>
+            <div sd-pagination-alt
+                 class="pagination-box"
+                 data-page="page.no"
+                 data-max-page="page.max"
+                 ng-if="page.max > 1"
+            ></div>
+        </div>
+        <div class="sd-chart__table-content">
+            <div ng-if="rows.length === 0" class="panel-info">
+                <div class="panel-info__icon">
+                    <i class="big-icon--comments"></i>
+                </div>
+                <h3 class="panel-info__heading" translate>No data found</h3>
+                <p class="panel-info__description" translate>Change the search filters and try again!</p>
+            </div>
+            <table ng-if="rows.length > 1">
+                <thead>
+                <tr>
+                    <th ng-repeat="header in headers track by $index"
+                        ng-class="{'clickable': header.field}"
+                        ng-click="onHeaderClicked(header)"
+                    >
+                        {{:: header.title | translate}}
+                        <i class="icon-chevron-up-thin"
+                           ng-if="page.sort.field === header.field && page.sort.order === 'asc'"
+                        ></i>
+                        <i class="icon-chevron-down-thin"
+                           ng-if="page.sort.field === header.field && page.sort.order === 'desc'"
+                        ></i>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="row in rows track by $index">
+                        <td ng-repeat="data in row track by $index"
+                            ng-class="{'clickable': data.clickable}"
+                            ng-click="data.clickable && onCellClicked(data)"
+                        >
+                            <a ng-if="data.clickable" data-sd-tooltip="{{data.tooltip | translate}}">
+                                {{data.label}}
+                            </a>
+                            <span ng-if="!data.clickable">
+                                {{data.label}}
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

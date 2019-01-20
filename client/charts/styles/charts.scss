@@ -21,6 +21,9 @@ $colors: #7cb5ec #434348 #90ed7d #f7a35c #8085e9 #f15c80 #e4d354 #2b908f #f45b5b
 
     &--margin-bottom {
         margin-bottom: 3rem;
+        .sd-chart__table {
+            margin-bottom: 3rem;
+        }
     }
 
     &--multi-chart {
@@ -39,10 +42,10 @@ $colors: #7cb5ec #434348 #90ed7d #f7a35c #8085e9 #f15c80 #e4d354 #2b908f #f45b5b
 
     .clickable {
         cursor: pointer;
+    }
 
-        &:hover {
-            border: 1px solid #9bb3ff;
-        }
+    td.clickable:hover {
+        border: 1px solid #9bb3ff;
     }
 
     .sd-chart__table-header {
@@ -53,6 +56,21 @@ $colors: #7cb5ec #434348 #90ed7d #f7a35c #8085e9 #f15c80 #e4d354 #2b908f #f45b5b
         position: sticky;
         top: 0;
         background-color: $white;
+
+        &--no-padding-bottom {
+            padding-bottom: 0;
+        }
+
+        .pagination-box {
+            display: block;
+            position: absolute;
+            right: 0;
+            bottom: 0;
+        }
+
+        .sd-pagination {
+            padding: 0;
+        }
     }
 
     .sd-chart__table-header-options {
@@ -105,6 +123,11 @@ $colors: #7cb5ec #434348 #90ed7d #f7a35c #8085e9 #f15c80 #e4d354 #2b908f #f45b5b
         .no-vert-padding {
             padding-top: 0;
             padding-bottom: 0;
+        }
+
+        .panel-info {
+            border-top: 1px solid rgba(0, 0, 0, 0.15);
+            padding-bottom: 10rem;
         }
     }
 }
