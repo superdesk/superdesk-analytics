@@ -1,1 +1,0 @@
-export {ContentQuotaReportWidgetSettings} from './ContentQuotaReportWidgetSettings';

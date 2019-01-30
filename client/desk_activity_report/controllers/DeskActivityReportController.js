@@ -425,7 +425,7 @@ export function DeskActivityReportController(
             startOfWeek: deployConfig.getSync('start_of_week', 0),
             timezoneOffset: utcOffset,
             useUTC: false,
-            fullHeight: true,
+            fullHeight: false,
             legendTitle: gettext('Desk Transitions'),
         });
 

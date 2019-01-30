@@ -12,22 +12,21 @@ import './styles/analytics.scss';
 import * as svc from './services';
 import * as directive from './directives';
 
+// Base services/directives
 import './charts';
 import './search';
-import './activity_reports';
-import './activity-widget';
-import './processed_items_report';
-import './processed_items_widget';
-import './track_activity_report';
-import './track_activity_widget';
-import './content_quota_report';
-import './content_quota_widget';
-import './source_category_report';
 import './saved_reports';
 import './scheduled_reports';
+import './email_report';
+
+// Reports
+import './activity_reports';
+import './processed_items_report';
+import './track_activity_report';
+import './content_quota_report';
+import './source_category_report';
 import './content_publishing_report';
 import './publishing_performance_report';
-import './email_report';
 import './planning_usage_report';
 import './desk_activity_report';
 import './production_time_report';
@@ -52,16 +51,20 @@ cacheIncludedTemplates.$inject = ['$templateCache'];
  * @description Superdesk analytics module.
  */
 export default angular.module('superdesk.analytics', [
-    'superdesk.analytics.reports',
-    'superdesk.analytics.saved_reports',
+    // Base services/directives
     'superdesk.analytics.charts',
     'superdesk.analytics.search',
+    'superdesk.analytics.saved_reports',
     'superdesk.analytics.scheduled_reports',
+    'superdesk.analytics.reports',
     'superdesk.analytics.email_report',
-    'superdesk.analytics.activity-report', 'superdesk.analytics.processed-items-report',
-    'superdesk.analytics.processed-items-widget', 'superdesk.analytics.track-activity-report',
-    'superdesk.analytics.track-activity-widget', 'superdesk.analytics.activity-report-widget',
-    'superdesk.analytics.content-quota-report', 'superdesk.analytics.content-quota-widget',
+    'superdesk-ui',
+
+    // Reports
+    'superdesk.analytics.activity-report',
+    'superdesk.analytics.processed-items-report',
+    'superdesk.analytics.track-activity-report',
+    'superdesk.analytics.content-quota-report',
     'superdesk.analytics.source-category-report',
     'superdesk.analytics.content-publishing-report',
     'superdesk.analytics.publishing-performance-report',
@@ -71,12 +74,8 @@ export default angular.module('superdesk.analytics', [
     'superdesk.analytics.user-activity-report',
     'superdesk.analytics.featuremedia-updates-report',
     'superdesk.analytics.update-time-report',
-    'superdesk-ui',
 ])
-    .service('analyticsWidgetSettings', svc.AnalyticsWidgetSettings)
-
     .directive('sdAnalyticsContainer', directive.AnalyticsContainer)
-    .directive('sdAfterRender', directive.AfterRender)
     .directive('sdReportDropdown', directive.ReportDropdown)
     .directive('sdConvertToNumber', directive.ConvertToNumber)
     .directive('sdaArchivePreviewProxy', directive.ArchivePreviewProxy)

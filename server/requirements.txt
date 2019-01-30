@@ -6,5 +6,7 @@ flake8-docstrings
 wooper
 requests
 requests-mock
+coverage==4.3.4
+coveralls
 -e git://github.com/superdesk/superdesk-core.git@master#egg=Superdesk_Core
 git+git://github.com/superdesk/superdesk-planning.git@master#egg=superdesk-planning
