@@ -65,7 +65,7 @@ def init_gen_stats_task(app):
     if not app.config['CELERY_BEAT_SCHEDULE'].get('analytics:gen_archive_stats'):
         app.config['CELERY_BEAT_SCHEDULE']['analytics:gen_archive_stats'] = {
             'task': 'analytics.stats.gen_archive_stats',
-            'schedule': crontab(minute='0', hour='3')  # Runs once a day at 3am
+            'schedule': crontab(minute='0')  # Runs every hour
         }
 
 
