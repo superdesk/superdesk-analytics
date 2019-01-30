@@ -104,12 +104,12 @@ class ProcessedItemsService(BaseService):
         report = []
 
         for user in doc['users']:
-                user_details = get_resource_service('users').find_one(req=None, _id=user['_id'])
-                report.append({
-                    'user': {
-                        '_id': user_details['_id'],
-                        'display_name': user_details['display_name']},
-                    'processed_items': self.search_items_single_user(doc, user['_id'])})
+            user_details = get_resource_service('users').find_one(req=None, _id=user['_id'])
+            report.append({
+                'user': {
+                    '_id': user_details['_id'],
+                    'display_name': user_details['display_name']},
+                'processed_items': self.search_items_single_user(doc, user['_id'])})
 
         return report
 
