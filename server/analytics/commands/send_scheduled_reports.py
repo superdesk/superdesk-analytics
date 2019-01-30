@@ -18,6 +18,16 @@ from datetime import datetime
 
 
 class SendScheduledReports(Command):
+    """
+    Send scheduled reports
+
+    Example:
+    ::
+
+        $ python manage.py analytics:send_scheduled_reports
+        $ python manage.py analytics:send_scheduled_reports --now
+    """
+
     option_list = [
         Option(
             '--now', '-n',
