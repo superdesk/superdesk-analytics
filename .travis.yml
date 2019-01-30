@@ -37,7 +37,11 @@ install:
     - cd server && pip install -q -r requirements.txt && cd ..
     - chmod a+x server/scripts/install-highcharts-export-server.sh
     - pip install -e .
+    - gem install coveralls-lcov
 
 script:
     - cd server && python3 -u -m analytics.reports.highcharts_server &
     - make test
+
+after_success:
+    - coveralls-lcov -v -n coverage/lcov.info > coverage.json && coveralls --merge=coverage.json

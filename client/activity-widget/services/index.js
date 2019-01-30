@@ -1,1 +1,0 @@
-export {ActivityReportWidgetSettings} from './ActivityReportWidgetSettings';

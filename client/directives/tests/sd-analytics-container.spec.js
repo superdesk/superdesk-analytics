@@ -36,9 +36,11 @@ describe('sd-analytics-container', () => {
         allowScheduling: false,
     }];
 
+    beforeEach(window.module('angularMoment'));
     beforeEach(window.module('superdesk.templates-cache'));
     beforeEach(window.module('superdesk.core.activity'));
     beforeEach(window.module('superdesk.core.services.pageTitle'));
+    beforeEach(window.module('superdesk.apps.desks'));
     beforeEach(window.module('superdesk.analytics'));
 
     beforeEach(window.module((reportsProvider) => {
