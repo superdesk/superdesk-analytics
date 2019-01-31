@@ -51,7 +51,6 @@ export function FeaturemediaUpdatesReportController(
      * @description Initialises the scope parameters
      */
     this.init = () => {
-        $scope.currentTab = 'parameters';
         $scope.dateFilters = [
             DATE_FILTERS.YESTERDAY,
             DATE_FILTERS.LAST_WEEK,
@@ -182,19 +181,6 @@ export function FeaturemediaUpdatesReportController(
 
     /**
      * @ngdoc method
-     * @name FeaturemediaUpdatesReportController#runQuery
-     * @param {Object} params - The report parameters used to search the data
-     * @return {Object}
-     * @description Queries the ContentPublishing API and returns it's response
-     */
-    $scope.runQuery = (params) => searchReport.query(
-        'featuremedia_updates_report',
-        params,
-        true
-    );
-
-    /**
-     * @ngdoc method
      * @name FeaturemediaUpdatesReportController#generate
      * @description Updates the Highchart configs in the report's content view
      */
@@ -223,16 +209,6 @@ export function FeaturemediaUpdatesReportController(
                     )
                 );
             });
-    };
-
-    /**
-     * @ngdoc method
-     * @name FeaturemediaUpdatesReportController#changeTab
-     * @param {String} tabName - The name of the tab to change to
-     * @description Change the current tab in the filters panel
-     */
-    $scope.changeTab = (tabName) => {
-        $scope.currentTab = tabName;
     };
 
     /**

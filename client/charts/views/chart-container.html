@@ -1,11 +1,11 @@
-<div class="sd-chart__container">
+<div class="sda-chart__container">
     <div ng-repeat="chart in reportConfigs.charts track by chart.id"
-         sd-chart
-         class="sd-chart__chart"
+         sda-chart
+         class="sda-chart__chart"
          ng-class="{
-            'sd-chart__chart--multi-chart': !!reportConfigs.multiChart && reportConfigs.charts.length > 1,
-            'sd-chart__chart--full-height': !!chart.fullHeight && chart.type !== 'table',
-            'sd-chart__chart--margin-bottom': !!reportConfigs.marginBottom
+            'sda-chart__chart--multi-chart': !!reportConfigs.multiChart && reportConfigs.charts.length > 1,
+            'sda-chart__chart--full-height': !!chart.fullHeight && chart.type !== 'table',
+            'sda-chart__chart--margin-bottom': !!reportConfigs.marginBottom
          }"
          data-config="chart"
          id="{{chart.id}}"

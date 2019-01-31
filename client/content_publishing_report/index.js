@@ -42,7 +42,7 @@ angular.module('superdesk.analytics.content-publishing-report', [])
             id: 'content_publishing_report',
             label: gettext('Content Publishing'),
             sidePanelTemplate: 'content-publishing-report-panel.html',
-            priority: 600,
+            priority: 100,
             privileges: {content_publishing_report: 1},
             allowScheduling: true,
         });

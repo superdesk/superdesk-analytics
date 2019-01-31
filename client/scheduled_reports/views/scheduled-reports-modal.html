@@ -50,7 +50,7 @@
                         </div>
                     </div>
 
-                    <div sd-report-schedule-input
+                    <div sda-report-schedule-input
                          ng-model="schedule.schedule"
                          data-as-label="false"
                          data-submitted="scheduleForm.$submitted"
@@ -185,7 +185,7 @@
                                             <label class="sd-line-input__label" translate>Image Width</label>
                                             <select class="sd-line-input__select"
                                                     ng-model="schedule.report_width"
-                                                    sd-convert-to-number
+                                                    sda-convert-to-number
                                             >
                                                 <option ng-repeat="width in allowedWidths" value="{{width}}">{{width}} pixels</option>
                                             </select>

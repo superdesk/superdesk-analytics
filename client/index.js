@@ -20,11 +20,6 @@ import './scheduled_reports';
 import './email_report';
 
 // Reports
-import './activity_reports';
-import './processed_items_report';
-import './track_activity_report';
-import './content_quota_report';
-import './source_category_report';
 import './content_publishing_report';
 import './publishing_performance_report';
 import './planning_usage_report';
@@ -61,11 +56,6 @@ export default angular.module('superdesk.analytics', [
     'superdesk-ui',
 
     // Reports
-    'superdesk.analytics.activity-report',
-    'superdesk.analytics.processed-items-report',
-    'superdesk.analytics.track-activity-report',
-    'superdesk.analytics.content-quota-report',
-    'superdesk.analytics.source-category-report',
     'superdesk.analytics.content-publishing-report',
     'superdesk.analytics.publishing-performance-report',
     'superdesk.analytics.planning-usage-report',
@@ -75,9 +65,9 @@ export default angular.module('superdesk.analytics', [
     'superdesk.analytics.featuremedia-updates-report',
     'superdesk.analytics.update-time-report',
 ])
-    .directive('sdAnalyticsContainer', directive.AnalyticsContainer)
-    .directive('sdReportDropdown', directive.ReportDropdown)
-    .directive('sdConvertToNumber', directive.ConvertToNumber)
+    .directive('sdaAnalyticsContainer', directive.AnalyticsContainer)
+    .directive('sdaReportDropdown', directive.ReportDropdown)
+    .directive('sdaConvertToNumber', directive.ConvertToNumber)
     .directive('sdaArchivePreviewProxy', directive.ArchivePreviewProxy)
     .directive('sdaRenditionsPreview', directive.RenditionsPreview)
 

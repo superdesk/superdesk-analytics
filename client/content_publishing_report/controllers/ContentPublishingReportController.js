@@ -54,7 +54,6 @@ export function ContentPublishingReportController(
      * @description Initialises the scope parameters
      */
     this.init = () => {
-        $scope.currentTab = 'parameters';
         $scope.dateFilters = [
             DATE_FILTERS.YESTERDAY,
             DATE_FILTERS.LAST_WEEK,
@@ -242,19 +241,6 @@ export function ContentPublishingReportController(
 
     /**
      * @ngdoc method
-     * @name ContentPublishingReportController#runQuery
-     * @param {Object} params - The report parameters used to search the data
-     * @return {Object}
-     * @description Queries the ContentPublishing API and returns it's response
-     */
-    $scope.runQuery = (params) => searchReport.query(
-        'content_publishing_report',
-        params,
-        true
-    );
-
-    /**
-     * @ngdoc method
      * @name ContentPublishingReportController#generate
      * @description Updates the Highchart configs in the report's content view
      */
@@ -287,16 +273,6 @@ export function ContentPublishingReportController(
                     )
                 );
             });
-    };
-
-    /**
-     * @ngdoc method
-     * @name ContentPublishingReportController#changeTab
-     * @param {String} tabName - The name of the tab to change to
-     * @description Change the current tab in the filters panel
-     */
-    $scope.changeTab = (tabName) => {
-        $scope.currentTab = tabName;
     };
 
     /**

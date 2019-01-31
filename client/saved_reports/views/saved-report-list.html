@@ -10,7 +10,7 @@
     </div>
     <div class="saved-reports__group-title" translate>My Saved Reports</div>
     <div ng-repeat="savedReport in filteredUserReports | orderBy:'name'"
-         sd-saved-report-item
+         sda-saved-report-item
          data-report="savedReport"
          data-remove-report="remove"
          data-select-report="selectReport"
@@ -24,7 +24,7 @@
     ></div>
     <div class="saved-reports__group-title" translate>Global Saved Activity Reports</div>
     <div ng-repeat="savedReport in filteredGlobalReports | orderBy:'name'"
-         sd-saved-report-item
+         sda-saved-report-item
          data-report="savedReport"
          data-remove-report="remove"
          data-select-report="selectReport"

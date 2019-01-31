@@ -4,7 +4,7 @@ $colors: #7cb5ec #434348 #90ed7d #f7a35c #8085e9 #f15c80 #e4d354 #2b908f #f45b5b
 @import '~superdesk-ui-framework/app/styles/_reboot.scss';
 @import '~superdesk-ui-framework/app/styles/variables/_colors.scss';
 
-.sd-chart__container {
+.sda-chart__container {
     width: 100%;
     height: 100%;
     display: flex;
@@ -12,20 +12,20 @@ $colors: #7cb5ec #434348 #90ed7d #f7a35c #8085e9 #f15c80 #e4d354 #2b908f #f45b5b
     padding: 2rem;
 }
 
-.sd-chart__chart {
+.sda-chart__chart {
     width: 100%;
 
     &--full-height {
         height: 100%;
 
-        .sd-chart__highchart {
+        .sda-chart__highchart {
             height: 100%;
         }
     }
 
     &--margin-bottom {
         margin-bottom: 3rem;
-        .sd-chart__table {
+        .sda-chart__table {
             margin-bottom: 3rem;
         }
     }
@@ -35,12 +35,12 @@ $colors: #7cb5ec #434348 #90ed7d #f7a35c #8085e9 #f15c80 #e4d354 #2b908f #f45b5b
         height: 85%;
     }
 
-    .sd-chart__highchart {
+    .sda-chart__highchart {
         width: 100%;
     }
 }
 
-.sd-chart__table {
+.sda-chart__table {
     display: block;
     background-color: white;
 
@@ -52,7 +52,7 @@ $colors: #7cb5ec #434348 #90ed7d #f7a35c #8085e9 #f15c80 #e4d354 #2b908f #f45b5b
         border: 1px solid #9bb3ff;
     }
 
-    .sd-chart__table-header {
+    .sda-chart__table-header {
         z-index: 1000;
         text-align: center;
         padding: 1rem 0 2rem 0;
@@ -77,13 +77,13 @@ $colors: #7cb5ec #434348 #90ed7d #f7a35c #8085e9 #f15c80 #e4d354 #2b908f #f45b5b
         }
     }
 
-    .sd-chart__table-header-options {
+    .sda-chart__table-header-options {
         position: absolute !important;
         right: 1rem;
         top: 1rem;
     }
 
-    .sd-chart__table-content {
+    .sda-chart__table-content {
         display: block;
 
         table {
@@ -154,18 +154,18 @@ $colors: #7cb5ec #434348 #90ed7d #f7a35c #8085e9 #f15c80 #e4d354 #2b908f #f45b5b
     border-width: 0;
 }
 
-.highcharts-title, .sd-chart__table-header-title {
+.highcharts-title, .sda-chart__table-header-title {
     text-transform: uppercase;
     font-size: 2.0rem;
     letter-spacing: 0.04em;
     color: $grayDark;
 }
 
-.sd-chart__table-header-title {
+.sda-chart__table-header-title {
     margin-bottom: 1rem;
 }
 
-.highcharts-subtitle, .sd-chart__table-header-subtitle {
+.highcharts-subtitle, .sda-chart__table-header-subtitle {
     font-size: 1.4rem;
     letter-spacing: 0.04em;
     color: $gray;

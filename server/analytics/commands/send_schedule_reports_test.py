@@ -65,11 +65,23 @@ mock_vocabs = [{
 mock_saved_reports = [{
     '_id': 'srep1',
     'name': 'Saved Report',
-    'report': 'source_category_report',
+    'report': 'content_publishing_report',
     'params': {
-        'date_filter': 'range',
-        'start_date': '2018-06-01',
-        'end_date': '2018-06-30',
+        'dates': {
+            'filter': 'range',
+            'start': '2018-06-01',
+            'end': '2018-06-30'
+        },
+        'aggs': {
+            'group': {
+                'field': 'source',
+                'size': 0
+            },
+            'subgroup': {
+                'field': 'anpa_category.qcode',
+                'size': 0
+            }
+        }
     },
     'user': 'user1'
 }]
@@ -281,11 +293,13 @@ class SendScheduleReportTestCase(TestCase):
             self.app.data.insert('saved_reports', [{
                 '_id': 'srep1',
                 'name': 'Saved Report',
-                'report': 'source_category_report',
+                'report': 'content_publishing_report',
                 'params': {
-                    'date_filter': 'range',
-                    'start_date': '2018-06-01',
-                    'end_date': '2018-06-30',
+                    'dates': {
+                        'filter': 'range',
+                        'start': '2018-06-01',
+                        'end': '2018-06-30',
+                    },
                     'chart_type': 'pie'
                 },
                 'user': 'user1'

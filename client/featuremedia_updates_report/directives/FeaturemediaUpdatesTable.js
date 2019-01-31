@@ -37,7 +37,7 @@ export function FeaturemediaUpdatesTable(
 ) {
     return {
         replace: true,
-        require: '^sdAnalyticsContainer',
+        require: '^sdaAnalyticsContainer',
         template: require('../views/featuremedia-updates-table.html'),
         link: function(scope, element) {
             /**

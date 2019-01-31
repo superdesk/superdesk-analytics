@@ -15,7 +15,7 @@ ScheduledReportsList.$inject = [
 /**
  * @ngdoc directive
  * @module superdesk.apps.analytics.scheduled_reports
- * @name sdScheduledReportsList
+ * @name sdaScheduledReportsList
  * @requires modal
  * @requires lodash
  * @requires reports
@@ -51,7 +51,7 @@ export function ScheduledReportsList(
         link: function(scope) {
             /**
             * @ngdoc method
-            * @name sdScheduledReportsList#init
+            * @name sdaScheduledReportsList#init
             * @description Initializes the scope parameters
             */
             this.init = () => {
@@ -76,7 +76,7 @@ export function ScheduledReportsList(
 
             /**
              * @ngdoc method
-             * @name sdScheduledReportsList#onSavedReportsUpdate
+             * @name sdaScheduledReportsList#onSavedReportsUpdate
              * @param {object} event - The websocket event object
              * @param {object} data - The websocket data (saved report details)
              * @description Reload all ScheduledReports when a SavedReport gets updated
@@ -93,7 +93,7 @@ export function ScheduledReportsList(
 
             /**
              * @ngdoc property
-             * @name sdScheduledReportsList#mimeTypes
+             * @name sdaScheduledReportsList#mimeTypes
              * @type {Array<Object>}
              * @description Array of the supported MIME types
              */
@@ -107,7 +107,7 @@ export function ScheduledReportsList(
 
             /**
              * @ngdoc method
-             * @name sdScheduledReportsList#getSavedReportType
+             * @name sdaScheduledReportsList#getSavedReportType
              * @param {Object} schedule - The schedule to get the report type
              * @return {String} Name of the saved report
              * @description Gets the name of the report type from the saved report for the provided schedule
@@ -118,7 +118,7 @@ export function ScheduledReportsList(
 
             /**
              * @ngdoc method
-             * @name sdScheduledReportsList#loadSchedules
+             * @name sdaScheduledReportsList#loadSchedules
              * @description Loads all the schedules for the current report type
              */
             this.loadSchedules = () => (
@@ -134,7 +134,7 @@ export function ScheduledReportsList(
 
             /**
              * @ngdoc method
-             * @name sdScheduledReportsList#loadSavedReports
+             * @name sdaScheduledReportsList#loadSavedReports
              * @description Loads all the saved reports for the current report type
              */
             this.loadSavedReports = () => (
@@ -152,7 +152,7 @@ export function ScheduledReportsList(
 
             /**
              * @ngdoc method
-             * @name sdScheduledReportsList#loadSchedulesAndReports
+             * @name sdaScheduledReportsList#loadSchedulesAndReports
              * @description Loads all schedules and saved reports for the current report type
              */
             this.loadSchedulesAndReports = () => {
@@ -174,7 +174,7 @@ export function ScheduledReportsList(
 
             /**
              * @ngdoc method
-             * @name sdScheduledReportsList#openModal
+             * @name sdaScheduledReportsList#openModal
              * @param {Object} schedule - The schedule to edit
              * @description Opens the editor modal for the provided schedule
              */
@@ -185,7 +185,7 @@ export function ScheduledReportsList(
 
             /**
              * @ngdoc method
-             * @name sdScheduledReportsList#closeModal
+             * @name sdaScheduledReportsList#closeModal
              * @description Closes the editor modal
              */
             scope.closeModal = () => {
@@ -195,7 +195,7 @@ export function ScheduledReportsList(
 
             /**
              * @ngdoc method
-             * @name sdScheduledReportsList#remove
+             * @name sdaScheduledReportsList#remove
              * @param {Object} schedule - The schedule to delete
              * @description Displays a confirmation modal, and if confirmed delets the provided schedule
              */
@@ -207,7 +207,7 @@ export function ScheduledReportsList(
 
             /**
              * @ngdoc method
-             * @name sdScheduledReportsList#getFileType
+             * @name sdaScheduledReportsList#getFileType
              * @param {Object} schedule - The schedule to get the file type for
              * @return {String} The name of the file type
              * @description Gets the name of the file type for the provided schedule's MIME type
@@ -220,7 +220,7 @@ export function ScheduledReportsList(
 
             /**
              * @ngdoc method
-             * @name sdScheduledReportsList#openCreateModal
+             * @name sdaScheduledReportsList#openCreateModal
              * @param {Object} savedReport - The saved report
              * @description Opens the editor modal with the provided saved report already filled in
              */
@@ -243,7 +243,7 @@ export function ScheduledReportsList(
 
             /**
              * @ngdoc method
-             * @name sdScheduledReportsList#viewScheduleForReport
+             * @name sdaScheduledReportsList#viewScheduleForReport
              * @param {Object} event - The Angular broadcast event
              * @param {Object} savedReport - The saved report to filter by
              * @description Filters the schedules based on the provided saved report
@@ -263,7 +263,7 @@ export function ScheduledReportsList(
 
             /**
              * @ngdoc method
-             * @name sdScheduledReportsList#createNewFromSavedReport
+             * @name sdaScheduledReportsList#createNewFromSavedReport
              * @param {Object} event - The Angular broadcast event
              * @param {Object} savedReport - The saved report
              * @description Creates a new schedule for the provided saved report
@@ -274,7 +274,7 @@ export function ScheduledReportsList(
 
             /**
              * @ngdoc method
-             * @name sdScheduledReportsList#getLastRunDescription
+             * @name sdaScheduledReportsList#getLastRunDescription
              * @param {Object} schedule - The scheduled report
              * @return {String} Human readable date/time format
              * @description Returns the human readable date/time the scheduled report was last run
@@ -291,7 +291,7 @@ export function ScheduledReportsList(
 
             /**
              * @ngdoc method
-             * @name sdScheduledReportsList#openEmailModal
+             * @name sdaScheduledReportsList#openEmailModal
              * @param {Object} schedule - The schedule to send an email for
              * @description Opens the sdEmailReportModal with the provided schedule
              */

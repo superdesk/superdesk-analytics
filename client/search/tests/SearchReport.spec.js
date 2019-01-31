@@ -101,9 +101,11 @@ describe('searchReport', () => {
     it('can generate the date filters', () => {
         // Range
         searchReport.query('source_category_report', {
-            date_filter: 'range',
-            start_date: '01/06/2018',
-            end_date: '30/06/2018',
+            dates: {
+                filter: 'range',
+                start: '01/06/2018',
+                end: '30/06/2018',
+            },
         });
 
         expectBoolQuery('source_category_report', {
@@ -120,7 +122,7 @@ describe('searchReport', () => {
         });
 
         // Yesterday
-        searchReport.query('source_category_report', {date_filter: 'yesterday'});
+        searchReport.query('source_category_report', {dates: {filter: 'yesterday'}});
 
         expectBoolQuery('source_category_report', {
             must: [{
@@ -136,7 +138,7 @@ describe('searchReport', () => {
         });
 
         // Last Week
-        searchReport.query('source_category_report', {date_filter: 'last_week'});
+        searchReport.query('source_category_report', {dates: {filter: 'last_week'}});
 
         expectBoolQuery('source_category_report', {
             must: [{
@@ -152,7 +154,7 @@ describe('searchReport', () => {
         });
 
         // Last Month
-        searchReport.query('source_category_report', {date_filter: 'last_month'});
+        searchReport.query('source_category_report', {dates: {filter: 'last_month'}});
 
         expectBoolQuery('source_category_report', {
             must: [{
@@ -385,18 +387,22 @@ describe('searchReport', () => {
             searchReport.query(
                 'source_category_report',
                 {
-                    date_filter: 'range',
-                    start_date: '01/06/2018',
-                    end_date: '30/06/2018',
+                    dates: {
+                        filter: 'range',
+                        start: '01/06/2018',
+                        end: '30/06/2018',
+                    },
                 },
                 true
             );
 
             expect(api.query).toHaveBeenCalledWith('source_category_report', {
                 params: {
-                    date_filter: 'range',
-                    start_date: '2018-06-01',
-                    end_date: '2018-06-30',
+                    dates: {
+                        filter: 'range',
+                        start: '2018-06-01',
+                        end: '2018-06-30',
+                    },
                     must: {},
                     must_not: {},
                     chart: {},
@@ -406,16 +412,18 @@ describe('searchReport', () => {
             searchReport.query(
                 'source_category_report',
                 {
-                    date_filter: 'yesterday',
-                    start_date: '01/06/2018',
-                    end_date: '30/06/2018',
+                    dates: {
+                        filter: 'yesterday',
+                        start: '01/06/2018',
+                        end: '30/06/2018',
+                    },
                 },
                 true
             );
 
             expect(api.query).toHaveBeenCalledWith('source_category_report', {
                 params: {
-                    date_filter: 'yesterday',
+                    dates: {filter: 'yesterday'},
                     must: {},
                     must_not: {},
                     chart: {},

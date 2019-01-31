@@ -3,7 +3,7 @@ ReportPreviewProxy.$inject = ['$compile', 'lodash'];
 /**
  * @ngdoc directive
  * @module superdesk.apps.analytics.scheduled_reports
- * @name sdReportPreviewProxy
+ * @name sdaReportPreviewProxy
  * @requires $compile
  * @requires lodash
  * @description A directive that compiles and renders a preview directive based on the
@@ -17,7 +17,7 @@ export function ReportPreviewProxy($compile, _) {
         link: function(scope, element) {
             /**
              * @ngdoc method
-             * @name sdReportPreviewProxy#constructTemplate
+             * @name sdaReportPreviewProxy#constructTemplate
              * @description Creates and compiles the angular preview directive
              * for the provided report
              */

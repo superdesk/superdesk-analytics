@@ -42,7 +42,7 @@ angular.module('superdesk.analytics.production-time-report', [])
             id: 'production_time_report',
             label: gettext('Production Time'),
             sidePanelTemplate: 'production-time-report-panel.html',
-            priority: 600,
+            priority: 500,
             privileges: {production_time_report: 1},
             allowScheduling: true,
             required_features: ['production_time_report'],

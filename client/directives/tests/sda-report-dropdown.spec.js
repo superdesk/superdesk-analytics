@@ -1,4 +1,4 @@
-describe('sd-report-dropdown', () => {
+describe('sda-report-dropdown', () => {
     let $compile;
     let $rootScope;
     let scope;
@@ -33,7 +33,7 @@ describe('sd-report-dropdown', () => {
         scope.currentReport = currentReport;
         scope.changeReport = changeReport;
 
-        const element = $compile('<div sd-report-dropdown></div>')(scope);
+        const element = $compile('<div sda-report-dropdown></div>')(scope);
 
         $rootScope.$digest();
         return element;

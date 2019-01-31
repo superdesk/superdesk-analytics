@@ -42,7 +42,7 @@ angular.module('superdesk.analytics.desk-activity-report', [])
             id: 'desk_activity_report',
             label: gettext('Desk Activity'),
             sidePanelTemplate: 'desk-activity-report-panel.html',
-            priority: 600,
+            priority: 200,
             privileges: {desk_activity_report: 1},
             allowScheduling: true,
             required_features: ['desk_activity_report'],

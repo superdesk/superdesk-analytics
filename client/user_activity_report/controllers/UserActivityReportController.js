@@ -70,8 +70,6 @@ export function UserActivityReportController(
      * @description Initialises the scope parameters
      */
     this.init = () => {
-        $scope.currentTab = 'parameters';
-
         $scope.form = {
             submitted: false,
             userError: null,
@@ -213,19 +211,6 @@ export function UserActivityReportController(
 
     /**
      * @ngdoc method
-     * @name UserActivityReportController#runQuery
-     * @param {Object} params - The report parameters used to search the data
-     * @return {Object}
-     * @description Queries the DeskActivityReport API and returns it's response
-     */
-    $scope.runQuery = (params) => searchReport.query(
-        'user_activity_report',
-        params,
-        true
-    );
-
-    /**
-     * @ngdoc method
      * @name UserActivityReportController#validateParams
      * @return {boolean}
      * @description Validates is a user has been selected or not
@@ -278,16 +263,6 @@ export function UserActivityReportController(
                     )
                 );
             });
-    };
-
-    /**
-     * @ngdoc method
-     * @name UserActivityReportController#changeTab
-     * @param {String} tabName - The name of the tab to change to
-     * @description Change the current tab in the filters panel
-     */
-    $scope.changeTab = (tabName) => {
-        $scope.currentTab = tabName;
     };
 
     /**
@@ -422,6 +397,7 @@ export function UserActivityReportController(
             fullHeight: false,
             onPointClick: onPointClick,
             tooltipFormatter: generateTooltip,
+            defaultConfig: chartConfig.defaultConfig,
         });
 
         const axis = chart.addAxis()
@@ -559,6 +535,7 @@ export function UserActivityReportController(
             invertAxes: report.chart.invertAxes,
             tooltipFormatter: generateTooltip,
             legendTitle: gettext('Users'),
+            defaultConfig: chartConfig.defaultConfig,
         });
 
         const axis = chart.addAxis()

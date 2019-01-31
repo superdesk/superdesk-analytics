@@ -1,4 +1,4 @@
-describe('sd-analytics-container', () => {
+describe('sda-analytics-container', () => {
     let $compile;
     let $rootScope;
     let scope;
@@ -58,7 +58,7 @@ describe('sd-analytics-container', () => {
 
     const initContainer = () => {
         // Construct the analytics container
-        $compile('<div sd-analytics-container></div>')(scope);
+        $compile('<div sda-analytics-container></div>')(scope);
         $rootScope.$digest();
     };
 

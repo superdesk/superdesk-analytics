@@ -1,7 +1,7 @@
 /**
  * @ngdoc directive
  * @module superdesk.apps.analytics
- * @name sdAnalyticsContainer
+ * @name sdaAnalyticsContainer
  * @requires $location
  * @requires pageTitle
  * @requires gettext
@@ -14,13 +14,14 @@
  * @required api
  * @required desks
  * @required metadata
+ * @required searchReport
  * @description A directive that encapsulates the entire analytics module view
  */
 export function AnalyticsContainer() {
     return {
         controllerAs: 'analytics',
         controller: ['$scope', '$location', 'pageTitle', 'gettext', 'lodash', 'reports', '$rootScope', '$timeout',
-            'emailReport', 'savedReports', 'api', 'desks', 'metadata',
+            'emailReport', 'savedReports', 'api', 'desks', 'metadata', 'searchReport',
             function AnalyticsContainerController(
                 $scope,
                 $location,
@@ -34,7 +35,8 @@ export function AnalyticsContainer() {
                 savedReports,
                 api,
                 desks,
-                metadata
+                metadata,
+                searchReport
             ) {
                 const defaultReportConfigs = {charts: []};
 
@@ -45,6 +47,7 @@ export function AnalyticsContainer() {
                 $scope.currentReport = {};
                 $scope.reportConfigs = $scope.reportConfigs || _.cloneDeep(defaultReportConfigs);
                 $scope.currentPanel = 'advanced';
+                $scope.currentTab = 'parameters';
                 $scope.emailModal = emailReport.modal;
                 $scope.preview = {
                     item: null,
@@ -53,7 +56,7 @@ export function AnalyticsContainer() {
 
                 /**
                  * @ngdoc method
-                 * @name sdAnalyticsContainer#init
+                 * @name sdaAnalyticsContainer#init
                  * @description Init the container members/values
                  */
                 const init = () => {
@@ -70,7 +73,7 @@ export function AnalyticsContainer() {
 
                 /**
                  * @ngdoc method
-                 * @name sdAnalyticsContainer#changeReport
+                 * @name sdaAnalyticsContainer#changeReport
                  * @param {object} report - The registered report to change to
                  * @param {Boolean} deselectSavedReport - Deselects SavedReport if true (false on initial load)
                  * @description Changes the current report
@@ -84,6 +87,7 @@ export function AnalyticsContainer() {
                     $scope.currentReport = report || null;
                     $scope.reportConfigs = _.cloneDeep(defaultReportConfigs);
                     $scope.currentPanel = 'advanced';
+                    $scope.currentTab = 'parameters';
 
                     if (_.get(report, 'id')) {
                         $location.search('report', report.id);
@@ -102,7 +106,7 @@ export function AnalyticsContainer() {
 
                 /**
                  * @ngdoc method
-                 * @name sdAnalyticsContainer#toggleSidePanel
+                 * @name sdaAnalyticsContainer#toggleSidePanel
                  * @description Shows/hides the side panel
                  */
                 $scope.toggleSidePanel = () => {
@@ -114,7 +118,7 @@ export function AnalyticsContainer() {
 
                 /**
                  * @ngdoc method
-                 * @name sdAnalyticsContainer#changeReportParams
+                 * @name sdaAnalyticsContainer#changeReportParams
                  * @param {Object} params - The report parameters
                  * @description Changes the current report parameters used to generate the charts
                  */
@@ -124,7 +128,7 @@ export function AnalyticsContainer() {
 
                 /**
                  * @ngdoc method
-                 * @name sdAnalyticsContainer#changeContentViewThenSendBroadcast
+                 * @name sdaAnalyticsContainer#changeContentViewThenSendBroadcast
                  * @param {String} contentView - The name of the content view to change to
                  * @param {String} broadcast - The name to broadcast from this scope
                  * @param {Object} params - The saved report for the broadcast
@@ -144,8 +148,8 @@ export function AnalyticsContainer() {
 
                 /**
                  * @ngdoc method
-                 * @name sdAnalyticsContainer#openCreateScheduleModal
-                 * @description Sends a broadcast for sd-scheduled-reports-list to show the
+                 * @name sdaAnalyticsContainer#openCreateScheduleModal
+                 * @description Sends a broadcast for sda-scheduled-reports-list to show the
                  * create new schedule modal
                  */
                 $scope.openCreateScheduleModal = () => {
@@ -157,10 +161,10 @@ export function AnalyticsContainer() {
 
                 /**
                  * @ngdoc method
-                 * @name sdAnalyticsContainer#viewSchedule
+                 * @name sdaAnalyticsContainer#viewSchedule
                  * @param {Object} savedReport - Filter schedules based on this saved report
                  * @description Changes the content view to view the report schedules
-                 * Then sends a broadcast for sd-scheduled-reports-list to show the schedules
+                 * Then sends a broadcast for sda-scheduled-reports-list to show the schedules
                  * Which might show the create/edit modal
                  */
                 $scope.viewSchedule = (savedReport) => {
@@ -173,7 +177,7 @@ export function AnalyticsContainer() {
 
                 /**
                  * @ngdoc method
-                 * @name sdAnalyticsContainer#changeContentView
+                 * @name sdaAnalyticsContainer#changeContentView
                  * @param {String} viewName - The name of the content view
                  * @param {Object} savedReport - Filter schedules based on this saved report
                  * @description Changes the content view to view the report schedules
@@ -186,7 +190,7 @@ export function AnalyticsContainer() {
 
                 /**
                  * @ngdoc method
-                 * @name sdAnalyticsContainer#clearSavedReportForSchedule
+                 * @name sdaAnalyticsContainer#clearSavedReportForSchedule
                  * @description Clears the current saved report for use with the schedules
                  * (i.e. removes the saved report filter and shows all schedules for current report type)
                  */
@@ -196,7 +200,7 @@ export function AnalyticsContainer() {
 
                 /**
                  * @ngdoc method
-                 * @name sdAnalyticsContainer#createNewSchedule
+                 * @name sdaAnalyticsContainer#createNewSchedule
                  * @param {Object} savedReport
                  */
                 $scope.createNewSchedule = (savedReport) => {
@@ -209,7 +213,7 @@ export function AnalyticsContainer() {
 
                 /**
                  * @ngdoc method
-                 * @name sdAnalyticsContainer#viewSchedules
+                 * @name sdaAnalyticsContainer#viewSchedules
                  * @param {Object} savedReport - The saved report to filter schedules for
                  * @description Show the schedule view and filter them by the provided saved report
                  */
@@ -219,7 +223,7 @@ export function AnalyticsContainer() {
 
                 /**
                  * @ngdoc method
-                 * @name sdAnalyticsContainer#changePanel
+                 * @name sdaAnalyticsContainer#changePanel
                  * @param {String} panelName - The name of the panel to change to
                  * @description Changes the current outter tab (panel) to use in the side panel
                  */
@@ -229,7 +233,7 @@ export function AnalyticsContainer() {
 
                 /**
                  * @ngdoc method
-                 * @name sdAnalyticsContainer#closePreview
+                 * @name sdaAnalyticsContainer#closePreview
                  * @description Closes the preview panel
                  */
                 $scope.closePreview = () => {
@@ -241,7 +245,7 @@ export function AnalyticsContainer() {
 
                 /**
                  * @ngdoc
-                 * @name sdAnalyticsContainer#openPreview
+                 * @name sdaAnalyticsContainer#openPreview
                  * @param {Object} item - The item to preview
                  * @param {String} type - The type of the item (used with sda-archive-preview-proxy)
                  * @description Opens the preview panel with the appropriate preview directive based on type
@@ -252,6 +256,29 @@ export function AnalyticsContainer() {
                         type: type,
                     };
                 };
+
+                /**
+                 * @ngdoc method
+                 * @name sdaAnalyticsContainer#changeTab
+                 * @param {String} tabName - The name of the tab to change to
+                 * @description Change the current tab in the filters panel
+                 */
+                $scope.changeTab = (tabName) => {
+                    $scope.currentTab = tabName;
+                };
+
+                /**
+                 * @ngdoc method
+                 * @name sdaAnalyticsContainer#runQuery
+                 * @param {Object} params - The report parameters used to search the data
+                 * @return {Object}
+                 * @description Queries the DeskActivityReport API and returns it's response
+                 */
+                $scope.runQuery = (params) => searchReport.query(
+                    _.get($scope.currentReport, 'id'),
+                    params,
+                    true
+                );
 
                 init();
             },

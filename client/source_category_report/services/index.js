@@ -1,1 +1,0 @@
-export {SourceCategoryChart} from './SourceCategoryChart';

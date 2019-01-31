@@ -330,6 +330,7 @@ export function ChartConfig(
                 title: this.getTitle(),
                 subtitle: this.getSubtitle(),
                 defaultConfig: self.defaultConfig,
+                fullHeight: true,
             });
 
             chart.translations = self.translations;
@@ -676,8 +677,8 @@ export function ChartConfig(
 
         const filters = {
             range: () => {
-                const start = _.get(params, 'start_date') || _.get(params, 'dates.start');
-                const end = _.get(params, 'end_date') || _.get(params, 'dates.end');
+                const start = _.get(params, 'dates.start');
+                const end = _.get(params, 'dates.end');
 
                 if (moment(start, config.model.dateformat).isValid() &&
                     moment(end, config.model.dateformat).isValid()
@@ -710,7 +711,7 @@ export function ChartConfig(
                     .format('MMMM YYYY')
             ),
             day: () => (
-                moment(_.get(params, 'date') || _.get(params, 'dates.date'), config.model.dateformat)
+                moment(_.get(params, 'dates.date'), config.model.dateformat)
                     .format('dddd Do MMMM YYYY')
             ),
             relative: () => (
@@ -725,7 +726,7 @@ export function ChartConfig(
             ),
         };
 
-        const dateFilter = _.get(params, 'date_filter') || _.get(params, 'dates.filter');
+        const dateFilter = _.get(params, 'dates.filter');
 
         return _.get(filters, dateFilter) ?
             filters[dateFilter]() :

@@ -47,7 +47,7 @@ angular.module('superdesk.analytics.featuremedia-updates-report', [])
             id: 'featuremedia_updates_report',
             label: gettext('Featuremedia Updates'),
             sidePanelTemplate: 'featuremedia-updates-report-panel.html',
-            priority: 600,
+            priority: 300,
             privileges: {featuremedia_updates_report: 1},
             allowScheduling: true,
             reportTemplate: 'featuremedia-updates-report-view.html',

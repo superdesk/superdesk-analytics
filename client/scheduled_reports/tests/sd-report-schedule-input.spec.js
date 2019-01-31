@@ -1,4 +1,4 @@
-describe('sd-report-schedule-input', () => {
+describe('sda-report-schedule-input', () => {
     let $compile;
     let $rootScope;
     let scope;
@@ -21,7 +21,7 @@ describe('sd-report-schedule-input', () => {
         scope.submitted = submitted;
 
         const element = $compile(`
-<div sd-report-schedule-input
+<div sda-report-schedule-input
     ng-model="schedule"
     data-as-label="asLabel"
     data-submitted="submitted"

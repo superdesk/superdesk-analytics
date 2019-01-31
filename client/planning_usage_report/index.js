@@ -42,7 +42,7 @@ angular.module('superdesk.analytics.planning-usage-report', [])
             id: 'planning_usage_report',
             label: gettext('Planning Usage'),
             sidePanelTemplate: 'planning-usage-report-panel.html',
-            priority: 600,
+            priority: 400,
             privileges: {planning_usage_report: 1},
             required_features: ['events', 'planning', 'assignments'],
             allowScheduling: true,

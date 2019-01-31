@@ -23,7 +23,7 @@ import './styles/saved_reports.scss';
 angular.module('superdesk.analytics.saved_reports', [])
     .service('savedReports', svc.SavedReportsService)
 
-    .directive('sdSaveReportForm', directives.SaveReportForm)
-    .directive('sdSavedReportList', directives.SavedReportList)
-    .directive('sdSavedReportItem', directives.SavedReportItem)
-    .directive('sdSaveGenerateReport', directives.SaveGenerateReport);
+    .directive('sdaSaveReportForm', directives.SaveReportForm)
+    .directive('sdaSavedReportList', directives.SavedReportList)
+    .directive('sdaSavedReportItem', directives.SavedReportItem)
+    .directive('sdaSaveGenerateReport', directives.SaveGenerateReport);
