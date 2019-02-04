@@ -1,4 +1,4 @@
-describe('sd-chart-container', () => {
+describe('sda-chart-container', () => {
     let $compile;
     let $rootScope;
     let $timeout;
@@ -46,10 +46,10 @@ describe('sd-chart-container', () => {
         scope = $rootScope.$new();
         scope.reportConfigs = {charts: configs};
 
-        // Mock sd-analytics-container by providing sdAnalyticsContainerController onto a fake parent element
-        const elem = angular.element('<fake-parent><div sd-chart-container></div></fake-parent>');
+        // Mock sda-analytics-container by providing sdaAnalyticsContainerController onto a fake parent element
+        const elem = angular.element('<fake-parent><div sda-chart-container></div></fake-parent>');
 
-        elem.data('$sdAnalyticsContainerController', {});
+        elem.data('$sdaAnalyticsContainerController', {});
         const element = $compile(elem)(scope);
 
         $rootScope.$digest();
@@ -61,21 +61,21 @@ describe('sd-chart-container', () => {
     it('renders 1 svg element', () => {
         const element = getElement([configs[0]]);
 
-        expect(element.html()).toContain('sd-chart__container');
+        expect(element.html()).toContain('sda-chart__container');
         expect(element.find('svg').length).toBe(1);
     });
 
     it('renders 2 svg elements', () => {
         const element = getElement([configs[0], configs[1]]);
 
-        expect(element.html()).toContain('sd-chart__container');
+        expect(element.html()).toContain('sda-chart__container');
         expect(element.find('svg').length).toBe(2);
     });
 
     it('updates the charts when config is updated', () => {
         const element = getElement([configs[0]]);
 
-        expect(element.html()).toContain('sd-chart__container');
+        expect(element.html()).toContain('sda-chart__container');
         expect(element.find('svg').length).toBe(1);
 
         scope.reportConfigs = {charts: [configs[0], configs[1]]};
@@ -83,7 +83,7 @@ describe('sd-chart-container', () => {
         $rootScope.$digest();
         $timeout.flush(5000);
 
-        expect(element.html()).toContain('sd-chart__container');
+        expect(element.html()).toContain('sda-chart__container');
         expect(element.find('svg').length).toBe(2);
     });
 });

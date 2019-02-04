@@ -94,8 +94,8 @@ describe('sda-table', () => {
         setElement();
 
         // Test titles
-        expect(trim(element.find('.sd-chart__table-header-title'))).toBe('Test Table');
-        expect(trim(element.find('.sd-chart__table-header-subtitle'))).toBe('Fake Data');
+        expect(trim(element.find('.sda-chart__table-header-title'))).toBe('Test Table');
+        expect(trim(element.find('.sda-chart__table-header-subtitle'))).toBe('Fake Data');
 
         // Test header
         expect(trim(getHeader(0))).toBe('one');

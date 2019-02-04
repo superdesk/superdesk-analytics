@@ -5,7 +5,7 @@ ScheduledReportsModal.$inject = ['lodash', 'savedReports', 'scheduledReports', '
 /**
  * @ngdoc directive
  * @module superdesk.apps.analytics.scheduled_reports
- * @name sdScheduledReportsModal
+ * @name sdaScheduledReportsModal
  * @requires lodash
  * @requires savedReports
  * @requires scheduledReports
@@ -28,7 +28,7 @@ export function ScheduledReportsModal(_, savedReports, scheduledReports, notify,
 
             /**
              * @ngdoc property
-             * @name sdScheduledReportsModal#allowedWidths
+             * @name sdaScheduledReportsModal#allowedWidths
              * @type {Array<Number>}
              * @description Provides array of allowed widths for use with width dropdown
              */
@@ -43,7 +43,7 @@ export function ScheduledReportsModal(_, savedReports, scheduledReports, notify,
 
             /**
              * @ngdoc method
-             * @name sdScheduledReportsModal#fetchSavedReports
+             * @name sdaScheduledReportsModal#fetchSavedReports
              * @description Fetches the saved reports for use with the current schedule
              */
             this.fetchSavedReports = () => {
@@ -60,7 +60,7 @@ export function ScheduledReportsModal(_, savedReports, scheduledReports, notify,
 
             /**
              * @ngdoc method
-             * @name sdScheduledReportsModal#setSavedReport
+             * @name sdaScheduledReportsModal#setSavedReport
              * @description Sets the saved report object for use with showing report parameters
              */
             scope.setSavedReport = () => {
@@ -72,7 +72,7 @@ export function ScheduledReportsModal(_, savedReports, scheduledReports, notify,
 
             /**
              * @ngdoc method
-             * @name sdScheduledReportsModal#save
+             * @name sdaScheduledReportsModal#save
              * @param {Object} scheduleForm - The DOM form (to set ngModel/ngForm attributes)
              * @param {Object} schedule - The current schedule to save
              * @description Saves the current schedule, and closes the modal on success

@@ -7,7 +7,7 @@
 export function ChartContainer() {
     return {
         replace: true,
-        require: '^sdAnalyticsContainer',
+        require: '^sdaAnalyticsContainer',
         template: require('../views/chart-container.html'),
         link: function(scope, element) {
             // Scroll to the top when the report configs change

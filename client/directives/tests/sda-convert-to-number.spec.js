@@ -1,4 +1,4 @@
-describe('sd-convert-to-number', () => {
+describe('sda-convert-to-number', () => {
     let $compile;
     let $rootScope;
     let scope;
@@ -18,7 +18,7 @@ describe('sd-convert-to-number', () => {
         scope.item = {number: 25};
         const element = $compile(
             '<form>' +
-                '<input type="text" ng-model="item.number" sd-convert-to-number />' +
+                '<input type="text" ng-model="item.number" sda-convert-to-number />' +
             '</form>'
         )(scope);
 

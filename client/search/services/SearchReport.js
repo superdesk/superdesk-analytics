@@ -96,34 +96,22 @@ export function SearchReport(_, config, moment, api, $q, gettext, gettextCatalog
     const convertDatesForServer = (params) => {
         const report = _.cloneDeep(params);
 
-        if (_.get(report, 'start_date')) {
-            report.start_date = moment(report.start_date, config.model.dateformat)
-                .format('YYYY-MM-DD');
-        } else if (_.get(report, 'dates.start')) {
+        if (_.get(report, 'dates.start')) {
             report.dates.start = moment(report.dates.start, config.model.dateformat)
                 .format('YYYY-MM-DD');
         }
 
-        if (_.get(report, 'end_date')) {
-            report.end_date = moment(report.end_date, config.model.dateformat)
-                .format('YYYY-MM-DD');
-        } else if (_.get(report, 'dates.end')) {
+        if (_.get(report, 'dates.end')) {
             report.dates.end = moment(report.dates.end, config.model.dateformat)
                 .format('YYYY-MM-DD');
         }
 
-        if (_.get(report, 'date')) {
-            report.date = moment(report.date, config.model.dateformat)
-                .format('YYYY-MM-DD');
-        } else if (_.get(report, 'dates.date')) {
+        if (_.get(report, 'dates.date')) {
             report.dates.date = moment(report.dates.date, config.model.dateformat)
                 .format('YYYY-MM-DD');
         }
 
-        if (report.date_filter && report.date_filter !== 'range') {
-            delete report.start_date;
-            delete report.end_date;
-        } else if (_.get(report, 'dates.filter') && report.dates.filter !== 'range') {
+        if (_.get(report, 'dates.filter') && report.dates.filter !== 'range') {
             delete report.dates.start;
             delete report.dates.end;
         }
@@ -154,10 +142,10 @@ export function SearchReport(_, config, moment, api, $q, gettext, gettextCatalog
      * @description Returns the date filter, start, end and date fields from the report parameters
      */
     const getFilterAndDates = (params) => {
-        const dateFilter = _.get(params, 'date_filter') || _.get(params, 'dates.filter');
-        const startDate = _.get(params, 'start_date') || _.get(params, 'dates.start');
-        const endDate = _.get(params, 'end_date') || _.get(params, 'dates.end');
-        const date = _.get(params, 'date') || _.get(params, 'dates.date');
+        const dateFilter = _.get(params, 'dates.filter');
+        const startDate = _.get(params, 'dates.start');
+        const endDate = _.get(params, 'dates.end');
+        const date = _.get(params, 'dates.date');
         const relative = _.get(params, 'dates.relative');
         const relativeDays = _.get(params, 'dates.relative_days');
 

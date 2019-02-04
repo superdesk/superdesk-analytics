@@ -69,7 +69,7 @@ describe('chartConfig', () => {
                 },
             },
         },
-        fullHeight: false,
+        fullHeight: true,
         time: {useUTC: true},
     };
 

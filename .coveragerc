@@ -1,0 +1,2 @@
+[report]
+omit = server/analytics/reports/highcharts_server.py, *tests*, *_test*

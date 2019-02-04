@@ -1,13 +1,13 @@
-<div ng-if="config.type === 'table'" class="sd-chart__table sd-shadow--z2">
-    <div class="sd-chart__table-header">
-        <div class="sd-chart__table-header-title" ng-if="config.title">
+<div ng-if="config.type === 'table'" class="sda-chart__table sd-shadow--z2">
+    <div class="sda-chart__table-header">
+        <div class="sda-chart__table-header-title" ng-if="config.title">
             <span>{{config.title | translate}}</span>
         </div>
-        <div class="sd-chart__table-header-subtitle" ng-if="config.subtitle">
+        <div class="sda-chart__table-header-subtitle" ng-if="config.subtitle">
             <span>{{config.subtitle | translate}}</span>
         </div>
 
-        <div class="dropdown dropdown--allign-right sd-chart__table-header-options" dropdown ng-if="config.rows.length > 0">
+        <div class="dropdown dropdown--allign-right sda-chart__table-header-options" dropdown ng-if="config.rows.length > 0">
             <button
                     class="dropdown__toggle dropdown-toggle icn-btn pull-right"
                     dropdown__toggle
@@ -23,7 +23,7 @@
             </ul>
         </div>
     </div>
-    <div class="sd-chart__table-content" ng-if="config.rows.length > 0">
+    <div class="sda-chart__table-content" ng-if="config.rows.length > 0">
         <table>
             <thead>
                 <tr ng-if="config.top_headers">
@@ -43,4 +43,4 @@
     </div>
 </div>
 
-<div ng-show="config.type !== 'table'" class="sd-chart__highchart sd-shadow--z2"></div>
+<div ng-show="config.type !== 'table'" class="sda-chart__highchart sd-shadow--z2"></div>

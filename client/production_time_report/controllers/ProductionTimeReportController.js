@@ -56,8 +56,6 @@ export function ProductionTimeReportController(
      * @description Initialises the scope parameters
      */
     this.init = () => {
-        $scope.currentTab = 'parameters';
-
         $scope.form = {
             datesError: null,
             submitted: false,
@@ -207,19 +205,6 @@ export function ProductionTimeReportController(
 
     /**
      * @ngdoc method
-     * @name ProductionTimeReportController#runQuery
-     * @param {Object} params - The report parameters used to search the data
-     * @return {Object}
-     * @description Queries the DeskActivityReport API and returns it's response
-     */
-    $scope.runQuery = (params) => searchReport.query(
-        'production_time_report',
-        params,
-        true
-    );
-
-    /**
-     * @ngdoc method
      * @name ProductionTimeReportController#generate
      * @description Updates the Highchart configs in the report's content view
      */
@@ -254,16 +239,6 @@ export function ProductionTimeReportController(
                     )
                 );
             });
-    };
-
-    /**
-     * @ngdoc method
-     * @name ProductionTimeReportController#changeTab
-     * @param {String} tabName - The name of the tab to change to
-     * @description Change the current tab in the filters panel
-     */
-    $scope.changeTab = (tabName) => {
-        $scope.currentTab = tabName;
     };
 
     /**

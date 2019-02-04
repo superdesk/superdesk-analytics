@@ -63,8 +63,6 @@ export function DeskActivityReportController(
      * @description Initialises the scope parameters
      */
     this.init = () => {
-        $scope.currentTab = 'parameters';
-
         $scope.form = {
             deskError: null,
             datesError: null,
@@ -263,19 +261,6 @@ export function DeskActivityReportController(
 
     /**
      * @ngdoc method
-     * @name DeskActivityReportController#runQuery
-     * @param {Object} params - The report parameters used to search the data
-     * @return {Object}
-     * @description Queries the DeskActivityReport API and returns it's response
-     */
-    $scope.runQuery = (params) => searchReport.query(
-        'desk_activity_report',
-        params,
-        true
-    );
-
-    /**
-     * @ngdoc method
      * @name DeskActivityReportController#validateParams
      * @param {Object} params - The report parameters to validate
      * @return {Boolean}
@@ -371,16 +356,6 @@ export function DeskActivityReportController(
 
     /**
      * @ngdoc method
-     * @name DeskActivityReportController#changeTab
-     * @param {String} tabName - The name of the tab to change to
-     * @description Change the current tab in the filters panel
-     */
-    $scope.changeTab = (tabName) => {
-        $scope.currentTab = tabName;
-    };
-
-    /**
-     * @ngdoc method
      * @name DeskActivityReportController#createChart
      * @param {Object} report - The report parameters used to search the data
      * @return {Object}
@@ -427,6 +402,7 @@ export function DeskActivityReportController(
             useUTC: false,
             fullHeight: false,
             legendTitle: gettext('Desk Transitions'),
+            defaultConfig: chartConfig.defaultConfig,
         });
 
         chart.setTranslation('desk_transition', gettext('Desk Transitions'), {

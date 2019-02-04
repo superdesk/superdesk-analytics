@@ -44,7 +44,7 @@ export function UpdateTimeTable(
 ) {
     return {
         replace: true,
-        require: '^sdAnalyticsContainer',
+        require: '^sdaAnalyticsContainer',
         template: require('../views/update-time-table.html'),
         link: function(scope, element) {
             /**

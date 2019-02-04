@@ -28,7 +28,7 @@
             <select class="sd-line-input__select scheduled-reports__schedule-input"
                     ng-model="schedule.day"
                     name="day"
-                    sd-convert-to-number
+                    sda-convert-to-number
             >
                 <option ng-repeat="d in days" value="{{d.value}}">
                     {{d.label}}
@@ -50,7 +50,7 @@
             <select class="sd-line-input__select scheduled-reports__schedule-input"
                     ng-model="schedule.hour"
                     name="hour"
-                    sd-convert-to-number
+                    sda-convert-to-number
             >
                 <option ng-repeat="h in hours" value="{{h.value}}">
                     {{h.label}}

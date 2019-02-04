@@ -6,7 +6,7 @@
  */
 export function ReportDropdown() {
     return {
-        requires: '^sdAnalyticsContainer',
+        requires: '^sdaAnalyticsContainer',
         template: require('../views/report-dropdown.html'),
     };
 }

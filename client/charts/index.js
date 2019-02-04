@@ -43,8 +43,8 @@ angular.module('superdesk.analytics.charts', [])
     .service('chartManager', svc.ChartManager)
     .service('chartConfig', svc.ChartConfig)
 
-    .directive('sdChart', directives.Chart)
-    .directive('sdChartContainer', directives.ChartContainer)
+    .directive('sdaChart', directives.Chart)
+    .directive('sdaChartContainer', directives.ChartContainer)
     .directive('sdaTable', directives.Table)
 
     .run(cacheIncludedTemplates);

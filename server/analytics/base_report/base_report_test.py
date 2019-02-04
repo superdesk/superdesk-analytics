@@ -48,7 +48,7 @@ class BaseReportServiceTestCase(TestCase):
         with self.app.app_context():
             init_app(self.app)
             self.app.config['DEFAULT_TIMEZONE'] = 'Australia/Sydney'
-            self.service = get_resource_service('source_category_report')
+            self.service = get_resource_service('analytics_test_report')
 
             self.app.data.insert('vocabularies', [{
                 '_id': 'categories',
@@ -88,7 +88,7 @@ class BaseReportServiceTestCase(TestCase):
         with self.app.app_context():
             # Test source_category aggregation
             self.assertEqual(
-                self.service.get_aggregation_buckets(aggregation_response),
+                self.service.get_aggregation_buckets(aggregation_response, ['source_category']),
                 {
                     'source_category': [{
                         'key': 'AAP',
@@ -122,9 +122,11 @@ class BaseReportServiceTestCase(TestCase):
             # DateFilters - Range
             query = self.service.generate_elastic_query({
                 'params': {
-                    'date_filter': 'range',
-                    'start_date': '2018-06-30',
-                    'end_date': '2018-06-30'
+                    'dates': {
+                        'filter': 'range',
+                        'start': '2018-06-30',
+                        'end': '2018-06-30'
+                    }
                 }
             })
             self.assert_bool_query(query, {
@@ -141,7 +143,9 @@ class BaseReportServiceTestCase(TestCase):
             })
 
             # DateFilters - Yesterday
-            query = self.service.generate_elastic_query({'params': {'date_filter': 'yesterday'}})
+            query = self.service.generate_elastic_query({
+                'params': {'dates': {'filter': 'yesterday'}}
+            })
             self.assert_bool_query(query, {
                 'must': [{
                     'range': {
@@ -156,7 +160,9 @@ class BaseReportServiceTestCase(TestCase):
             })
 
             # DateFilters - Last Week
-            query = self.service.generate_elastic_query({'params': {'date_filter': 'last_week'}})
+            query = self.service.generate_elastic_query({
+                'params': {'dates': {'filter': 'last_week'}}
+            })
             self.assert_bool_query(query, {
                 'must': [{
                     'range': {
@@ -171,7 +177,9 @@ class BaseReportServiceTestCase(TestCase):
             })
 
             # DateFilters - Last Month
-            query = self.service.generate_elastic_query({'params': {'date_filter': 'last_month'}})
+            query = self.service.generate_elastic_query({
+                'params': {'dates': {'filter': 'last_month'}}
+            })
             self.assert_bool_query(query, {
                 'must': [{
                     'range': {
@@ -612,7 +620,7 @@ class BaseReportServiceTestCase(TestCase):
                 }
             },
             'params': {
-                'date_filter': 'yesterday'
+                'dates': {'filter': 'yesterday'}
             },
             'repo': 'published',
             'return_type': 'text/csv'
@@ -697,7 +705,7 @@ class BaseReportServiceTestCase(TestCase):
                 }
             },
             'params': {
-                'date_filter': 'yesterday'
+                'dates': {'filter': 'yesterday'}
             },
             'repo': 'published',
             'return_type': 'text/csv'

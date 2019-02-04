@@ -47,7 +47,7 @@ angular.module('superdesk.analytics.update-time-report', [])
             id: 'update_time_report',
             label: gettext('Update Time'),
             sidePanelTemplate: 'update-time-report-panel.html',
-            priority: 600,
+            priority: 700,
             privileges: {update_time_report: 1},
             allowScheduling: true,
             reportTemplate: 'update-time-report-view.html',

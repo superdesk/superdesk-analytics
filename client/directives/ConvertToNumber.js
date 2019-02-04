@@ -1,7 +1,7 @@
 /**
  * @ngdoc directive
  * @module superdesk.apps.analytics
- * @name sd-convert-to-number
+ * @name sda-convert-to-number
  * @description A directive that converts input value to an integer (base 10)
  */
 export function ConvertToNumber() {

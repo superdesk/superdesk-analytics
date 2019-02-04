@@ -1,10 +1,10 @@
-<div class="sd-chart__chart">
-    <div class="sd-chart__table sd-shadow--z2">
-        <div class="sd-chart__table-header sd-chart__table-header--no-padding-bottom">
-            <div class="sd-chart__table-header-title" ng-if="title">
+<div class="sda-chart__chart">
+    <div class="sda-chart__table sd-shadow--z2">
+        <div class="sda-chart__table-header sda-chart__table-header--no-padding-bottom">
+            <div class="sda-chart__table-header-title" ng-if="title">
                 <span>{{title | translate}}</span>
             </div>
-            <div class="sd-chart__table-header-subtitle" ng-if="subtitle">
+            <div class="sda-chart__table-header-subtitle" ng-if="subtitle">
                 <span>{{subtitle | translate}}</span>
             </div>
             <div sd-pagination-alt
@@ -14,7 +14,7 @@
                  ng-if="page.max > 1"
             ></div>
         </div>
-        <div class="sd-chart__table-content">
+        <div class="sda-chart__table-content">
             <div ng-if="rows.length === 0" class="panel-info">
                 <div class="panel-info__icon">
                     <i class="big-icon--comments"></i>

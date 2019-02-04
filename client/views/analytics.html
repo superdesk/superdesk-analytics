@@ -1,4 +1,4 @@
-<div sd-analytics-container class="sd-page-grid--basic sd-analytics">
+<div sda-analytics-container class="sd-page-grid--basic sd-analytics">
     <div class="sd-content sd-page-content--slide-in sd-content--margin-b30">
         <div class="sd-page-content__content-block sd-page-content__content-block--main"
              ng-class="{'open-filters': flags.showSidePanel}"
@@ -11,7 +11,7 @@
                 >
                     <i class="icon-filter-large"></i>
                 </button>
-                <div sd-report-dropdown
+                <div sda-report-dropdown
                      class="subnav__button-stack subnav__button-stack--padded"
                 >
                 </div>
@@ -66,7 +66,7 @@
                      ></div>
 
                     <!-- Schedule View -->
-                    <div sd-scheduled-reports-list
+                    <div sda-scheduled-reports-list
                          class="sd-column-box__main-column__items"
                          ng-if="currentReport.allowScheduling && flags.contentView == 'schedules'"
                          data-current-report="currentReport"

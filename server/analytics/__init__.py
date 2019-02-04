@@ -10,13 +10,6 @@
 
 import superdesk
 
-from analytics.activity_report import ActivityReportResource, ActivityReportService
-from analytics.saved_activity_reports import SavedActivityReportResource, \
-    SavedActivityReportService
-from analytics.track_activity import TrackActivityResource, TrackActivityService
-from analytics.processed_items_report import ProcessedItemsResource, ProcessedItemsService
-from analytics.content_quota_reports import ContentQuotaReportResource, ContentQuotaReportService
-from analytics.source_category_report import SourceCategoryReportResource, SourceCategoryReportService
 from analytics.base_report import BaseReportService
 from analytics.saved_reports import SavedReportsResource, SavedReportsService
 from analytics.reports.scheduled_reports import ScheduledReportsResource, ScheduledReportsService
@@ -71,55 +64,14 @@ def init_schedule_task(app):
 
 
 def init_app(app):
-    endpoint_name = 'activity_report'
-    service = ActivityReportService(endpoint_name, backend=superdesk.get_backend())
-    ActivityReportResource(endpoint_name, app=app, service=service)
-    register_report('activity_report', 'activity_report')
-
-    endpoint_name = 'saved_activity_reports'
-    service = SavedActivityReportService(endpoint_name, backend=superdesk.get_backend())
-    SavedActivityReportResource(endpoint_name, app=app, service=service)
-
-    endpoint_name = 'track_activity_report'
-    service = TrackActivityService(endpoint_name, backend=superdesk.get_backend())
-    TrackActivityResource(endpoint_name, app=app, service=service)
-    register_report('track_activity_report', 'track_activity_report')
-
-    endpoint_name = 'processed_items_report'
-    service = ProcessedItemsService(endpoint_name, backend=superdesk.get_backend())
-    ProcessedItemsResource(endpoint_name, app=app, service=service)
-    register_report('processed_items_report', 'processed_items_report')
-
-    endpoint_name = 'content_quota_report'
-    service = ContentQuotaReportService(endpoint_name, backend=superdesk.get_backend())
-    ContentQuotaReportResource(endpoint_name, app=app, service=service)
-    register_report('content_quota_report', 'content_quota_report')
-
-    endpoint_name = 'source_category_report'
-    service = SourceCategoryReportService(endpoint_name, backend=superdesk.get_backend())
-    SourceCategoryReportResource(endpoint_name, app=app, service=service)
-    register_report('source_category_report', 'source_category_report')
-
     endpoint_name = 'scheduled_reports'
     service = ScheduledReportsService(endpoint_name, backend=superdesk.get_backend())
     ScheduledReportsResource(endpoint_name, app=app, service=service)
 
-    superdesk.privilege(name='activity_report', label='Activity Report View',
-                        description='User can view activity reports.')
-    superdesk.privilege(name='track_activity_report', label='Track Activity Report View')
-    superdesk.privilege(name='processed_items_report', label='Processed Items Report View',
-                        description='User can view activity reports.')
-    superdesk.privilege(name='content_quota_report', label='Content Quota Report View',
-                        description='User can view content v quota reports.')
-    superdesk.privilege(
-        name='source_category_report',
-        label='Source Category Report View',
-        description='User can view source v category reports.'
-    )
-
     endpoint_name = SavedReportsResource.endpoint_name
     service = SavedReportsService(endpoint_name, backend=superdesk.get_backend())
     SavedReportsResource(endpoint_name, app=app, service=service)
+
     superdesk.privilege(
         name='global_saved_reports',
         label='Manage Global Saved Reports',

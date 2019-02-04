@@ -387,13 +387,13 @@ class BaseReportService(SearchService):
 
     def _es_get_date_filters(self, params):
         dates = params.get('dates') or {}
-        date_filter = params.get('date_filter') or dates.get('filter')
+        date_filter = dates.get('filter')
         if not date_filter:
             return None, None, None
 
-        start_date = params.get('start_date') or dates.get('start')
-        end_date = params.get('end_date') or dates.get('end')
-        date = params.get('date') or dates.get('date')
+        start_date = dates.get('start')
+        end_date = dates.get('end')
+        date = dates.get('date')
         relative = dates.get('relative')
         relative_days = dates.get('relative_days')
 

@@ -43,7 +43,7 @@ angular.module('superdesk.analytics.user-activity-report', [])
             id: 'user_activity_report',
             label: gettext('User Activity'),
             sidePanelTemplate: 'user-activity-report-panel.html',
-            priority: 600,
+            priority: 800,
             privileges: {user_activity_report: 1},
             allowScheduling: false,
             required_features: ['user_activity_report'],

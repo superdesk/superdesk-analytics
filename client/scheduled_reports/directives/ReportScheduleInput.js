@@ -3,7 +3,7 @@ ReportScheduleInput.$inject = ['gettext', 'lodash'];
 /**
  * @ngdoc directive
  * @module superdesk.apps.analytics.scheduled_reports
- * @name sdReportScheduleInput
+ * @name sdaReportScheduleInput
  * @requires gettext
  * @requires lodash
  * @description A directive that renders either the input or the label for the scheduling details
@@ -20,7 +20,7 @@ export function ReportScheduleInput(gettext, _) {
         link: function(scope, element, attr, ngModel) {
             /**
              * @ngdoc method
-             * @name sdReportScheduleInput#initAsInput
+             * @name sdaReportScheduleInput#initAsInput
              * @description Initializes this directive as input fields
              */
             this.initAsInput = () => {
@@ -51,7 +51,7 @@ export function ReportScheduleInput(gettext, _) {
 
             /**
              * @ngdoc method
-             * @name sdReportScheduleInput#initAsInput
+             * @name sdaReportScheduleInput#initAsInput
              * @description Initializes this directive as a read-only label
              */
             this.initAsLabel = () => {
@@ -78,7 +78,7 @@ export function ReportScheduleInput(gettext, _) {
 
             /**
              * @ngdoc method
-             * @name sdReportScheduleInput#updateFrequency
+             * @name sdaReportScheduleInput#updateFrequency
              * @param {Object} schedule - The updated schedule
              * @description Updates the schedule values when the frequency changes
              */
@@ -145,7 +145,7 @@ export function ReportScheduleInput(gettext, _) {
 
             /**
              * @ngdoc method
-             * @name sdReportScheduleInput#onWeekdayChange
+             * @name sdaReportScheduleInput#onWeekdayChange
              * @description Validates input when the week days change
              */
             scope.onWeekdayChange = () => {
@@ -168,7 +168,7 @@ export function ReportScheduleInput(gettext, _) {
 
             /**
              * @ngdoc method
-             * @name sdReportScheduleInput#resetWeekdays
+             * @name sdaReportScheduleInput#resetWeekdays
              * @description Turns all weekday selections off
              */
             scope.resetWeekdays = () => {
@@ -185,7 +185,7 @@ export function ReportScheduleInput(gettext, _) {
 
             /**
              * @ngdoc property
-             * @name sdReportScheduleInput#hours
+             * @name sdaReportScheduleInput#hours
              * @type {Array}
              * @description Provides array of values for use with select dropdowns
              */
@@ -211,7 +211,7 @@ export function ReportScheduleInput(gettext, _) {
 
             /**
              * @ngdoc property
-             * @name sdReportScheduleInput#days
+             * @name sdaReportScheduleInput#days
              * @type {Array}
              * @description Provides array of values for use with select dropdowns
              */
