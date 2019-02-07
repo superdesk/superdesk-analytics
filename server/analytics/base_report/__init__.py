@@ -422,6 +422,15 @@ class BaseReportService(SearchService):
         elif date_filter == 'relative_days':
             lt = 'now'
             gte = 'now-{}d'.format(relative_days)
+        elif date_filter == 'today':
+            lt = 'now'
+            gte = 'now/d'
+        elif date_filter == 'this_week':
+            lt = 'now'
+            gte = 'now/w'
+        elif date_filter == 'this_month':
+            lt = 'now'
+            gte = 'now/M'
 
         return lt, gte, time_zone
 

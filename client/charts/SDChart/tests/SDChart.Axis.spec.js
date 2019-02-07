@@ -161,4 +161,122 @@ describe('SDChart.Axis', () => {
             }],
         }));
     });
+
+    it('can sort categories', () => {
+        let chart = new SDChart.Chart({});
+
+        chart.addAxis()
+            .setOptions({
+                type: 'category',
+                categories: ['a', 'b', 'c'],
+                sortOrder: 'asc',
+                xTitle: 'Category',
+            })
+            .addSeries()
+            .setOptions({
+                data: {a: 1, b: 10, c: 3},
+            });
+
+        expect(chart.genConfig()).toEqual(jasmine.objectContaining({
+            xAxis: [{
+                type: 'category',
+                allowDecimals: false,
+                categories: ['a', 'c', 'b'],
+                title: {text: 'Category'},
+            }],
+        }));
+
+        chart = new SDChart.Chart({});
+
+        chart.addAxis()
+            .setOptions({
+                type: 'category',
+                categories: ['a', 'b', 'c'],
+                sortOrder: 'desc',
+                xTitle: 'Category',
+            })
+            .addSeries()
+            .setOptions({
+                data: {a: 1, b: 10, c: 3},
+            });
+
+        expect(chart.genConfig()).toEqual(jasmine.objectContaining({
+            xAxis: [{
+                type: 'category',
+                allowDecimals: false,
+                categories: ['b', 'c', 'a'],
+                title: {text: 'Category'},
+            }],
+        }));
+
+        chart = new SDChart.Chart({});
+
+        chart.addAxis()
+            .setOptions({
+                type: 'category',
+                categories: ['a', 'b', 'c'],
+                xTitle: 'Category',
+            })
+            .addSeries()
+            .setOptions({
+                data: {a: 1, b: 10, c: 3},
+            });
+
+        expect(chart.genConfig()).toEqual(jasmine.objectContaining({
+            xAxis: [{
+                type: 'category',
+                allowDecimals: false,
+                categories: ['a', 'b', 'c'],
+                title: {text: 'Category'},
+            }],
+        }));
+    });
+
+    it('can exclude empty data', () => {
+        let chart = new SDChart.Chart({});
+
+        chart.addAxis()
+            .setOptions({
+                type: 'category',
+                categories: ['a', 'b', 'c'],
+                xTitle: 'Category',
+                excludeEmpty: true,
+            })
+            .addSeries()
+            .setOptions({
+                data: {a: 1, b: 0, c: 3},
+            });
+
+        expect(chart.genConfig()).toEqual(jasmine.objectContaining({
+            xAxis: [{
+                type: 'category',
+                allowDecimals: false,
+                categories: ['a', 'c'],
+                title: {text: 'Category'},
+            }],
+        }));
+
+        chart = new SDChart.Chart({});
+
+        chart.addAxis()
+            .setOptions({
+                type: 'category',
+                categories: ['a', 'b', 'c'],
+                xTitle: 'Category',
+                excludeEmpty: false,
+            })
+            .addSeries()
+            .setOptions({
+                data: {a: 1, b: 0, c: 3},
+            });
+
+        expect(chart.genConfig()).toEqual(jasmine.objectContaining({
+            xAxis: [{
+                type: 'category',
+                allowDecimals: false,
+                categories: ['a', 'b', 'c'],
+                title: {text: 'Category'},
+            }],
+        }));
+    });
 });

@@ -4,6 +4,9 @@
     <p ng-if="dateFilter === 'yesterday'" translate>Yesterday</p>
     <p ng-if="dateFilter === 'last_week'" translate>Last Week</p>
     <p ng-if="dateFilter === 'last_month'" translate>Last Month</p>
+    <p ng-if="dateFilter === 'today'" translate>Today</p>
+    <p ng-if="dateFilter === 'this_week'" translate>This Week</p>
+    <p ng-if="dateFilter === 'this_month'" translate>This Month</p>
 
     <div ng-if="dateFilter === 'range'">
         <p><span translate>From:</span> {{startDate}}</p>

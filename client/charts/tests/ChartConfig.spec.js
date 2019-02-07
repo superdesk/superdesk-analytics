@@ -106,6 +106,7 @@ describe('chartConfig', () => {
             }],
             legend: {enabled: false},
             tooltip: {
+                enabled: true,
                 headerFormat: '{point.x}: {point.y}',
                 pointFormat: '',
             },
@@ -120,6 +121,7 @@ describe('chartConfig', () => {
                 type: 'bar',
                 xAxis: 0,
             }],
+            shadow: true,
             ...defaultConfig,
         });
     });
@@ -189,8 +191,10 @@ describe('chartConfig', () => {
             legend: {
                 enabled: true,
                 title: {text: 'Urgency'},
+                useHTML: true,
             },
             tooltip: {
+                enabled: true,
                 headerFormat: '{series.name}/{point.x}: {point.y}',
                 pointFormat: '',
             },
@@ -221,6 +225,7 @@ describe('chartConfig', () => {
                 stacking: 'normal',
                 stack: 0,
             }],
+            shadow: true,
             ...defaultConfig,
         });
     });

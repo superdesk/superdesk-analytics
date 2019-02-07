@@ -10,6 +10,7 @@
 
 import * as ctrl from './controllers';
 import * as directives from './directives';
+import './widgets';
 
 function cacheIncludedTemplates($templateCache) {
     $templateCache.put(
@@ -30,7 +31,9 @@ cacheIncludedTemplates.$inject = ['$templateCache'];
  * @packageName analytics.publishing-performance-report
  * @description Superdesk analytics generate report of Publishing Performance statistics.
  */
-angular.module('superdesk.analytics.publishing-performance-report', [])
+angular.module('superdesk.analytics.publishing-performance-report',
+    ['superdesk.analytics.publishing-performance-report.widgets']
+)
     .controller('PublishingPerformanceReportController', ctrl.PublishingPerformanceReportController)
 
     .directive('sdaPublishingPerformanceReportPreview', directives.PublishingPerformanceReportPreview)

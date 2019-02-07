@@ -46,5 +46,7 @@ angular.module('superdesk.analytics.charts', [])
     .directive('sdaChart', directives.Chart)
     .directive('sdaChartContainer', directives.ChartContainer)
     .directive('sdaTable', directives.Table)
+    .directive('sdaChartOptions', directives.ChartOptions)
+    .directive('sdaChartColourPicker', directives.ChartColourPicker)
 
     .run(cacheIncludedTemplates);

@@ -15,6 +15,9 @@ export const DATE_FILTERS = {
     RELATIVE: 'relative',
     RELATIVE_DAYS: 'relative_days',
     DAY: 'day',
+    TODAY: 'today',
+    THIS_WEEK: 'this_week',
+    THIS_MONTH: 'this_month',
 };
 
 /**
@@ -103,7 +106,9 @@ export function DateFilters(gettext, moment, $interpolate, config) {
                     delete scope.params.dates.date;
                 }
 
-                scope._onFilterChange();
+                if (angular.isDefined(scope._onFilterChange)) {
+                    scope._onFilterChange();
+                }
             };
 
             /**

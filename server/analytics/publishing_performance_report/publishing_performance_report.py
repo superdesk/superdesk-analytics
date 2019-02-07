@@ -24,6 +24,7 @@ class PublishingPerformanceReportResource(Resource):
 
 
 class PublishingPerformanceReportService(BaseReportService):
+    repos = ['published', 'archived']
     aggregations = {
         'source': {
             'terms': {
@@ -104,14 +105,11 @@ class PublishingPerformanceReportService(BaseReportService):
         """
         agg_buckets = self.get_aggregation_buckets(getattr(docs, 'hits'), ['parent'])
 
+        states = ['killed', 'corrected', 'updated', 'published', 'recalled']
+
         report = {
             'groups': {},
-            'subgroups': {
-                'killed': 0,
-                'corrected': 0,
-                'updated': 0,
-                'published': 0
-            }
+            'subgroups': {state: 0 for state in states}
         }
 
         for parent in agg_buckets.get('parent') or []:
@@ -120,12 +118,7 @@ class PublishingPerformanceReportService(BaseReportService):
             if not parent_key:
                 continue
 
-            report['groups'][parent_key] = {
-                'killed': 0,
-                'corrected': 0,
-                'updated': 0,
-                'published': 0,
-            }
+            report['groups'][parent_key] = {state: 0 for state in states}
 
             no_rewrite_of = (parent.get('no_rewrite_of') or {}).get('state') or {}
             rewrite_of = (parent.get('rewrite_of') or {}).get('state') or {}
@@ -133,32 +126,27 @@ class PublishingPerformanceReportService(BaseReportService):
             for child in no_rewrite_of.get('buckets') or []:
                 state_key = child.get('key')
 
-                if not state_key:
+                if not state_key or state_key not in states:
                     continue
 
                 doc_count = child.get('doc_count') or 0
 
-                if state_key == 'published':
-                    report['groups'][parent_key]['published'] += doc_count
-                    report['subgroups']['published'] += doc_count
-                elif state_key == 'killed':
-                    report['groups'][parent_key]['killed'] += doc_count
-                    report['subgroups']['killed'] += doc_count
+                report['groups'][parent_key][state_key] += doc_count
+                report['subgroups'][state_key] += doc_count
 
             for child in rewrite_of.get('buckets') or []:
                 state_key = child.get('key')
 
-                if not state_key:
+                if not state_key or state_key not in states:
                     continue
+
+                if state_key == 'published':
+                    state_key = 'updated'
 
                 doc_count = child.get('doc_count') or 0
 
-                if state_key == 'corrected':
-                    report['groups'][parent_key]['corrected'] += doc_count
-                    report['subgroups']['corrected'] += doc_count
-                elif state_key == 'published':
-                    report['groups'][parent_key]['updated'] += doc_count
-                    report['subgroups']['updated'] += doc_count
+                report['groups'][parent_key][state_key] += doc_count
+                report['subgroups'][state_key] += doc_count
 
         return report
 

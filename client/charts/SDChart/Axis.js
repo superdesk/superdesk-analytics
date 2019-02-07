@@ -1,5 +1,5 @@
 import {Series} from './Series';
-import {map, get} from 'lodash';
+import {map, get, sortBy, filter} from 'lodash';
 
 
 /**
@@ -150,6 +150,25 @@ export class Axis {
          * @description The maximum value on the x axis
          */
         this.xMax = undefined;
+
+        /**
+         * @ngdoc property
+         * @name SDChart.Axis#sortOrder
+         * @type {String}
+         * @description If undefined, do not sort, otherwise sort categories in ascending or descending
+         * order based on series values (if series data is provided as an object)
+         */
+        this.sortOrder = undefined;
+
+        /**
+         * @ngdoc property
+         * @name SDChart.Axis#excludeEmpty
+         * @type {Boolean}
+         * @description If true, remove values with 0 from the categories and series
+         */
+        this.excludeEmpty = false;
+
+        this._sortedCategories = undefined;
     }
 
     /**
@@ -168,6 +187,9 @@ export class Axis {
      * @param {string} [options.xTitle] - The title used on the x-axis
      * @param {Number} [options.xMin] - The minimum value on the x axis
      * @param {Number} [options.xMax] - The maximum value on the x axis
+     * @param {String} [options.sortOrder] - If undefined, do not sort, otherwise sort categories in
+     * ascending or descending order based on series values (if series data is provided as an object)
+     * @param {Boolean} [options.excludeEmpty=false] If true, remove values with 0 from the categories and series
      * @return {SDChart.Axis}
      * @description Sets the options for the axis
      */
@@ -199,16 +221,58 @@ export class Axis {
      * @description Returns translated category field names
      */
     getCategories() {
-        if (this.categories !== undefined && this.categoryField !== undefined) {
-            const names = this.chart.getTranslationNames(this.categoryField);
-
-            return map(
-                this.categories,
-                (category) => get(names, category) || category
-            );
+        if (this._sortedCategories !== undefined) {
+            return this._sortedCategories;
         }
 
-        return this.categories;
+        if (this.categories === undefined) {
+            return undefined;
+        }
+
+        let categories = this.categories;
+
+        if (this.series.length === 1 && typeof this.series[0].data === 'object') {
+            const data = this.series[0].data;
+
+            if (this.excludeEmpty === true) {
+                categories = filter(
+                    categories,
+                    (categoryId) => data[categoryId]
+                );
+            }
+
+            if (this.sortOrder !== undefined) {
+                categories = sortBy(
+                    categories,
+                    (categoryId) => (
+                        this.sortOrder === 'asc' ? data[categoryId] : -data[categoryId]
+                    )
+                );
+            }
+        }
+
+        this._sortedCategories = categories;
+        return categories;
+    }
+
+    /**
+     * @ngdoc method
+     * @name SDChart.Axis#getTranslatedCategories
+     * @return {Array<String>}
+     * @description Returns categories sorted and translated
+     */
+    getTranslatedCategories() {
+        let categories = this.getCategories();
+
+        if (!this.categoryField) {
+            return categories;
+        }
+
+        const names = this.chart.getTranslationNames(this.categoryField);
+
+        return categories.map(
+            (categoryId) => names[categoryId] || categoryId
+        );
     }
 
     /**
@@ -223,6 +287,15 @@ export class Axis {
 
         if (this.categories !== undefined) {
             axisConfig.categories = this.getCategories();
+
+            if (this.categoryField !== undefined) {
+                const names = this.chart.getTranslationNames(this.categoryField);
+
+                axisConfig.categories = map(
+                    axisConfig.categories,
+                    (categoryId) => get(names, categoryId) || categoryId
+                );
+            }
         }
 
         if (this.allowDecimals !== undefined) {

@@ -1,32 +1,32 @@
-<div class="form__row form__row--no-padding">
+<div class="form__row form__row--no-padding" ng-if="enabled.title">
     <div class="sd-line-input">
         <label class="sd-line-input__label" translate>Title</label>
         <textarea
                 class="sd-line-input__input"
-                placeholder="{{generateTitle() | translate}}"
-                ng-model="currentParams.params.chart.title"
+                placeholder="{{titlePlaceholder | translate}}"
+                ng-model="params.chart.title"
                 rows="2"
         ></textarea>
     </div>
 </div>
 
-<div class="form__row">
+<div class="form__row" ng-if="enabled.subtitle">
     <div class="sd-line-input">
         <label class="sd-line-input__label" translate>Subtitle</label>
         <input
                 class="sd-line-input__input"
-                placeholder="{{generateSubtitle() | translate}}"
-                ng-model="currentParams.params.chart.subtitle" type="text"
+                placeholder="{{subtitlePlaceholder | translate}}"
+                ng-model="params.chart.subtitle" type="text"
         />
     </div>
 </div>
 
-<div class="form__row" ng-if="chart_types.length > 1">
+<div class="form__row" ng-if="types.length > 1 && enabled.type">
     <div class="sd-line-input sd-line-input--no-margin">
         <label class="sd-line-input__label" translate>Chart Type</label>
         <div class="flex-grid flex-grid--boxed-small flex-grid--wrap-items flex-grid--small-2">
-            <button ng-repeat="type in chart_types"
-                    ng-model="currentParams.params.chart.type"
+            <button ng-repeat="type in types"
+                    ng-model="params.chart.type"
                     sd-check
                     type="radio"
                     ng-value="{{type.qcode}}"
@@ -39,11 +39,11 @@
     </div>
 </div>
 
-<div class="form__row" ng-if="currentParams.params.chart.sort_order">
+<div class="form__row" ng-if="params.chart.sort_order && enabled.sort">
     <div class="sd-line-input sd-line-input--is-select">
         <label class="sd-line-input__label" translate>Order Categories In:</label>
         <select class="sd-line-input__select"
-                ng-model="currentParams.params.chart.sort_order"
+                ng-model="params.chart.sort_order"
                 ng-change="updateChartConfig()"
         >
             <option value="desc" translate>Descending Order of Stories</option>
@@ -52,13 +52,13 @@
     </div>
 </div>
 
-<div class="form__row" ng-if="currentParams.params.chart.type === 'table'">
+<div class="form__row" ng-if="params.chart.type === 'table' && enabled.page_size">
     <div class="sd-line-input">
         <label class="sd-line-input__label" translate>Page Size</label>
         <input type="number"
                min="1"
                class="sd-line-input__input"
-               ng-model="currentParams.params.size"
+               ng-model="params.size"
         />
     </div>
 </div>

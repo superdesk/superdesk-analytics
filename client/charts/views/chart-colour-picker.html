@@ -1,0 +1,12 @@
+<div class="sd-line-input sd-line-input--is-select">
+    <label class="sd-line-input__label" translate>{{label | translate}}</label>
+    <select class="sd-line-input__select"
+            ng-model="field"
+            ng-class="field"
+    >
+        <option ng-repeat="colour in colours track by $index"
+                value="{{colour.colour}}"
+                ng-class="colour.colour"
+        ></option>
+    </select>
+</div>

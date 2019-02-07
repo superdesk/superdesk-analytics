@@ -92,18 +92,63 @@ export class Series {
          * @description Config to use for the data labels of this series
          */
         this.dataLabelConfig = undefined;
+
+        /**
+         * @ngdoc property
+         * @name SDChart.Series#colours
+         * @type {Array<String>|Object}
+         * @description Array or Object of colours to use for the data points
+         */
+        this.colours = undefined;
+
+        /**
+         * @ngdoc property
+         * @name SDChart.Series#size
+         * @type {Number}
+         * @description Size of the chart
+         */
+        this.size = undefined;
+
+        /**
+         * @ngdoc property
+         * @name SDChart.Series#semiCircle
+         * @type {Boolean}
+         * @description If the chart type is a pie, then render a semi circle
+         */
+        this.semiCircle = undefined;
+
+        /**
+         * @ngdoc property
+         * @name SDChart.Series#center
+         * @type {Array<String>}
+         * @description The x and y offset of the center of the chart
+         */
+        this.center = undefined;
+
+        /**
+         * @ngdoc property
+         * @name SDChart.Series#showInLegend
+         * @type {Boolean}
+         * @description If true, show the point names in the legend
+         */
+        this.showInLegend = undefined;
     }
 
     /**
      * @ngdoc method
      * @name SDChart.Series#setOptions
      * @param {string} [options.type=this.axis.defaultChartType] - The chart type
-     * @param {Object|Array} options.data - The data to add to the series
+     * @param {Object|Array} [options.data] - The data to add to the series
      * @param {string} [options.field] - The field type for the data
      * @param {string} [options.name] - The field name for the data
      * @param {Number} [options.stack] - The stack number
      * @param {string} [options.stackType] - The type of stacking to perform
      * @param {string} [options.colourIndex] - The colour index to use for this series
+     * @param {Array<String>|Object} [options.colours] - Array or Object of colours to use for the data points
+     * @param {Number} [options.size] - Size of the chart
+     * @param {Boolean} [options.semiCircle] - If the chart type is a pie, then render a semi circle
+     * @param {Array<String>} [options.center] - The x and y offset of the center of the chart
+     * @param {Boolean} [options.showInLegend] - If true, show the point names in the legend
      * @return {SDChart.Series}
      * @description Sets the options for the series
      */
@@ -121,17 +166,18 @@ export class Series {
      * @return {Array}
      * @description Returns the data for this series
      */
-    getData() {
-        if (this.data === undefined) {
-            return undefined;
-        } else if (Array.isArray(this.data)) {
+    getData(series) {
+        if (this.data === undefined || Array.isArray(this.data)) {
             return this.data;
-        }
+        } else if (this.axis.categories !== undefined) {
+            const names = this.chart.getTranslationNames(this.axis.categoryField);
 
-        if (this.axis.categories !== undefined) {
-            return map(
-                this.axis.categories,
-                (source) => get(this.data, source) || 0
+            return this.axis.getCategories().map(
+                (categoryId, index) => ({
+                    name: names[categoryId] || categoryId,
+                    y: get(this.data, categoryId) || 0,
+                    className: get(this.colours, categoryId) || get(this.colours, index) || '',
+                })
             );
         }
 
@@ -167,7 +213,7 @@ export class Series {
      */
     setDataConfig(series) {
         const name = this.getName();
-        const data = this.getData();
+        const data = this.getData(series);
 
         if (name !== undefined) {
             series.name = name;
@@ -196,6 +242,25 @@ export class Series {
 
         if (this.axis.pointInterval !== undefined) {
             series.pointInterval = this.axis.pointInterval;
+        }
+
+        if (this.size) {
+            series.size = this.size;
+        }
+
+        if (series.type === 'pie' && this.semiCircle !== undefined) {
+            series.startAngle = -90;
+            series.endAngle = 90;
+            series.innerSize = '50%';
+            series.slicedOffset = 0;
+        }
+
+        if (this.center !== undefined) {
+            series.center = this.center;
+        }
+
+        if (this.showInLegend !== undefined) {
+            series.showInLegend = this.showInLegend;
         }
     }
 
@@ -231,6 +296,7 @@ export class Series {
         this.setDataConfig(series);
         this.setPointConfig(series);
         this.setStyleConfig(series);
+
 
         return series;
     }
