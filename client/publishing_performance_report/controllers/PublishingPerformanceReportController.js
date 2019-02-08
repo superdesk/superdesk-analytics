@@ -1,5 +1,7 @@
 import {getErrorMessage} from '../../utils';
 import {DATE_FILTERS} from '../../search/directives/DateFilters';
+import {CHART_FIELDS, CHART_TYPES} from '../../charts/directives/ChartOptions';
+
 
 PublishingPerformanceReportController.$inject = [
     '$scope',
@@ -59,6 +61,19 @@ export function PublishingPerformanceReportController(
             DATE_FILTERS.LAST_WEEK,
             DATE_FILTERS.LAST_MONTH,
             DATE_FILTERS.RANGE,
+        ];
+
+        $scope.chartFields = [
+            CHART_FIELDS.TITLE,
+            CHART_FIELDS.SUBTITLE,
+            CHART_FIELDS.TYPE,
+            CHART_FIELDS.SORT,
+        ];
+
+        $scope.chartTypes = [
+            CHART_TYPES.BAR,
+            CHART_TYPES.COLUMN,
+            CHART_TYPES.TABLE,
         ];
 
         this.initDefaultParams();
@@ -130,7 +145,7 @@ export function PublishingPerformanceReportController(
                     },
                 },
                 chart: {
-                    type: _.get($scope, 'chart_types[0].qcode') || 'bar',
+                    type: CHART_TYPES.COLUMN,
                     sort_order: 'desc',
                     title: null,
                     subtitle: null,
@@ -226,6 +241,7 @@ export function PublishingPerformanceReportController(
      * @description Updates the Highchart configs in the report's content view
      */
     $scope.generate = () => {
+        $scope.beforeGenerateChart();
         $scope.changeContentView('report');
 
         const params = _.cloneDeep($scope.currentParams.params);

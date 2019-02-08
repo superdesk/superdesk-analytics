@@ -72,6 +72,7 @@
                 <div sda-chart-options
                      ng-if="currentTab==='chartOptions'"
                      data-params="currentParams.params"
+                     data-chart-types="chartTypes"
                      data-title-placeholder="generateTitle()"
                      data-subtitle-placeholder="generateSubtitle()"
                      data-update-chart-config="updateChartConfig"
@@ -86,5 +87,6 @@
          data-get-report-params="getReportParams"
          data-is-dirty="isDirty"
          data-view-schedule="viewSchedule"
+         data-on-clear-filters="onClearFilters"
     ></div>
 </div>

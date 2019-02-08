@@ -1,5 +1,6 @@
 import {getErrorMessage} from '../../utils';
 import {DATE_FILTERS} from '../../search/directives/DateFilters';
+import {CHART_TYPES} from '../../charts/directives/ChartOptions';
 
 ContentPublishingReportController.$inject = [
     '$scope',
@@ -61,6 +62,12 @@ export function ContentPublishingReportController(
             DATE_FILTERS.RANGE,
         ];
 
+        $scope.chartTypes = [
+            CHART_TYPES.BAR,
+            CHART_TYPES.COLUMN,
+            CHART_TYPES.TABLE,
+        ];
+
         this.initDefaultParams();
         savedReports.selectReportFromURL();
 
@@ -76,10 +83,6 @@ export function ContentPublishingReportController(
     this.initDefaultParams = () => {
         $scope.item_states = searchReport.filterItemStates(
             ['published', 'killed', 'corrected', 'recalled']
-        );
-
-        $scope.chart_types = chartConfig.filterChartTypes(
-            ['bar', 'column', 'table']
         );
 
         $scope.report_groups = searchReport.filterDataFields(
@@ -127,7 +130,7 @@ export function ContentPublishingReportController(
                     },
                 },
                 chart: {
-                    type: _.get($scope, 'chart_types[0].qcode') || 'bar',
+                    type: CHART_TYPES.COLUMN,
                     sort_order: 'desc',
                     title: null,
                     subtitle: null,
@@ -245,6 +248,7 @@ export function ContentPublishingReportController(
      * @description Updates the Highchart configs in the report's content view
      */
     $scope.generate = () => {
+        $scope.beforeGenerateChart();
         $scope.changeContentView('report');
 
         const params = _.cloneDeep($scope.currentParams.params);

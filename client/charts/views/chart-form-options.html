@@ -41,13 +41,13 @@
 
 <div class="form__row" ng-if="params.chart.sort_order && enabled.sort">
     <div class="sd-line-input sd-line-input--is-select">
-        <label class="sd-line-input__label" translate>Order Categories In:</label>
+        <label class="sd-line-input__label" translate>Order Data In:</label>
         <select class="sd-line-input__select"
                 ng-model="params.chart.sort_order"
                 ng-change="updateChartConfig()"
         >
-            <option value="desc" translate>Descending Order of Stories</option>
-            <option value="asc" translate>Ascending Order of Stores</option>
+            <option value="desc" translate>Descending Order</option>
+            <option value="asc" translate>Ascending Order</option>
         </select>
     </div>
 </div>

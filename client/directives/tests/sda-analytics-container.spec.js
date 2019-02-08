@@ -74,7 +74,7 @@ describe('sda-analytics-container', () => {
             contentView: 'report',
         });
         expect(scope.currentReport).toEqual(reports[0]);
-        expect(scope.reportConfigs).toEqual({charts: []});
+        expect(scope.reportConfigs).toEqual({loading: false});
 
         // Scope functions exist
         expect(angular.isFunction(scope.changeReport)).toBeTruthy();
@@ -93,7 +93,7 @@ describe('sda-analytics-container', () => {
             expect(scope.currentReport).toEqual(reports[0]);
             expect($location.search().report).toBeUndefined();
             expect(scope.flags.showSidePanel).toBeFalsy();
-            expect(scope.reportConfigs).toEqual({charts: []});
+            expect(scope.reportConfigs).toEqual({loading: false});
 
             // Change the reportConfigs so that we know it is reset when changing reports
             scope.reportConfigs = {charts: [{id: 'chart_1'}]};
@@ -105,7 +105,7 @@ describe('sda-analytics-container', () => {
             expect(scope.currentReport).toEqual(reports[2]);
             expect($location.search().report).toBe('report_2');
             expect(scope.flags.showSidePanel).toBeTruthy();
-            expect(scope.reportConfigs).toEqual({charts: []});
+            expect(scope.reportConfigs).toEqual({loading: false});
 
             // Change the reportConfigs, then attempt to change to the same report
             scope.reportConfigs = {charts: [{id: 'chart_1'}]};
@@ -127,7 +127,7 @@ describe('sda-analytics-container', () => {
             expect(scope.currentReport).toEqual(reports[0]);
             expect($location.search().report).toBeUndefined();
             expect(scope.flags.showSidePanel).toBeFalsy();
-            expect(scope.reportConfigs).toEqual({charts: []});
+            expect(scope.reportConfigs).toEqual({loading: false});
         });
 
         it('Uses the URL parameter to switch the report on load', () => {
@@ -169,14 +169,17 @@ describe('sda-analytics-container', () => {
 
     it('changeReportParams', () => {
         initContainer();
-        expect(scope.reportConfigs).toEqual({charts: []});
+        expect(scope.reportConfigs).toEqual({loading: false});
 
         scope.changeReportParams({charts: [{id: 'chart_1'}]});
         $rootScope.$digest();
-        expect(scope.reportConfigs).toEqual({charts: [{id: 'chart_1'}]});
+        expect(scope.reportConfigs).toEqual({
+            charts: [{id: 'chart_1'}],
+            loading: false,
+        });
 
         scope.changeReportParams();
         $rootScope.$digest();
-        expect(scope.reportConfigs).toEqual({charts: []});
+        expect(scope.reportConfigs).toEqual({loading: false});
     });
 });

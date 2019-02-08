@@ -97,7 +97,7 @@ describe('chartConfig', () => {
             }],
             yAxis: [{
                 title: {text: 'Published Stories'},
-                stackLabels: {enabled: false},
+                stackLabels: {enabled: true},
                 allowDecimals: false,
                 labels: {
                     enabled: true,
@@ -111,7 +111,7 @@ describe('chartConfig', () => {
                 pointFormat: '',
             },
             plotOptions: {
-                series: {dataLabels: {enabled: true}},
+                series: {dataLabels: {enabled: false}},
                 bar: {colorByPoint: true},
                 column: {colorByPoint: true},
             },
@@ -120,6 +120,8 @@ describe('chartConfig', () => {
                 data: [4, 3, 1],
                 type: 'bar',
                 xAxis: 0,
+                stacking: 'normal',
+                stack: 0,
             }],
             shadow: true,
             ...defaultConfig,
@@ -142,6 +144,8 @@ describe('chartConfig', () => {
             data: [1, 3, 4],
             type: 'bar',
             xAxis: 0,
+            stacking: 'normal',
+            stack: 0,
         }]);
 
         chart.sortOrder = 'desc';
@@ -157,6 +161,8 @@ describe('chartConfig', () => {
             data: [4, 3, 1],
             type: 'bar',
             xAxis: 0,
+            stacking: 'normal',
+            stack: 0,
         }]);
     });
 
@@ -318,6 +324,8 @@ describe('chartConfig', () => {
                 data: [4, 3, 1],
                 xAxis: 0,
                 type: 'column',
+                stacking: 'normal',
+                stack: 0,
             }],
             headers: ['Category', 'Published Stories'],
             rows: [
@@ -344,6 +352,8 @@ describe('chartConfig', () => {
             data: [1, 3, 4],
             xAxis: 0,
             type: 'column',
+            stacking: 'normal',
+            stack: 0,
         }]);
         expect(config.rows).toEqual([
             ['Cricket', 1],
@@ -364,6 +374,8 @@ describe('chartConfig', () => {
             data: [4, 3, 1],
             xAxis: 0,
             type: 'column',
+            stacking: 'normal',
+            stack: 0,
         }]);
         expect(config.rows).toEqual([
             ['Basketball', 4],
@@ -413,7 +425,7 @@ describe('chartConfig', () => {
                 stacking: 'normal',
                 stack: 0,
             }],
-            headers: ['Category', '1', '3', '5', 'Total Stories'],
+            headers: ['Category', '1', '3', '5', 'Total'],
             rows: [
                 ['Cricket', 2, 1, 1, 4],
                 ['Basketball', 1, 2, 0, 3],

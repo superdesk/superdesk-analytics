@@ -333,6 +333,7 @@ export function ChartConfig(
                 defaultConfig: self.defaultConfig,
                 fullHeight: true,
                 shadow: this.shadow,
+                dataLabels: false,
             });
 
             chart.translations = self.translations;
@@ -340,46 +341,37 @@ export function ChartConfig(
 
             const parent = this.getParent();
 
-            const axisOptions = {
-                type: 'category',
-                defaultChartType: this.chartType === 'table' ? 'column' : this.chartType,
-                yTitle: this.getYAxisTitle(),
-                xTitle: chart.getTranslationTitle(parent.field),
-                categoryField: parent.field,
-                categories: this.getSortedKeys(parent.data),
-            };
+            const axis = chart.addAxis()
+                .setOptions({
+                    type: 'category',
+                    defaultChartType: this.chartType === 'table' ? 'column' : this.chartType,
+                    yTitle: this.getYAxisTitle(),
+                    xTitle: chart.getTranslationTitle(parent.field),
+                    categoryField: parent.field,
+                    categories: this.getSortedKeys(parent.data),
+                    stackLabels: true,
+                });
 
             if (!this.isMultiSource()) {
                 chart.tooltipHeader = '{point.x}: {point.y}';
-                chart.dataLabels = true;
                 chart.colourByPoint = true;
 
-                chart.addAxis()
-                    .setOptions({
-                        ...axisOptions,
-                        stackLabels: false,
-                    })
-                    .addSeries()
+                axis.addSeries()
                     .setOptions({
                         field: parent.field,
                         data: _.map(
                             this.getSortedKeys(parent.data),
                             (source) => _.get(parent.data, source) || 0
                         ),
+                        stack: 0,
+                        stackType: 'normal',
                     });
             } else {
                 const child = this.getChild();
 
                 chart.legendTitle = this.getSourceName(child.field);
                 chart.tooltipHeader = '{series.name}/{point.x}: {point.y}';
-                chart.dataLabels = false;
                 chart.colourByPoint = false;
-
-                const axis = chart.addAxis()
-                    .setOptions({
-                        ...axisOptions,
-                        stackLabels: true,
-                    });
 
                 Object.keys(child.data).forEach((group) => {
                     axis.addSeries()

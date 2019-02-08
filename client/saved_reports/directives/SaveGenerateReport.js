@@ -17,6 +17,7 @@ export function SaveGenerateReport(_, privileges, savedReports) {
             getReportParams: '=',
             isDirty: '=',
             _viewSchedule: '=viewSchedule',
+            onClearFilters: '=',
         },
         link: function(scope, element, attrs, controller) {
             scope.showSaveForm = false;
@@ -68,9 +69,13 @@ export function SaveGenerateReport(_, privileges, savedReports) {
                 scope._viewSchedule(scope.currentTemplate)
             );
 
-            scope.clearFilters = () => (
-                savedReports.selectReport({})
-            );
+            scope.clearFilters = () => {
+                savedReports.selectReport({});
+
+                if (scope.onClearFilters) {
+                    scope.onClearFilters();
+                }
+            };
         },
     };
 }

@@ -385,7 +385,7 @@ export class Chart {
             config.legend = {};
         }
 
-        if (!this.legendTitle && !this.legendFormatter && !this.legendFormat) {
+        if (this.legendTitle === undefined && this.legendFormatter === undefined && this.legendFormat === undefined) {
             config.legend.enabled = false;
         } else {
             config.legend.enabled = true;
@@ -484,7 +484,9 @@ export class Chart {
      */
     genPlotConfig(config) {
         if (!get(config, 'plotOptions')) {
-            config.plotOptions = {};
+            config.plotOptions = {series: {}};
+        } else if (!get(config, 'plotOptions.series')) {
+            config.plotOptions.series = {};
         }
 
         this.genPlotLabelConfig(config);
@@ -668,7 +670,7 @@ export class Chart {
 
         const headers = [axis.xTitle].concat(
             axis.series.map((series) => series.getName()),
-            'Total Stories'
+            'Total'
         );
 
         const rows = axis.getTranslatedCategories().map((category) => ([category]));

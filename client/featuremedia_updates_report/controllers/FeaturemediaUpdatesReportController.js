@@ -116,6 +116,8 @@ export function FeaturemediaUpdatesReportController(
                 },
                 repos: {archive_statistics: true},
                 min: 1,
+                size: 15,
+                page: 1,
                 chart: {
                     type: 'table',
                     sort_order: 'desc',
@@ -193,6 +195,7 @@ export function FeaturemediaUpdatesReportController(
      * @description Updates the Highchart configs in the report's content view
      */
     $scope.generate = () => {
+        $scope.beforeGenerateChart();
         $scope.changeContentView('report');
 
         const params = _.cloneDeep($scope.currentParams.params);

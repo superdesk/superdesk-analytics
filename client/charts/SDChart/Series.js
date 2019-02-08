@@ -132,6 +132,38 @@ export class Series {
          * @description If true, show the point names in the legend
          */
         this.showInLegend = undefined;
+
+        /**
+         * @ngdoc property
+         * @name SDChart.Series#groupPadding
+         * @type {Number}
+         * @description Padding between each value groups, in x axis units.
+         */
+        this.groupPadding = undefined;
+
+        /**
+         * @ngdoc property
+         * @name SDChart.Series#pointPadding
+         * @type {Number}
+         * @description Padding between each column or bar, in x axis units.
+         */
+        this.pointPadding = undefined;
+
+        /**
+         * @ngdoc property
+         * @name SDChart.Series#borderWidth
+         * @type {Number}
+         * @description The width of the border surrounding each column or bar.
+         */
+        this.borderWidth = undefined;
+
+        /**
+         * @ngdoc property
+         * @name SDChart.Series#maxPointWidth
+         * @type {Number}
+         * @description The maximum allowed pixel width for a column, translated to the height of a bar in a bar chart
+         */
+        this.maxPointWidth = undefined;
     }
 
     /**
@@ -255,13 +287,13 @@ export class Series {
             series.slicedOffset = 0;
         }
 
-        if (this.center !== undefined) {
-            series.center = this.center;
-        }
-
-        if (this.showInLegend !== undefined) {
-            series.showInLegend = this.showInLegend;
-        }
+        ['center', 'showInLegend', 'groupPadding', 'pointPadding', 'borderWidth', 'maxPointWidth'].forEach(
+            (field) => {
+                if (this[field] !== undefined) {
+                    series[field] = this[field];
+                }
+            }
+        );
     }
 
     /**
@@ -296,7 +328,6 @@ export class Series {
         this.setDataConfig(series);
         this.setPointConfig(series);
         this.setStyleConfig(series);
-
 
         return series;
     }
