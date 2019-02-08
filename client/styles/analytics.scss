@@ -324,3 +324,67 @@
         background-color: unset !important;
     }
 }
+
+// Styles copied from client-core for widget styling
+.widget-list {
+    li {
+        &.widget {
+            &.publishing-actions {
+                .thumbnail {
+                    background-color: #d62776;
+                }
+            }
+        }
+    }
+}
+
+.widget-detail {
+    .thumbnail-box {
+        &.publishing-actions {
+            background-color: #d62776;
+        }
+    }
+}
+
+.sd-widget {
+    &.publishing-actions {
+        .widget-header {
+            z-index: 2;
+            background: $white;
+            box-sizing: border-box;
+
+        }
+
+        .widget-content {
+            overflow-x: hidden;
+            top: 0;
+        }
+
+        .widget-container__chart {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            top: 38px;
+            width: 100%;
+            @include transition(all ease 0.2s);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            &.wrap {
+                left: -100%;
+                right: auto;
+                overflow: hidden;
+                .scroll-shadow {
+                    display: none;
+                }
+                .content-list-holder {
+                    overflow: hidden !important;
+                }
+            }
+            &.custom-widget {
+                bottom: 50%;
+            }
+        }
+    }
+}

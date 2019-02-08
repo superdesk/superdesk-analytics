@@ -33,8 +33,12 @@ export class Chart {
      * @param {Function} [options.tooltipFormatter] - Callback function to dynamically generate tooltips
      * @param {Function} [options.onPointClick] - Callback function when a point is clicked
      * @param {Object} [options.dataLabelConfig] - Custom config for dataLabels
-     * @params {Boolean} [options.invertAxes=false] - Invert the X and Y axes
-     * @params {Function} [options.legendFormatter] - Callback function to dynamically generate legend labels
+     * @param {Boolean} [options.invertAxes=false] - Invert the X and Y axes
+     * @param {Function} [options.legendFormatter] - Callback function to dynamically generate legend labels
+     * @param {String} [options.legendFormat] - The legend point format
+     * @param {Boolean} [options.shadow=true] - Creates a shadow around the chart container
+     * @param {Boolean} [options.exporting] - If false, then disables exporting options
+     * @param {Array<Number>} [options.legendOffset] - X/Y Offset for the legend position
      * @description Initialise the data for the chart config
      */
     constructor(options) {
@@ -64,6 +68,10 @@ export class Chart {
 
         if (!('invertAxes' in options)) {
             options.invertAxes = false;
+        }
+
+        if (!('shadow' in options)) {
+            options.shadow = true;
         }
 
         /**
@@ -271,6 +279,38 @@ export class Chart {
          * @description Callback function to dynamically generate legend labels
          */
         this.legendFormatter = options.legendFormatter;
+
+        /**
+         * @ngdoc property
+         * @name SDChart.Chart#legendFormat
+         * @type {String}
+         * @description The legend point format
+         */
+        this.legendFormat = options.legendFormat;
+
+        /**
+         * @ngdoc property
+         * @name SDChart.Chart#shadow
+         * @type {Boolean}
+         * @description Creates a shadow around the chart container
+         */
+        this.shadow = options.shadow;
+
+        /**
+         * @ngdoc property
+         * @name SDChart.Chart#exporting
+         * @type {Boolean}
+         * @description If false, then disables exporting options
+         */
+        this.exporting = options.exporting;
+
+        /**
+         * @ngdoc property
+         * @name SDChart.Chart#legendOffset
+         * @ype {Array<Number>}
+         * @description X/Y Offset for the legend position
+         */
+        this.legendOffset = options.legendOffset;
     }
 
     /**
@@ -292,11 +332,14 @@ export class Chart {
     genTitleConfig(config) {
         const title = this.getTitle();
 
+        if (!get(config, 'title')) {
+            config.title = {};
+        }
+
         if (title !== undefined) {
-            if (!get(config, 'title')) {
-                config.title = {};
-            }
             config.title.text = title;
+        } else if (!get(config, 'title.text')) {
+            config.title.text = '';
         }
 
         return config;
@@ -342,16 +385,28 @@ export class Chart {
             config.legend = {};
         }
 
-        if (this.legendTitle === undefined) {
+        if (!this.legendTitle && !this.legendFormatter && !this.legendFormat) {
             config.legend.enabled = false;
         } else {
             config.legend.enabled = true;
-            config.legend.title = {text: this.legendTitle};
-        }
-
-        if (this.legendFormatter !== undefined) {
-            config.legend.labelFormatter = this.legendFormatter;
             config.legend.useHTML = true;
+
+            if (this.legendTitle) {
+                config.legend.title = {text: this.legendTitle};
+            }
+
+            if (this.legendFormatter) {
+                config.legend.labelFormatter = this.legendFormatter;
+            }
+
+            if (this.legendFormat) {
+                config.legend.labelFormat = this.legendFormat;
+            }
+
+            if (this.legendOffset) {
+                config.legend.x = this.legendOffset[0];
+                config.legend.y = this.legendOffset[1];
+            }
         }
 
         return config;
@@ -368,17 +423,22 @@ export class Chart {
             config.tooltip = {};
         }
 
-        if (this.tooltipHeader !== undefined) {
-            config.tooltip.headerFormat = this.tooltipHeader;
-        }
+        if (!this.tooltipHeader && !this.tooltipPoint && !this.tooltipFormatter) {
+            config.tooltip.enabled = false;
+        } else {
+            config.tooltip.enabled = true;
+            if (this.tooltipHeader !== undefined) {
+                config.tooltip.headerFormat = this.tooltipHeader;
+            }
 
-        if (this.tooltipPoint !== undefined) {
-            config.tooltip.pointFormat = this.tooltipPoint;
-        }
+            if (this.tooltipPoint !== undefined) {
+                config.tooltip.pointFormat = this.tooltipPoint;
+            }
 
-        if (this.tooltipFormatter !== undefined) {
-            config.tooltip.formatter = this.tooltipFormatter;
-            config.tooltip.useHTML = true;
+            if (this.tooltipFormatter !== undefined) {
+                config.tooltip.formatter = this.tooltipFormatter;
+                config.tooltip.useHTML = true;
+            }
         }
 
         return config;
@@ -531,6 +591,18 @@ export class Chart {
 
     /**
      * @ngdoc method
+     * @name SDChart.Chart#genExportingConfig
+     * @param {Object} config
+     * @description Generates the exporting config to use for the chart
+     */
+    genExportingConfig(config) {
+        if (this.exporting === false) {
+            config.exporting = {enabled: false};
+        }
+    }
+
+    /**
+     * @ngdoc method
      * @name SDChart.Chart#genHighchartsConfig
      * @param {Object} config
      * @description Generates the config for use with highcharts
@@ -538,6 +610,7 @@ export class Chart {
     genHighchartsConfig(config) {
         config.id = this.id;
         config.type = this.chartType;
+        config.shadow = this.shadow;
 
         this.genChartConfig(config);
         this.genTitleConfig(config);
@@ -546,6 +619,7 @@ export class Chart {
         this.genLegendConfig(config);
         this.genTooltipConfig(config);
         this.genPlotConfig(config);
+        this.genExportingConfig(config);
 
         this.axis.forEach((axis) => axis.genConfig(config));
 
@@ -563,7 +637,7 @@ export class Chart {
         const headers = [axis.xTitle, axis.yTitle];
         const rows = [];
 
-        forEach(axis.getCategories(), (category, index) => {
+        forEach(axis.getTranslatedCategories(), (category, index) => {
             rows.push([
                 category,
                 axis.series[0].data[index],
@@ -597,7 +671,7 @@ export class Chart {
             'Total Stories'
         );
 
-        const rows = axis.getCategories().map((category) => ([category]));
+        const rows = axis.getTranslatedCategories().map((category) => ([category]));
 
         forEach(axis.series, (series) => {
             series.getData().forEach((count, index) => {

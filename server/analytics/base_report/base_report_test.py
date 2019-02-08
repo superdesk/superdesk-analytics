@@ -117,14 +117,14 @@ class BaseReportServiceTestCase(TestCase):
                 'must_not': []
             })
 
-    def test_generate_elastic_query_from_date_attributes(self):
+    def test_generate_elastic_query_from_date_object(self):
         with self.app.app_context():
             # DateFilters - Range
             query = self.service.generate_elastic_query({
                 'params': {
                     'dates': {
                         'filter': 'range',
-                        'start': '2018-06-30',
+                        'start': '2018-06-01',
                         'end': '2018-06-30'
                     }
                 }
@@ -134,7 +134,7 @@ class BaseReportServiceTestCase(TestCase):
                     'range': {
                         'versioncreated': {
                             'lt': '2018-06-30T23:59:59+1000',
-                            'gte': '2018-06-30T00:00:00+1000',
+                            'gte': '2018-06-01T00:00:00+1000',
                             'time_zone': '+1000'
                         }
                     }
@@ -142,66 +142,12 @@ class BaseReportServiceTestCase(TestCase):
                 'must_not': []
             })
 
-            # DateFilters - Yesterday
-            query = self.service.generate_elastic_query({
-                'params': {'dates': {'filter': 'yesterday'}}
-            })
-            self.assert_bool_query(query, {
-                'must': [{
-                    'range': {
-                        'versioncreated': {
-                            'lt': 'now/d',
-                            'gte': 'now-1d/d',
-                            'time_zone': '+1000'
-                        }
-                    }
-                }],
-                'must_not': []
-            })
-
-            # DateFilters - Last Week
-            query = self.service.generate_elastic_query({
-                'params': {'dates': {'filter': 'last_week'}}
-            })
-            self.assert_bool_query(query, {
-                'must': [{
-                    'range': {
-                        'versioncreated': {
-                            'lt': 'now/w',
-                            'gte': 'now-1w/w',
-                            'time_zone': '+1000'
-                        }
-                    }
-                }],
-                'must_not': []
-            })
-
-            # DateFilters - Last Month
-            query = self.service.generate_elastic_query({
-                'params': {'dates': {'filter': 'last_month'}}
-            })
-            self.assert_bool_query(query, {
-                'must': [{
-                    'range': {
-                        'versioncreated': {
-                            'lt': 'now/M',
-                            'gte': 'now-1M/M',
-                            'time_zone': '+1000'
-                        }
-                    }
-                }],
-                'must_not': []
-            })
-
-    def test_generate_elastic_query_from_date_object(self):
-        with self.app.app_context():
-            # DateFilters - Range
+            # DateFilters - Day
             query = self.service.generate_elastic_query({
                 'params': {
                     'dates': {
-                        'filter': 'range',
-                        'start': '2018-06-30',
-                        'end': '2018-06-30'
+                        'filter': 'day',
+                        'date': '2018-06-30'
                     }
                 }
             })
@@ -262,6 +208,101 @@ class BaseReportServiceTestCase(TestCase):
                         'versioncreated': {
                             'lt': 'now/M',
                             'gte': 'now-1M/M',
+                            'time_zone': '+1000'
+                        }
+                    }
+                }],
+                'must_not': []
+            })
+
+            # DateFilters - Relative
+            query = self.service.generate_elastic_query({
+                'params': {
+                    'dates': {
+                        'filter': 'relative',
+                        'relative': 12
+                    }
+                }
+            })
+            self.assert_bool_query(query, {
+                'must': [{
+                    'range': {
+                        'versioncreated': {
+                            'lt': 'now',
+                            'gte': 'now-12h',
+                            'time_zone': '+1000'
+                        }
+                    }
+                }],
+                'must_not': []
+            })
+
+            # DateFilters - Relative Days
+            query = self.service.generate_elastic_query({
+                'params': {
+                    'dates': {
+                        'filter': 'relative_days',
+                        'relative_days': 7
+                    }
+                }
+            })
+            self.assert_bool_query(query, {
+                'must': [{
+                    'range': {
+                        'versioncreated': {
+                            'lt': 'now',
+                            'gte': 'now-7d',
+                            'time_zone': '+1000'
+                        }
+                    }
+                }],
+                'must_not': []
+            })
+
+            # DateFilters - Today
+            query = self.service.generate_elastic_query(
+                {'params': {'dates': {'filter': 'today'}}}
+            )
+            self.assert_bool_query(query, {
+                'must': [{
+                    'range': {
+                        'versioncreated': {
+                            'lt': 'now',
+                            'gte': 'now/d',
+                            'time_zone': '+1000'
+                        }
+                    }
+                }],
+                'must_not': []
+            })
+
+            # DateFilters - This Week
+            query = self.service.generate_elastic_query(
+                {'params': {'dates': {'filter': 'this_week'}}}
+            )
+            self.assert_bool_query(query, {
+                'must': [{
+                    'range': {
+                        'versioncreated': {
+                            'lt': 'now',
+                            'gte': 'now/w',
+                            'time_zone': '+1000'
+                        }
+                    }
+                }],
+                'must_not': []
+            })
+
+            # DateFilters - This Month
+            query = self.service.generate_elastic_query(
+                {'params': {'dates': {'filter': 'this_month'}}}
+            )
+            self.assert_bool_query(query, {
+                'must': [{
+                    'range': {
+                        'versioncreated': {
+                            'lt': 'now',
+                            'gte': 'now/M',
                             'time_zone': '+1000'
                         }
                     }

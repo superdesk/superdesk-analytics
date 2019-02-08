@@ -1,5 +1,6 @@
 import {getErrorMessage} from '../../utils';
 import {DATE_FILTERS} from '../../search/directives/DateFilters';
+import {CHART_FIELDS} from '../../charts/directives/ChartOptions';
 
 FeaturemediaUpdatesReportController.$inject = [
     '$scope',
@@ -56,6 +57,13 @@ export function FeaturemediaUpdatesReportController(
             DATE_FILTERS.LAST_WEEK,
             DATE_FILTERS.LAST_MONTH,
             DATE_FILTERS.RANGE,
+        ];
+
+        $scope.chartFields = [
+            CHART_FIELDS.TITLE,
+            CHART_FIELDS.SUBTITLE,
+            CHART_FIELDS.SORT,
+            CHART_FIELDS.PAGE_SIZE,
         ];
 
         this.initDefaultParams();

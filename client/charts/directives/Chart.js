@@ -1,4 +1,4 @@
-Chart.$inject = ['chartManager', '$timeout', '$sce'];
+Chart.$inject = ['chartManager', '$timeout', '$sce', 'lodash'];
 
 /**
  * @ngdoc directive
@@ -8,19 +8,25 @@ Chart.$inject = ['chartManager', '$timeout', '$sce'];
  * @requires $timeout
  * @description A directive that renders a Highcharts instance given its config
  */
-export function Chart(chartManager, $timeout, $sce) {
+export function Chart(chartManager, $timeout, $sce, _) {
     return {
         scope: {config: '<'},
         template: require('../views/chart.html'),
         link: function(scope, element, attrs) {
             let target = element.find('div');
 
-            scope.$watch('config', (config) => {
-                render(config, config.id);
+            scope.$watch('config', (newConfig, oldConfig) => {
+                if (newConfig) {
+                    render(newConfig, newConfig.id);
+                } else if (_.get(oldConfig, 'id')) {
+                    chartManager.destroy(oldConfig.id);
+                }
             });
 
             scope.$on('$destroy', () => {
-                chartManager.destroy(scope.config.id);
+                if (_.get(scope, 'config.id')) {
+                    chartManager.destroy(scope.config.id);
+                }
             });
 
             /**

@@ -1,6 +1,7 @@
 import {DATE_FILTERS} from '../../search/directives/DateFilters';
 import {SOURCE_FILTERS} from '../../search/directives/SourceFilters';
 import {getErrorMessage} from '../../utils';
+import {CHART_FIELDS} from '../../charts/directives/ChartOptions';
 
 UpdateTimeReportController.$inject = [
     '$scope',
@@ -71,6 +72,13 @@ export function UpdateTimeReportController(
             SOURCE_FILTERS.URGENCY,
             SOURCE_FILTERS.INGEST_PROVIDERS,
             SOURCE_FILTERS.PUBLISH_PARS,
+        ];
+
+        $scope.chartFields = [
+            CHART_FIELDS.TITLE,
+            CHART_FIELDS.SUBTITLE,
+            CHART_FIELDS.SORT,
+            CHART_FIELDS.PAGE_SIZE,
         ];
 
         $scope.form = {submitted: false};

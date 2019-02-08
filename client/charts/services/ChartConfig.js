@@ -143,6 +143,7 @@ export function ChartConfig(
             this.chartType = chartType;
             this.sources = [];
             this.sortOrder = 'desc';
+            this.shadow = true;
         }
 
         /**
@@ -331,6 +332,7 @@ export function ChartConfig(
                 subtitle: this.getSubtitle(),
                 defaultConfig: self.defaultConfig,
                 fullHeight: true,
+                shadow: this.shadow,
             });
 
             chart.translations = self.translations;

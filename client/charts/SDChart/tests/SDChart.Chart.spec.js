@@ -14,9 +14,11 @@ describe('SDChart.Chart', () => {
             chart: {},
             time: {useUTC: true},
             legend: {enabled: false},
-            tooltip: {},
+            tooltip: {enabled: false},
             plotOptions: {series: {dataLabels: {enabled: false}}},
             fullHeight: false,
+            shadow: true,
+            title: {text: ''},
         });
 
         expect(genConfig({
@@ -33,7 +35,7 @@ describe('SDChart.Chart', () => {
             chart: {},
             time: {useUTC: true},
             legend: {enabled: false},
-            tooltip: {},
+            tooltip: {enabled: false},
             plotOptions: {
                 series: {
                     dataLabels: {enabled: false},
@@ -44,6 +46,7 @@ describe('SDChart.Chart', () => {
             title: {text: 'Default Title'},
             subtitle: {text: 'Default Subtitle'},
             fullHeight: false,
+            shadow: true,
         });
     });
 
@@ -93,6 +96,7 @@ describe('SDChart.Chart', () => {
             legend: {
                 enabled: true,
                 title: {text: 'Test Legend'},
+                useHTML: true,
             },
         }));
 
@@ -103,6 +107,7 @@ describe('SDChart.Chart', () => {
             })
         ).toEqual(jasmine.objectContaining({
             tooltip: {
+                enabled: true,
                 headerFormat: 'Tool Header {point.x}',
                 pointFormat: 'Tool Point {point.y}',
             },

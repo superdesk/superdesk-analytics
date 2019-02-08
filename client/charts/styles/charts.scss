@@ -238,3 +238,158 @@ $colors: #7cb5ec #434348 #90ed7d #f7a35c #8085e9 #f15c80 #e4d354 #2b908f #f45b5b
 .highcharts-data-label-color-9 .highcharts-data-label-box {@extend .highcharts-color-9;}
 .highcharts-data-label-color-9.highcharts-data-label text {fill: $gray;}
 
+.sda-black {
+    fill: $black;
+    stroke: $black;
+    background-color: $black !important;
+}
+
+.sda-gray-darker {
+    fill: $grayDarker;
+    stroke: $grayDarker;
+    background-color: $grayDarker !important;
+}
+
+.sda-gray-dark {
+    fill: $grayDark;
+    stroke: $grayDark;
+    background-color: $grayDark !important;
+}
+
+.sda-gray-medium {
+    fill: $grayMedium;
+    stroke: $grayMedium;
+    background-color: $grayMedium !important;
+}
+
+.sda-gray {
+    fill: $gray;
+    stroke: $gray;
+    background-color: $gray !important;
+}
+
+.sda-gray-neutral {
+    fill: $grayNeutral;
+    stroke: $grayNeutral;
+    background-color: $grayNeutral !important;
+}
+
+.sda-gray-text {
+    fill: $grayText;
+    stroke: $grayText;
+    background-color: $grayText !important;
+}
+
+.sda-gray-light {
+    fill: $grayLight;
+    stroke: $grayLight;
+    background-color: $grayLight !important;
+}
+
+.sda-gray-lighter {
+    fill: $grayLighter;
+    stroke: $grayLighter;
+    background-color: $grayLighter !important;
+}
+
+.sda-white {
+    fill: $white;
+    stroke: $white;
+    background-color: $white !important;
+}
+
+.sda-blue {
+    fill: $sd-blue;
+    stroke: $sd-blue;
+    background-color: $sd-blue !important;
+}
+
+.sda-blue-medium {
+    fill: $sd-blueMedium;
+    stroke: $sd-blueMedium;
+    background-color: $sd-blueMedium !important;
+}
+
+.sda-blue-dark {
+    fill: $sd-blueDark;
+    stroke: $sd-blueDark;
+    background-color: $sd-blueDark !important;
+}
+
+.sda-green {
+    fill: $green;
+    stroke: $green;
+    background-color: $green !important;
+}
+
+.sda-red {
+    fill: $red;
+    stroke: $red;
+    background-color: $red !important;
+}
+
+.sda-yellow {
+    fill: $yellow;
+    stroke: $yellow;
+    background-color: $yellow !important;
+}
+
+.sda-orange {
+    fill: $orange;
+    stroke: $orange;
+    background-color: $orange !important;
+}
+
+.sda-purple {
+    fill: $purple;
+    stroke: $purple;
+    background-color: $purple !important;
+}
+
+.sda-fern-green {
+    fill: $fernGreen;
+    stroke: $fernGreen;
+    background-color: $fernGreen !important;
+}
+
+.sda-old-gold {
+    fill: $oldGold;
+    stroke: $oldGold;
+    background-color: $oldGold !important;
+}
+
+.sda-dark-orange {
+    fill: $darkOrange;
+    stroke: $darkOrange;
+    background-color: $darkOrange !important;
+}
+
+.sda-fire-brick {
+    fill: $fireBrick;
+    stroke: $fireBrick;
+    background-color: $fireBrick !important;
+}
+
+.sda-deep-pink {
+    fill: $deepPink;
+    stroke: $deepPink;
+    background-color: $deepPink !important;
+}
+
+.sda-dark-magenta {
+    fill: $darkMagenta;
+    stroke: $darkMagenta;
+    background-color: $darkMagenta !important;
+}
+
+.sda-dark-violet {
+    fill: $darkViolet;
+    stroke: $darkViolet;
+    background-color: $darkViolet !important;
+}
+
+.sda-navy {
+    fill: $navy;
+    stroke: $navy;
+    background-color: $navy !important;
+}

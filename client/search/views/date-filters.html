@@ -11,6 +11,14 @@
                     ng-click="onFilterChange()"
             >{{:: 'Yesterday' | translate }}</button>
             <button sd-check
+                    ng-if="enabled.today"
+                    data-type="radio"
+                    ng-model="params.dates.filter"
+                    ng-value="today"
+                    data-label-position="inside"
+                    ng-click="onFilterChange()"
+            >{{:: 'Today' | translate }}</button>
+            <button sd-check
                     ng-if="enabled.last_week"
                     data-type="radio"
                     ng-model="params.dates.filter"
@@ -19,6 +27,14 @@
                     ng-click="onFilterChange()"
             >{{:: 'Last Week' | translate }}</button>
             <button sd-check
+                    ng-if="enabled.this_week"
+                    data-type="radio"
+                    ng-model="params.dates.filter"
+                    ng-value="this_week"
+                    data-label-position="inside"
+                    ng-click="onFilterChange()"
+            >{{:: 'This Week' | translate }}</button>
+            <button sd-check
                     ng-if="enabled.last_month"
                     data-type="radio"
                     ng-model="params.dates.filter"
@@ -26,6 +42,14 @@
                     data-label-position="inside"
                     ng-click="onFilterChange()"
             >{{:: 'Last Month' | translate }}</button>
+            <button sd-check
+                    ng-if="enabled.this_month"
+                    data-type="radio"
+                    ng-model="params.dates.filter"
+                    ng-value="this_month"
+                    data-label-position="inside"
+                    ng-click="onFilterChange()"
+            >{{:: 'This Month' | translate }}</button>
             <button sd-check
                     ng-if="enabled.range"
                     data-type="radio"

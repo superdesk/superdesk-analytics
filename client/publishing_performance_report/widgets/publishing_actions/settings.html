@@ -1,0 +1,68 @@
+<div ng-controller="PublishingActionsWidgetController as ctrl"
+     ng-init="ctrl.init(true)"
+>
+        <div class="modal__header">
+            <button class="modal__close pull-right" sd-hotkey="esc" ng-click="$close()">
+                <i class="icon-close-small"></i>
+            </button>
+            <h3 class="modal__heading" translate>
+                Widget settings <span translate>for "{{currentDesk.name}}" Desk</span>
+            </h3>
+        </div>
+        <div class="modal__body" ng-if="ready">
+            <div sda-chart-options
+                 data-params="configuration"
+                 data-fields="chartFields"
+            ></div>
+            <div sda-date-filters
+                 data-filters="dateFilters"
+                 data-params="configuration"
+            ></div>
+
+            <span class="form-label" translate>Chart Colours</span>
+            <div class="form__row form__row--flex">
+                <div class="form__row-item">
+                    <div sda-chart-colour-picker
+                         data-field="configuration.chart.colours.published"
+                         data-label="'Published' | translate"
+                    ></div>
+                </div>
+                <div class="form__row-item">
+                    <div sda-chart-colour-picker
+                         data-field="configuration.chart.colours.killed"
+                         data-label="'Killed' | translate"
+                    ></div>
+                </div>
+                <div class="form__row-item">
+                    <div sda-chart-colour-picker
+                         data-field="configuration.chart.colours.corrected"
+                         data-label="'Corrected' | translate"
+                    ></div>
+                </div>
+                <div class="form__row-item">
+                    <div sda-chart-colour-picker
+                         data-field="configuration.chart.colours.updated"
+                         data-label="'Updated' | translate"
+                    ></div>
+                </div>
+                <div class="form__row-item">
+                    <div sda-chart-colour-picker
+                         data-field="configuration.chart.colours.recalled"
+                         data-label="'Recalled' | translate"
+                    ></div>
+                </div>
+            </div>
+        </div>
+        <div class="modal__footer">
+            <button class="btn" ng-click="$close()" translate>
+                Cancel
+            </button>
+            <button class="btn btn--primary"
+                    ng-click="saveConfig()"
+                    ng-disabled="!ready"
+                    translate
+            >
+                Save
+            </button>
+        </div>
+</div>

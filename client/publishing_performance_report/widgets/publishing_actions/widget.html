@@ -1,0 +1,15 @@
+<div class="widget-container"
+     ng-controller="PublishingActionsWidgetController as ctrl"
+     ng-init="ctrl.init(false)"
+>
+    <div class="widget-header" style="margin-top: 3px;">
+        <div class="widget-title">{{ title || translate}}</div>
+    </div>
+    <div class="widget-container__chart">
+        <div sda-chart
+             class="sda-chart__chart sda-chart__chart--full-height"
+             data-config="chartConfig"
+             id="{{chartConfig.id}}"
+        ></div>
+    </div>
+</div>
