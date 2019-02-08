@@ -213,6 +213,7 @@ export function UpdateTimeReportController(
      * @description Updates the Highchart configs in the report's content view
      */
     $scope.generate = () => {
+        $scope.beforeGenerateChart();
         $scope.changeContentView('report');
 
         const params = _.cloneDeep($scope.currentParams.params);

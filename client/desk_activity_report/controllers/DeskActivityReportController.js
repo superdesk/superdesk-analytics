@@ -5,6 +5,7 @@ import {
     EXIT_DESK_OPERATIONS,
 } from '../../utils';
 import {DATE_FILTERS} from '../../search/directives/DateFilters';
+import {CHART_FIELDS, CHART_TYPES} from '../../charts/directives/ChartOptions';
 import {SDChart} from '../../charts/SDChart';
 
 DeskActivityReportController.$inject = [
@@ -67,6 +68,21 @@ export function DeskActivityReportController(
             deskError: null,
             datesError: null,
         };
+
+        $scope.chartFields = [
+            CHART_FIELDS.TITLE,
+            CHART_FIELDS.SUBTITLE,
+            CHART_FIELDS.TYPE,
+        ];
+
+        $scope.chartTypes = [
+            CHART_TYPES.BAR,
+            CHART_TYPES.COLUMN,
+            CHART_TYPES.LINE,
+            CHART_TYPES.AREA,
+            CHART_TYPES.SCATTER,
+            CHART_TYPES.SPLINE,
+        ];
 
         $scope.dateFilters = [];
 
@@ -331,6 +347,8 @@ export function DeskActivityReportController(
         if (!this.validateParams(params)) {
             return;
         }
+
+        $scope.beforeGenerateChart();
 
         $scope.runQuery(params)
             .then((data) => {

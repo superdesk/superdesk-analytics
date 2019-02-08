@@ -38,7 +38,7 @@ export function AnalyticsContainer() {
                 metadata,
                 searchReport
             ) {
-                const defaultReportConfigs = {charts: []};
+                const defaultReportConfigs = {loading: false};
 
                 $scope.reports = reports;
                 $scope.flags = $scope.flags || {};
@@ -124,6 +124,7 @@ export function AnalyticsContainer() {
                  */
                 $scope.changeReportParams = (params = null) => {
                     $scope.reportConfigs = params || _.cloneDeep(defaultReportConfigs);
+                    $scope.reportConfigs.loading = false;
                 };
 
                 /**
@@ -279,6 +280,16 @@ export function AnalyticsContainer() {
                     params,
                     true
                 );
+
+                $scope.onClearFilters = () => {
+                    $scope.changeReportParams();
+                };
+
+                $scope.beforeGenerateChart = () => {
+                    $scope.$applyAsync(() => {
+                        $scope.reportConfigs.loading = true;
+                    });
+                };
 
                 init();
             },

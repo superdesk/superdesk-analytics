@@ -1,6 +1,7 @@
 import {getErrorMessage, secondsToHumanReadable} from '../../utils';
 import {DATE_FILTERS} from '../../search/directives/DateFilters';
 import {SOURCE_FILTERS} from '../../search/directives/SourceFilters';
+import {CHART_TYPES, CHART_FIELDS} from '../../charts/directives/ChartOptions';
 import {SDChart} from '../../charts/SDChart';
 
 ProductionTimeReportController.$inject = [
@@ -72,6 +73,22 @@ export function ProductionTimeReportController(
             DATE_FILTERS.YESTERDAY,
         ];
 
+        $scope.chartFields = [
+            CHART_FIELDS.TITLE,
+            CHART_FIELDS.SUBTITLE,
+            CHART_FIELDS.TYPE,
+            CHART_FIELDS.SORT,
+        ];
+
+        $scope.chartTypes = [
+            CHART_TYPES.BAR,
+            CHART_TYPES.COLUMN,
+            CHART_TYPES.SPLINE,
+            CHART_TYPES.SCATTER,
+            CHART_TYPES.AREA,
+            CHART_TYPES.LINE,
+        ];
+
         this.initDefaultParams();
         savedReports.selectReportFromURL();
 
@@ -121,7 +138,7 @@ export function ProductionTimeReportController(
                 must_not: {},
                 repos: {archive_statistics: true},
                 chart: {
-                    type: _.get($scope, 'chart_types[1].qcode') || 'column',
+                    type: CHART_TYPES.COLUMN,
                     sort_order: 'desc',
                     title: null,
                     subtitle: null,
@@ -218,6 +235,8 @@ export function ProductionTimeReportController(
             return;
         }
 
+        $scope.beforeGenerateChart();
+
         $scope.runQuery(params)
             .then((data) => {
                 this.createChart(
@@ -280,16 +299,17 @@ export function ProductionTimeReportController(
 
         return chartConfig.loadTranslations(['task.desk'])
             .then(() => {
+                const chartType = _.get($scope, 'currentParams.params.chart.type') || CHART_TYPES.COLUMN;
                 const chart = new SDChart.Chart({
                     id: 'production_time_report',
-                    chartType: 'highcharts',
+                    chartType: chartType === 'table' ? 'table' : 'highcharts',
                     title: $scope.generateTitle(),
                     subtitle: $scope.generateSubtitle(),
                     useUTC: false,
                     fullHeight: true,
                     legendTitle: gettext('Production Time'),
                     tooltipHeader: '{series.name}/{point.x}: {point.y}',
-                    dataLabels: true,
+                    dataLabels: false,
                     colourByPoint: false,
                     defaultConfig: chartConfig.defaultConfig,
                     translations: chartConfig.translations,
@@ -316,7 +336,7 @@ export function ProductionTimeReportController(
                 const axis = chart.addAxis()
                     .setOptions({
                         type: 'category',
-                        defaultChartType: _.get($scope, 'currentParams.params.chart.type'),
+                        defaultChartType: chartType,
                         yTitle: gettext('Time spent producing content'),
                         categoryField: 'task.desk',
                         categories: sortedDeskIds,

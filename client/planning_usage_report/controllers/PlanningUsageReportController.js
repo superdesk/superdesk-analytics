@@ -1,5 +1,6 @@
 import {getErrorMessage} from '../../utils';
 import {DATE_FILTERS} from '../../search/directives/DateFilters';
+import {CHART_FIELDS, CHART_TYPES} from '../../charts/directives/ChartOptions';
 
 PlanningUsageReportController.$inject = [
     '$scope',
@@ -55,6 +56,19 @@ export function PlanningUsageReportController(
             DATE_FILTERS.RANGE,
         ];
 
+        $scope.chartFields = [
+            CHART_FIELDS.TITLE,
+            CHART_FIELDS.SUBTITLE,
+            CHART_FIELDS.TYPE,
+            CHART_FIELDS.SORT,
+        ];
+
+        $scope.chartTypes = [
+            CHART_TYPES.BAR,
+            CHART_TYPES.COLUMN,
+            CHART_TYPES.TABLE,
+        ];
+
         this.initDefaultParams();
         savedReports.selectReportFromURL();
 
@@ -100,7 +114,7 @@ export function PlanningUsageReportController(
                 must: {},
                 must_not: {},
                 chart: {
-                    type: 'bar',
+                    type: CHART_TYPES.TABLE,
                     sort_order: 'desc',
                     title: null,
                     subtitle: null,
@@ -136,7 +150,7 @@ export function PlanningUsageReportController(
             return $scope.currentParams.params.chart.title;
         }
 
-        return gettext('Planning Module Usage');
+        return gettext('Planning Module (Items created per user)');
     };
 
     /**
@@ -180,6 +194,7 @@ export function PlanningUsageReportController(
      * @description Updates the Highchart configs in the report's content view
      */
     $scope.generate = () => {
+        $scope.beforeGenerateChart();
         $scope.changeContentView('report');
 
         const params = _.cloneDeep($scope.currentParams.params);

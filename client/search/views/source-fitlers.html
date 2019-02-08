@@ -18,7 +18,7 @@
                       ng-change="onFilterChanged(filters.desks)"
                 ></span>
             </div>
-            <div class="form__row">
+            <div class="form__row form__row--no-padding">
                 <sd-tag-input
                         ng-model="filters.desks.selected"
                         data-field="{{filters.desks.labelField}}"
@@ -47,7 +47,7 @@
                       ng-change="onFilterChanged(filters.stages)"
                 ></span>
             </div>
-            <div class="form__row">
+            <div class="form__row form__row--no-padding">
                 <sd-tag-input
                         ng-model="filters.stages.selected"
                         data-field="{{filters.stages.labelField}}"
@@ -76,7 +76,7 @@
                       ng-change="onFilterChanged(filters.users)"
                 ></span>
             </div>
-            <div class="form__row">
+            <div class="form__row form__row--no-padding">
                 <sd-tag-input
                         ng-model="filters.users.selected"
                         data-field="{{filters.users.labelField}}"
@@ -105,7 +105,7 @@
                       ng-change="onFilterChanged(filters.sources)"
                 ></span>
             </div>
-            <div class="form__row">
+            <div class="form__row form__row--no-padding">
                 <sd-tag-input
                         ng-model="filters.sources.selected"
                         data-field="{{filters.sources.labelField}}"
@@ -134,7 +134,7 @@
                       ng-change="onFilterChanged(filters.ingest_providers)"
                 ></span>
             </div>
-            <div class="form__row">
+            <div class="form__row form__row--no-padding">
                 <sd-tag-input
                         ng-model="filters.ingest_providers.selected"
                         data-field="{{filters.ingest_providers.labelField}}"
@@ -163,7 +163,7 @@
                       ng-change="onFilterChanged(filters.categories)"
                 ></span>
             </div>
-            <div class="form__row">
+            <div class="form__row form__row--no-padding">
                 <sd-tag-input
                         ng-model="filters.categories.selected"
                         data-field="{{filters.categories.labelField}}"
@@ -192,7 +192,7 @@
                       ng-change="onFilterChanged(filters.genre)"
                 ></span>
             </div>
-            <div class="form__row">
+            <div class="form__row form__row--no-padding">
                 <sd-tag-input
                         ng-model="filters.genre.selected"
                         data-field="{{filters.genre.labelField}}"
@@ -221,7 +221,7 @@
                       ng-change="onFilterChanged(filters.urgency)"
                 ></span>
             </div>
-            <div class="form__row">
+            <div class="form__row form__row--no-padding">
                 <sd-tag-input
                         ng-model="filters.urgency.selected"
                         data-field="{{filters.urgency.labelField}}"
@@ -250,7 +250,7 @@
                       ng-change="onFilterChanged(filters.states)"
                 ></span>
             </div>
-            <div class="form__row">
+            <div class="form__row form__row--no-padding">
                 <sd-tag-input
                         ng-model="filters.states.selected"
                         data-field="{{filters.states.labelField}}"
@@ -265,7 +265,7 @@
                 ></sd-tag-input>
             </div>
 
-            <div class="form__row">
+            <div class="form__row form__row--no-padding">
                 <div class="sd-line-input sd-line-input--is-select">
                     <label class="sd-line-input__label" translate>Rewrites</label>
                     <select class="sd-line-input__select"
@@ -292,7 +292,7 @@
                       ng-change="onFilterChanged(filters.stats_desk_transition_enter)"
                 ></span>
             </div>
-            <div class="form__row">
+            <div class="form__row form__row--no-padding">
                 <sd-tag-input
                         ng-model="filters.stats_desk_transition_enter.selected"
                         data-field="{{filters.stats_desk_transition_enter.labelField}}"
@@ -321,7 +321,7 @@
                       ng-change="onFilterChanged(filters.stats_desk_transition_exit)"
                 ></span>
             </div>
-            <div class="form__row">
+            <div class="form__row form__row--no-padding">
                 <sd-tag-input
                         ng-model="filters.stats_desk_transition_exit.selected"
                         data-field="{{filters.stats_desk_transition_exit.labelField}}"
@@ -342,7 +342,7 @@
                      data-style="'circle'"
                      ng-if="filters.publish_pars.enabled"
     >
-        <div class="form__row">
+        <div class="form__row form__row--no-padding">
             <div class="sd-line-input">
                 <label class="sd-line-input__label">{{:: filters.publish_pars.label | translate}}</label>
                 <input type="number"

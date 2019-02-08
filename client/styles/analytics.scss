@@ -315,6 +315,11 @@
     &--padding-bottom {
         padding-bottom: 20rem;
     }
+
+    // Fix width of placeholder
+    .tags-input__input {
+        width: auto !important;
+    }
 }
 
 .sda-report-filters__loader {

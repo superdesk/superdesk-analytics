@@ -1,5 +1,6 @@
 <div class="sda-chart__container">
     <div ng-repeat="chart in reportConfigs.charts track by chart.id"
+         ng-if="reportConfigs.charts.length > 0"
          sda-chart
          class="sda-chart__chart"
          ng-class="{
@@ -10,5 +11,19 @@
          data-config="chart"
          id="{{chart.id}}"
     >
+    </div>
+    <div ng-if="!reportConfigs.loading && reportConfigs && reportConfigs.charts.length < 1"
+         class="panel-info"
+    >
+        <div class="panel-info__icon">
+            <i class="big-icon--comments"></i>
+        </div>
+        <h3 class="panel-info__heading">No data found</h3>
+        <p class="panel-info__description">Change your filters and try again</p>
+    </div>
+    <div ng-if="reportConfigs.loading" class="sda-chart__loader-container">
+        <div class="sda-chart__loader">
+            <div ng-if="reportConfigs.loading" class="sd-loader"></div>
+        </div>
     </div>
 </div>

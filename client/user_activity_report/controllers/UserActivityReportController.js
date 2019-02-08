@@ -6,6 +6,7 @@ import {
 } from '../../utils';
 import {DATE_FILTERS} from '../../search/directives/DateFilters';
 import {SOURCE_FILTERS} from '../../search/directives/SourceFilters';
+import {CHART_FIELDS} from '../../charts/directives/ChartOptions';
 import {SDChart} from '../../charts/SDChart';
 
 UserActivityReportController.$inject = [
@@ -79,6 +80,11 @@ export function UserActivityReportController(
             DATE_FILTERS.DAY,
         ];
 
+        $scope.chartFields = [
+            CHART_FIELDS.TITLE,
+            CHART_FIELDS.SUBTITLE,
+        ];
+
         this.loadUserSelections();
 
         this.initDefaultParams();
@@ -123,11 +129,9 @@ export function UserActivityReportController(
                 must_not: {},
                 repos: {archive_statistics: true},
                 chart: {
-                    type: _.get($scope, 'chart_types[1].qcode') || 'column',
-                    sort_order: 'desc',
                     title: null,
                     subtitle: null,
-                    invertAxes: true,
+                    invertAxes: false,
                 },
             },
         };
@@ -232,6 +236,7 @@ export function UserActivityReportController(
      */
     $scope.generate = (selectedItem = null) => {
         $scope.form.submitted = true;
+        $scope.previousSelectedItem = $scope.selectedItem;
         $scope.selectedItem = selectedItem;
         $scope.changeContentView('report');
 
@@ -239,6 +244,7 @@ export function UserActivityReportController(
             return;
         }
 
+        $scope.beforeGenerateChart();
         const params = _.cloneDeep($scope.currentParams.params);
 
         return $scope.runQuery(params)
@@ -273,13 +279,26 @@ export function UserActivityReportController(
      * @description Generate the Chart and Table configs from the report parameters
      */
     this.createChart = (report) => {
-        const configs = [this.genChartConfig(report)];
+        const items = _.get(report, 'items', []);
+        let configs = [];
 
-        if ($scope.selectedItem !== null) {
-            const itemConfig = this.genItemConfig(report);
+        if (items.length > 0) {
+            // If the currently selected news item is still available in the new generated report
+            // then continue to show the news item's timeline
+            if ($scope.selectedItem === null &&
+                items.findIndex((item) => _.get(item, '_id') === _.get($scope, 'previousSelectedItem._id')) > -1
+            ) {
+                $scope.selectedItem = $scope.previousSelectedItem;
+            }
 
-            if (itemConfig !== null) {
-                configs.push(itemConfig);
+            configs.push(this.genChartConfig(report));
+
+            if ($scope.selectedItem !== null) {
+                const itemConfig = this.genItemConfig(report);
+
+                if (itemConfig !== null) {
+                    configs.push(itemConfig);
+                }
             }
         }
 
@@ -406,6 +425,7 @@ export function UserActivityReportController(
                 defaultChartType: 'xrange',
                 xMin: min,
                 xMax: max,
+                yTitle: gettext('Slugline'),
             });
 
         const data = [];
@@ -467,18 +487,25 @@ export function UserActivityReportController(
 
         // Dynamically calculates the height of the chart (200 if there is only 1 entry)
         chart.height = index === 1 ?
-            200 :
-            75 + (index * 75);
+            100 :
+            100 + (index * 25);
 
         axis.addSeries()
             .setOptions({
                 data: data,
+                groupPadding: 0,
+                pointPadding: 0,
+                borderWidth: 0,
+                maxPointWidth: 15,
             });
 
         const conf = chart.genConfig();
 
         conf.yAxis[0].categories = categories;
         conf.yAxis[0].reversed = true;
+        conf.xAxis.push(_.cloneDeep(conf.xAxis[0]));
+        conf.xAxis[1].linkedTo = 0;
+        conf.xAxis[1].opposite = true;
         return conf;
     };
 
