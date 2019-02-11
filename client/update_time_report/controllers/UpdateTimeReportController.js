@@ -124,7 +124,6 @@ export function UpdateTimeReportController(
                         recalled: false,
                     },
                 },
-                repos: {archive_statistics: true},
                 min: 1,
                 chart: {
                     type: 'table',
@@ -224,7 +223,7 @@ export function UpdateTimeReportController(
                     Object.assign(
                         {},
                         $scope.currentParams.params,
-                        data
+                        data._items ? data : {_items: [data]}
                     )
                 )
                     .then((chartConfig) => {

@@ -28,7 +28,6 @@ class UpdateTimeReportResource(Resource):
 
 class UpdateTimeReportService(StatsReportService):
     aggregations = None
-    repos = ['archive_statistics']
     date_filter_field = 'firstpublished'
 
     def get_request_aggregations(self, params, args):

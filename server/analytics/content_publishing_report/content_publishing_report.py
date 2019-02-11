@@ -24,6 +24,8 @@ class ContentPublishingReportResource(Resource):
 
 
 class ContentPublishingReportService(BaseReportService):
+    repos = ['published', 'archived']
+
     aggregations = {
         'source': {
             'terms': {

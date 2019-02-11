@@ -139,7 +139,6 @@ export function DeskActivityReportController(
                 },
                 must: {},
                 must_not: {},
-                repos: {archive_statistics: true},
                 chart: {
                     type: _.get($scope, 'chart_types[1].qcode') || 'column',
                     sort_order: 'desc',

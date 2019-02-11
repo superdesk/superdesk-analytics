@@ -28,7 +28,6 @@ class FeaturemdiaUpdatesReportResource(Resource):
 
 class FeaturemediaUpdatesTimeReportService(StatsReportService):
     aggregations = None
-    repos = ['archive_statistics']
     date_filter_field = 'versioncreated'
 
     def get_request_aggregations(self, params, args):

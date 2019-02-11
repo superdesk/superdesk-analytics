@@ -22,7 +22,7 @@
                 <h3 class="panel-info__heading" translate>No data found</h3>
                 <p class="panel-info__description" translate>Change the search filters and try again!</p>
             </div>
-            <table ng-if="rows.length > 1">
+            <table ng-if="rows.length > 0">
                 <thead>
                 <tr>
                     <th ng-repeat="header in headers track by $index"
