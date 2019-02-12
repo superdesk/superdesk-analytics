@@ -114,7 +114,6 @@ export function FeaturemediaUpdatesReportController(
                         recalled: false,
                     },
                 },
-                repos: {archive_statistics: true},
                 min: 1,
                 size: 15,
                 page: 1,

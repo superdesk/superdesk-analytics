@@ -34,7 +34,7 @@ before_install:
 
 install:
     - npm install
-    - cd server && pip install -q -r requirements.txt && cd ..
+    - cd server && pip install -r requirements.txt && cd ..
     - chmod a+x server/scripts/install-highcharts-export-server.sh
     - pip install -e .
 

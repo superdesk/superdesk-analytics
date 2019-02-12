@@ -136,7 +136,6 @@ export function ProductionTimeReportController(
                     desk_transitions: {min: 1},
                 },
                 must_not: {},
-                repos: {archive_statistics: true},
                 chart: {
                     type: CHART_TYPES.COLUMN,
                     sort_order: 'desc',

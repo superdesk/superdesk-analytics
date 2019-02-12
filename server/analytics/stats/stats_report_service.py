@@ -12,6 +12,8 @@ from analytics.base_report import BaseReportService
 
 
 class StatsReportService(BaseReportService):
+    repos = ['archive_statistics']
+
     def get_elastic_index(self, types):
         return 'statistics'
 

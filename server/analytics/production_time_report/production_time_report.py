@@ -32,7 +32,6 @@ class ProductionTimeReportService(StatsReportService):
             }
         }
     }
-    repos = ['archive_statistics']
     histogram_source_field = 'stats.timeline.operation_created'
     date_filter_field = 'versioncreated'
 

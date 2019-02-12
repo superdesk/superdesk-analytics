@@ -24,16 +24,11 @@ class UserActivityReportResource(Resource):
 
 
 class UserActivityReportService(StatsReportService):
-    repos = ['archive_statistics']
     date_filter_field = 'versioncreated'
 
     def get_request_aggregations(self, params, args):
         """Disable generating aggregations"""
         return None
-
-    def _es_set_size(self, query, params):
-        """Disable setting the size"""
-        pass
 
     def generate_report(self, docs, args):
         report = {

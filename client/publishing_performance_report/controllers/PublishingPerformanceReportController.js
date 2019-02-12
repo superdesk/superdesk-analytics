@@ -128,12 +128,6 @@ export function PublishingPerformanceReportController(
                         recalled: false,
                     },
                 },
-                repos: {
-                    ingest: false,
-                    archive: false,
-                    published: true,
-                    archived: true,
-                },
                 min: 1,
                 aggs: {
                     group: {

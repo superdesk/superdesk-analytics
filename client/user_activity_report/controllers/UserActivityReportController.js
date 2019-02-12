@@ -127,12 +127,11 @@ export function UserActivityReportController(
                     user_locks: null,
                 },
                 must_not: {},
-                repos: {archive_statistics: true},
                 chart: {
                     title: null,
                     subtitle: null,
-                    invertAxes: false,
                 },
+                size: 200,
             },
         };
 
@@ -559,7 +558,6 @@ export function UserActivityReportController(
             timezoneOffset: utcOffset,
             useUTC: false,
             fullHeight: false,
-            invertAxes: report.chart.invertAxes,
             tooltipFormatter: generateTooltip,
             legendTitle: gettext('Users'),
             defaultConfig: chartConfig.defaultConfig,

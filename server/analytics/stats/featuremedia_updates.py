@@ -61,68 +61,70 @@ def process(entry, new_timeline, updates, update, stats):
         # Calculate featuremedia stats
         associations = update.get(ASSOCIATIONS) or None
 
+        media = None if associations is None else associations.get('featuremedia') or None
+
+        if updates['_featuremedia'] is not None and \
+            operation in [OPERATION.UPDATE, OPERATION.CORRECT] and \
+                (associations is None or media is None or not media.get('_id')):
+            # If featuremedia is removed
+            updates['_featuremedia'] = None
+            add_media_operation(
+                entry,
+                operation,
+                new_timeline,
+                updates,
+                stats,
+                OPERATION.REMOVE_FEATUREMEDIA,
+                media
+            )
+
+            return
+
         # If there are no associations in this update, then media has not changed
         if associations is None:
             return
-
-        media = associations.get('featuremedia') or None
 
         # If there is no featuremedia, then don't calculate any timeline entries
         if media is None and updates['_featuremedia'] is None:
             return
 
-        if media is None or not media.get('_id'):
-            # If featuremedia is removed
-            if updates['_featuremedia'] is not None:
-                updates['_featuremedia'] = None
+        if updates['_featuremedia'] is None:
+            updates['_featuremedia'] = media
 
-                add_media_operation(
-                    entry,
-                    operation,
-                    new_timeline,
-                    updates,
-                    stats,
-                    OPERATION.REMOVE_FEATUREMEDIA,
-                    media
-                )
-        else:
-            if updates['_featuremedia'] is None:
-                updates['_featuremedia'] = media
+            add_media_operation(
+                entry,
+                operation,
+                new_timeline,
+                updates,
+                stats,
+                OPERATION.ADD_FEATUREMEDIA,
+                media
+            )
+        elif media.get('_id') != updates['_featuremedia'].get('_id'):
+            updates['_featuremedia'] = media
 
-                add_media_operation(
-                    entry,
-                    operation,
-                    new_timeline,
-                    updates,
-                    stats,
-                    OPERATION.ADD_FEATUREMEDIA,
-                    media
-                )
-            elif media.get('_id') != updates['_featuremedia'].get('_id'):
-                updates['_featuremedia'] = media
+            add_media_operation(
+                entry,
+                operation,
+                new_timeline,
+                updates,
+                stats,
+                OPERATION.UPDATE_FEATUREMEDIA_IMAGE,
+                media
+            )
 
-                add_media_operation(
-                    entry,
-                    operation,
-                    new_timeline,
-                    updates,
-                    stats,
-                    OPERATION.UPDATE_FEATUREMEDIA_IMAGE,
-                    media
-                )
+        elif renditions_changed(updates['_featuremedia'], media):
+            updates['_featuremedia'] = media
 
-            elif renditions_changed(updates['_featuremedia'], media):
-                updates['_featuremedia'] = media
-
-                add_media_operation(
-                    entry,
-                    operation,
-                    new_timeline,
-                    updates,
-                    stats,
-                    OPERATION.UPDATE_FEATUREMEDIA_POI,
-                    media
-                )
+            add_media_operation(
+                entry,
+                operation,
+                new_timeline,
+                updates,
+                stats,
+                OPERATION.UPDATE_FEATUREMEDIA_POI,
+                media
+            )
     elif item_type == CONTENT_TYPE.PICTURE:
         if updates['_featuremedia'] is None:
             updates['_featuremedia'] = deepcopy(update)
