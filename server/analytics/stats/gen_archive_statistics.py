@@ -26,6 +26,36 @@ from datetime import timedelta
 
 
 class GenArchiveStatistics(Command):
+    """Generate statistics for archive documents based on archive_history documents
+
+    Generates a linear timeline of operations based on documents from archive_history.
+    This data is then used to search and aggregate for usage in generating charts.
+
+    Options
+    ::
+
+        -d, --max-days (defaults to 3):
+        Maximum number of days to process from archive_history
+        -i, --item-id (defaults to None):
+        Generate statistics for a single archive item only
+        -c, --chunk-size (defaults to 1000):
+        Number of archive history items to process per iteration
+
+    If the config option ANALYTICS_ENABLE_ARCHIVE_STATS is true, this command will run in
+    celery on a schedule every hour (minute=0).
+
+    Example:
+    ::
+
+        $ python manage.py analytics:gen_archive_statistics
+        $ python manage.py analytics:gen_archive_statistics -d 1
+        $ python manage.py analytics:gen_archive_statistics -max-days 1
+        $ python manage.py analytics:gen_archive_statistics -i 'id-of-item-to-gen-stats-for'
+        $ python manage.py analytics:gen_archive_statistics -item-id 'id-of-item-to-gen-stats-for'
+        $ python manage.py analytics:gen_archive_statistics -c 500
+        $ python manage.py analytics:gen_archive_statistics -chunk-size 500
+    """
+
     option_list = [
         Option('--max-days', '-d', dest='max_days', default=3),
         Option('--item-id', '-i', dest='item_id', default=None),
