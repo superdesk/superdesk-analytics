@@ -7,14 +7,18 @@
             <span>{{config.subtitle | translate}}</span>
         </div>
 
-        <div class="dropdown dropdown--allign-right sda-chart__table-header-options" dropdown ng-if="config.rows.length > 0">
+        <div dropdown
+             dropdown-append-to-body
+             class="dropdown dropdown--allign-right sda-chart__table-header-options"
+             ng-if="config.rows.length > 0"
+        >
             <button
                     class="dropdown__toggle dropdown-toggle icn-btn pull-right"
                     dropdown__toggle
             >
               <i class="icon-collapse icon--gray"></i>
             </button>
-            <ul class="dropdown__menu">
+            <ul class="dropdown__menu sda-chart__dropdown-menu">
                 <li>
                     <div class="dropdown__menu-label" translate>Export Chart As...</div>
                 </li>
