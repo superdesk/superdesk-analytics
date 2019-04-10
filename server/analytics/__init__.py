@@ -10,6 +10,7 @@
 
 import superdesk
 
+from analytics.report_configs import ReportConfigsResource, ReportConfigsService
 from analytics.base_report import BaseReportService
 from analytics.saved_reports import SavedReportsResource, SavedReportsService
 from analytics.reports.scheduled_reports import ScheduledReportsResource, ScheduledReportsService
@@ -87,6 +88,10 @@ def init_app(app):
         label='Manage Scheduling Reports',
         description='User can manage scheduling of reports'
     )
+
+    endpoint_name = ReportConfigsResource.endpoint_name
+    service = ReportConfigsService(endpoint_name, backend=superdesk.get_backend())
+    ReportConfigsResource(endpoint_name, app=app, service=service)
 
     init_content_publishing_report(app)
     init_publishing_performance_report(app)

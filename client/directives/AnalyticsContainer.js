@@ -15,13 +15,14 @@
  * @required desks
  * @required metadata
  * @required searchReport
+ * @required reportConfigs
  * @description A directive that encapsulates the entire analytics module view
  */
 export function AnalyticsContainer() {
     return {
         controllerAs: 'analytics',
         controller: ['$scope', '$location', 'pageTitle', 'gettext', 'lodash', 'reports', '$rootScope', '$timeout',
-            'emailReport', 'savedReports', 'api', 'desks', 'metadata', 'searchReport',
+            'emailReport', 'savedReports', 'api', 'desks', 'metadata', 'searchReport', 'reportConfigs',
             function AnalyticsContainerController(
                 $scope,
                 $location,
@@ -36,9 +37,12 @@ export function AnalyticsContainer() {
                 api,
                 desks,
                 metadata,
-                searchReport
+                searchReport,
+                reportConfigs
             ) {
                 const defaultReportConfigs = {loading: false};
+
+                reportConfigs.loadAll();
 
                 $scope.reports = reports;
                 $scope.flags = $scope.flags || {};

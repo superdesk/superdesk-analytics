@@ -46,19 +46,19 @@ describe('sda-preview-date-filter', () => {
         expect(element.html()).toContain('March 25, 2018</p>');
     });
 
-    it('render for "relative"', () => {
-        compileElement({filter: 'relative', relative: 12});
+    it('render for "relative_hours"', () => {
+        compileElement({filter: 'relative_hours', relative: 12});
         expect(element.html()).toContain('<span translate="">Last</span> 12 <span translate="">hours</span>');
 
-        compileElement({filter: 'relative', relative: '72'});
+        compileElement({filter: 'relative_hours', relative: '72'});
         expect(element.html()).toContain('<span translate="">Last</span> 72 <span translate="">hours</span>');
     });
 
     it('render for "relative_days"', () => {
-        compileElement({filter: 'relative_days', relative_days: 7});
+        compileElement({filter: 'relative_days', relative: 7});
         expect(element.html()).toContain('<span translate="">Last</span> 7 <span translate="">days</span>');
 
-        compileElement({filter: 'relative_days', relative_days: '3'});
+        compileElement({filter: 'relative_days', relative: '3'});
         expect(element.html()).toContain('<span translate="">Last</span> 3 <span translate="">days</span>');
     });
 });

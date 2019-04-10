@@ -1,7 +1,7 @@
-import {DATE_FILTERS} from '../../search/directives/DateFilters';
+import {DATE_FILTERS} from '../../search/common';
 import {SOURCE_FILTERS} from '../../search/directives/SourceFilters';
 import {getErrorMessage} from '../../utils';
-import {CHART_FIELDS} from '../../charts/directives/ChartOptions';
+import {CHART_FIELDS, CHART_TYPES} from '../../charts/directives/ChartOptions';
 
 UpdateTimeReportController.$inject = [
     '$scope',
@@ -15,6 +15,7 @@ UpdateTimeReportController.$inject = [
     'config',
     '$q',
     'chartConfig',
+    'reportConfigs',
 ];
 
 /**
@@ -32,6 +33,7 @@ UpdateTimeReportController.$inject = [
  * @requires config
  * @requires $q
  * @requires chartConfig
+ * @requires reportConfigs
  * @description Controller for Update Time reports
  */
 export function UpdateTimeReportController(
@@ -45,23 +47,23 @@ export function UpdateTimeReportController(
     moment,
     config,
     $q,
-    chartConfig
+    chartConfig,
+    reportConfigs
 ) {
+    const reportName = 'update_time_report';
+
     /**
      * @ngdoc method
      * @name UpdateTimeReportController#init
      * @description Initialises the scope parameters
      */
     this.init = () => {
-        $scope.dateFilters = [
-            DATE_FILTERS.YESTERDAY,
-            DATE_FILTERS.RELATIVE,
-            DATE_FILTERS.DAY,
-            DATE_FILTERS.RANGE,
-            DATE_FILTERS.LAST_WEEK,
-            DATE_FILTERS.LAST_MONTH,
-            DATE_FILTERS.RELATIVE_DAYS,
-        ];
+        $scope.form = {
+            datesError: null,
+            submitted: false,
+            showErrors: false,
+        };
+        $scope.config = reportConfigs.getConfig(reportName);
 
         $scope.sourceFilters = [
             SOURCE_FILTERS.DESKS,
@@ -81,8 +83,6 @@ export function UpdateTimeReportController(
             CHART_FIELDS.PAGE_SIZE,
         ];
 
-        $scope.form = {submitted: false};
-
         this.initDefaultParams();
         savedReports.selectReportFromURL();
 
@@ -101,8 +101,8 @@ export function UpdateTimeReportController(
         );
 
         $scope.currentParams = {
-            report: 'update_time_report',
-            params: {
+            report: reportName,
+            params: $scope.config.defaultParams({
                 dates: {
                     filter: DATE_FILTERS.YESTERDAY,
                 },
@@ -126,14 +126,14 @@ export function UpdateTimeReportController(
                 },
                 min: 1,
                 chart: {
-                    type: 'table',
+                    type: CHART_TYPES.TABLE,
                     title: null,
                     subtitle: null,
                 },
                 size: 15,
                 page: 1,
                 sort: [{time_to_next_update_publish: 'desc'}],
-            },
+            }),
         };
 
         $scope.defaultReportParams = _.cloneDeep($scope.currentParams);
@@ -212,8 +212,16 @@ export function UpdateTimeReportController(
      * @description Updates the Highchart configs in the report's content view
      */
     $scope.generate = () => {
-        $scope.beforeGenerateChart();
         $scope.changeContentView('report');
+        $scope.form.submitted = true;
+
+        if ($scope.form.datesError) {
+            $scope.form.showErrors = true;
+            return;
+        }
+
+        $scope.form.showErrors = false;
+        $scope.beforeGenerateChart();
 
         const params = _.cloneDeep($scope.currentParams.params);
 
@@ -227,8 +235,8 @@ export function UpdateTimeReportController(
                     )
                 )
                     .then((chartConfig) => {
-                        $scope.form.submitted = true;
                         $scope.changeReportParams(chartConfig);
+                        $scope.form.submitted = false;
                     });
             }, (error) => {
                 notify.error(

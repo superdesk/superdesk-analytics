@@ -29,7 +29,7 @@ import './user_activity_report';
 import './featuremedia_updates_report';
 import './update_time_report';
 
-angular.module('superdesk.analytics.reports', [])
+angular.module('superdesk.analytics.reports', ['superdesk.core.features'])
     .provider('reports', svc.ReportsProvider);
 
 function cacheIncludedTemplates($templateCache) {
@@ -70,6 +70,8 @@ export default angular.module('superdesk.analytics', [
     .directive('sdaConvertToNumber', directive.ConvertToNumber)
     .directive('sdaArchivePreviewProxy', directive.ArchivePreviewProxy)
     .directive('sdaRenditionsPreview', directive.RenditionsPreview)
+
+    .service('reportConfigs', svc.ReportConfigService)
 
     .run(cacheIncludedTemplates)
 

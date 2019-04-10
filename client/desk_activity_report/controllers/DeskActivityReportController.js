@@ -4,9 +4,9 @@ import {
     ENTER_DESK_OPERATIONS,
     EXIT_DESK_OPERATIONS,
 } from '../../utils';
-import {DATE_FILTERS} from '../../search/directives/DateFilters';
 import {CHART_FIELDS, CHART_TYPES} from '../../charts/directives/ChartOptions';
 import {SDChart} from '../../charts/SDChart';
+import {REPORT_CONFIG} from '../../services/ReportConfigService';
 
 DeskActivityReportController.$inject = [
     '$scope',
@@ -22,6 +22,7 @@ DeskActivityReportController.$inject = [
     'config',
     'deployConfig',
     'desks',
+    'reportConfigs',
 ];
 
 /**
@@ -41,6 +42,7 @@ DeskActivityReportController.$inject = [
  * @requires config
  * @requires deployConfig
  * @requires desks
+ * @requires reportConfigs
  * @description Controller for Desk Activity Reports
  */
 export function DeskActivityReportController(
@@ -56,8 +58,11 @@ export function DeskActivityReportController(
     $q,
     config,
     deployConfig,
-    desks
+    desks,
+    reportConfigs
 ) {
+    const reportName = 'desk_activity_report';
+
     /**
      * @ngdoc method
      * @name DeskActivityReportController#init
@@ -67,24 +72,17 @@ export function DeskActivityReportController(
         $scope.form = {
             deskError: null,
             datesError: null,
+            submitted: false,
+            showErrors: false,
         };
+
+        this.updateConfig();
 
         $scope.chartFields = [
             CHART_FIELDS.TITLE,
             CHART_FIELDS.SUBTITLE,
             CHART_FIELDS.TYPE,
         ];
-
-        $scope.chartTypes = [
-            CHART_TYPES.BAR,
-            CHART_TYPES.COLUMN,
-            CHART_TYPES.LINE,
-            CHART_TYPES.AREA,
-            CHART_TYPES.SCATTER,
-            CHART_TYPES.SPLINE,
-        ];
-
-        $scope.dateFilters = [];
 
         this.loadDeskSelections();
 
@@ -105,6 +103,16 @@ export function DeskActivityReportController(
         ];
     };
 
+    this.updateConfig = () => {
+        $scope.config = reportConfigs.getConfig(reportName, {
+            [REPORT_CONFIG.DATE_FILTERS]: (filter) => {
+                const interval = _.get($scope, 'currentParams.params.histogram.interval');
+
+                return _.get(filter, interval);
+            },
+        });
+    };
+
     /**
      * @ngdoc method
      * @name DeskActivityReportController#initDefaultParams
@@ -113,10 +121,6 @@ export function DeskActivityReportController(
     this.initDefaultParams = () => {
         $scope.item_states = searchReport.filterItemStates(
             ['published', 'killed', 'corrected', 'recalled']
-        );
-
-        $scope.chart_types = chartConfig.filterChartTypes(
-            ['bar', 'column']
         );
 
         $scope.intervals = [{
@@ -128,8 +132,8 @@ export function DeskActivityReportController(
         }];
 
         $scope.currentParams = {
-            report: 'desk_activity_report',
-            params: {
+            report: reportName,
+            params: $scope.config.defaultParams({
                 dates: {
                     filter: 'range',
                     start: moment()
@@ -140,7 +144,7 @@ export function DeskActivityReportController(
                 must: {},
                 must_not: {},
                 chart: {
-                    type: _.get($scope, 'chart_types[1].qcode') || 'column',
+                    type: CHART_TYPES.COLUMN,
                     sort_order: 'desc',
                     title: null,
                     subtitle: null,
@@ -149,7 +153,7 @@ export function DeskActivityReportController(
                     interval: 'daily',
                 },
                 desk: null,
-            },
+            }),
         };
 
         $scope.defaultReportParams = _.cloneDeep($scope.currentParams);
@@ -189,28 +193,12 @@ export function DeskActivityReportController(
      * @description Updates the available date filters when histogram interval changes
      */
     $scope.onIntervalChanged = () => {
-        if ($scope.currentParams.params.histogram.interval === 'hourly') {
-            $scope.dateFilters = [
-                DATE_FILTERS.YESTERDAY,
-                DATE_FILTERS.DAY,
-                DATE_FILTERS.RELATIVE,
-            ];
-        } else {
-            $scope.dateFilters = [
-                DATE_FILTERS.LAST_WEEK,
-                DATE_FILTERS.LAST_MONTH,
-                DATE_FILTERS.RANGE,
-                DATE_FILTERS.RELATIVE_DAYS,
-            ];
-        }
-
-        // If the current date filter is no longer available after changing interval type
-        // Then default to the first available date filter
-        if ($scope.dateFilters.indexOf($scope.currentParams.params.dates.filter) < 0) {
-            $scope.currentParams.params.dates.filter = $scope.dateFilters[0];
-        }
-
+        this.updateConfig();
         $scope.form.datesError = null;
+    };
+
+    $scope.onDeskChanged = () => {
+        this.validateParams($scope.currentParams.params);
     };
 
     /**
@@ -283,54 +271,12 @@ export function DeskActivityReportController(
      */
     this.validateParams = (params) => {
         $scope.form.deskError = null;
-        $scope.form.datesError = null;
 
-        this.validateDesk(params);
-        this.validateDates(params);
-
-        return $scope.form.deskError === null && $scope.form.datesError === null;
-    };
-
-    /**
-     * @ngdoc method
-     * @name DeskActivityReportController#validateDesk
-     * @param {Object} params - The report parameters to validate
-     * @description Validates desk parameter
-     */
-    this.validateDesk = (params) => {
         if (!_.get(params, 'desk')) {
             $scope.form.deskError = gettext('A desk is required');
         }
-    };
 
-    /**
-     * @ngdoc method
-     * @name DeskActivityReportController#validateDates
-     * @param {Object} params - The report parameters to validate
-     * @description Validates date parameters
-     */
-    this.validateDates = (params) => {
-        const interval = _.get(params, 'histogram.interval');
-        const dates = _.get(params, 'dates');
-        const dateFilter = _.get(dates, 'filter');
-
-        if (interval === 'daily') {
-            if (dateFilter === 'range') {
-                if (!dates.start || !dates.end) {
-                    $scope.form.datesError = gettext('Start and End dates is required');
-                } else if (moment(dates.end).diff(moment(dates.start), 'days') > 31) {
-                    $scope.form.datesError = gettext('Range cannot be greater than 31 days');
-                }
-            } else if (dateFilter === 'relative_days' && !dates.relative_days) {
-                $scope.form.datesError = gettext('Number of days is required');
-            }
-        } else if (interval === 'hourly') {
-            if (dateFilter === 'day' && !dates.date) {
-                $scope.form.datesError = gettext('Date field is required');
-            } else if (dateFilter === 'relative' && !dates.relative) {
-                $scope.form.datesError = gettext('Number of hours is required');
-            }
-        }
+        return $scope.form.deskError === null && $scope.form.datesError === null;
     };
 
     /**
@@ -340,13 +286,15 @@ export function DeskActivityReportController(
      */
     $scope.generate = () => {
         $scope.changeContentView('report');
-
+        $scope.form.submitted = true;
         const params = _.cloneDeep($scope.currentParams.params);
 
         if (!this.validateParams(params)) {
+            $scope.form.showErrors = true;
             return;
         }
 
+        $scope.form.showErrors = false;
         $scope.beforeGenerateChart();
 
         $scope.runQuery(params)
@@ -360,6 +308,7 @@ export function DeskActivityReportController(
                 )
                     .then((chartConfig) => {
                         $scope.changeReportParams(chartConfig);
+                        $scope.form.submitted = false;
                     });
             }, (error) => {
                 notify.error(
@@ -410,7 +359,7 @@ export function DeskActivityReportController(
         );
 
         const chart = new SDChart.Chart({
-            id: 'desk_activity_report',
+            id: reportName,
             chartType: 'highcharts',
             title: $scope.generateTitle(),
             subtitle: $scope.generateSubtitle(),
