@@ -26,6 +26,6 @@ def init_app(app):
 
     superdesk.privilege(
         name='user_activity_report',
-        label='User Activity Reports',
+        label='Analytics - User Activity Reports',
         description='User can view User Activity Reports'
     )

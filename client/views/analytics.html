@@ -15,7 +15,7 @@
                      class="subnav__button-stack subnav__button-stack--padded"
                 >
                 </div>
-                <div class="subnav__button-stack" ng-if="currentReport.allowScheduling">
+                <div class="subnav__button-stack" ng-if="currentReport.allowScheduling && showSchedules">
                     <span sd-check
                           type="radio"
                           ng-model="flags.contentView"

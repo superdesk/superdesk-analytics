@@ -38,7 +38,7 @@
         <div dropdown
              dropdown-append-to-body
              class="dropdown dropdown--align-right"
-             ng-if="report.is_global"
+             ng-if="report.is_global && schedulePrivilege"
         >
             <button dropdown__toggle
                     class="icn-btn dropdown__toggle"

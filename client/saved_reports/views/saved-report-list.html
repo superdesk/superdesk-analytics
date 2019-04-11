@@ -8,21 +8,24 @@
                type="text"
         />
     </div>
-    <div class="saved-reports__group-title" translate>My Saved Reports</div>
-    <div ng-repeat="savedReport in filteredUserReports | orderBy:'name'"
-         sda-saved-report-item
-         data-report="savedReport"
-         data-remove-report="remove"
-         data-select-report="selectReport"
-         data-current-user="currentUser"
-         data-owner-name="userLookup[savedReport.user].display_name"
-         data-local-privilege="localPrivilege"
-         data-global-privilege="globalPrivilege"
-         data-is-selected="isReportSelected(savedReport)"
-         data-create-new-schedule="createNewSchedule"
-         data-view-schedules="viewSchedules"
-    ></div>
-    <div class="saved-reports__group-title" translate>Global Saved Activity Reports</div>
+    <div ng-if="localPrivilege">
+        <div class="saved-reports__group-title" translate>My Saved Reports</div>
+        <div ng-repeat="savedReport in filteredUserReports | orderBy:'name'"
+             sda-saved-report-item
+             data-report="savedReport"
+             data-remove-report="remove"
+             data-select-report="selectReport"
+             data-current-user="currentUser"
+             data-owner-name="userLookup[savedReport.user].display_name"
+             data-local-privilege="localPrivilege"
+             data-global-privilege="globalPrivilege"
+             data-schedule-privilege="schedulePrivilege"
+             data-is-selected="isReportSelected(savedReport)"
+             data-create-new-schedule="createNewSchedule"
+             data-view-schedules="viewSchedules"
+        ></div>
+    </div>
+    <div class="saved-reports__group-title" translate>Global Saved Reports</div>
     <div ng-repeat="savedReport in filteredGlobalReports | orderBy:'name'"
          sda-saved-report-item
          data-report="savedReport"
@@ -32,6 +35,7 @@
          data-owner-name="userLookup[savedReport.user].display_name"
          data-local-privilege="localPrivilege"
          data-global-privilege="globalPrivilege"
+         data-schedule-privilege="schedulePrivilege"
          data-is-selected="isReportSelected(savedReport)"
          data-create-new-schedule="createNewSchedule"
          data-view-schedules="viewSchedules"

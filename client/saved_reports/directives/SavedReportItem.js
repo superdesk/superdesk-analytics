@@ -20,6 +20,7 @@ export function SavedReportItem(_) {
             ownerName: '=',
             globalPrivilege: '=',
             localPrivilege: '=',
+            schedulePrivilege: '=',
             isSelected: '=',
             _createNewSchedule: '=createNewSchedule',
             _viewSchedules: '=viewSchedules',

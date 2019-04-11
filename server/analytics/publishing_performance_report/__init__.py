@@ -23,6 +23,6 @@ def init_app(app):
 
     superdesk.privilege(
         name='publishing_performance_report',
-        label='Publishing Performance Reports',
+        label='Analytics - Publishing Performance Reports',
         description='User can view Publishing Performance Reports'
     )
