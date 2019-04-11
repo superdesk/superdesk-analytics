@@ -103,7 +103,7 @@ describe('sda-preview-source-filter', () => {
         });
         expect(html).toContain('States');
         expect(html).not.toContain('Exclude</span>');
-        expect(html).toContain('>Published, Corrected</p>');
+        expect(html).toContain('>New, Corrections</p>');
 
         compileElement({
             must_not: {
@@ -117,7 +117,7 @@ describe('sda-preview-source-filter', () => {
         });
         expect(html).toContain('States');
         expect(html).toContain('Exclude</span>');
-        expect(html).toContain('>Killed, Recalled</p>');
+        expect(html).toContain('>Kills, Recalls</p>');
     });
 
     it('can render ingest providers', () => {

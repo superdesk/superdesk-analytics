@@ -631,11 +631,11 @@ describe('chartConfig', () => {
                 state: {
                     title: 'State',
                     names: {
-                        published: 'Published',
-                        killed: 'Killed',
-                        corrected: 'Corrected',
-                        updated: 'Updated',
-                        recalled: 'Recalled',
+                        published: 'New',
+                        killed: 'Kills',
+                        corrected: 'Corrections',
+                        updated: 'Updates',
+                        recalled: 'Recalls',
                     },
                 },
             });
