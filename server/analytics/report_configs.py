@@ -20,11 +20,12 @@ from analytics.common import registered_reports, DATE_FILTERS, CHART_TYPES, REPO
 class ReportConfigsResource(Resource):
     endpoint_name = resource_title = 'report_configs'
     schema = {
-        'name': {
+        '_id': {
             'type': 'string',
             'required': True,
             'minlength': 1
         },
+        'name': {'type': 'string'},
         'enabled': {
             'type': 'boolean',
             'default': True
