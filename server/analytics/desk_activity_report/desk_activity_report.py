@@ -14,7 +14,7 @@ from superdesk.errors import SuperdeskApiError
 from analytics.base_report import BaseReportService
 from analytics.stats.common import ENTER_DESK_OPERATIONS, EXIT_DESK_OPERATIONS
 from analytics.chart_config import SDChart, ChartConfig
-from analytics.common import get_utc_offset_in_minutes
+from analytics.common import get_utc_offset_in_minutes, REPORT_CONFIG, CHART_TYPES
 
 from flask import current_app as app
 from datetime import datetime
@@ -40,6 +40,21 @@ class DeskActivityReportService(BaseReportService):
     repos = ['archive_statistics']
     histogram_source_field = 'stats.timeline.operation_created'
     date_filter_field = 'versioncreated'
+
+    defaultConfig = {
+        REPORT_CONFIG.CHART_TYPES: {
+            CHART_TYPES.BAR: {'enabled': True},
+            CHART_TYPES.COLUMN: {'enabled': True},
+            CHART_TYPES.LINE: {'enabled': True},
+            CHART_TYPES.AREA: {'enabled': True},
+            CHART_TYPES.SCATTER: {'enabled': True},
+            CHART_TYPES.SPLINE: {'enabled': True},
+
+            # Disable Table as generating tables for time base charts is currently not supported
+            # The 'report_configs' endpoint will omit it from the result
+            # CHART_TYPES.TABLE: {'enabled': False}
+        }
+    }
 
     def get_request_aggregations(self, params, args):
         aggs = super().get_request_aggregations(params, args)

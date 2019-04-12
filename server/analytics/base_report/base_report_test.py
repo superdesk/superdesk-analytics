@@ -219,7 +219,7 @@ class BaseReportServiceTestCase(TestCase):
             query = self.service.generate_elastic_query({
                 'params': {
                     'dates': {
-                        'filter': 'relative',
+                        'filter': 'relative_hours',
                         'relative': 12
                     }
                 }
@@ -242,7 +242,7 @@ class BaseReportServiceTestCase(TestCase):
                 'params': {
                     'dates': {
                         'filter': 'relative_days',
-                        'relative_days': 7
+                        'relative': 7
                     }
                 }
             })

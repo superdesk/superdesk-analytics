@@ -8,12 +8,10 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-from superdesk import es_utils, get_resource_service
+from superdesk import get_resource_service
 from superdesk.resource import Resource
-from superdesk.utils import ListCursor
 
 from analytics.chart_config import ChartConfig
-from analytics.common import MIME_TYPES
 from analytics.base_report import BaseReportService
 
 

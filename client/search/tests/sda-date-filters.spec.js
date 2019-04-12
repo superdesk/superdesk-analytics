@@ -1,40 +1,81 @@
+import _ from 'lodash';
+import {ReportConfigService} from '../../services';
+import {DATE_FILTERS} from '../common';
+import {REPORT_CONFIG} from '../../services/ReportConfigService';
+
 describe('sda-date-filters', () => {
     let $compile;
     let $rootScope;
     let scope;
+    let $q;
     let element;
     let moment;
 
     let params;
     let form;
-    let maxRange;
+    let config;
+    let reportConfigs;
 
     beforeEach(window.module('gettext'));
     beforeEach(window.module('angularMoment'));
     beforeEach(window.module('superdesk.core.activity'));
     beforeEach(window.module('superdesk.analytics.search'));
 
-    beforeEach(inject((_$compile_, _$rootScope_, _moment_) => {
+    beforeEach(inject((_$compile_, _$rootScope_, _moment_, _$q_) => {
         $compile = _$compile_;
         $rootScope = _$rootScope_;
         moment = _moment_;
+        $q = _$q_;
 
-        form = {datesError: null, submitted: true};
-        params = {dates: {}};
+        reportConfigs = new ReportConfigService({}, $q, _);
+
+        reportConfigs.configs = {
+            test_report: {
+                _id: 'test_report',
+                [REPORT_CONFIG.DATE_FILTERS]: {
+                    [DATE_FILTERS.RANGE]: {
+                        enabled: true,
+                        max: '72',
+                    },
+                    [DATE_FILTERS.RELATIVE_DAYS]: {
+                        enabled: true,
+                        max: '12',
+                    },
+                    [DATE_FILTERS.RELATIVE_HOURS]: {
+                        enabled: true,
+                        max: '12',
+                    },
+                    [DATE_FILTERS.DAY]: {
+                        enabled: true,
+                    },
+                },
+            },
+        };
+
+        config = reportConfigs.getConfig('test_report');
     }));
+
+    beforeEach(() => {
+        form = {
+            datesError: null,
+            submitted: true,
+            showErrors: true,
+        };
+        params = {dates: {}};
+    });
 
     const compileElement = () => {
         scope = $rootScope.$new();
 
         scope.params = params;
         scope.form = form;
-        scope.maxRange = maxRange;
+        scope.config = config;
 
         element = $compile(
             `<div sda-date-filters
                 data-params="params"
                 data-form="form"
-                data-max-range="maxRange"
+                data-config="config"
             ></div>`
         )(scope);
 
@@ -46,8 +87,8 @@ describe('sda-date-filters', () => {
             $rootScope.$digest();
 
             expect(scope.form.datesError).toBe(msg);
-            expect(element.find('.sd-line-input--invalid').length).toBe(1);
-            expect(element.find('.sd-line-input--invalid').html()).toContain(msg);
+            expect(element.find('.sd-line-input__message').length).toBe(1);
+            expect(element.find('.sd-line-input__message').html()).toContain(msg);
         };
 
         const expectNoError = () => {
@@ -57,11 +98,11 @@ describe('sda-date-filters', () => {
                 expect(scope.form.datesError).toBe(null);
             }
 
-            expect(element.find('.sd-line-input--invalid').length).toBe(0);
+            expect(element.find('.sd-line-input__message').length).toBe(0);
         };
 
         it('can validate range', () => {
-            params.dates.filter = 'range';
+            params.dates.filter = DATE_FILTERS.RANGE;
 
             compileElement();
             expectError('Start date is required');
@@ -80,7 +121,7 @@ describe('sda-date-filters', () => {
             params.dates.end = '30/06/2013';
             expectError('Range cannot be greater than 72 days');
 
-            scope.maxRange = 7;
+            config.date_filters[DATE_FILTERS.RANGE].max = '7';
             params.dates.end = '09/06/2012';
             expectError('Range cannot be greater than 7 days');
 
@@ -99,25 +140,25 @@ describe('sda-date-filters', () => {
         });
 
         it('can validate relative_days', () => {
-            params.dates.filter = 'relative_days';
+            params.dates.filter = DATE_FILTERS.RELATIVE_DAYS;
 
             compileElement();
-            expectError('Number of days is required');
+            expectError('Relative value is required');
 
             form.submitted = false;
             compileElement();
             expectNoError();
 
             form.submitted = true;
-            params.dates.relative_days = 12;
+            params.dates.relative = 12;
             expectNoError();
         });
 
-        it('can validate relative', () => {
-            params.dates.filter = 'relative';
+        it('can validate relative_hours', () => {
+            params.dates.filter = DATE_FILTERS.RELATIVE_HOURS;
 
             compileElement();
-            expectError('Number of hours is required');
+            expectError('Relative value is required');
 
             form.submitted = false;
             compileElement();
@@ -129,7 +170,7 @@ describe('sda-date-filters', () => {
         });
 
         it('can validate date', () => {
-            params.dates.filter = 'day';
+            params.dates.filter = DATE_FILTERS.DAY;
 
             compileElement();
             expectError('Date field is required');
@@ -141,6 +182,26 @@ describe('sda-date-filters', () => {
             form.submitted = true;
             params.dates.date = '30/06/2018';
             expectNoError();
+        });
+
+        it('only shows selection for configured date filters', () => {
+            const getFilter = (value) => (
+                element.find(`option[value="${value}"]`).length
+            );
+
+            config.date_filters = {
+                [DATE_FILTERS.RANGE]: {enabled: true},
+                [DATE_FILTERS.DAY]: {enabled: false},
+                [DATE_FILTERS.RELATIVE_HOURS]: {enabled: true},
+                [DATE_FILTERS.RELATIVE_DAYS]: {enabled: true},
+            };
+            compileElement();
+
+            expect(getFilter(DATE_FILTERS.RANGE)).toBe(1);
+            expect(getFilter(DATE_FILTERS.DAY)).toBe(0);
+            expect(getFilter(DATE_FILTERS.RELATIVE_HOURS)).toBe(1);
+            expect(getFilter(DATE_FILTERS.RELATIVE_DAYS)).toBe(1);
+            expect(getFilter(DATE_FILTERS.LAST_YEAR)).toBe(0);
         });
     });
 });

@@ -1,5 +1,4 @@
 import {getErrorMessage, secondsToHumanReadable} from '../../utils';
-import {DATE_FILTERS} from '../../search/directives/DateFilters';
 import {SOURCE_FILTERS} from '../../search/directives/SourceFilters';
 import {CHART_TYPES, CHART_FIELDS} from '../../charts/directives/ChartOptions';
 import {SDChart} from '../../charts/SDChart';
@@ -17,6 +16,7 @@ ProductionTimeReportController.$inject = [
     '$interpolate',
     '$q',
     'config',
+    'reportConfigs',
 ];
 
 /**
@@ -35,6 +35,7 @@ ProductionTimeReportController.$inject = [
  * @required $interpolate
  * @requires $q
  * @requires config
+ * @requires reportConfigs
  * @description Controller for Production Time Reports
  */
 export function ProductionTimeReportController(
@@ -49,44 +50,29 @@ export function ProductionTimeReportController(
     gettextCatalog,
     $interpolate,
     $q,
-    config
+    config,
+    reportConfigs
 ) {
+    const reportName = 'production_time_report';
+
     /**
      * @ngdoc method
      * @name ProductionTimeReportController#init
      * @description Initialises the scope parameters
      */
     this.init = () => {
+        $scope.config = reportConfigs.getConfig(reportName);
         $scope.form = {
             datesError: null,
             submitted: false,
+            showErrors: false,
         };
-
-        $scope.dateFilters = [
-            DATE_FILTERS.RELATIVE,
-            DATE_FILTERS.DAY,
-            DATE_FILTERS.LAST_MONTH,
-            DATE_FILTERS.LAST_WEEK,
-            DATE_FILTERS.RANGE,
-            DATE_FILTERS.RELATIVE,
-            DATE_FILTERS.RELATIVE_DAYS,
-            DATE_FILTERS.YESTERDAY,
-        ];
 
         $scope.chartFields = [
             CHART_FIELDS.TITLE,
             CHART_FIELDS.SUBTITLE,
             CHART_FIELDS.TYPE,
             CHART_FIELDS.SORT,
-        ];
-
-        $scope.chartTypes = [
-            CHART_TYPES.BAR,
-            CHART_TYPES.COLUMN,
-            CHART_TYPES.SPLINE,
-            CHART_TYPES.SCATTER,
-            CHART_TYPES.AREA,
-            CHART_TYPES.LINE,
         ];
 
         this.initDefaultParams();
@@ -118,13 +104,9 @@ export function ProductionTimeReportController(
             ['published', 'killed', 'corrected', 'recalled']
         );
 
-        $scope.chart_types = chartConfig.filterChartTypes(
-            ['bar', 'column']
-        );
-
         $scope.currentParams = {
-            report: 'production_time_report',
-            params: {
+            report: reportName,
+            params: $scope.config.defaultParams({
                 dates: {
                     filter: 'range',
                     start: moment()
@@ -148,7 +130,7 @@ export function ProductionTimeReportController(
                     max: false,
                     sum: false,
                 },
-            },
+            }),
         };
 
         $scope.defaultReportParams = _.cloneDeep($scope.currentParams);
@@ -228,13 +210,15 @@ export function ProductionTimeReportController(
         $scope.changeContentView('report');
         $scope.form.submitted = true;
 
-        const params = _.cloneDeep($scope.currentParams.params);
-
         if ($scope.form.datesError) {
+            $scope.form.showErrors = true;
             return;
         }
 
+        $scope.form.showErrors = false;
         $scope.beforeGenerateChart();
+
+        const params = _.cloneDeep($scope.currentParams.params);
 
         $scope.runQuery(params)
             .then((data) => {
@@ -300,7 +284,7 @@ export function ProductionTimeReportController(
             .then(() => {
                 const chartType = _.get($scope, 'currentParams.params.chart.type') || CHART_TYPES.COLUMN;
                 const chart = new SDChart.Chart({
-                    id: 'production_time_report',
+                    id: reportName,
                     chartType: chartType === 'table' ? 'table' : 'highcharts',
                     title: $scope.generateTitle(),
                     subtitle: $scope.generateSubtitle(),

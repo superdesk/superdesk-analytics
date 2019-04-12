@@ -1,94 +1,43 @@
-<div class="form__row" ng-if="filters.length > 1">
-    <div class="sd-line-input sd-line-input--no-margin">
-        <label class="sd-line-input__label" translate>Date Filters</label>
-        <div class="flex-grid flex-grid--boxed-small flex-grid--wrap-items flex-grid--small-2">
-            <button sd-check
-                    ng-if="enabled.yesterday"
-                    data-type="radio"
-                    ng-model="params.dates.filter"
-                    ng-value="yesterday"
-                    data-label-position="inside"
-                    ng-click="onFilterChange()"
-            >{{:: 'Yesterday' | translate }}</button>
-            <button sd-check
-                    ng-if="enabled.today"
-                    data-type="radio"
-                    ng-model="params.dates.filter"
-                    ng-value="today"
-                    data-label-position="inside"
-                    ng-click="onFilterChange()"
-            >{{:: 'Today' | translate }}</button>
-            <button sd-check
-                    ng-if="enabled.last_week"
-                    data-type="radio"
-                    ng-model="params.dates.filter"
-                    ng-value="last_week"
-                    data-label-position="inside"
-                    ng-click="onFilterChange()"
-            >{{:: 'Last Week' | translate }}</button>
-            <button sd-check
-                    ng-if="enabled.this_week"
-                    data-type="radio"
-                    ng-model="params.dates.filter"
-                    ng-value="this_week"
-                    data-label-position="inside"
-                    ng-click="onFilterChange()"
-            >{{:: 'This Week' | translate }}</button>
-            <button sd-check
-                    ng-if="enabled.last_month"
-                    data-type="radio"
-                    ng-model="params.dates.filter"
-                    ng-value="last_month"
-                    data-label-position="inside"
-                    ng-click="onFilterChange()"
-            >{{:: 'Last Month' | translate }}</button>
-            <button sd-check
-                    ng-if="enabled.this_month"
-                    data-type="radio"
-                    ng-model="params.dates.filter"
-                    ng-value="this_month"
-                    data-label-position="inside"
-                    ng-click="onFilterChange()"
-            >{{:: 'This Month' | translate }}</button>
-            <button sd-check
-                    ng-if="enabled.range"
-                    data-type="radio"
-                    ng-model="params.dates.filter"
-                    ng-value="range"
-                    data-label-position="inside"
-                    ng-click="onFilterChange()"
-            >{{:: 'Range' | translate }}</button>
-            <button sd-check
-                    ng-if="enabled.day"
-                    data-type="radio"
-                    ng-model="params.dates.filter"
-                    ng-value="day"
-                    data-label-position="inside"
-                    ng-click="onFilterChange()"
-            >{{:: 'Day' | translate }}</button>
-            <button sd-check
-                    ng-if="enabled.relative"
-                    data-type="radio"
-                    ng-model="params.dates.filter"
-                    ng-value="relative"
-                    data-label-position="inside"
-                    ng-click="onFilterChange()"
-            >{{:: 'Relative Hrs' | translate }}</button>
-            <button sd-check
-                    ng-if="enabled.relative_days"
-                    data-type="radio"
-                    ng-model="params.dates.filter"
-                    ng-value="relative_days"
-                    data-label-position="inside"
-                    ng-click="onFilterChange()"
-            >{{:: 'Relative Days' | translate }}</button>
-        </div>
+<div class="form__row form__row--no-padding" ng-if="filters.length > 1">
+    <div class="sd-line-input sd-line-input--is-select">
+        <label class="sd-line-input__label" translate>Date Filter:</label>
+        <select class="sd-line-input__select"
+                ng-model="params.dates.filter"
+                ng-change="onFilterChange()"
+        >
+            <optgroup label="Absolute:" ng-if="groupEnabled.absolute">
+                <option value="range" ng-if="enabled.range" translate>Range</option>
+                <option value="day" ng-if="enabled.day" translate>Single Day</option>
+            </optgroup>
+            <optgroup label="Hours" ng-if="groupEnabled.hours">
+                <option value="relative_hours" ng-if="enabled.relative_hours" translate>Relative Hours</option>
+            </optgroup>
+            <optgroup label="Days" ng-if="groupEnabled.days">
+                <option value="relative_days" ng-if="enabled.relative_days" translate>Relative Days</option>
+                <option value="yesterday" ng-if="enabled.yesterday" translate>Yesterday</option>
+                <option value="today" ng-if="enabled.today" translate>Today</option>
+            </optgroup>
+            <optgroup label="Weeks" ng-if="groupEnabled.weeks">
+                <option value="relative_weeks" ng-if="enabled.relative_weeks" translate>Relative Weeks</option>
+                <option value="last_week" ng-if="enabled.last_week" translate>Last Week</option>
+                <option value="this_week" ng-if="enabled.this_week" translate>This Week</option>
+            </optgroup>
+            <optgroup label="Months" ng-if="groupEnabled.months">
+                <option value="relative_months" ng-if="enabled.relative_months" translate>Relative Months</option>
+                <option value="last_month" ng-if="enabled.last_month" translate>Last Month</option>
+                <option value="this_month" ng-if="enabled.this_month" translate>This Month</option>
+            </optgroup>
+            <optgroup label="Year" ng-if="groupEnabled.year">
+                <option value="last_year" ng-if="enabled.last_year" translate>Last Year</option>
+                <option value="this_year" ng-if="enabled.this_year" translate>This Year</option>
+            </optgroup>
+        </select>
     </div>
 </div>
 
 <div class="form__row form__row--flex"
      ng-if="params.dates.filter === 'range'"
-     ng-class="{'form__row--no-padding': form.submitted && form.datesError}"
+     ng-class="{'form__row--no-padding': form.showErrors}"
 >
     <div class="form__row-item">
         <label class="form-label" translate>From</label>
@@ -106,10 +55,9 @@
     </div>
 </div>
 
-
 <div ng-if="params.dates.filter === 'day'"
      class="form__row"
-     ng-class="{'form__row--no-padding': form.submitted && form.datesError}"
+     ng-class="{'form__row--no-padding': form.showErrors}"
 >
     <label class="form-label" translate>Date</label>
     <div sd-datepicker
@@ -118,49 +66,25 @@
     ></div>
 </div>
 
-<div ng-if="params.dates.filter === 'relative'"
+<div ng-if="choices !== null"
      class="form__row"
-     ng-class="{'form__row--no-padding': form.submitted && form.datesError}"
+     ng-class="{'form__row--no-padding': form.showErrors}"
 >
     <div class="sd-line-input sd-line-input--is-select"
-         ng-class="{'sd-line-input--invalid': form.submitted && form.datesError}"
+         ng-class="{'sd-line-input--invalid': form.showErrors}"
     >
         <label class="sd-line-input__label" translate>Last</label>
         <select class="sd-line-input__select"
                 ng-model="params.dates.relative"
         >
-            <option ng-repeat="n in [].constructor(maxRange) track by $index+1"
+            <option ng-repeat="n in choices track by $index+1"
                     value="{{$index+1}}"
-            >{{$index+1 + ' hours' | translate}}</option>
+            >{{n | translate}}</option>
         </select>
-        <div ng-if="form.submitted && form.datesError" class="sd-line-input__message">
-            {{form.datesError | translate}}
-        </div>
     </div>
 </div>
 
-<div ng-if="params.dates.filter === 'relative_days'"
-     class="form__row"
-     ng-class="{'form__row--no-padding': form.submitted && form.datesError}"
->
-    <div class="sd-line-input sd-line-input--is-select"
-         ng-class="{'sd-line-input--invalid': form.submitted && form.datesError}"
-    >
-        <label class="sd-line-input__label" translate>Last</label>
-        <select class="sd-line-input__select"
-                ng-model="params.dates.relative_days"
-        >
-            <option ng-repeat="n in [].constructor(maxRelativeDays) track by $index+1"
-                    value="{{$index+1}}"
-            >{{$index+1 + ' days' | translate}}</option>
-        </select>
-        <div ng-if="form.submitted && form.datesError" class="sd-line-input__message">
-            {{form.datesError | translate}}
-        </div>
-    </div>
-</div>
-
-<div ng-if="form.submitted && form.datesError && ['relative', 'relative_days'].indexOf(params.dates.filter) < 0"
+<div ng-if="form.showErrors"
      class="sd-line-input sd-line-input--invalid sd-line-input--no-label"
 >
     <div class="sd-line-input__message">

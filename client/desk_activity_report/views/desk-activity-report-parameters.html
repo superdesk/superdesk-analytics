@@ -7,7 +7,7 @@
          ng-class="{'sd-line-input--invalid': form.deskError}"
     >
         <label class="sd-line-input__label" translate>Desk</label>
-        <select ng-model="currentParams.params.desk" required>
+        <select ng-model="currentParams.params.desk" ng-change="onDeskChanged()" required>
             <option value="" disabled></option>
             <option ng-repeat="desk in desks" value="{{desk._id}}">{{desk.name}}</option>
         </select>
@@ -28,15 +28,9 @@
 </div>
 
 <div sda-date-filters
-     data-filters="dateFilters"
      data-params="currentParams.params"
      data-on-filter-change="updateChartConfig"
      data-on-dates-change="updateChartConfig"
-     data-max-range="24"
+     data-config="config"
+     data-form="form"
 ></div>
-
-<div class="sd-line-input sd-line-input--invalid sd-line-input--no-label">
-    <div ng-if="form.datesError" class="sd-line-input__message">
-        {{form.datesError | translate}}
-    </div>
-</div>

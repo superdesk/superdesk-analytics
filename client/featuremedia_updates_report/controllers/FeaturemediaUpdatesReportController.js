@@ -1,6 +1,6 @@
 import {getErrorMessage} from '../../utils';
-import {DATE_FILTERS} from '../../search/directives/DateFilters';
-import {CHART_FIELDS} from '../../charts/directives/ChartOptions';
+import {CHART_FIELDS, CHART_TYPES} from '../../charts/directives/ChartOptions';
+import {DATE_FILTERS} from '../../search/common';
 
 FeaturemediaUpdatesReportController.$inject = [
     '$scope',
@@ -14,6 +14,7 @@ FeaturemediaUpdatesReportController.$inject = [
     'config',
     '$q',
     'chartConfig',
+    'reportConfigs',
 ];
 
 /**
@@ -31,6 +32,7 @@ FeaturemediaUpdatesReportController.$inject = [
  * @requires config
  * @requires $q
  * @requires chartConfig
+ * @requires reportConfigs
  * @description Controller for Publishing Performance reports
  */
 export function FeaturemediaUpdatesReportController(
@@ -44,21 +46,23 @@ export function FeaturemediaUpdatesReportController(
     moment,
     config,
     $q,
-    chartConfig
+    chartConfig,
+    reportConfigs
 ) {
+    const reportName = 'featuremedia_updates_report';
+
     /**
      * @ngdoc method
      * @name FeaturemediaUpdatesReportController#init
      * @description Initialises the scope parameters
      */
     this.init = () => {
-        $scope.dateFilters = [
-            DATE_FILTERS.YESTERDAY,
-            DATE_FILTERS.LAST_WEEK,
-            DATE_FILTERS.LAST_MONTH,
-            DATE_FILTERS.RANGE,
-        ];
-
+        $scope.form = {
+            datesError: null,
+            submitted: false,
+            showErrors: false,
+        };
+        $scope.config = reportConfigs.getConfig(reportName);
         $scope.chartFields = [
             CHART_FIELDS.TITLE,
             CHART_FIELDS.SUBTITLE,
@@ -88,42 +92,27 @@ export function FeaturemediaUpdatesReportController(
         );
 
         $scope.currentParams = {
-            report: 'featuremedia_updates_report',
-            params: {
+            report: reportName,
+            params: $scope.config.defaultParams({
                 dates: {
-                    filter: 'range',
+                    filter: DATE_FILTERS.RANGE,
                     start: moment()
                         .subtract(30, 'days')
                         .format(config.model.dateformat),
                     end: moment().format(config.model.dateformat),
                 },
-                must: {
-                    categories: [],
-                    genre: [],
-                    sources: [],
-                    urgency: [],
-                    desks: [],
-                    users: [],
-                },
-                must_not: {
-                    rewrites: false,
-                    states: {
-                        published: false,
-                        killed: false,
-                        corrected: false,
-                        recalled: false,
-                    },
-                },
+                must: {},
+                must_not: {},
                 min: 1,
                 size: 15,
                 page: 1,
                 chart: {
-                    type: 'table',
+                    type: CHART_TYPES.TABLE,
                     sort_order: 'desc',
                     title: null,
                     subtitle: null,
                 },
-            },
+            }),
         };
 
         $scope.defaultReportParams = _.cloneDeep($scope.currentParams);
@@ -194,8 +183,16 @@ export function FeaturemediaUpdatesReportController(
      * @description Updates the Highchart configs in the report's content view
      */
     $scope.generate = () => {
-        $scope.beforeGenerateChart();
         $scope.changeContentView('report');
+        $scope.form.submitted = true;
+
+        if ($scope.form.datesError) {
+            $scope.form.showErrors = true;
+            return;
+        }
+
+        $scope.form.showErrors = false;
+        $scope.beforeGenerateChart();
 
         const params = _.cloneDeep($scope.currentParams.params);
 
@@ -210,6 +207,7 @@ export function FeaturemediaUpdatesReportController(
                 )
                     .then((chartConfig) => {
                         $scope.changeReportParams(chartConfig);
+                        $scope.form.submitted = false;
                     });
             }, (error) => {
                 notify.error(

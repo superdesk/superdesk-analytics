@@ -1,6 +1,6 @@
 import {getErrorMessage} from '../../utils';
-import {DATE_FILTERS} from '../../search/directives/DateFilters';
 import {CHART_FIELDS, CHART_TYPES} from '../../charts/directives/ChartOptions';
+import {DATE_FILTERS} from '../../search/common';
 
 PlanningUsageReportController.$inject = [
     '$scope',
@@ -13,6 +13,7 @@ PlanningUsageReportController.$inject = [
     'gettext',
     'chartConfig',
     '$q',
+    'reportConfigs',
 ];
 
 /**
@@ -29,6 +30,7 @@ PlanningUsageReportController.$inject = [
  * @requires gettext
  * @requires chartConfig
  * @requires $q
+ * @requires reportConfigs
  * @description Controller for Planning Usage Reports
  */
 export function PlanningUsageReportController(
@@ -41,32 +43,28 @@ export function PlanningUsageReportController(
     notify,
     gettext,
     chartConfig,
-    $q
+    $q,
+    reportConfigs
 ) {
+    const reportName = 'planning_usage_report';
+
     /**
      * @ngdoc method
      * @name PlanningUsageReportController#init
      * @description Initialises the scope parameters and custom field translations
      */
     this.init = () => {
-        $scope.dateFilters = [
-            DATE_FILTERS.YESTERDAY,
-            DATE_FILTERS.LAST_WEEK,
-            DATE_FILTERS.LAST_MONTH,
-            DATE_FILTERS.RANGE,
-        ];
-
+        $scope.form = {
+            datesError: null,
+            submitted: false,
+            showErrors: false,
+        };
+        $scope.config = reportConfigs.getConfig(reportName);
         $scope.chartFields = [
             CHART_FIELDS.TITLE,
             CHART_FIELDS.SUBTITLE,
             CHART_FIELDS.TYPE,
             CHART_FIELDS.SORT,
-        ];
-
-        $scope.chartTypes = [
-            CHART_TYPES.BAR,
-            CHART_TYPES.COLUMN,
-            CHART_TYPES.TABLE,
         ];
 
         this.initDefaultParams();
@@ -87,7 +85,7 @@ export function PlanningUsageReportController(
             return null;
         };
 
-        this.chart = chartConfig.newConfig('planning_usage_report', 'bar');
+        this.chart = chartConfig.newConfig(reportName, 'bar');
         $scope.updateChartConfig();
     };
 
@@ -97,15 +95,11 @@ export function PlanningUsageReportController(
      * @description Initialises the default report parameters
      */
     this.initDefaultParams = () => {
-        $scope.chart_types = chartConfig.filterChartTypes(
-            ['bar', 'column', 'table']
-        );
-
         $scope.currentParams = {
-            report: 'planning_usage_report',
-            params: {
+            report: reportName,
+            params: $scope.config.defaultParams({
                 dates: {
-                    filter: 'range',
+                    filter: DATE_FILTERS.RANGE,
                     start: moment()
                         .subtract(30, 'days')
                         .format(config.model.dateformat),
@@ -119,7 +113,7 @@ export function PlanningUsageReportController(
                     title: null,
                     subtitle: null,
                 },
-            },
+            }),
         };
 
         $scope.defaultReportParams = _.cloneDeep($scope.currentParams);
@@ -194,8 +188,16 @@ export function PlanningUsageReportController(
      * @description Updates the Highchart configs in the report's content view
      */
     $scope.generate = () => {
-        $scope.beforeGenerateChart();
         $scope.changeContentView('report');
+        $scope.form.submitted = true;
+
+        if ($scope.form.datesError) {
+            $scope.form.showErrors = true;
+            return;
+        }
+
+        $scope.form.showErrors = false;
+        $scope.beforeGenerateChart();
 
         const params = _.cloneDeep($scope.currentParams.params);
 
@@ -210,6 +212,7 @@ export function PlanningUsageReportController(
                 )
                     .then((chartConfig) => {
                         $scope.changeReportParams(chartConfig);
+                        $scope.form.submitted = false;
                     });
             }, (error) => {
                 notify.error(

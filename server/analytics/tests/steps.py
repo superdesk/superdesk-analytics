@@ -8,7 +8,7 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-from superdesk.tests.steps import when, then, assert_200, get_json_data, json,\
+from superdesk.tests.steps import when, then, assert_200, assert_equal, get_json_data, json,\
     fail_and_print_body, apply_placeholders, json_match
 
 from analytics.stats.gen_archive_statistics import GenArchiveStatistics
@@ -68,6 +68,24 @@ def step_impl_then_get_charts(context, total_count):
 def step_impl_when_generate_stats_from_archive_history(context):
     with context.app.app_context():
         GenArchiveStatistics().run()
+
+
+@then('we get "{report_id}" config')
+def step_impl_then_we_get_config(context, report_id):
+    assert_200(context.response)
+
+    if not context.text:
+        return
+
+    data = get_json_data(context.response)
+
+    config = next((
+        c for c in (data.get('_items') or [])
+        if c.get('_id') == report_id
+    ), None)
+
+    expected_config = json.loads(apply_placeholders(context, context.text))
+    assert_equal(json_match(expected_config, config), True)
 
 
 @then('we get stats')

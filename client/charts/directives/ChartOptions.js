@@ -1,3 +1,5 @@
+import {REPORT_CONFIG} from '../../services/ReportConfigService';
+
 ChartOptions.$inject = ['chartConfig'];
 
 export const CHART_FIELDS = {
@@ -26,21 +28,15 @@ export const CHART_TYPES = {
     SPLINE: 'spline',
 };
 
-export const DEFAULT_CHART_TYPES = [
-    CHART_TYPES.BAR,
-    CHART_TYPES.COLUMN,
-    CHART_TYPES.TABLE,
-];
-
 export function ChartOptions(chartConfig) {
     return {
         scope: {
             params: '=',
             fields: '=?',
-            chartTypes: '=?',
             titlePlaceholder: '=?',
             subtitlePlaceholder: '=?',
             updateChartConfig: '=?',
+            config: '=',
         },
         template: require('../views/chart-form-options.html'),
         link: function(scope) {
@@ -56,11 +52,9 @@ export function ChartOptions(chartConfig) {
                 }
             );
 
-            if (angular.isUndefined(scope.chartTypes)) {
-                scope.chartTypes = DEFAULT_CHART_TYPES;
-            }
-
-            scope.types = chartConfig.filterChartTypes(scope.chartTypes);
+            scope.types = chartConfig.filterChartTypes(
+                Object.keys(scope.config.get(REPORT_CONFIG.CHART_TYPES))
+            );
         },
     };
 }

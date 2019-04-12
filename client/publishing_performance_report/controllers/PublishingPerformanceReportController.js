@@ -1,5 +1,4 @@
 import {getErrorMessage} from '../../utils';
-import {DATE_FILTERS} from '../../search/directives/DateFilters';
 import {CHART_FIELDS, CHART_TYPES} from '../../charts/directives/ChartOptions';
 
 
@@ -16,6 +15,7 @@ PublishingPerformanceReportController.$inject = [
     '$q',
     'chartConfig',
     '$interpolate',
+    'reportConfigs',
 ];
 
 /**
@@ -34,6 +34,7 @@ PublishingPerformanceReportController.$inject = [
  * @requires $q
  * @requires chartConfig
  * @requires $interpolate
+ * @requires reportConfigs
  * @description Controller for Publishing Performance reports
  */
 export function PublishingPerformanceReportController(
@@ -48,32 +49,29 @@ export function PublishingPerformanceReportController(
     config,
     $q,
     chartConfig,
-    $interpolate
+    $interpolate,
+    reportConfigs
 ) {
+    const reportName = 'publishing_performance_report';
+
     /**
      * @ngdoc method
      * @name PublishingPerformanceReportController#init
      * @description Initialises the scope parameters
      */
     this.init = () => {
-        $scope.dateFilters = [
-            DATE_FILTERS.YESTERDAY,
-            DATE_FILTERS.LAST_WEEK,
-            DATE_FILTERS.LAST_MONTH,
-            DATE_FILTERS.RANGE,
-        ];
+        $scope.form = {
+            datesError: null,
+            submitted: false,
+            showErrors: false,
+        };
+        $scope.config = reportConfigs.getConfig(reportName);
 
         $scope.chartFields = [
             CHART_FIELDS.TITLE,
             CHART_FIELDS.SUBTITLE,
             CHART_FIELDS.TYPE,
             CHART_FIELDS.SORT,
-        ];
-
-        $scope.chartTypes = [
-            CHART_TYPES.BAR,
-            CHART_TYPES.COLUMN,
-            CHART_TYPES.TABLE,
         ];
 
         this.initDefaultParams();
@@ -93,17 +91,13 @@ export function PublishingPerformanceReportController(
             ['published', 'killed', 'corrected', 'recalled']
         );
 
-        $scope.chart_types = chartConfig.filterChartTypes(
-            ['bar', 'column', 'table']
-        );
-
         $scope.report_groups = searchReport.filterDataFields(
             ['task.desk', 'task.user', 'anpa_category.qcode', 'source', 'urgency', 'genre.qcode']
         );
 
         $scope.currentParams = {
-            report: 'publishing_performance_report',
-            params: {
+            report: reportName,
+            params: $scope.config.defaultParams({
                 dates: {
                     filter: 'range',
                     start: moment()
@@ -144,7 +138,7 @@ export function PublishingPerformanceReportController(
                     title: null,
                     subtitle: null,
                 },
-            },
+            }),
         };
 
         $scope.defaultReportParams = _.cloneDeep($scope.currentParams);
@@ -235,8 +229,16 @@ export function PublishingPerformanceReportController(
      * @description Updates the Highchart configs in the report's content view
      */
     $scope.generate = () => {
-        $scope.beforeGenerateChart();
         $scope.changeContentView('report');
+        $scope.form.submitted = true;
+
+        if ($scope.form.datesError) {
+            $scope.form.showErrors = true;
+            return;
+        }
+
+        $scope.form.showErrors = false;
+        $scope.beforeGenerateChart();
 
         const params = _.cloneDeep($scope.currentParams.params);
 
@@ -251,6 +253,7 @@ export function PublishingPerformanceReportController(
                 )
                     .then((chartConfig) => {
                         $scope.changeReportParams(chartConfig);
+                        $scope.form.submitted = false;
                     });
             }, (error) => {
                 notify.error(
