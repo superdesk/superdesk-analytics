@@ -28,6 +28,6 @@ def init_app(app):
 
     superdesk.privilege(
         name=endpoint_name,
-        label='Update Time Report',
+        label='Analytics - Update Time Report',
         description='User can view Update Time Report'
     )

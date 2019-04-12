@@ -75,17 +75,17 @@ def init_app(app):
 
     superdesk.privilege(
         name='global_saved_reports',
-        label='Manage Global Saved Reports',
+        label='Analytics - Manage Global Saved Reports',
         description='User can manage other uses\' global saved reports'
     )
     superdesk.privilege(
         name='saved_reports',
-        label='Manage Saved Reports',
+        label='Analytics - Manage Saved Reports',
         description='User can manage saved reports'
     )
     superdesk.privilege(
         name='scheduled_reports',
-        label='Manage Scheduling Reports',
+        label='Analytics - Manage Scheduling Reports',
         description='User can manage scheduling of reports'
     )
 

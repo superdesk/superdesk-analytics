@@ -26,6 +26,6 @@ def init_app(app):
 
     superdesk.privilege(
         name='production_time_report',
-        label='Production Time Reports',
+        label='Analytics - Production Time Reports',
         description='User can view Production Time Reports'
     )

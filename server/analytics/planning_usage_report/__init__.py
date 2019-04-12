@@ -25,6 +25,6 @@ def init_app(app):
 
     superdesk.privilege(
         name='planning_usage_report',
-        label='Planning Usage Reports',
+        label='Analytics - Planning Usage Reports',
         description='User can view Planning Usage Reports'
     )

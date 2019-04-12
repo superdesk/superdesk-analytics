@@ -74,8 +74,9 @@ export function SavedReportList(
 
                 scope.currentUser = session.identity._id;
 
-                scope.localPrivilege = privileges.privileges.saved_reports === 1;
-                scope.globalPrivilege = privileges.privileges.global_saved_reports === 1;
+                scope.localPrivilege = _.get(privileges, 'privileges.saved_reports') === 1;
+                scope.globalPrivilege = _.get(privileges, 'privileges.global_saved_reports') === 1;
+                scope.schedulePrivilege = _.get(privileges, 'privileges.scheduled_reports') === 1;
 
                 scope.currentReport = savedReports.currentReport;
                 scope.selectReport = savedReports.selectReport;

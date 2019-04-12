@@ -23,6 +23,6 @@ def init_app(app):
 
     superdesk.privilege(
         name='content_publishing_report',
-        label='Content Publishing Reports',
+        label='Analytics - Content Publishing Reports',
         description='User can view Content Publishing Reports'
     )

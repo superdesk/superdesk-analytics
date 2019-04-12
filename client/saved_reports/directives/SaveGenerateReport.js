@@ -24,8 +24,8 @@ export function SaveGenerateReport(_, privileges, savedReports) {
             scope.currentParams = {};
             scope.currentTemplate = {};
 
-            scope.canSave = _.get(privileges, 'privileges.saved_reports') === 1 ||
-                _.get(privileges, 'privileges.global_saved_reports') === 1;
+            scope.showSave = _.get(privileges, 'privileges.saved_reports') === 1;
+            scope.showSchedule = _.get(privileges, 'privileges.scheduled_reports') === 1;
 
             scope.$watch(() => savedReports.currentReport, () => {
                 scope.currentTemplate = savedReports.currentReport;
