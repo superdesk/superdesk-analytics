@@ -237,7 +237,7 @@ class DeskActivityReportService(BaseReportService):
             for activity in report.get('histogram'):
                 interval = datetime.strptime(
                     activity.get('interval'),
-                    '%Y-%m-%dT%H:%M:%S.%fZ'
+                    '%Y-%m-%dT%H:%M:%S'
                 )
 
                 row = [interval.strftime(
