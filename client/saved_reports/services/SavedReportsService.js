@@ -162,9 +162,15 @@ export function SavedReportsService(
 
                 return convertedReport;
             }, (error) => {
-                notify.error(
-                    getErrorMessage(error, gettext('Failed to save report'))
-                );
+                if (_.get(error, 'status') === 412) {
+                    // If etag error, then notify user
+                    // eslint-disable-next-line max-len
+                    notify.error(gettext('Saved Report has changed since it was opened. Please re-select the Saved Report to continue. Regrettably, your changes cannot be saved.'));
+                } else {
+                    notify.error(
+                        getErrorMessage(error, gettext('Failed to save report'))
+                    );
+                }
             })
     );
 
@@ -263,7 +269,7 @@ export function SavedReportsService(
 
         if (operation === 'update') {
             notify.warning(
-                gettext('The Saved Report you are using was updated!')
+                gettext('The Saved Report you are using was updated! Please re-select the Saved Report')
             );
         } else if (operation === 'delete') {
             // If this report is currently selected, then deselect it now
