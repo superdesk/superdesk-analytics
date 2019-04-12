@@ -188,6 +188,18 @@ export function ChartConfig(
 
         /**
          * @ngdoc method
+         * @name HighchartConfig#getChildKeys
+         * @return {Array<String>}
+         * @description Returns an array of the keys for the child
+         */
+        getChildKeys() {
+            const child = this.getChild();
+
+            return Object.keys(child.data);
+        }
+
+        /**
+         * @ngdoc method
          * @name HighchartConfig#getTitle
          * @return {string}
          * @description Returns the title string to use for the chart
@@ -374,7 +386,7 @@ export function ChartConfig(
                 chart.tooltipHeader = '{series.name}/{point.x}: {point.y}';
                 chart.colourByPoint = false;
 
-                Object.keys(child.data).forEach((group) => {
+                this.getChildKeys().forEach((group) => {
                     axis.addSeries()
                         .setOptions({
                             field: child.field,
@@ -548,11 +560,11 @@ export function ChartConfig(
                 'state',
                 gettext('State'),
                 {
-                    published: gettext('Published'),
-                    killed: gettext('Killed'),
-                    corrected: gettext('Corrected'),
-                    updated: gettext('Updated'),
-                    recalled: gettext('Recalled'),
+                    published: gettext('New'),
+                    killed: gettext('Kills'),
+                    corrected: gettext('Corrections'),
+                    updated: gettext('Updates'),
+                    recalled: gettext('Recalls'),
                 }
             );
 

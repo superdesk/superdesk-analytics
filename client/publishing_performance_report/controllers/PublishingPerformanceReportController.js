@@ -296,6 +296,7 @@ export function PublishingPerformanceReportController(
 
         this.chart.getTitle = () => $scope.generateTitle(report);
         this.chart.getSubtitle = $scope.generateSubtitle;
+        this.chart.getChildKeys = () => ['published', 'recalled', 'killed', 'corrected', 'updated'];
 
         return this.chart.loadTranslations(_.get(report, 'aggs.group.field'))
             .then(() => this.chart.genConfig())
