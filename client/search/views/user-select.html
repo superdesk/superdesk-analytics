@@ -1,0 +1,25 @@
+<div class="form__row form__row--no-padding user-select">
+    <div class="sd-line-input"
+         ng-class="{'sd-line-input--invalid': errors, 'sd-line-input--required': required}"
+    >
+        <label class="sd-line-input__label" translate>User</label>
+        <div class="sd-line-input__input">
+            <sd-tag-input
+                    ng-model="source.selected"
+                    data-field="display_name"
+                    data-key-property="_id"
+                    data-items="source.items"
+                    data-on-change="onInputChanged()"
+                    data-freetext="false"
+                    data-replace-spaces-with-dashes="false"
+                    data-min-length="min"
+                    data-max-items="max"
+                    data-placeholder="{{'Search Users' | translate}}"
+                    data-max-results-to-show="0"
+            ></sd-tag-input>
+        </div>
+        <span class="sd-line-input__message" ng-if="errors">
+            {{errors | translate}}
+        </span>
+    </div>
+</div>

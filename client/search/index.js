@@ -25,4 +25,6 @@ angular.module('superdesk.analytics.search', [])
     .directive('sdaDateFilters', directives.DateFilters)
 
     .directive('sdaPreviewDateFilter', directives.PreviewDateFilter)
-    .directive('sdaPreviewSourceFilter', directives.PreviewSourceFilter);
+    .directive('sdaPreviewSourceFilter', directives.PreviewSourceFilter)
+
+    .directive('sdaUserSelect', directives.UserSelect);
