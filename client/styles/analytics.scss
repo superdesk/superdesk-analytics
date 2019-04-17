@@ -122,6 +122,24 @@
         }
 
     }
+
+    .user-select {
+        .tags-input__add-button {
+            display: none;
+        }
+
+        .tags-input__input:focus {
+            width: 20px;
+        }
+
+        .sd-line-input__label {
+            top: 0.5rem;
+        }
+
+        sd-tag-input {
+            padding-bottom: 0;
+        }
+    }
 }
 
 // Hack so that content is not rendered underneath the workqueue
