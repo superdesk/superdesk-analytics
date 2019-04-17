@@ -108,7 +108,8 @@ class BaseReportService(SearchService):
                     'extended_bounds': {
                         'min': gte,
                         'max': lt
-                    }
+                    },
+                    'format': 'yyyy-MM-dd\'T\'HH:mm:ss'
                 },
                 'aggs': aggregations
             }
