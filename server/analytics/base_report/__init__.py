@@ -106,8 +106,8 @@ class BaseReportService(SearchService):
                     'min_doc_count': 0,
                     'offset': '{}h'.format(offset),
                     'extended_bounds': {
-                        'min': gte,
-                        'max': lt
+                        'min': gte[:-5],  # remove timezone part
+                        'max': lt[:-5]  # remove timezone part
                     },
                     'format': 'yyyy-MM-dd\'T\'HH:mm:ss'
                 },
