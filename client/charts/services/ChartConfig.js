@@ -1,5 +1,6 @@
 import {formatDate, getTranslatedOperations} from '../../utils';
 import {SDChart} from '../SDChart';
+import {DATE_FILTERS} from '../../search/common';
 
 ChartConfig.$inject = [
     'lodash',
@@ -183,6 +184,18 @@ export function ChartConfig(
          */
         getChild() {
             return this.getSource(1);
+        }
+
+        /**
+         * @ngdoc method
+         * @name HighchartConfig#getChildKeys
+         * @return {Array<String>}
+         * @description Returns an array of the keys for the child
+         */
+        getChildKeys() {
+            const child = this.getChild();
+
+            return Object.keys(child.data);
         }
 
         /**
@@ -373,7 +386,7 @@ export function ChartConfig(
                 chart.tooltipHeader = '{series.name}/{point.x}: {point.y}';
                 chart.colourByPoint = false;
 
-                Object.keys(child.data).forEach((group) => {
+                this.getChildKeys().forEach((group) => {
                     axis.addSeries()
                         .setOptions({
                             field: child.field,
@@ -547,11 +560,11 @@ export function ChartConfig(
                 'state',
                 gettext('State'),
                 {
-                    published: gettext('Published'),
-                    killed: gettext('Killed'),
-                    corrected: gettext('Corrected'),
-                    updated: gettext('Updated'),
-                    recalled: gettext('Recalled'),
+                    published: gettext('New'),
+                    killed: gettext('Kills'),
+                    corrected: gettext('Corrections'),
+                    updated: gettext('Updates'),
+                    recalled: gettext('Recalls'),
                 }
             );
 
@@ -670,7 +683,8 @@ export function ChartConfig(
         }
 
         const filters = {
-            range: () => {
+            // ABSOLUTE
+            [DATE_FILTERS.RANGE]: () => {
                 const start = _.get(params, 'dates.start');
                 const end = _.get(params, 'dates.end');
 
@@ -682,12 +696,41 @@ export function ChartConfig(
                         formatDate(moment, config, end);
                 }
             },
-            yesterday: () => (
+            [DATE_FILTERS.DAY]: () => (
+                moment(_.get(params, 'dates.date'), config.model.dateformat)
+                    .format('dddd Do MMMM YYYY')
+            ),
+
+            // HOURS
+            [DATE_FILTERS.RELATIVE_HOURS]: () => (
+                $interpolate(
+                    gettext('Last {{hours}} hours')
+                )({hours: _.get(params, 'dates.relative')})
+            ),
+
+            // DAYS
+            [DATE_FILTERS.RELATIVE_DAYS]: () => (
+                $interpolate(
+                    gettext('Last {{days}} days')
+                )({days: _.get(params, 'dates.relative')})
+            ),
+            [DATE_FILTERS.YESTERDAY]: () => (
                 moment()
                     .subtract(1, 'days')
                     .format('dddd Do MMMM YYYY')
             ),
-            last_week: () => {
+            [DATE_FILTERS.TODAY]: () => (
+                moment()
+                    .format('dddd Do MMMM YYYY')
+            ),
+
+            // WEEKS
+            [DATE_FILTERS.RELATIVE_WEEKS]: () => (
+                $interpolate(
+                    gettext('Last {{weeks}} weeks')
+                )({weeks: _.get(params, 'dates.relative')})
+            ),
+            [DATE_FILTERS.LAST_WEEK]: () => {
                 const startDate = moment()
                     .subtract(1, 'weeks')
                     .startOf('week')
@@ -699,24 +742,42 @@ export function ChartConfig(
 
                 return startDate + ' - ' + endDate;
             },
-            last_month: () => (
+            [DATE_FILTERS.THIS_WEEK]: () => {
+                const startDate = moment()
+                    .startOf('week')
+                    .format('LL');
+                const endDate = moment()
+                    .endOf('week')
+                    .format('LL');
+
+                return startDate + ' - ' + endDate;
+            },
+
+            // MONTHS
+            [DATE_FILTERS.RELATIVE_MONTHS]: () => (
+                $interpolate(
+                    gettext('Last {{months}} months')
+                )({months: _.get(params, 'dates.relative')})
+            ),
+            [DATE_FILTERS.LAST_MONTH]: () => (
                 moment()
                     .subtract(1, 'months')
                     .format('MMMM YYYY')
             ),
-            day: () => (
-                moment(_.get(params, 'dates.date'), config.model.dateformat)
-                    .format('dddd Do MMMM YYYY')
+            [DATE_FILTERS.THIS_MONTH]: () => (
+                moment()
+                    .format('MMMM YYYY')
             ),
-            relative: () => (
-                $interpolate(
-                    gettext('Last {{hours}} hours')
-                )({hours: _.get(params, 'dates.relative')})
+
+            // YEARS
+            [DATE_FILTERS.LAST_YEAR]: () => (
+                moment()
+                    .subtract(1, 'years')
+                    .format('YYYY')
             ),
-            relative_days: () => (
-                $interpolate(
-                    gettext('Last {{days}} days')
-                )({days: _.get(params, 'dates.relative_days')})
+            [DATE_FILTERS.THIS_YEAR]: () => (
+                moment()
+                    .format('YYYY')
             ),
         };
 

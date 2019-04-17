@@ -37,6 +37,96 @@ MIME_TYPES = namedtuple('MIME_TYPES', [
     'HTML'
 ])(*mime_types)
 
+date_filters = [
+    # ABSOLUTE
+    'range',
+    'day',
+
+    # HOURS
+    'relative_hours',
+
+    # DAYS
+    'relative_days',
+    'yesterday',
+    'today',
+
+    # WEEKS
+    'relative_weeks',
+    'last_week',
+    'this_week',
+
+    # MONTHS
+    'relative_months',
+    'last_month',
+    'this_month',
+
+    # YEARS
+    'last_year',
+    'this_year'
+]
+
+DATE_FILTERS = namedtuple('DATE_FILTERS', [
+    # ABSOLUTE
+    'RANGE',
+    'DAY',
+
+    # HOURS
+    'RELATIVE_HOURS',
+
+    # DAYS
+    'RELATIVE_DAYS',
+    'YESTERDAY',
+    'TODAY',
+
+    # WEEKS
+    'RELATIVE_WEEKS',
+    'LAST_WEEK',
+    'THIS_WEEK',
+
+    # MONTHS
+    'RELATIVE_MONTHS',
+    'LAST_MONTH',
+    'THIS_MONTH',
+
+    # YEARS
+    'LAST_YEAR',
+    'THIS_YEAR'
+])(*date_filters)
+
+chart_types = [
+    'bar',
+    'column',
+    'table',
+    'area',
+    'line',
+    'pie',
+    'scatter',
+    'spline'
+]
+
+CHART_TYPES = namedtuple('CHART_TYPES', [
+    'BAR',
+    'COLUMN',
+    'TABLE',
+    'AREA',
+    'LINE',
+    'PIE',
+    'SCATTER',
+    'SPLINE'
+])(*chart_types)
+
+report_config = [
+    'date_filters',
+    'chart_types',
+    'default_params'
+]
+
+REPORT_CONFIG = namedtuple('REPORT_CONFIG', [
+    'DATE_FILTERS',
+    'CHART_TYPES',
+    'DEFAULT_PARAMS'
+])(*report_config)
+
 
 def get_mime_type_extension(mimetype):
     if mimetype == MIME_TYPES.PNG:

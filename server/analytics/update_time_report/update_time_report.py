@@ -13,6 +13,7 @@ from superdesk.utc import utc_to_local, utcnow
 
 from analytics.stats.stats_report_service import StatsReportService
 from analytics.chart_config import ChartConfig
+from analytics.common import REPORT_CONFIG, CHART_TYPES
 
 from flask import current_app as app
 from datetime import timedelta
@@ -29,6 +30,17 @@ class UpdateTimeReportResource(Resource):
 class UpdateTimeReportService(StatsReportService):
     aggregations = None
     date_filter_field = 'firstpublished'
+
+    defaultConfig = {
+        REPORT_CONFIG.CHART_TYPES: {
+            # Table is the only supported chart type for this report
+            # The 'report_configs' endpoint will omit all others
+            CHART_TYPES.TABLE: {'enabled': True}
+        },
+        REPORT_CONFIG.DEFAULT_PARAMS: {
+            'chart': {'type': CHART_TYPES.TABLE}
+        }
+    }
 
     def get_request_aggregations(self, params, args):
         """Disable generating aggregations"""

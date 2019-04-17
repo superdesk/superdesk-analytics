@@ -11,7 +11,7 @@
 
 from superdesk import get_resource_service
 
-from analytics.common import get_cv_by_qcode
+from analytics.common import get_cv_by_qcode, DATE_FILTERS
 from analytics.chart_config import SDChart
 from analytics.stats.common import OPERATION_NAMES
 
@@ -386,7 +386,8 @@ class ChartConfig:
         dates = params.get('dates') or {}
         date_filter = dates.get('filter')
 
-        if date_filter == 'range':
+        # ABSOLUTE
+        if date_filter == DATE_FILTERS.RANGE:
             start = datetime.strptime(dates.get('start'), '%Y-%m-%d')
             end = datetime.strptime(dates.get('end'), '%Y-%m-%d')
 
@@ -394,11 +395,35 @@ class ChartConfig:
                 start.strftime('%B %-d, %Y'),
                 end.strftime('%B %-d, %Y')
             )
+        elif date_filter == DATE_FILTERS.DAY:
+            date_str = params.get('date') or dates.get('date')
+            date = datetime.strptime(date_str, '%Y-%m-%d')
 
-        elif date_filter == 'yesterday':
+            return date.strftime('%A %-d %B %Y')
+
+        # HOURS
+        elif date_filter == DATE_FILTERS.RELATIVE_HOURS:
+            hours = dates.get('relative')
+
+            return 'Last {} hours'.format(hours)
+
+        # DAYS
+        elif date_filter == DATE_FILTERS.RELATIVE_DAYS:
+            days = dates.get('relative')
+
+            return 'Last {} days'.format(days)
+        elif date_filter == DATE_FILTERS.YESTERDAY:
             return (datetime.today() - timedelta(days=1)) \
                 .strftime('%A %-d %B %Y')
-        elif date_filter == 'last_week':
+        elif date_filter == DATE_FILTERS.TODAY:
+            return datetime.today().strftime('%A %-d %B %Y')
+
+        # WEEKS
+        elif date_filter == DATE_FILTERS.RELATIVE_WEEKS:
+            weeks = dates.get('relative')
+
+            return 'Last {} weeks'.format(weeks)
+        elif date_filter == DATE_FILTERS.LAST_WEEK:
             week = datetime.today() - timedelta(weeks=1)
             start = week - timedelta(days=week.weekday() + 1)
             end = start + timedelta(days=6)
@@ -407,23 +432,39 @@ class ChartConfig:
                 start.strftime('%B %-d, %Y'),
                 end.strftime('%B %-d, %Y')
             )
-        elif date_filter == 'last_month':
+        elif date_filter == DATE_FILTERS.THIS_WEEK:
+            week = datetime.today()
+            start = week - timedelta(days=week.weekday() + 1)
+            end = start + timedelta(days=6)
+
+            return '{} - {}'.format(
+                start.strftime('%B %-d, %Y'),
+                end.strftime('%B %-d, %Y')
+            )
+
+        # MONTHS
+        elif date_filter == DATE_FILTERS.RELATIVE_MONTHS:
+            months = dates.get('relative')
+
+            return 'Last {} months'.format(months)
+        elif date_filter == DATE_FILTERS.LAST_MONTH:
             first = datetime.today().replace(day=1)
             month = first - timedelta(days=1)
 
             return month.strftime('%B %Y')
-        elif date_filter == 'day':
-            date_str = params.get('date') or dates.get('date')
-            date = datetime.strptime(date_str, '%Y-%m-%d')
+        elif date_filter == DATE_FILTERS.THIS_MONTH:
+            month = datetime.today()
 
-            return date.strftime('%A %-d %B %Y')
-        elif date_filter == 'relative':
-            hours = dates.get('relative')
+            return month.strftime('%B %Y')
 
-            return 'Last {} hours'.format(hours)
-        elif date_filter == 'relative_days':
-            days = dates.get('relative_days')
+        # YEARS
+        elif date_filter == DATE_FILTERS.LAST_YEAR:
+            year = datetime.today() - timedelta(weeks=52)
 
-            return 'Last {} days'.format(days)
+            return year.strftime('%Y')
+        elif date_filter == DATE_FILTERS.THIS_YEAR:
+            year = datetime.today()
+
+            return year.strftime('%Y')
 
         return None

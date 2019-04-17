@@ -45,6 +45,7 @@ export function SavedReportList(
             reportType: '@',
             createNewSchedule: '=',
             viewSchedules: '=',
+            changePanel: '=',
         },
         link: function(scope, element, attrs, controller) {
             /**
@@ -74,11 +75,11 @@ export function SavedReportList(
 
                 scope.currentUser = session.identity._id;
 
-                scope.localPrivilege = privileges.privileges.saved_reports === 1;
-                scope.globalPrivilege = privileges.privileges.global_saved_reports === 1;
+                scope.localPrivilege = _.get(privileges, 'privileges.saved_reports') === 1;
+                scope.globalPrivilege = _.get(privileges, 'privileges.global_saved_reports') === 1;
+                scope.schedulePrivilege = _.get(privileges, 'privileges.scheduled_reports') === 1;
 
                 scope.currentReport = savedReports.currentReport;
-                scope.selectReport = savedReports.selectReport;
 
                 // Focus the filter input element
                 $timeout(() => {
@@ -86,6 +87,17 @@ export function SavedReportList(
                         .first()
                         .focus();
                 }, 0);
+            };
+
+            /**
+             * @ngdoc method
+             * @name sdSavedReportList#selectReport
+             * @param {Object} report - The report to select
+             * @Description Select the provided report and change to the Advanced panel
+             */
+            scope.selectReport = (report) => {
+                scope.changePanel('advanced');
+                savedReports.selectReport(report);
             };
 
             /**

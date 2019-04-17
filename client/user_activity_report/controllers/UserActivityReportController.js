@@ -4,7 +4,7 @@ import {
     getTranslatedOperations,
     compileAndGetHTML,
 } from '../../utils';
-import {DATE_FILTERS} from '../../search/directives/DateFilters';
+import {DATE_FILTERS} from '../../search/common';
 import {SOURCE_FILTERS} from '../../search/directives/SourceFilters';
 import {CHART_FIELDS} from '../../charts/directives/ChartOptions';
 import {SDChart} from '../../charts/SDChart';
@@ -25,6 +25,7 @@ UserActivityReportController.$inject = [
     'userList',
     '$timeout',
     '$compile',
+    'reportConfigs',
 ];
 
 /**
@@ -46,6 +47,7 @@ UserActivityReportController.$inject = [
  * @requires userList
  * @requires $timeout
  * @requires $compile
+ * @requires reportConfigs
  * @description Controller for User Activity Reports
  */
 export function UserActivityReportController(
@@ -63,22 +65,23 @@ export function UserActivityReportController(
     deployConfig,
     userList,
     $timeout,
-    $compile
+    $compile,
+    reportConfigs
 ) {
+    const reportName = 'user_activity_report';
+
     /**
      * @ngdoc method
      * @name UserActivityReportController#init
      * @description Initialises the scope parameters
      */
     this.init = () => {
+        $scope.config = reportConfigs.getConfig(reportName);
         $scope.form = {
             submitted: false,
             userError: null,
+            datesError: null,
         };
-
-        $scope.dateFilters = [
-            DATE_FILTERS.DAY,
-        ];
 
         $scope.chartFields = [
             CHART_FIELDS.TITLE,
@@ -117,10 +120,10 @@ export function UserActivityReportController(
         );
 
         $scope.currentParams = {
-            report: 'user_activity_report',
-            params: {
+            report: reportName,
+            params: $scope.config.defaultParams({
                 dates: {
-                    filter: 'day',
+                    filter: DATE_FILTERS.DAY,
                     date: moment().format(config.model.dateformat),
                 },
                 must: {
@@ -132,7 +135,7 @@ export function UserActivityReportController(
                     subtitle: null,
                 },
                 size: 200,
-            },
+            }),
         };
 
         $scope.defaultReportParams = _.cloneDeep($scope.currentParams);
@@ -201,16 +204,15 @@ export function UserActivityReportController(
 
     $scope.isDirty = () => true;
 
-    $scope.$watch(() => savedReports.currentReport._id, (newReportId) => {
-        if (newReportId) {
+    $scope.$watch(() => savedReports.currentReport, (newReport) => {
+        if (_.get(newReport, '_id')) {
             $scope.currentParams = _.cloneDeep(savedReports.currentReport);
-            $scope.changePanel('advanced');
         } else {
             $scope.currentParams = _.cloneDeep($scope.defaultReportParams);
         }
 
         $scope.updateChartConfig();
-    });
+    }, true);
 
     /**
      * @ngdoc method
@@ -225,7 +227,7 @@ export function UserActivityReportController(
             $scope.form.userError = gettext('A user is required');
         }
 
-        return $scope.form.userError === null;
+        return $scope.form.userError === null && $scope.form.datesError === null;
     };
 
     /**
@@ -234,22 +236,23 @@ export function UserActivityReportController(
      * @description Updates the Highchart configs in the report's content view
      */
     $scope.generate = (selectedItem = null) => {
+        $scope.changeContentView('report');
         $scope.form.submitted = true;
         $scope.previousSelectedItem = $scope.selectedItem;
         $scope.selectedItem = selectedItem;
-        $scope.changeContentView('report');
 
         if (!$scope.validateParams()) {
+            $scope.form.showErrors = true;
             return;
         }
 
+        $scope.form.showErrors = false;
         $scope.beforeGenerateChart();
+
         const params = _.cloneDeep($scope.currentParams.params);
 
         return $scope.runQuery(params)
             .then((data) => {
-                $scope.form.submitted = false;
-
                 this.createChart(
                     Object.assign(
                         {},
@@ -259,6 +262,7 @@ export function UserActivityReportController(
                 )
                     .then((chartConfig) => {
                         $scope.changeReportParams(chartConfig);
+                        $scope.form.submitted = false;
                     });
             }, (error) => {
                 notify.error(
@@ -406,7 +410,7 @@ export function UserActivityReportController(
         };
 
         const chart = new SDChart.Chart({
-            id: 'user_activity_report',
+            id: reportName,
             chartType: 'highcharts',
             title: $scope.generateTitle(),
             subtitle: $scope.generateSubtitle(),

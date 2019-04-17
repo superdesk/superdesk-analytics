@@ -1,5 +1,4 @@
 import {getErrorMessage} from '../../utils';
-import {DATE_FILTERS} from '../../search/directives/DateFilters';
 import {CHART_TYPES} from '../../charts/directives/ChartOptions';
 
 ContentPublishingReportController.$inject = [
@@ -15,6 +14,7 @@ ContentPublishingReportController.$inject = [
     '$q',
     'chartConfig',
     '$interpolate',
+    'reportConfigs',
 ];
 
 /**
@@ -33,6 +33,7 @@ ContentPublishingReportController.$inject = [
  * @requires $q
  * @requires chartConfig
  * @requires $interpolate
+ * @requires reportConfigs
  * @description Controller for Content Publishing reports
  */
 export function ContentPublishingReportController(
@@ -47,26 +48,23 @@ export function ContentPublishingReportController(
     config,
     $q,
     chartConfig,
-    $interpolate
+    $interpolate,
+    reportConfigs
 ) {
+    const reportName = 'content_publishing_report';
+
     /**
      * @ngdoc method
      * @name ContentPublishingReportController#init
      * @description Initialises the scope parameters
      */
     this.init = () => {
-        $scope.dateFilters = [
-            DATE_FILTERS.YESTERDAY,
-            DATE_FILTERS.LAST_WEEK,
-            DATE_FILTERS.LAST_MONTH,
-            DATE_FILTERS.RANGE,
-        ];
-
-        $scope.chartTypes = [
-            CHART_TYPES.BAR,
-            CHART_TYPES.COLUMN,
-            CHART_TYPES.TABLE,
-        ];
+        $scope.form = {
+            datesError: null,
+            submitted: false,
+            showErrors: false,
+        };
+        $scope.config = reportConfigs.getConfig(reportName);
 
         this.initDefaultParams();
         savedReports.selectReportFromURL();
@@ -90,8 +88,8 @@ export function ContentPublishingReportController(
         );
 
         $scope.currentParams = {
-            report: 'content_publishing_report',
-            params: {
+            report: reportName,
+            params: $scope.config.defaultParams({
                 dates: {
                     filter: 'range',
                     start: moment()
@@ -99,23 +97,8 @@ export function ContentPublishingReportController(
                         .format(config.model.dateformat),
                     end: moment().format(config.model.dateformat),
                 },
-                must: {
-                    categories: [],
-                    genre: [],
-                    sources: [],
-                    urgency: [],
-                    desks: [],
-                    users: [],
-                },
-                must_not: {
-                    rewrites: false,
-                    states: {
-                        published: false,
-                        killed: false,
-                        corrected: false,
-                        recalled: false,
-                    },
-                },
+                must: {},
+                must_not: {},
                 min: 1,
                 aggs: {
                     group: {
@@ -129,7 +112,7 @@ export function ContentPublishingReportController(
                     title: null,
                     subtitle: null,
                 },
-            },
+            }),
         };
 
         $scope.defaultReportParams = _.cloneDeep($scope.currentParams);
@@ -213,14 +196,13 @@ export function ContentPublishingReportController(
 
     $scope.isDirty = () => true;
 
-    $scope.$watch(() => savedReports.currentReport._id, (newReportId) => {
-        if (newReportId) {
+    $scope.$watch(() => savedReports.currentReport, (newReport) => {
+        if (_.get(newReport, '_id')) {
             $scope.currentParams = _.cloneDeep(savedReports.currentReport);
-            $scope.changePanel('advanced');
         } else {
             $scope.currentParams = _.cloneDeep($scope.defaultReportParams);
         }
-    });
+    }, true);
 
     /**
      * @ngdoc method
@@ -242,8 +224,16 @@ export function ContentPublishingReportController(
      * @description Updates the Highchart configs in the report's content view
      */
     $scope.generate = () => {
-        $scope.beforeGenerateChart();
         $scope.changeContentView('report');
+        $scope.form.submitted = true;
+
+        if ($scope.form.datesError) {
+            $scope.form.showErrors = true;
+            return;
+        }
+
+        $scope.form.showErrors = false;
+        $scope.beforeGenerateChart();
 
         const params = _.cloneDeep($scope.currentParams.params);
 
@@ -262,6 +252,7 @@ export function ContentPublishingReportController(
                 )
                     .then((chartConfig) => {
                         $scope.changeReportParams(chartConfig);
+                        $scope.form.submitted = false;
                     });
             }, (error) => {
                 notify.error(

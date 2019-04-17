@@ -1,4 +1,4 @@
-import {DATE_FILTERS} from '../../../search/directives/DateFilters';
+import {DATE_FILTERS} from '../../../search/common';
 import {CHART_FIELDS} from '../../../charts/directives/ChartOptions';
 import {SDChart} from '../../../charts/SDChart';
 import {CHART_COLOURS} from '../../../charts/directives/ChartColourPicker';
@@ -14,6 +14,7 @@ PublishingActionsWidgetController.$inject = [
     'chartConfig',
     'desks',
     '$interval',
+    'reportConfigs',
 ];
 
 /**
@@ -28,6 +29,7 @@ PublishingActionsWidgetController.$inject = [
  * @requires chartConfig
  * @requires desks
  * @requires $interval
+ * @requires reportConfigs
  * @description Controller for use with the PublishingActions widget and settings views
  */
 export function PublishingActionsWidgetController(
@@ -38,7 +40,8 @@ export function PublishingActionsWidgetController(
     searchReport,
     chartConfig,
     desks,
-    $interval
+    $interval,
+    reportConfigs
 ) {
     /**
      * @ngdoc method
@@ -64,9 +67,8 @@ export function PublishingActionsWidgetController(
                         this.initForSettings();
                     } else {
                         this.initForWidget();
+                        $scope.ready = true;
                     }
-
-                    $scope.ready = true;
                 })
         ));
     };
@@ -103,14 +105,11 @@ export function PublishingActionsWidgetController(
             CHART_FIELDS.SORT,
         ];
 
-        $scope.dateFilters = [
-            DATE_FILTERS.TODAY,
-            DATE_FILTERS.THIS_WEEK,
-            DATE_FILTERS.THIS_MONTH,
-            DATE_FILTERS.RANGE,
-            DATE_FILTERS.RELATIVE_DAYS,
-            DATE_FILTERS.RELATIVE,
-        ];
+        reportConfigs.loadAll()
+            .then(() => {
+                $scope.reportConfig = reportConfigs.getConfig('publishing_performance_report');
+                $scope.ready = true;
+            });
     };
 
     /**

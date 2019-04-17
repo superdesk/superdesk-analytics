@@ -18,13 +18,15 @@ from superdesk.errors import SuperdeskApiError
 
 from apps.search import SearchService
 
-from analytics.common import MIME_TYPES, get_elastic_version, get_weekstart_offset_hr
+from analytics.common import MIME_TYPES, get_elastic_version, get_weekstart_offset_hr, DATE_FILTERS
 
 
 class BaseReportService(SearchService):
     exclude_stages_with_global_read_off = True
     date_filter_field = 'versioncreated'
     histogram_source_field = 'versioncreated'
+
+    defaultConfig = {}
 
     def get_stages_to_exclude(self):
         """
@@ -396,42 +398,53 @@ class BaseReportService(SearchService):
         end_date = dates.get('end')
         date = dates.get('date')
         relative = dates.get('relative')
-        relative_days = dates.get('relative_days')
 
         time_zone = self.get_utc_offset()
         lt = None
         gte = None
 
-        if date_filter == 'range':
+        if date_filter == DATE_FILTERS.RANGE:
             lt = self.format_date(end_date, True)
             gte = self.format_date(start_date)
-        elif date_filter == 'day':
+        elif date_filter == DATE_FILTERS.DAY:
             lt = self.format_date(date, True)
             gte = self.format_date(date)
-        elif date_filter == 'yesterday':
+        elif date_filter == DATE_FILTERS.YESTERDAY:
             lt = 'now/d'
             gte = 'now-1d/d'
-        elif date_filter == 'last_week':
+        elif date_filter == DATE_FILTERS.LAST_WEEK:
             lt = 'now/w'
             gte = 'now-1w/w'
-        elif date_filter == 'last_month':
+        elif date_filter == DATE_FILTERS.LAST_MONTH:
             lt = 'now/M'
             gte = 'now-1M/M'
-        elif date_filter == 'relative':
+        elif date_filter == DATE_FILTERS.RELATIVE_HOURS:
             lt = 'now'
             gte = 'now-{}h'.format(relative)
-        elif date_filter == 'relative_days':
+        elif date_filter == DATE_FILTERS.RELATIVE_DAYS:
             lt = 'now'
-            gte = 'now-{}d'.format(relative_days)
-        elif date_filter == 'today':
+            gte = 'now-{}d'.format(relative)
+        elif date_filter == DATE_FILTERS.TODAY:
             lt = 'now'
             gte = 'now/d'
-        elif date_filter == 'this_week':
+        elif date_filter == DATE_FILTERS.THIS_WEEK:
             lt = 'now'
             gte = 'now/w'
-        elif date_filter == 'this_month':
+        elif date_filter == DATE_FILTERS.THIS_MONTH:
             lt = 'now'
             gte = 'now/M'
+        elif date_filter == DATE_FILTERS.RELATIVE_WEEKS:
+            lt = 'now'
+            gte = 'now-{}w/w'.format(relative)
+        elif date_filter == DATE_FILTERS.RELATIVE_MONTHS:
+            lt = 'now'
+            gte = 'now-{}M/M'.format(relative)
+        elif date_filter == DATE_FILTERS.LAST_YEAR:
+            lt = 'now/y'
+            gte = 'now-1y/y'
+        elif date_filter == DATE_FILTERS.THIS_YEAR:
+            lt = 'now'
+            gte = 'now/y'
 
         return lt, gte, time_zone
 
@@ -440,7 +453,7 @@ class BaseReportService(SearchService):
 
         if lt is not None and gte is not None:
             query['must'].append({
-                'range': {
+                DATE_FILTERS.RANGE: {
                     self.date_filter_field: {
                         'lt': lt,
                         'gte': gte,

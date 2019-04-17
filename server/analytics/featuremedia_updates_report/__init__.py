@@ -29,6 +29,6 @@ def init_app(app):
 
     superdesk.privilege(
         name='featuremedia_updates_report',
-        label='Featuremdia Updates Report',
+        label='Analytics - Featuremdia Updates Report',
         description='User can view Featuremdia Updates Report'
     )

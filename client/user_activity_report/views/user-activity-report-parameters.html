@@ -2,26 +2,19 @@
     Generate a report showing user activity.
 </div>
 
-<div class="form__row form__row--no-padding">
-    <div class="sd-line-input sd-line-input--is-select sd-line-input--required"
-         ng-class="{'sd-line-input--invalid': form.userError && form.submitted}"
-    >
-        <label class="sd-line-input__label" translate>User</label>
-        <select ng-model="currentParams.params.must.user_locks"
-                ng-change="validateParams()"
-                required
-        >
-            <option value="" disabled></option>
-            <option ng-repeat="user in users" value="{{user._id}}">{{user.display_name}}</option>
-        </select>
-        <div ng-if="form.userError && form.submitted"
-             class="sd-line-input__message"
-        >{{form.userError | translate}}</div>
-    </div>
-</div>
+<div sda-user-select
+     ng-if="users.length > 0"
+     data-users="users"
+     data-params="currentParams.params.must.user_locks"
+     data-errors="form.showErrors && form.userError"
+     data-min="1"
+     data-max="1"
+     data-required="true"
+></div>
 
 <div sda-date-filters
-     data-filters="dateFilters"
      data-params="currentParams.params"
      data-on-dates-change="updateChartConfig"
+     data-config="config"
+     data-form="form"
 ></div>

@@ -8,21 +8,7 @@
          data-toggle-save-form="toggleSaveForm"
     ></div>
 
-    <div ng-if="!showSaveForm && canSave">
-        <div class="flex-grid flex-grid--boxed-small flex-grid--wrap-items flex-grid--small-2">
-            <button
-                    id="generate_source_category_report"
-                    class="btn btn--primary"
-                    ng-click="generateReport()"
-                    translate
-            >Run Report</button>
-            <button class="btn btn--success"
-                    ng-click="viewSchedule()"
-                    ng-disabled="!currentTemplate._id || !currentTemplate.is_global"
-                    translate
-            >Schedule</button>
-        </div>
-
+    <div class="report-form__footer" ng-if="!showSaveForm">
         <div class="flex-grid flex-grid--boxed-small flex-grid--wrap-items flex-grid--small-2">
             <button class="btn"
                     ng-click="clearFilters()"
@@ -30,26 +16,26 @@
                     translate
             >Clear Filters</button>
             <button class="btn btn--primary"
+                    ng-click="generateReport()"
+                    translate
+            >Run Report</button>
+        </div>
+
+        <div class="flex-grid flex-grid--boxed-small flex-grid--wrap-items flex-grid--small-2"
+             ng-if="showSave || showSchedule"
+        >
+            <button class="btn btn--success"
+                    ng-if="showSchedule"
+                    ng-click="viewSchedule()"
+                    ng-disabled="!currentTemplate._id || !currentTemplate.is_global"
+                    translate
+            >Schedule</button>
+            <button class="btn btn--primary ml-auto"
+                    ng-if="showSave"
                     ng-click="toggleSaveForm()"
                     ng-disabled="!isDirty()"
                     translate
             >Save Report</button>
-        </div>
-    </div>
-
-    <div ng-if="!showSaveForm && !canSave">
-        <div class="flex-grid flex-grid--boxed-small flex-grid--wrap-items flex-grid--small-2">
-            <button class="btn"
-                    ng-click="clearFilters()"
-                    ng-disabled="!isDirty()"
-                    translate
-            >Clear Filters</button>
-            <button
-                    id="generate_source_category_report"
-                    class="btn btn--primary"
-                    ng-click="generateReport()"
-                    translate
-            >Generate Report</button>
         </div>
     </div>
 </div>
