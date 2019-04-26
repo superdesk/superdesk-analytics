@@ -24,7 +24,7 @@ export function EmailReportModal(emailReport, _, gettext) {
                 scope.report = _.cloneDeep(emailReport.modal.report);
                 scope.email = _.cloneDeep(emailReport.modal.email);
 
-                // This next attribute is required for sd-report-preview-proxy
+                // This next attribute is required for sda-report-preview-proxy
                 // to determine the report type
                 scope.report.report = scope.report.type;
             };
