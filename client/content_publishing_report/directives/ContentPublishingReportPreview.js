@@ -50,7 +50,7 @@ export function ContentPublishingReportPreview(
                     .then(() => {
                         scope.group = chart.getSourceName(_.get(params, 'aggs.group.field'));
                         scope.subgroup = chart.getSourceName(
-                            _.get(params, 'aggs.subgroup.field')
+                            _.get(params, 'aggs.subgroup.field', '')
                         ) || '-';
                     });
             };

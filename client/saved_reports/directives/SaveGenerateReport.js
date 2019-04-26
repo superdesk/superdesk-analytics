@@ -16,7 +16,7 @@ export function SaveGenerateReport(_, privileges, savedReports) {
             generateReport: '=',
             getReportParams: '=',
             isDirty: '=',
-            _viewSchedule: '=viewSchedule',
+            _viewSchedules: '=viewSchedules',
             onClearFilters: '=',
         },
         link: function(scope, element, attrs, controller) {
@@ -65,8 +65,8 @@ export function SaveGenerateReport(_, privileges, savedReports) {
              * @name sdSaveGenerateReport#viewSchedule
              * @description Views schedules for the current saved report
              */
-            scope.viewSchedule = () => (
-                scope._viewSchedule(scope.currentTemplate)
+            scope.viewSchedules = () => (
+                scope._viewSchedules(scope.currentTemplate)
             );
 
             scope.clearFilters = () => {
