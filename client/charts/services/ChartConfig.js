@@ -458,7 +458,9 @@ export function ChartConfig(
      * @description Helper function to get the translations for a field
      */
     self.getTranslations = (field) => (
-        self.translations[field.replace(/\./g, '_')] || {}
+        !field ?
+            {} :
+            self.translations[field.replace(/\./g, '_')] || {}
     );
 
     /**

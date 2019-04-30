@@ -252,10 +252,12 @@ export function ScheduledReportsList(
             this.viewScheduleForReport = (event, savedReport) => {
                 scheduledReports.fetchBySavedReport(savedReport._id)
                     .then((schedules) => {
-                        if (schedules._items.length < 1) {
+                        const numSchedules = _.get(schedules, '_items.length', 0);
+
+                        if (numSchedules < 1) {
                             // There are currently no schedules for this saved report
                             this.openCreateModal(savedReport);
-                        } else if (schedules._items.length === 1) {
+                        } else if (numSchedules === 1) {
                             // If there is only 1 schedule, then open the modal edit form
                             scope.openModal(schedules._items[0]);
                         }
