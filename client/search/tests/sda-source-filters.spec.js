@@ -226,9 +226,9 @@ describe('sda-source-filters', () => {
         expect(userList.getAll).toHaveBeenCalled();
         expect(element.html()).toContain('filters.users.label');
         expect(isoScope.filters.users.items).toEqual([
-            {_id: 'user1', display_name: 'first user'},
-            {_id: 'user3', display_name: 'last user'},
-            {_id: 'user2', display_name: 'second user'},
+            {_id: 'user1', display_name: 'first user', is_active: true, is_enabled: true, needs_activation: false},
+            {_id: 'user3', display_name: 'last user', is_active: true, is_enabled: true, needs_activation: false},
+            {_id: 'user2', display_name: 'second user', is_active: true, is_enabled: true, needs_activation: false},
         ]);
         expect(isoScope.filters.users.selected).toEqual([]);
         expect(isoScope.filters.users.exclude).toBe(false);
@@ -236,14 +236,14 @@ describe('sda-source-filters', () => {
         params = {must: {users: ['user1']}};
         compileElement();
         expect(isoScope.filters.users.selected).toEqual([
-            {_id: 'user1', display_name: 'first user'},
+            {_id: 'user1', display_name: 'first user', is_active: true, is_enabled: true, needs_activation: false},
         ]);
         expect(isoScope.filters.users.exclude).toBe(false);
 
         params = {must_not: {users: ['user2']}};
         compileElement();
         expect(isoScope.filters.users.selected).toEqual([
-            {_id: 'user2', display_name: 'second user'},
+            {_id: 'user2', display_name: 'second user', is_active: true, is_enabled: true, needs_activation: false},
         ]);
         expect(isoScope.filters.users.exclude).toBe(true);
     });

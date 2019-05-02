@@ -387,7 +387,13 @@ export function SourceFilters(
                     exclude: false,
                     enabled: false,
                     fetch: () => userList.getAll(),
-                    receive: (data) => _.get(data, 'users') || [],
+                    receive: (data) => (_.get(data, 'users') || []).filter(
+                        (user) => (
+                            _.get(user, 'is_active') &&
+                            _.get(user, 'is_enabled') &&
+                            !_.get(user, 'needs_activation')
+                        )
+                    ),
                     minLength: 1,
                 },
                 [SOURCE_FILTERS.CATEGORIES]: {
