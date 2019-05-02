@@ -45,9 +45,12 @@ export function mockUsers(userList, $q) {
     // eslint-disable-next-line jasmine/no-unsafe-spy
     spyOn(userList, 'getAll').and.returnValue(
         $q.when([
-            {_id: 'user1', display_name: 'first user'},
-            {_id: 'user2', display_name: 'second user'},
-            {_id: 'user3', display_name: 'last user'},
+            {_id: 'user1', display_name: 'first user', is_active: true, is_enabled: true, needs_activation: false},
+            {_id: 'user2', display_name: 'second user', is_active: true, is_enabled: true, needs_activation: false},
+            {_id: 'user3', display_name: 'last user', is_active: true, is_enabled: true, needs_activation: false},
+            {_id: 'user4', display_name: 'inactive', is_active: false, is_enabled: true, needs_activation: false},
+            {_id: 'user5', display_name: 'disabled', is_active: true, is_enabled: false, needs_activation: false},
+            {_id: 'user6', display_name: 'waiting', is_active: true, is_enabled: true, needs_activation: true},
         ])
     );
 }

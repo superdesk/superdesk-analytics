@@ -613,6 +613,9 @@ describe('chartConfig', () => {
                         user1: 'first user',
                         user2: 'second user',
                         user3: 'last user',
+                        user4: 'inactive',
+                        user5: 'disabled',
+                        user6: 'waiting',
                     },
                 },
             });
