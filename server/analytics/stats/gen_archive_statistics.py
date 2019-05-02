@@ -8,7 +8,7 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-from superdesk import Command, command, get_resource_service, Option
+from superdesk import Command, command, get_resource_service, Option, signals
 from superdesk.logging import logger
 from superdesk.utc import utcnow
 from superdesk.metadata.item import ITEM_STATE, ITEM_TYPE, FORMAT, SCHEDULE_SETTINGS, \
@@ -23,6 +23,34 @@ from analytics.stats import featuremedia_updates, desk_transitions
 from eve.utils import config
 from copy import deepcopy
 from datetime import timedelta
+
+gen_stats_signals = {
+    'generate': signals.signal('gen_archive_statistics:generate'),
+    'init_timeline': signals.signal('gen_archive_statistics:init_timeline'),
+    'process': signals.signal('gen_archive_statistics:process'),
+    'complete': signals.signal('gen_archive_statistics:complete'),
+}
+
+
+def connect_stats_signals(on_generate=None, on_init_timeline=None, on_process=None, on_complete=None):
+    """Connect functions to the gen_stats_signals
+
+    :param on_generate: Callback for generate signal
+    :param on_init_timeline: Callback for init_timeline signal
+    :param on_process: Callback for process signal
+    :param on_complete: Callback for complete signal
+    """
+    if on_generate:
+        gen_stats_signals['generate'].connect(on_generate)
+
+    if on_init_timeline:
+        gen_stats_signals['init_timeline'].connect(on_init_timeline)
+
+    if on_process:
+        gen_stats_signals['process'].connect(on_process)
+
+    if on_complete:
+        gen_stats_signals['complete'].connect(on_complete)
 
 
 class GenArchiveStatistics(Command):
@@ -54,6 +82,19 @@ class GenArchiveStatistics(Command):
         $ python manage.py analytics:gen_archive_statistics -item-id 'id-of-item-to-gen-stats-for'
         $ python manage.py analytics:gen_archive_statistics -c 500
         $ python manage.py analytics:gen_archive_statistics -chunk-size 500
+
+    There are 4 signals that are sent when generating statistics.
+    This allows custom statistics to be generated and stored in the item.
+    There is a dictionary in the schema for custom stats to be stored under the 'extra' attribute.
+
+    Example:
+    ::
+
+        from analytics.stats.gen_archive_statistics import connect_stats_signals
+
+        connect_stats_signals(on_generate, on_init_timeline, on_process, on_complete)
+        # or by key values
+        connect_stats_signals(on_process=on_process_stats)
     """
 
     option_list = [
@@ -406,6 +447,8 @@ class GenArchiveStatistics(Command):
         desk_transitions.store_update_fields(entry, update)
         featuremedia_updates.store_update_fields(entry, update)
 
+        gen_stats_signals['generate'].send(self, entry=entry, update=update)
+
         if update:
             entry['update'] = update
         else:
@@ -424,6 +467,8 @@ class GenArchiveStatistics(Command):
         new_timeline = []
         desk_transitions.init(stats)
         featuremedia_updates.init(stats)
+
+        gen_stats_signals['init_timeline'].send(self, stats=stats)
 
         try:
             entries = sorted(
@@ -477,8 +522,19 @@ class GenArchiveStatistics(Command):
             desk_transitions.process(entry, new_timeline, updates, update, stats)
             featuremedia_updates.process(entry, new_timeline, updates, update, stats)
 
+            gen_stats_signals['process'].send(
+                self,
+                entry=entry,
+                new_timeline=new_timeline,
+                updates=updates,
+                update=update,
+                stats=stats
+            )
+
         desk_transitions.complete(stats, updates)
         featuremedia_updates.complete(stats, updates)
+
+        gen_stats_signals['complete'].send(self, stats=stats, updates=updates)
 
         if updates.get('firstpublished') and updates.get('firstcreated'):
             updates['time_to_first_publish'] = (

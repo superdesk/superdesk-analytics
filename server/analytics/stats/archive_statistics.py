@@ -249,6 +249,12 @@ class ArchiveStatisticsResource(Resource):
             'type': 'integer',
             'default': 0
         },
+
+        # Dictionary for statistics generated via plugins (i.e. from gen_stats_signals)
+        'extra': {
+            'type': 'dict',
+            'mapping': not_enabled
+        }
     }
 
 

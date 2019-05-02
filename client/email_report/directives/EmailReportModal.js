@@ -89,8 +89,8 @@ export function EmailReportModal(emailReport, _, gettext) {
             scope.mimeTypes = [
                 {type: 'image/jpeg', label: gettext('JPEG Image')},
                 {type: 'image/png', label: gettext('PNG Image')},
-                {type: 'image/svg+xml', label: gettext('SVG Image')},
-                {type: 'text/csv', label: gettext('CSV File')},
+                // {type: 'image/svg+xml', label: gettext('SVG Image')},
+                // {type: 'text/csv', label: gettext('CSV File')},
                 {type: 'application/pdf', label: gettext('PDF File')},
             ];
 
