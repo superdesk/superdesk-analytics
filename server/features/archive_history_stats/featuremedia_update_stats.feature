@@ -884,3 +884,154 @@ Feature: Featuremedia Stats
             ]
         }
         """
+
+    @auth @wip
+    Scenario: Changes to featuremedia in updates are recorded as well
+        When we post to "/archive" with success
+        """
+        {
+            "_id": "item1", "guid": "item1",
+            "type": "text", "headline": "show my content", "version": 0,
+            "task": {"desk": "#desks._id#", "stage": "#desks.incoming_stage#", "user": "#CONTEXT_USER_ID#"}
+        }
+        """
+        When we patch "/archive/item1"
+        """
+        {
+            "associations": {
+                "featuremedia": {
+                    "_id": "bike",
+                    "poi": {"x": 0.75, "y": 0.4}
+                }
+            },
+            "state": "in_progress"
+        }
+        """
+        Then we get OK response
+        When we publish "item1" with "publish" type and "published" state
+        Then we get OK response
+        When we generate stats from archive history
+        When we get "/archive_statistics/item1"
+        Then we get stats
+        """
+        {
+            "timeline": [
+                {"operation": "create"},
+                {"operation": "update"},
+                {"operation": "add_featuremedia"},
+                {"operation": "publish"}
+            ],
+            "featuremedia_updates": [
+                {"operation": "publish"}
+            ]
+        }
+        """
+        When we rewrite "item1"
+        """
+        {"desk_id": "#desks._id#"}
+        """
+        Then we get OK response
+        Then we store "rewrite1" with value "#REWRITE_ID#" to context
+        When we patch "/archive/#rewrite1#"
+        """
+        {
+            "associations": {
+                "featuremedia": {
+                    "_id": "bike",
+                    "poi": {"x": 0.751, "y": 0.45},
+                    "headline": "bike vroom",
+                    "alt_text": "bike",
+                    "description_text": "a nice motor-bike"
+                }
+            }
+        }
+        """
+        Then we get OK response
+        When we publish "#rewrite1#" with "publish" type and "published" state
+        When we generate stats from archive history
+        When we get "/archive_statistics/item1"
+        Then we get stats
+        """
+        {
+            "timeline": [
+                {"operation": "create"},
+                {"operation": "update"},
+                {"operation": "add_featuremedia"},
+                {"operation": "publish"},
+                {"operation": "rewrite"}
+            ],
+            "featuremedia_updates": [
+                {"operation": "publish"}
+            ]
+        }
+        """
+        When we get "/archive_statistics/#rewrite1#"
+        Then we get stats
+        """
+        {
+            "timeline": [
+                {"operation": "create"},
+                {"operation": "add_featuremedia"},
+                {"operation": "link"},
+                {"operation": "update"},
+                {"operation": "update_featuremedia_poi"},
+                {"operation": "publish"}
+            ],
+            "featuremedia_updates": [
+                {"operation": "publish"}
+            ]
+        }
+        """
+        When we get "/archive_statistics/item1_family"
+        Then we get stats
+        """
+        {
+            "featuremedia_updates": [
+                {"operation": "publish"},
+                {"operation": "update_featuremedia_poi"}
+            ]
+        }
+        """
+        When we rewrite "#rewrite1#"
+        """
+        {"desk_id": "#desks._id#"}
+        """
+        Then we get OK response
+        Then we store "rewrite2" with value "#REWRITE_ID#" to context
+        When we patch "/archive/#rewrite2#"
+        """
+        {
+            "associations": {
+                "featuremedia": null
+            }
+        }
+        """
+        Then we get OK response
+        When we publish "#rewrite2#" with "publish" type and "published" state
+        When we generate stats from archive history
+        When we get "/archive_statistics/#rewrite2#"
+        Then we get stats
+        """
+        {
+            "timeline": [
+                {"operation": "create"},
+                {"operation": "add_featuremedia"},
+                {"operation": "link"},
+                {"operation": "update"},
+                {"operation": "remove_featuremedia"},
+                {"operation": "publish"}
+            ],
+            "featuremedia_updates": null
+        }
+        """
+        When we get "/archive_statistics/item1_family"
+        Then we get stats
+        """
+        {
+            "featuremedia_updates": [
+                {"operation": "publish"},
+                {"operation": "update_featuremedia_poi"},
+                {"operation": "remove_featuremedia"}
+            ]
+        }
+        """

@@ -46,6 +46,31 @@ class FeaturemediaUpdatesTimeReportService(StatsReportService):
         """Disable generating aggregations"""
         return None
 
+    def get_es_stats_type(self, query, params):
+        # Check the rewrites filter is include|exclude|only
+        # then modify this query to reflect the filter
+        if (params.get('rewrites') or 'include') == 'include':
+            query['should'] += [{
+                'bool': {
+                    'must': {'term': {'stats_type': 'archive'}},
+                    'must_not': [
+                        {'exists': {'field': 'rewritten_by'}},
+                        {'exists': {'field': 'rewrite_of'}}
+                    ]
+                }
+            }, {
+                'bool': {
+                    'must': [
+                        {'term': {'stats_type': 'archive_family'}},
+                        {'exists': {'field': 'rewritten_by'}}
+                    ],
+                }
+            }]
+
+            query['minimum_should_match'] = 1
+        else:
+            query['must'].append({'term': {'stats_type': 'archive'}})
+
     def _es_set_size(self, query, params):
         """Disable setting the size"""
         query['size'] = 200

@@ -96,6 +96,7 @@ export function FeaturemediaUpdatesTable(
                             user: _.get(scope.users, _.get(update, 'user'), {}).display_name,
                             operation: _.get(operations, _.get(update, 'operation')),
                             update: _.get(update, 'update'),
+                            clickable: _.get(update, 'operation') !== 'remove_featuremedia',
                         }));
 
                     scope.itemUpdates.push({
@@ -147,10 +148,12 @@ export function FeaturemediaUpdatesTable(
              * @description Opens the preview that will load the snapshot renditions and preview them
              */
             scope.onUpdateClicked = (item, update) => {
-                scope.openPreview({
-                    item: item,
-                    update: update,
-                }, 'renditions-preview');
+                if (_.get(update, 'clickable')) {
+                    scope.openPreview({
+                        item: item,
+                        update: update,
+                    }, 'renditions-preview');
+                }
             };
 
             init();

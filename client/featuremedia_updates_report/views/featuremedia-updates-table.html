@@ -37,10 +37,12 @@
                             <td class="no-vert-padding">
                                 <ul class="simple-list simple-list--dotted no-vert-padding">
                                     <li ng-repeat="update in item.updates track by $index"
-                                        class="simple-list__item clickable"
+                                        class="simple-list__item"
+                                        ng-class="{'clickable': update.clickable}"
                                         ng-click="onUpdateClicked(item, update)"
                                     >
-                                        <a translate>{{update.date}} - {{update.operation}} by {{update.user}}</a>
+                                        <a translate ng-if="update.clickable">{{update.date}} - {{update.operation}} by {{update.user}}</a>
+                                        <span ng-if="!update.clickable" translate>{{update.date}} - {{update.operation}} by {{update.user}}</span>
                                     </li>
                                 </ul>
                             </td>

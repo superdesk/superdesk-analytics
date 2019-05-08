@@ -18,28 +18,42 @@ from superdesk.celery_task_utils import get_lock_id
 from superdesk.lock import lock, unlock
 
 from analytics.stats.common import STAT_TYPE, OPERATION
-from analytics.stats import featuremedia_updates, desk_transitions
+from analytics.stats import desk_transitions
 
 from eve.utils import config
 from copy import deepcopy
 from datetime import timedelta
 
 gen_stats_signals = {
+    'start': signals.signal('gen_archive_statistics:start'),
     'generate': signals.signal('gen_archive_statistics:generate'),
     'init_timeline': signals.signal('gen_archive_statistics:init_timeline'),
     'process': signals.signal('gen_archive_statistics:process'),
     'complete': signals.signal('gen_archive_statistics:complete'),
+    'finish': signals.signal('gen_archive_statistics:finish'),
 }
 
 
-def connect_stats_signals(on_generate=None, on_init_timeline=None, on_process=None, on_complete=None):
+def connect_stats_signals(
+    on_start=None,
+    on_generate=None,
+    on_init_timeline=None,
+    on_process=None,
+    on_complete=None,
+    on_finish=None
+):
     """Connect functions to the gen_stats_signals
 
+    :param on_start: Callback for start signal
     :param on_generate: Callback for generate signal
     :param on_init_timeline: Callback for init_timeline signal
     :param on_process: Callback for process signal
     :param on_complete: Callback for complete signal
+    :param on_finish: Callback for finish signal
     """
+    if on_start:
+        gen_stats_signals['start'].connect(on_start)
+
     if on_generate:
         gen_stats_signals['generate'].connect(on_generate)
 
@@ -51,6 +65,9 @@ def connect_stats_signals(on_generate=None, on_init_timeline=None, on_process=No
 
     if on_complete:
         gen_stats_signals['complete'].connect(on_complete)
+
+    if on_finish:
+        gen_stats_signals['finish'].connect(on_finish)
 
 
 class GenArchiveStatistics(Command):
@@ -197,6 +214,8 @@ class GenArchiveStatistics(Command):
                 logger.info('No more history records to process')
                 break
 
+            gen_stats_signals['start'].send(self)
+
             num_history_items += len(history_items)
             last_entry_id = history_items[-1].get(config.ID_FIELD)
 
@@ -213,6 +232,7 @@ class GenArchiveStatistics(Command):
                 int(time_diff)
             ))
 
+            gen_stats_signals['finish'].send(self)
             iterated_started = utcnow()
 
         # Don't store the last processed id if we're generating stats for a single item
@@ -445,8 +465,6 @@ class GenArchiveStatistics(Command):
             update = entry.get('update') or {}
 
         desk_transitions.store_update_fields(entry, update)
-        featuremedia_updates.store_update_fields(entry, update)
-
         gen_stats_signals['generate'].send(self, entry=entry, update=update)
 
         if update:
@@ -466,8 +484,6 @@ class GenArchiveStatistics(Command):
 
         new_timeline = []
         desk_transitions.init(stats)
-        featuremedia_updates.init(stats)
-
         gen_stats_signals['init_timeline'].send(self, stats=stats)
 
         try:
@@ -520,8 +536,6 @@ class GenArchiveStatistics(Command):
                 updates['firstcreated'] = operation_created
 
             desk_transitions.process(entry, new_timeline, updates, update, stats)
-            featuremedia_updates.process(entry, new_timeline, updates, update, stats)
-
             gen_stats_signals['process'].send(
                 self,
                 entry=entry,
@@ -532,9 +546,7 @@ class GenArchiveStatistics(Command):
             )
 
         desk_transitions.complete(stats, updates)
-        featuremedia_updates.complete(stats, updates)
-
-        gen_stats_signals['complete'].send(self, stats=stats, updates=updates)
+        gen_stats_signals['complete'].send(self, stats=stats, orig=item, updates=updates)
 
         if updates.get('firstpublished') and updates.get('firstcreated'):
             updates['time_to_first_publish'] = (
