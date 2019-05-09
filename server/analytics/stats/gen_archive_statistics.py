@@ -8,7 +8,7 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-from superdesk import Command, command, get_resource_service, Option, signals
+from superdesk import Command, command, get_resource_service, Option
 from superdesk.logging import logger
 from superdesk.utc import utcnow
 from superdesk.metadata.item import ITEM_STATE, ITEM_TYPE, FORMAT, SCHEDULE_SETTINGS, \
@@ -16,6 +16,7 @@ from superdesk.metadata.item import ITEM_STATE, ITEM_TYPE, FORMAT, SCHEDULE_SETT
 from superdesk.text_utils import get_par_count
 from superdesk.celery_task_utils import get_lock_id
 from superdesk.lock import lock, unlock
+from superdesk.signals import signals
 
 from analytics.stats.common import STAT_TYPE, OPERATION
 from analytics.stats import featuremedia_updates, desk_transitions
