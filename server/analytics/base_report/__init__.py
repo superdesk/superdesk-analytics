@@ -506,6 +506,13 @@ class BaseReportService(SearchService):
             },
         }
 
+    def _es_base_query(self, query, params):
+        self._es_set_repos(query, params)
+        self._es_set_size(query, params)
+        self._es_set_sort(query, params)
+        self._es_filter_dates(query, params)
+        self._es_include_rewrites(query, params)
+
     def generate_elastic_query(self, args):
         params = args.get('params') or {}
 
@@ -513,14 +520,11 @@ class BaseReportService(SearchService):
         query = {
             'must': [],
             'must_not': [],
-            'sort': []
+            'sort': [],
+            'should': []
         }
 
-        self._es_set_repos(query, params)
-        self._es_set_size(query, params)
-        self._es_set_sort(query, params)
-        self._es_filter_dates(query, params)
-        self._es_include_rewrites(query, params)
+        self._es_base_query(query, params)
 
         for must in ['must', 'must_not']:
             for field, filters in (params.get(must) or {}).items():
@@ -556,7 +560,17 @@ class BaseReportService(SearchService):
             }
         }
 
-        if 'size' in query.keys():
+        query_keys = query.keys()
+
+        if len(query.get('should') or []) > 0:
+            es_query['source']['query']['filtered']['filter']['bool']['should'] = \
+                query['should']
+
+        if 'minimum_should_match' in query_keys:
+            es_query['source']['query']['filtered']['filter']['bool']['minimum_should_match'] = \
+                query['minimum_should_match']
+
+        if 'size' in query_keys:
             es_query['source']['size'] = query['size']
 
             page = query.get('page') or 1
@@ -564,7 +578,7 @@ class BaseReportService(SearchService):
             es_query['page'] = query.get('page') or 1
             es_query['max_results'] = query['size']
 
-        if 'sort' in query.keys():
+        if 'sort' in query_keys:
             es_query['source']['sort'] = query['sort']
 
         if len(query['repo']) > 0:

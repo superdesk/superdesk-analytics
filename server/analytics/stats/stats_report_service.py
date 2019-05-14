@@ -18,6 +18,15 @@ class StatsReportService(BaseReportService):
     def get_elastic_index(self, types):
         return app.config.get('STATISTICS_ELASTIC_INDEX') or app.config.get('STATISTICS_MONGO_DBNAME') or 'statistics'
 
+    def get_es_stats_type(self, query, params):
+        query['must'].append({
+            'term': {'stats_type': 'archive'}
+        })
+
+    def _es_base_query(self, query, params):
+        super()._es_base_query(query, params)
+        self.get_es_stats_type(query, params)
+
     def _get_filters(self, repos, invisible_stages):
         return None
 

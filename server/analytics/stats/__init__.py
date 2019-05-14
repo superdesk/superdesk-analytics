@@ -15,6 +15,7 @@ from superdesk.default_settings import crontab
 
 from .archive_statistics import ArchiveStatisticsResource, ArchiveStatisticsService
 from .gen_archive_statistics import GenArchiveStatistics
+from .featuremedia_updates import *  # noqa
 
 
 def init_app(app):

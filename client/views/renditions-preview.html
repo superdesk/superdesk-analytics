@@ -1,4 +1,4 @@
-<div class="analytics-renditions-preview" ng-if="preview.item.update.update">
+<div class="analytics-renditions-preview">
     <div class="side-panel__header">
         <div class="side-panel__tools">
             <a class="icn-btn" ng-click="close()">
@@ -17,7 +17,10 @@
         <div class="nav-tabs__pane">
             <div class="main-article preview">
                 <div class="fieldset main-article__fieldset">
-                    <div class="full-preview" sd-ratio-calc>
+                    <div class="full-preview" ng-if="!preview.item.update.update._id">
+                        <span>This version does not have any featuremedia attached!</span>
+                    </div>
+                    <div class="full-preview" sd-ratio-calc ng-if="preview.item.update.update._id">
                         <div class="media-item__item">
                             <div class="item-association item-association--preview">
                                 <div class="item-association__image-container"
