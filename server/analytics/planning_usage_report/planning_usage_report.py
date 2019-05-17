@@ -30,19 +30,47 @@ class PlanningUsageReportService(BaseReportService):
     aggregations = {
         'events': {
             'filter': {'term': {'type': 'event'}},
-            'aggs': {'users': {'terms': {'field': 'original_creator'}}}
+            'aggs': {
+                'users': {
+                    'terms': {
+                        'field': 'original_creator',
+                        'size': 0
+                    }
+                }
+            }
         },
         'planning': {
             'filter': {'term': {'type': 'planning'}},
-            'aggs': {'users': {'terms': {'field': 'original_creator'}}}
+            'aggs': {
+                'users': {
+                    'terms': {
+                        'field': 'original_creator',
+                        'size': 0
+                    }
+                }
+            }
         },
         'assignments': {
             'filter': {'term': {'type': 'assignment'}},
-            'aggs': {'users': {'terms': {'field': 'original_creator'}}}
+            'aggs': {
+                'users': {
+                    'terms': {
+                        'field': 'original_creator',
+                        'size': 0
+                    }
+                }
+            }
         },
         'coverages': {
             'nested': {'path': 'coverages'},
-            'aggs': {'users': {'terms': {'field': 'coverages.original_creator'}}}
+            'aggs': {
+                'users': {
+                    'terms': {
+                        'field': 'coverages.original_creator',
+                        'size': 0
+                    }
+                }
+            }
         }
     }
 
