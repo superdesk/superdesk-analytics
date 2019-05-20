@@ -13,7 +13,7 @@ from superdesk import get_resource_service, json
 from superdesk.services import BaseService
 from superdesk.resource import Resource, not_indexed, not_analyzed, not_enabled
 from superdesk.metadata.item import metadata_schema, FORMAT, ITEM_TYPE, ITEM_STATE, \
-    SCHEDULE_SETTINGS
+    SCHEDULE_SETTINGS, BYLINE
 from superdesk.metadata.utils import item_url
 from apps.archive.common import ARCHIVE_SCHEMA_FIELDS
 
@@ -233,6 +233,20 @@ class ArchiveStatisticsResource(Resource):
                 'stage': Resource.rel('stages', nullable=True)
             }
         },
+        'unique_id': metadata_schema['unique_id'],
+        'unique_name': metadata_schema['unique_name'],
+        'ingest_id': metadata_schema['ingest_id'],
+        'family_id': metadata_schema['family_id'],
+        'usageterms': metadata_schema['usageterms'],
+        'copyrightnotice': metadata_schema['copyrightnotice'],
+        'copyrightholder': metadata_schema['copyrightholder'],
+        'profile': metadata_schema['profile'],
+        BYLINE: metadata_schema[BYLINE],
+        'ednote': metadata_schema['ednote'],
+        'dateline': metadata_schema['dateline'],
+        'expiry': metadata_schema['expiry'],
+        'place': metadata_schema['place'],
+        'template': metadata_schema['template'],
 
         'original_par_count': metadata_schema['word_count'],
         'par_count': metadata_schema['word_count'],

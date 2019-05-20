@@ -12,7 +12,7 @@ from superdesk import Command, command, get_resource_service, Option
 from superdesk.logging import logger
 from superdesk.utc import utcnow
 from superdesk.metadata.item import ITEM_STATE, ITEM_TYPE, FORMAT, SCHEDULE_SETTINGS, \
-    CONTENT_STATE, PUBLISH_SCHEDULE, EMBARGO
+    CONTENT_STATE, PUBLISH_SCHEDULE, EMBARGO, BYLINE
 from superdesk.text_utils import get_par_count
 from superdesk.celery_task_utils import get_lock_id
 from superdesk.lock import lock, unlock
@@ -366,7 +366,10 @@ class GenArchiveStatistics(Command):
             'anpa_take_key', 'keywords', 'word_count', 'priority',
             'urgency', ITEM_STATE, 'pubstatus', 'flags', 'sms_message',
             FORMAT, 'auto_publish', 'assignment_id', 'rewrite_of', 'rewritten_by',
-            'original_id', SCHEDULE_SETTINGS, 'task', PUBLISH_SCHEDULE, EMBARGO
+            'original_id', SCHEDULE_SETTINGS, 'task', PUBLISH_SCHEDULE, EMBARGO,
+            'unique_id', 'unique_name', 'ingest_id', 'family_id', 'usageterms',
+            'copyrightnotice', 'copyrightholder', 'profile', BYLINE, 'ednote',
+            'dateline', 'expiry', 'place', 'template'
         ]
 
         # Calculate and store item attributes that the history service removes
