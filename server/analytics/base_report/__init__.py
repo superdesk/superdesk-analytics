@@ -15,6 +15,7 @@ from superdesk import get_resource_service, es_utils
 from superdesk.utils import ListCursor
 from superdesk.utc import utcnow, get_timezone_offset
 from superdesk.errors import SuperdeskApiError
+from superdesk.es_utils import REPOS
 
 from apps.search import SearchService
 
@@ -27,6 +28,7 @@ class BaseReportService(SearchService):
     histogram_source_field = 'versioncreated'
 
     defaultConfig = {}
+    repos = REPOS
 
     def get_stages_to_exclude(self):
         """
