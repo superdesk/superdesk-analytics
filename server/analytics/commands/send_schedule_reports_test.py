@@ -75,11 +75,9 @@ mock_saved_reports = [{
         'aggs': {
             'group': {
                 'field': 'source',
-                'size': 0
             },
             'subgroup': {
                 'field': 'anpa_category.qcode',
-                'size': 0
             }
         }
     },

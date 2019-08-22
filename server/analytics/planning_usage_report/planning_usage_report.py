@@ -34,7 +34,6 @@ class PlanningUsageReportService(BaseReportService):
                 'users': {
                     'terms': {
                         'field': 'original_creator',
-                        'size': 0
                     }
                 }
             }
@@ -45,7 +44,6 @@ class PlanningUsageReportService(BaseReportService):
                 'users': {
                     'terms': {
                         'field': 'original_creator',
-                        'size': 0
                     }
                 }
             }
@@ -56,7 +54,6 @@ class PlanningUsageReportService(BaseReportService):
                 'users': {
                     'terms': {
                         'field': 'original_creator',
-                        'size': 0
                     }
                 }
             }
@@ -67,7 +64,6 @@ class PlanningUsageReportService(BaseReportService):
                 'users': {
                     'terms': {
                         'field': 'coverages.original_creator',
-                        'size': 0
                     }
                 }
             }

@@ -233,13 +233,11 @@ class BaseReportService(SearchService):
 
         index = self.get_elastic_index(types)
 
-        hits = self.elastic.es.search(
-            body=query,
-            index=index,
-            doc_type=types,
+        docs = self.elastic.search(
+            query,
+            types,
             params={}
         )
-        docs = self._get_docs(hits)
 
         for resource in types:
             response = {app.config['ITEMS']: [doc for doc in docs if doc['_type'] == resource]}
