@@ -10,8 +10,12 @@
 
 import subprocess
 import logging
+import os
 
 logger = logging.getLogger(__name__)
+
+ROOT_PATH = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+NODE_MODULES_PATH = os.path.join(os.path.realpath(ROOT_PATH), 'node_modules')
 
 
 def get_app_config():
@@ -40,7 +44,7 @@ def run_server():
     try:
         args = [
             "node",
-            "node_modules/.bin/highcharts-export-server",
+            os.path.join(NODE_MODULES_PATH, ".bin", "highcharts-export-server"),
             "--enableServer", "1",
             "--host", config.get('HIGHCHARTS_SERVER_HOST', 'localhost'),
             "--port", config.get('HIGHCHARTS_SERVER_PORT', '6060'),
