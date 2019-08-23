@@ -1,18 +1,22 @@
 from setuptools import setup, find_packages
 from setuptools.command.develop import develop
 from setuptools.command.install import install
-from subprocess import check_call
-from os import path
+from subprocess import check_call, CallProcessError
 from distutils import log
+import os
 
 
 def install_highcharts():
     try:
         check_call(
-            "./install-highcharts-export-server.sh",
-            cwd=path.realpath('server/scripts')
+            os.path.join(
+                os.path.realpath(os.path.dirname(__file__)),
+                'server',
+                'scripts',
+                'highcharts-export-server.sh',
+            ),
         )
-    except Exception as e:
+    except CalledProcessError as e:
         log.error('\t**NodeJs not found, report scheduling will not work**:\n\t{}'.format(e))
 
 
