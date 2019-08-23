@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 from setuptools.command.develop import develop
 from setuptools.command.install import install
-from subprocess import check_call, CallProcessError
+from subprocess import check_call, CalledProcessError
 from distutils import log
 import os
 
