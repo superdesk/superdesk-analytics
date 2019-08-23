@@ -8,6 +8,7 @@ import os
 
 def install_highcharts():
     try:
+        print('cwd', os.getcwd())
         check_call(
             os.path.join(
                 os.path.realpath(os.path.dirname(__file__)),
@@ -23,6 +24,7 @@ def install_highcharts():
 class PostDevelopCommand(develop):
     """Post-installation for development mode."""
     def run(self):
+        print('cwd', os.getcwd())
         self.execute(install_highcharts, ())
         develop.run(self)
 
