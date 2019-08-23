@@ -19,10 +19,11 @@
   "license": "AGPL-3.0",
   "homepage": "https://github.com/superdesk/superdesk-analytics#readme",
   "dependencies": {
-    "highcharts": "^6.2.0",
-    "twix": "^1.1.5",
     "@types/lodash": "4.14.116",
-    "ts-loader": "3.5.0"
+    "highcharts": "^6.2.0",
+    "highcharts-export-server": "^2.0.24",
+    "ts-loader": "3.5.0",
+    "twix": "^1.1.5"
   },
   "devDependencies": {
     "eslint": "^3.7.1",

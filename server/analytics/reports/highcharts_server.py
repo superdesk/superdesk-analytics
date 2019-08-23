@@ -39,7 +39,8 @@ def run_server():
     config = get_app_config()
     try:
         args = [
-            "highcharts-export-server",
+            "node",
+            "node_modules/.bin/highcharts-export-server",
             "--enableServer", "1",
             "--host", config.get('HIGHCHARTS_SERVER_HOST', 'localhost'),
             "--port", config.get('HIGHCHARTS_SERVER_PORT', '6060'),

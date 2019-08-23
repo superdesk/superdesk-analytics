@@ -5,4 +5,4 @@ export HIGHCHARTS_VERSION=6.2.0
 export HIGHCHARTS_USE_STYLED=1
 export HIGHCHARTS_MOMENT=1
 
-npm install -g highcharts-export-server
+npm install highcharts-export-server
