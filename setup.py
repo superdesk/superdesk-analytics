@@ -13,7 +13,7 @@ def install_highcharts():
                 os.path.realpath(os.path.dirname(__file__)),
                 'server',
                 'scripts',
-                'highcharts-export-server.sh',
+                'install-highcharts-export-server.sh',
             ),
         )
     except CalledProcessError as e:
