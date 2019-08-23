@@ -11,6 +11,10 @@ services:
 env:
   global:
     - TRAVIS_NODE_VERSION="6"
+    - ACCEPT_HIGHCHARTS_LICENSE=1
+    - HIGHCHARTS_VERSION=6.2.0
+    - HIGHCHARTS_USE_STYLED=1
+    - HIGHCHARTS_MOMENT=1
 
 cache:
     - pip
