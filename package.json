@@ -39,7 +39,7 @@
     "lodash": "^4.17.5",
     "moment-timezone": "^0.5.14",
     "superdesk-code-style": "^1.2.0",
-    "superdesk-core": "superdesk/superdesk-client-core#master",
+    "superdesk-core": "superdesk/superdesk-client-core#develop",
     "angular-embed": "superdesk/angular-embed#d75968e",
     "angular-embedly": "Urigo/angular-embedly#0.0.8",
     "jquery": "3.3.1",
