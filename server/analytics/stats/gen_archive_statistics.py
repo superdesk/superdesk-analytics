@@ -113,6 +113,7 @@ class GenArchiveStatistics(Command):
         connect_stats_signals(on_generate, on_init_timeline, on_process, on_complete)
         # or by key values
         connect_stats_signals(on_process=on_process_stats)
+
     """
 
     option_list = [
