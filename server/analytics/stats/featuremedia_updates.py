@@ -225,7 +225,7 @@ class FeaturemediaUpdates:
         }
 
         def get_parent_id(doc):
-            if 'rewrite_of' not in doc:
+            if not doc.get('rewrite_of'):
                 return doc[config.ID_FIELD]
             elif doc['rewrite_of'] not in docs:
                 # If the parent item was not part of this stats iteration
