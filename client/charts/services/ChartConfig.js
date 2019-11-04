@@ -544,6 +544,19 @@ export function ChartConfig(
                     );
                 })
         ),
+        'subject.qcode': () => (
+            metadata.initialize()
+                .then(() => {
+                    self.setTranslation(
+                        'subject.qcode',
+                        gettext('Subject'),
+                        _.fromPairs(_.map(
+                            _.get(metadata, 'values.subjectcodes') || [],
+                            (item) => [_.get(item, 'qcode'), _.get(item, 'name')]
+                        ))
+                    );
+                })
+        ),
         urgency: () => (
             metadata.initialize()
                 .then(() => {

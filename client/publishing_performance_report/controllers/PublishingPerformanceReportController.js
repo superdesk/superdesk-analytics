@@ -92,7 +92,7 @@ export function PublishingPerformanceReportController(
         );
 
         $scope.report_groups = searchReport.filterDataFields(
-            ['task.desk', 'task.user', 'anpa_category.qcode', 'source', 'urgency', 'genre.qcode']
+            ['task.desk', 'task.user', 'anpa_category.qcode', 'source', 'urgency', 'genre.qcode', 'subject.qcode']
         );
 
         $scope.currentParams = {

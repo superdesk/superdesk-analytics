@@ -71,6 +71,9 @@ export function SearchReport(_, config, moment, api, $q, gettext, gettextCatalog
     }, {
         qcode: 'task.user',
         name: gettext('User'),
+    }, {
+        qcode: 'subject.qcode',
+        name: gettext('Subject'),
     }];
 
     /**
