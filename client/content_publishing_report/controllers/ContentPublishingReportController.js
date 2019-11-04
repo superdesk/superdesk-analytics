@@ -84,7 +84,7 @@ export function ContentPublishingReportController(
         );
 
         $scope.report_groups = searchReport.filterDataFields(
-            ['anpa_category.qcode', 'genre.qcode', 'source', 'urgency']
+            ['anpa_category.qcode', 'genre.qcode', 'source', 'urgency', 'subject.qcode']
         );
 
         $scope.currentParams = {
