@@ -347,7 +347,6 @@ def relative_to_absolute_datetime(value, format, now=None, offset=None):
                 'minute': 0,
                 'hour': 0
             }
-            pass
         elif granularity == 'M':
             parts = {
                 'second': 0,
