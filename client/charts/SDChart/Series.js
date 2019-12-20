@@ -325,6 +325,10 @@ export class Series {
             type: this.type !== undefined ? this.type : this.axis.defaultChartType || 'bar',
         };
 
+        if (series.type === 'table') {
+            series.type = 'bar';
+        }
+
         this.setDataConfig(series);
         this.setPointConfig(series);
         this.setStyleConfig(series);

@@ -168,6 +168,14 @@ export class Axis {
          */
         this.excludeEmpty = false;
 
+        /**
+         * @ngdoc property
+         * @name SDChart.Axis#includeTotal
+         * @type {Boolean}
+         * @description If true, then adds the 'Total' column in table outputs
+         */
+        this.includeTotal = true;
+
         this._sortedCategories = undefined;
     }
 
@@ -190,6 +198,7 @@ export class Axis {
      * @param {String} [options.sortOrder] - If undefined, do not sort, otherwise sort categories in
      * ascending or descending order based on series values (if series data is provided as an object)
      * @param {Boolean} [options.excludeEmpty=false] If true, remove values with 0 from the categories and series
+     * @param {Boolean} [options.includeTotal] - If true, then adds the 'Total' column in table outputs
      * @return {SDChart.Axis}
      * @description Sets the options for the axis
      */
@@ -283,7 +292,9 @@ export class Axis {
      * @description Generate the x-axis config
      */
     genXAxisConfig(config) {
-        const axisConfig = {type: this.type};
+        const axisConfig = {
+            type: this.type === 'table' ? 'category' : this.type,
+        };
 
         if (this.categories !== undefined) {
             axisConfig.categories = this.getCategories();
