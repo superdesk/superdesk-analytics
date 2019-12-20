@@ -313,6 +313,7 @@ describe('chartConfig', () => {
             chart: {type: 'column'},
             title: 'Tables',
             subtitle: 'For Today',
+            genCSV: jasmine.any(Function),
             xAxis: [{
                 title: {text: 'Category'},
                 categories: ['Basketball', 'Advisories', 'Cricket'],
@@ -397,6 +398,7 @@ describe('chartConfig', () => {
             chart: {type: 'column'},
             title: 'Tables',
             subtitle: 'For Today',
+            genCSV: jasmine.any(Function),
             xAxis: [{
                 title: {text: 'Category'},
                 categories: ['Cricket', 'Basketball', 'Advisories'],

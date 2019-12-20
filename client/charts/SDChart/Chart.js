@@ -1,6 +1,7 @@
 import {forEach, get, sum, drop, cloneDeep} from 'lodash';
 
 import {Axis} from './Axis';
+import {convertHtmlStringToText} from '../../utils';
 
 /**
  * @ngdoc class
@@ -656,7 +657,28 @@ export class Chart {
             rows: rows,
             title: this.getTitle(),
             subtitle: this.getSubtitle(),
+            genCSV: this.genCSVFromTable.bind(this),
         };
+    }
+
+    genCSVFromTable() {
+        let csv = '';
+
+        csv += `"${this.config.headers.join('","')}"\n`;
+        this.config.rows.forEach((row) => {
+            let text = row.map((cell) => {
+                let cellText = convertHtmlStringToText(cell);
+
+                return typeof cellText === 'number' ?
+                    cellText :
+                    `"${cellText.replace(/"/g, '""')}"`;
+            })
+                .join(',');
+
+            csv += text + '\n';
+        });
+
+        return csv.replace(/\n/g, '\r\n');
     }
 
     /**
@@ -669,8 +691,7 @@ export class Chart {
         const axis = this.axis[0];
 
         const headers = [axis.xTitle].concat(
-            axis.series.map((series) => series.getName()),
-            'Total'
+            axis.series.map((series) => series.getName())
         );
 
         const rows = axis.getTranslatedCategories().map((category) => ([category]));
@@ -681,13 +702,17 @@ export class Chart {
             });
         });
 
-        rows.forEach((row) => {
-            row.push(
-                sum(
-                    drop(row)
-                )
-            );
-        });
+        if (axis.includeTotal) {
+            headers.push('Total');
+
+            rows.forEach((row) => {
+                row.push(
+                    sum(
+                        drop(row)
+                    )
+                );
+            });
+        }
 
         return {
             id: this.id,
@@ -699,6 +724,7 @@ export class Chart {
             rows: rows,
             title: this.getTitle(),
             subtitle: this.getSubtitle(),
+            genCSV: this.genCSVFromTable.bind(this),
         };
     }
 
