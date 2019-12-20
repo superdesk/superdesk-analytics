@@ -276,3 +276,55 @@ export const compileAndGetHTML = ($compile, scope, template, data = {}) => {
 
     return html;
 };
+
+/**
+ * Utility to select and copy the text within a parent node
+ * @param {Node} node - The parent node used to select all text from
+ * @returns {string}
+ */
+export const getTextFromDOMNode = (node) => {
+    let innerText;
+
+    if (typeof document.selection !== 'undefined' && typeof document.body.createTextRange !== 'undefined') {
+        const range = document.body.createTextRange();
+
+        range.moveToElementText(node);
+        innerText = range.text;
+    } else if (typeof window.getSelection !== 'undefined' && typeof document.createRange !== 'undefined') {
+        const selection = window.getSelection();
+
+        selection.selectAllChildren(node);
+        innerText = '' + selection;
+        selection.removeAllRanges();
+    }
+    return innerText;
+};
+
+/**
+ * Utility to convert text into HTML DOM Nodes, then select and return the text shown
+ * This replicates the user highlighting the text within those nodes, using the Browser
+ * to do the grunt work for us.
+ * @param {String|Number} data - The html in string format, i.e. '<div><p>testing</p></div>'
+ * @returns {string|Number}
+ */
+export const convertHtmlStringToText = (data) => {
+    if (typeof data !== 'string' || !data.startsWith('<')) {
+        return data;
+    }
+
+    const node = document.createElement('div');
+    let text;
+
+    node.innerHTML = data;
+
+    // Attach the node to the document before selecting
+    // This is required otherwise the browser won't be able to
+    // select the text
+    document.body.appendChild(node);
+    text = getTextFromDOMNode(node);
+
+    // Make sure we clean up after adding the node to the document
+    document.body.removeChild(node);
+
+    return text;
+};

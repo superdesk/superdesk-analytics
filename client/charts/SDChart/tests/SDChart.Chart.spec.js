@@ -145,4 +145,66 @@ describe('SDChart.Chart', () => {
             fullHeight: true,
         }));
     });
+
+    it('can generate CSV from table', () => {
+        const chart = new SDChart.Chart({
+            id: 'test_table',
+            title: 'Testing Table to CSV',
+            chartType: 'table',
+        });
+
+        const axis = chart.addAxis()
+            .setOptions({
+                dfaultChartType: 'table',
+                xTitle: 'Sent',
+                includeTotal: false,
+                categories: [
+                    '11/10/2019 15:43',
+                    '12/10/2019 15:43',
+                    '13/10/2019 15:43',
+                ],
+            });
+
+        axis.addSeries()
+            .setOptions({
+                name: 'Slugline',
+                data: [
+                    'Cri Aust',
+                    'Test',
+                    'Three',
+                ],
+            });
+
+        axis.addSeries()
+            .setOptions({
+                name: 'Version',
+                data: [
+                    1,
+                    3,
+                    7,
+                ],
+            });
+
+        axis.addSeries()
+            .setOptions({
+                name: 'Reason',
+                data: [
+                    '<div><p>Single line text</p></div>',
+                    '<div><p>Multi line text</p><p>second line<br />third "line" test</p></div>',
+                    '',
+                ],
+            });
+
+        const config = chart.genConfig();
+        const csv = config.genCSV();
+
+        expect(csv).toBe('"Sent","Slugline","Version","Reason"\r\n' +
+            '"11/10/2019 15:43","Cri Aust",1,"Single line text"\r\n' +
+            '"12/10/2019 15:43","Test",3,"Multi line text\r\n' +
+            '\r\n' +
+            'second line\r\n' +
+            'third ""line"" test"\r\n' +
+            '"13/10/2019 15:43","Three",7,""\r\n'
+        );
+    });
 });

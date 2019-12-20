@@ -72,7 +72,7 @@ export function Chart(chartManager, $timeout, $sce, _) {
              * @description Using the chartManager, download the chart data as a CSV file
              */
             scope.downloadAsCSV = function() {
-                chartManager.downloadCSV(scope.config.id, 'chart.csv');
+                chartManager.downloadCSV(scope.config);
             };
 
             /**
