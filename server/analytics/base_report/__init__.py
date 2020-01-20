@@ -100,7 +100,7 @@ class BaseReportService(SearchService):
         # starting day of the week, based on app.config['START_OF_WEEK']
         offset = 0 if interval != 'week' else get_weekstart_offset_hr()
 
-        if lt == 'now':
+        if lt.startswith('now'):
             extended_bounds = {
                 'max': relative_to_absolute_datetime(lt, '%Y-%m-%dT%H:%M:%S'),
                 'min': relative_to_absolute_datetime(gte, '%Y-%m-%dT%H:%M:%S')
