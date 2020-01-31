@@ -9,12 +9,18 @@
 # at https://www.sourcefabric.org/superdesk/license
 
 from superdesk import get_resource_service
+from superdesk.utc import utcnow, utc_to_local
 from collections import namedtuple
 from subprocess import check_call, PIPE
 from flask import current_app as app
 import pytz
-from datetime import datetime
+from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 from math import floor
+import re
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 mime_types = [
@@ -236,3 +242,129 @@ def seconds_to_human_readable(seconds):
         return '1 second'
 
     return '{} seconds'.format(floor(seconds))
+
+
+def relative_to_absolute_datetime(value, format, now=None, offset=None):
+    """Converts a relative datetime to an absolute datetime in the format provided
+
+    Formats supported include:
+    now
+    now/[g]
+    now-[o]
+    now-[o]/[g]
+
+    g = granularity (rounding the value down to the nearest value)
+        - m = minute
+        - h = hour
+        - d = day (first hour/minute/second of the day)
+        - w = week (first day of the week, using the system configured START_OF_WEEK value)
+        - M = month (the first day of the month)
+        - y = year (the first day of the year)
+
+    o = offset from now suffixed by the granularity (see above for supported values)
+
+    examples:
+    now
+    now/d
+    now-1d
+    now-1d/d
+
+    :param string value: The relative datetime
+    :param string format: The format used to convert the datetime instance back to a string
+    :param datetime now: The date and time to use for relative calculations (defaults to now using DEFAULT_TIMEZONE)
+    :param number offset: The utc offset in minutes (defaults to offset using the DEFAULT_TIMEZONE config)
+    :return string: The absolute datetime in the format provided
+
+    """
+
+    try:
+        values = re.search(r'^now(?P<offset>(-\d+[mhdwMy])?)(?P<granularity>(/[mhdwMy])?)$', value).groupdict()
+    except AttributeError as e:
+        logger.exception('Value {} is in incorrect relative format'.format(value))
+        raise
+
+    if now is None:
+        now = utc_to_local(app.config.get('DEFAULT_TIMEZONE'), utcnow())
+
+    if values.get('offset'):
+        # Retrieve the offset value and granularity, then shift the datetime
+
+        granularity = values['offset'][-1]
+        offset = int(values['offset'][1:-1])
+
+        if granularity == 'm':
+            now = now - timedelta(minutes=offset)
+        elif granularity == 'h':
+            now = now - timedelta(hours=offset)
+        elif granularity == 'd':
+            now = now - timedelta(days=offset)
+        elif granularity == 'w':
+            now = now - timedelta(weeks=offset)
+        elif granularity == 'M':
+            now = now - relativedelta(months=offset)
+        elif granularity == 'y':
+            now = now - relativedelta(years=offset)
+
+    if values.get('granularity'):
+        # Round the value down using the granularity provided
+
+        granularity = values['granularity'][1:]
+
+        parts = None
+        if granularity == 'm':
+            parts = {'second': 0}
+        elif granularity == 'h':
+            parts = {
+                'second': 0,
+                'minute': 0
+            }
+        elif granularity == 'd':
+            parts = {
+                'second': 0,
+                'minute': 0,
+                'hour': 0
+            }
+        elif granularity == 'w':
+            # Using START_OF_WEEK to calculate the number of days to shift for the beginning of the week
+            # START_OF_WEEK
+            #   0: Sunday
+            #   6: Saturday
+
+            isoweekday = now.isoweekday()
+            if isoweekday == 7:
+                isoweekday = 0
+
+            start_of_week = app.config.get('START_OF_WEEK') or 0
+            offset = 7 - start_of_week + isoweekday
+
+            if offset < 7:
+                now -= timedelta(days=offset)
+            elif offset > 7:
+                now -= timedelta(days=offset - 7)
+
+            parts = {
+                'second': 0,
+                'minute': 0,
+                'hour': 0
+            }
+        elif granularity == 'M':
+            parts = {
+                'second': 0,
+                'minute': 0,
+                'hour': 0,
+                'day': 1
+            }
+        elif granularity == 'y':
+            parts = {
+                'second': 0,
+                'minute': 0,
+                'hour': 0,
+                'day': 1,
+                'month': 1
+            }
+
+        if parts:
+            # Sets the second, minute, hour, day and/or month of the shifted value provided
+            now = now.replace(**parts)
+
+    return now.strftime(format)

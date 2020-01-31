@@ -43,17 +43,17 @@ export function SaveGenerateReport(_, privileges, savedReports) {
                 // and translations from the current report controller
                 if (showSaveForm) {
                     scope.getReportParams()
-                    .then((params) => {
-                        scope.currentParams = Object.assign(
-                            {},
-                            params,
-                            {
-                                name: scope.currentTemplate.name,
-                                description: scope.currentTemplate.description,
-                            }
-                        );
-                        scope.showSaveForm = showSaveForm;
-                    });
+                        .then((params) => {
+                            scope.currentParams = Object.assign(
+                                {},
+                                params,
+                                {
+                                    name: scope.currentTemplate.name,
+                                    description: scope.currentTemplate.description,
+                                }
+                            );
+                            scope.showSaveForm = showSaveForm;
+                        });
                 } else {
                     scope.showSaveForm = showSaveForm;
                     scope.currentParams = {};

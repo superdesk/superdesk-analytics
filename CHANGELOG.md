@@ -1,5 +1,13 @@
 # Superdesk Analytics Changelog
 
+## [1.7.3] 2020-01-31
+### Fixes
+- [SDESK-4847] Implement CSV download for tables (#113)
+- [SDESK-4695] Convert relative dates to absolute for date_histogram bounds (#112)
+- [SDESK-4695] (fix): Histogram aggregations failing for relative dates (#114)
+- fix(install): Fix installing mkdir for highcharts-export-server (#115)
+- fix(packages): Update versions based on GitHub recommendations (#116)
+
 ## [1.7.2] 2019-11-05
 ### Improvements
 - [SDESK-4779] Add subject to publishing based reports (#111)
