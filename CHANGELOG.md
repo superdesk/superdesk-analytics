@@ -1,5 +1,9 @@
 # Superdesk Analytics Changelog
 
+## [1.7.4] 2020-03-03
+### Fixes
+- fix(build): Use github/commit for highcharts export server version (#118)
+
 ## [1.7.3] 2020-01-31
 ### Fixes
 - [SDESK-4847] Implement CSV download for tables (#113)
