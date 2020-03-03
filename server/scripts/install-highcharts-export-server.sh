@@ -5,11 +5,7 @@ export HIGHCHARTS_VERSION=6.2.0
 export HIGHCHARTS_USE_STYLED=1
 export HIGHCHARTS_MOMENT=1
 
-npm install -g highcharts-export-server
-
-# Hack to force mkdirp version
-# until https://github.com/highcharts/node-export-server/pull/231 is merged
-MODULES_DIR=`npm root -g`
-npm install -g mkdirp@0.5.1
-rm -Rf $MODULES_DIR/highcharts-export-server/node_modules/mkdirp
-ln -s $MODULES_DIR/mkdirp $MODULES_DIR/highcharts-export-server/node_modules/mkdirp
+# Hack to force using a newer commit form github
+# due to issues with uui module version requirements
+npm install -g highcharts/node-export-server#e3bd98c
+# npm install -g highcharts-export-server
