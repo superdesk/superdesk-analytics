@@ -1,3 +1,5 @@
+import {appConfig} from 'superdesk-core/scripts/appConfig';
+
 import {mockAll} from '../../tests/mocks';
 
 describe('sda-source-filters', () => {
@@ -14,15 +16,15 @@ describe('sda-source-filters', () => {
     let searchReport;
     let ingestSources;
 
-    beforeEach(window.module(($provide) => {
+    beforeEach(() => {
         // Use the superdesk.config.js/webpack.config.js application config
-        $provide.constant('config', {
+        Object.assign(appConfig, {
             // eslint-disable-next-line no-undef
             ...__SUPERDESK_CONFIG__,
             server: {url: ''},
             defaultTimezone: 'UTC',
         });
-    }));
+    });
 
     beforeEach(window.module('superdesk.core.activity'));
     beforeEach(window.module('superdesk.apps.users'));

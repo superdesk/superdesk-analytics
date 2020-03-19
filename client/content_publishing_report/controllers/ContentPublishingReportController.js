@@ -1,3 +1,5 @@
+import {appConfig} from 'superdesk-core/scripts/appConfig';
+
 import {getErrorMessage} from '../../utils';
 import {CHART_TYPES} from '../../charts/directives/ChartOptions';
 
@@ -10,7 +12,6 @@ ContentPublishingReportController.$inject = [
     'searchReport',
     'notify',
     'moment',
-    'config',
     '$q',
     'chartConfig',
     '$interpolate',
@@ -29,7 +30,6 @@ ContentPublishingReportController.$inject = [
  * @requires searchReport
  * @requires notify
  * @requires moment
- * @requires config
  * @requires $q
  * @requires chartConfig
  * @requires $interpolate
@@ -45,7 +45,6 @@ export function ContentPublishingReportController(
     searchReport,
     notify,
     moment,
-    config,
     $q,
     chartConfig,
     $interpolate,
@@ -94,8 +93,8 @@ export function ContentPublishingReportController(
                     filter: 'range',
                     start: moment()
                         .subtract(30, 'days')
-                        .format(config.model.dateformat),
-                    end: moment().format(config.model.dateformat),
+                        .format(appConfig.model.dateformat),
+                    end: moment().format(appConfig.model.dateformat),
                 },
                 must: {},
                 must_not: {},
