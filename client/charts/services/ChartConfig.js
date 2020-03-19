@@ -1,3 +1,5 @@
+import {appConfig} from 'superdesk-core/scripts/appConfig';
+
 import {formatDate, getTranslatedOperations} from '../../utils';
 import {SDChart} from '../SDChart';
 import {DATE_FILTERS} from '../../search/common';
@@ -8,7 +10,6 @@ ChartConfig.$inject = [
     'gettext',
     'gettextCatalog',
     'moment',
-    'config',
     '$q',
     'userList',
     'desks',
@@ -26,7 +27,6 @@ ChartConfig.$inject = [
  * @param gettext
  * @param gettextCatalog
  * @param moment
- * @param config
  * @param $q
  * @param userList
  * @param desks
@@ -41,7 +41,6 @@ export function ChartConfig(
     gettext,
     gettextCatalog,
     moment,
-    config,
     $q,
     userList,
     desks,
@@ -703,16 +702,14 @@ export function ChartConfig(
                 const start = _.get(params, 'dates.start');
                 const end = _.get(params, 'dates.end');
 
-                if (moment(start, config.model.dateformat).isValid() &&
-                    moment(end, config.model.dateformat).isValid()
+                if (moment(start, appConfig.model.dateformat).isValid() &&
+                    moment(end, appConfig.model.dateformat).isValid()
                 ) {
-                    return formatDate(moment, config, start) +
-                        ' - ' +
-                        formatDate(moment, config, end);
+                    return formatDate(start) + ' - ' + formatDate(end);
                 }
             },
             [DATE_FILTERS.DAY]: () => (
-                moment(_.get(params, 'dates.date'), config.model.dateformat)
+                moment(_.get(params, 'dates.date'), appConfig.model.dateformat)
                     .format('dddd Do MMMM YYYY')
             ),
 

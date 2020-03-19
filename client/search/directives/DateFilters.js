@@ -1,7 +1,9 @@
+import {appConfig} from 'superdesk-core/scripts/appConfig';
+
 import {DATE_FILTERS} from '../common';
 import {REPORT_CONFIG} from '../../services/ReportConfigService';
 
-DateFilters.$inject = ['moment', '$interpolate', 'config', 'lodash', 'gettextCatalog'];
+DateFilters.$inject = ['moment', '$interpolate', 'lodash', 'gettextCatalog'];
 
 /**
  * @ngdoc property
@@ -23,12 +25,11 @@ export const DEFAULT_FILTERS = [
  * @name sdaDateFilters
  * @requires moment
  * @requires $interpolate
- * @requires config
  * @requires lodash
  * @requires gettextCatalog
  * @description A directive that provides date filters for reports
  */
-export function DateFilters(moment, $interpolate, config, _, gettextCatalog) {
+export function DateFilters(moment, $interpolate, _, gettextCatalog) {
     return {
         template: require('../views/date-filters.html'),
         scope: {
@@ -160,17 +161,17 @@ export function DateFilters(moment, $interpolate, config, _, gettextCatalog) {
                     } else if (!dates.end) {
                         scope.form.datesError = gettextCatalog.getString('End date is required');
                     } else if (_.get(currentConfig, 'max')) {
-                        let range = moment(dates.end, config.model.dateformat)
-                            .diff(moment(dates.start, config.model.dateformat), 'days');
+                        let range = moment(dates.end, appConfig.model.dateformat)
+                            .diff(moment(dates.start, appConfig.model.dateformat), 'days');
 
                         if (range > currentConfig.max) {
                             scope.form.datesError = $interpolate(
                                 gettextCatalog.getString('Range cannot be greater than {{max}} days')
                             )({max: currentConfig.max});
-                        } else if (moment(dates.start, config.model.dateformat)
+                        } else if (moment(dates.start, appConfig.model.dateformat)
                             .isAfter(moment(), 'days')) {
                             scope.form.datesError = gettextCatalog.getString('Start date cannot be greater than today');
-                        } else if (moment(dates.end, config.model.dateformat)
+                        } else if (moment(dates.end, appConfig.model.dateformat)
                             .isAfter(moment(), 'days')) {
                             scope.form.datesError = gettextCatalog.getString('End date cannot be greater than today');
                         }
