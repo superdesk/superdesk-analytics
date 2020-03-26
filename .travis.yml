@@ -20,12 +20,12 @@ cache:
 
 before_install:
     - |
-      if [ "$CLIENT" == "true" ];
+      if [ "$CLIENT" == "true" ]; then
         nvm install 10
         npm install
       fi
     - |
-      if [ "$SERVER" == "true" ];
+      if [ "$SERVER" == "true" ]; then
         docker-compose -f .travis-docker-compose.yml up -d
         cd server && pip install -r requirements.txt && cd ..
         chmod a+x server/scripts/install-highcharts-export-server.sh
