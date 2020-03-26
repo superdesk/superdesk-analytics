@@ -1,47 +1,43 @@
 language: python
 
-python: 3.5
+python: 3.6
 
-dist: xenial
-sudo: required
+dist: bionic
 
 env:
   global:
-    - TRAVIS_NODE_VERSION="6"
+    - TRAVIS_NODE_VERSION="10"
 
 services:
-    - mongodb
-    - redis-server
+    - docker
 
 addons:
-  apt:
-    sources:
-    - mongodb-3.0-precise
-    - elasticsearch-2.x
-    packages:
-    - mongodb-org-server
-    - elasticsearch
+    chrome: stable
 
 cache:
     - pip
     - npm
 
 before_install:
-    - node --version
-    - sudo apt-get purge elasticsearch
-    - sudo apt-get install -t stable elasticsearch
-    - sudo service elasticsearch restart
+    - |
+      if [ "$CLIENT" == "true" ]; then
+        nvm install 10
+        npm install
+      fi
+    - |
+      if [ "$SERVER" == "true" ]; then
+        docker-compose -f .travis-docker-compose.yml up -d
+        cd server && pip install -r requirements.txt && cd ..
+        chmod a+x server/scripts/install-highcharts-export-server.sh
+        pip install -e .
+        cd server && python3 -u -m analytics.reports.highcharts_server &
+      fi
 
-install:
-    - npm install
-    - cd server && pip install -r requirements.txt && cd ..
-    - chmod a+x server/scripts/install-highcharts-export-server.sh
-    - pip install -e .
-
-script:
-    - cd server && python3 -u -m analytics.reports.highcharts_server &
-    - make testpy
-    - make testjs
-
-after_success:
-    - coveralls
+jobs:
+    include:
+        - name: "server"
+          env: SERVER=true
+          script: make testpy
+        - name: "client"
+          env: CLIENT=true
+          script: make testjs

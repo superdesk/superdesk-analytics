@@ -1,3 +1,5 @@
+import {appConfig} from 'superdesk-core/scripts/appConfig';
+
 import {getErrorMessage} from '../../utils';
 import {CHART_FIELDS, CHART_TYPES} from '../../charts/directives/ChartOptions';
 import {DATE_FILTERS} from '../../search/common';
@@ -11,7 +13,6 @@ FeaturemediaUpdatesReportController.$inject = [
     'searchReport',
     'notify',
     'moment',
-    'config',
     '$q',
     'chartConfig',
     'reportConfigs',
@@ -29,7 +30,6 @@ FeaturemediaUpdatesReportController.$inject = [
  * @requires searchReport
  * @requires notify
  * @requires moment
- * @requires config
  * @requires $q
  * @requires chartConfig
  * @requires reportConfigs
@@ -44,7 +44,6 @@ export function FeaturemediaUpdatesReportController(
     searchReport,
     notify,
     moment,
-    config,
     $q,
     chartConfig,
     reportConfigs
@@ -98,8 +97,8 @@ export function FeaturemediaUpdatesReportController(
                     filter: DATE_FILTERS.RANGE,
                     start: moment()
                         .subtract(30, 'days')
-                        .format(config.model.dateformat),
-                    end: moment().format(config.model.dateformat),
+                        .format(appConfig.model.dateformat),
+                    end: moment().format(appConfig.model.dateformat),
                 },
                 must: {},
                 must_not: {},

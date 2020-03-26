@@ -1,10 +1,11 @@
+import {appConfig} from 'superdesk-core/scripts/appConfig';
+
 import {getTranslatedOperations} from '../../utils';
 
 FeaturemediaUpdatesTable.$inject = [
     'gettext',
     'userList',
     'moment',
-    'config',
     'api',
     'lodash',
     'searchReport',
@@ -18,7 +19,6 @@ FeaturemediaUpdatesTable.$inject = [
  * @requires gettext
  * @requires userList
  * @requires moment
- * @requires config
  * @requires api
  * @requires lodash
  * @requires searchReport
@@ -29,7 +29,6 @@ export function FeaturemediaUpdatesTable(
     gettext,
     userList,
     moment,
-    config,
     api,
     _,
     searchReport,
@@ -84,7 +83,7 @@ export function FeaturemediaUpdatesTable(
                 const operations = getTranslatedOperations(gettext);
 
                 const genDateStr = (date) => (
-                    moment(date).format(config.view.dateformat + ' ' + config.view.timeformat)
+                    moment(date).format(appConfig.view.dateformat + ' ' + appConfig.view.timeformat)
                 );
 
                 scope.itemUpdates = [];

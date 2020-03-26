@@ -1,3 +1,5 @@
+import {appConfig} from 'superdesk-core/scripts/appConfig';
+
 import {getErrorMessage, secondsToHumanReadable} from '../../utils';
 import {SOURCE_FILTERS} from '../../search/directives/SourceFilters';
 import {CHART_TYPES, CHART_FIELDS} from '../../charts/directives/ChartOptions';
@@ -15,7 +17,6 @@ ProductionTimeReportController.$inject = [
     'gettextCatalog',
     '$interpolate',
     '$q',
-    'config',
     'reportConfigs',
 ];
 
@@ -34,7 +35,6 @@ ProductionTimeReportController.$inject = [
  * @requires gettextCatalog
  * @required $interpolate
  * @requires $q
- * @requires config
  * @requires reportConfigs
  * @description Controller for Production Time Reports
  */
@@ -50,7 +50,6 @@ export function ProductionTimeReportController(
     gettextCatalog,
     $interpolate,
     $q,
-    config,
     reportConfigs
 ) {
     const reportName = 'production_time_report';
@@ -111,8 +110,8 @@ export function ProductionTimeReportController(
                     filter: 'range',
                     start: moment()
                         .subtract(30, 'days')
-                        .format(config.model.dateformat),
-                    end: moment().format(config.model.dateformat),
+                        .format(appConfig.model.dateformat),
+                    end: moment().format(appConfig.model.dateformat),
                 },
                 must: {
                     desk_transitions: {min: 1},

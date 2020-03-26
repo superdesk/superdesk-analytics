@@ -1,3 +1,5 @@
+import {appConfig} from 'superdesk-core/scripts/appConfig';
+
 import {
     getErrorMessage,
     getUtcOffsetInMinutes,
@@ -20,8 +22,6 @@ UserActivityReportController.$inject = [
     'gettext',
     'gettextCatalog',
     '$q',
-    'config',
-    'deployConfig',
     'userList',
     '$timeout',
     '$compile',
@@ -42,8 +42,6 @@ UserActivityReportController.$inject = [
  * @requires gettext
  * @requires gettextCatalog
  * @requires $q
- * @requires config
- * @requires deployConfig
  * @requires userList
  * @requires $timeout
  * @requires $compile
@@ -61,8 +59,6 @@ export function UserActivityReportController(
     gettext,
     gettextCatalog,
     $q,
-    config,
-    deployConfig,
     userList,
     $timeout,
     $compile,
@@ -124,7 +120,7 @@ export function UserActivityReportController(
             params: $scope.config.defaultParams({
                 dates: {
                     filter: DATE_FILTERS.DAY,
-                    date: moment().format(config.model.dateformat),
+                    date: moment().format(appConfig.model.dateformat),
                 },
                 must: {
                     user_locks: null,
@@ -329,8 +325,7 @@ export function UserActivityReportController(
         // Any data after the daylight savings change will be 1 hour out
         getUtcOffsetInMinutes(
             report.start,
-            config.defaultTimezone,
-            moment
+            appConfig.defaultTimezone
         )
     );
 

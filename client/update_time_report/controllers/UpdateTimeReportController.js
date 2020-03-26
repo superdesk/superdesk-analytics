@@ -12,7 +12,6 @@ UpdateTimeReportController.$inject = [
     'searchReport',
     'notify',
     'moment',
-    'config',
     '$q',
     'chartConfig',
     'reportConfigs',
@@ -30,7 +29,6 @@ UpdateTimeReportController.$inject = [
  * @requires searchReport
  * @requires notify
  * @requires moment
- * @requires config
  * @requires $q
  * @requires chartConfig
  * @requires reportConfigs
@@ -45,7 +43,6 @@ export function UpdateTimeReportController(
     searchReport,
     notify,
     moment,
-    config,
     $q,
     chartConfig,
     reportConfigs

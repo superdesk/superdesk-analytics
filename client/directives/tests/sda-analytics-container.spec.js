@@ -56,6 +56,10 @@ describe('sda-analytics-container', () => {
         scope = $rootScope.$new();
     }));
 
+    beforeEach(inject(($httpBackend) => {
+        $httpBackend.whenGET(/api$/).respond({_links: {child: []}});
+    }));
+
     const initContainer = () => {
         // Construct the analytics container
         $compile('<div sda-analytics-container></div>')(scope);

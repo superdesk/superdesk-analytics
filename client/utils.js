@@ -1,44 +1,17 @@
+import moment from 'moment';
 
-/**
- * @ngdoc method
- * @name analytics.utils#formatDateForServer
- * @param {Object} moment
- * @param {Object} config
- * @param {String} date
- * @param {Number} addDays
- * @returns {String|null}
- * @description Format given date for use with API calls
-*/
-export function formatDateForServer(moment, config, date, addDays = 0) {
-    if (date) {
-        const timeSuffix = addDays ? 'T23:59:59' : 'T00:00:00';
-        let local = moment(date, config.model.dateformat).format('YYYY-MM-DD') + timeSuffix;
-
-        if (config.search && config.search.useDefaultTimezone) {
-            // use the default timezone of the server
-            local += moment.tz(config.defaultTimezone).format('ZZ');
-        } else {
-            local += moment().format('ZZ');
-        }
-
-        return local;
-    }
-
-    return null;
-}
+import {appConfig} from 'superdesk-core/scripts/appConfig';
 
 /**
  * @ngdoc method
  * @name analytics.utils#formatDate
- * @param {Function} moment
- * @param {Object} config
  * @param {String} dateTime
  * @param {String} format
  * @returns {String}
  * @description Format the date/time based on the supplied format
  */
-export function formatDate(moment, config, dateTime, format = 'LL') {
-    return moment(dateTime, config.model.dateformat).format(format);
+export function formatDate(dateTime, format = 'LL') {
+    return moment(dateTime, appConfig.model.dateformat).format(format);
 }
 
 /**
@@ -72,11 +45,10 @@ export const getErrorMessage = (error, defaultMessage) => {
  * @name analytics.utils#getUtcOffsetInMinutes
  * @param {moment} utcDatetime The moment date/time instance used to calculate utc offset
  * @param {String} timezone - The timezone name
- * @param {Function} moment - The moment js module
  * @return {Number}
  * @description Calculates the UTC Offset in minutes for the supplied datetime instance
  */
-export const getUtcOffsetInMinutes = (utcDatetime, timezone, moment) => (
+export const getUtcOffsetInMinutes = (utcDatetime, timezone) => (
     moment(utcDatetime)
         .tz(timezone)
         .utcOffset()
