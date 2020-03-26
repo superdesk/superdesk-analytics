@@ -20,6 +20,10 @@ describe('chartConfig', () => {
         config = {};
     }));
 
+    beforeEach(inject(($httpBackend) => {
+        $httpBackend.whenGET(/api$/).respond({_links: {child: []}});
+    }));
+
     mockAll();
 
     const genSingleChart = (chartId, chartType) => {

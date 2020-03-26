@@ -14,6 +14,10 @@ describe('sda-report-schedule-input', () => {
         $rootScope = _$rootScope_;
     }));
 
+    beforeEach(inject(($httpBackend) => {
+        $httpBackend.whenGET(/api$/).respond({_links: {child: []}});
+    }));
+
     const getElement = (schedule, asLabel = false, submitted = false) => {
         scope = $rootScope.$new();
         scope.schedule = schedule;

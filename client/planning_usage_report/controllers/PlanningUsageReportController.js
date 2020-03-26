@@ -1,3 +1,5 @@
+import {appConfig} from 'superdesk-core/scripts/appConfig';
+
 import {getErrorMessage} from '../../utils';
 import {CHART_FIELDS, CHART_TYPES} from '../../charts/directives/ChartOptions';
 import {DATE_FILTERS} from '../../search/common';
@@ -7,7 +9,6 @@ PlanningUsageReportController.$inject = [
     'savedReports',
     'searchReport',
     'moment',
-    'config',
     'lodash',
     'notify',
     'gettext',
@@ -24,7 +25,6 @@ PlanningUsageReportController.$inject = [
  * @requires savedReports
  * @requires searchReport
  * @requires moment
- * @requires config
  * @requires lodash
  * @requires notify
  * @requires gettext
@@ -38,7 +38,6 @@ export function PlanningUsageReportController(
     savedReports,
     searchReport,
     moment,
-    config,
     _,
     notify,
     gettext,
@@ -102,8 +101,8 @@ export function PlanningUsageReportController(
                     filter: DATE_FILTERS.RANGE,
                     start: moment()
                         .subtract(30, 'days')
-                        .format(config.model.dateformat),
-                    end: moment().format(config.model.dateformat),
+                        .format(appConfig.model.dateformat),
+                    end: moment().format(appConfig.model.dateformat),
                 },
                 must: {},
                 must_not: {},

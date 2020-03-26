@@ -8,7 +8,7 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-from superdesk import get_resource_service
+from superdesk import get_resource_service, resources
 from superdesk.tests import TestCase
 
 from analytics.planning_usage_report import init_app
@@ -17,6 +17,13 @@ from analytics.planning_usage_report import init_app
 class PlanningUsageReportTestCase(TestCase):
     def test_get_users_with_planning(self):
         with self.app.app_context():
+            # Remove the 'Planning' app and 'planning_usage_report' endpoint if they are already configured
+            try:
+                self.app.settings['INSTALLED_APPS'].remove('planning')
+                resources.pop('planning_usage_report', None)
+            except ValueError:
+                pass
+
             # Test PlanningUsage not registering if 'Planning' module is not configured
             init_app(self.app)
             self.assertRaises(KeyError, get_resource_service, 'planning_usage_report')

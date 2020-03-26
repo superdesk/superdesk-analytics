@@ -1,8 +1,9 @@
+import {appConfig} from 'superdesk-core/scripts/appConfig';
+
 UpdateTimeTable.$inject = [
     'gettext',
     'userList',
     'moment',
-    'config',
     'api',
     'lodash',
     '$interpolate',
@@ -19,7 +20,6 @@ UpdateTimeTable.$inject = [
  * @requires gettext
  * @requires userList
  * @requires moment
- * @requires config
  * @requires api
  * @requires lodash
  * @requires $interpolate
@@ -33,7 +33,6 @@ export function UpdateTimeTable(
     gettext,
     userList,
     moment,
-    config,
     api,
     _,
     $interpolate,
@@ -89,7 +88,7 @@ export function UpdateTimeTable(
                 scope.page.max = Math.ceil(meta.total / report.size);
 
                 const genDateStr = (date) => (
-                    moment(date).format(config.view.dateformat + ' ' + config.view.timeformat)
+                    moment(date).format(appConfig.view.dateformat + ' ' + appConfig.view.timeformat)
                 );
 
                 const getUpdateString = (seconds) => {
