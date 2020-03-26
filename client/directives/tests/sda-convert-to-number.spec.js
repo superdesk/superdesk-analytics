@@ -13,6 +13,10 @@ describe('sda-convert-to-number', () => {
         $rootScope = _$rootScope_;
     }));
 
+    beforeEach(inject(($httpBackend) => {
+        $httpBackend.whenGET(/api$/).respond({_links: {child: []}});
+    }));
+
     it('passes an integer into the directive', () => {
         scope = $rootScope.$new();
         scope.item = {number: 25};

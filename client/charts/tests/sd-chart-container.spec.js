@@ -16,6 +16,10 @@ describe('sda-chart-container', () => {
         $timeout = _$timeout_;
     }));
 
+    beforeEach(inject(($httpBackend) => {
+        $httpBackend.whenGET(/api$/).respond({_links: {child: []}});
+    }));
+
     beforeEach(() => {
         configs = [{
             id: 'test-chart-1',
