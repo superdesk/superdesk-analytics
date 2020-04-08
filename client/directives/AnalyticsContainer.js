@@ -290,6 +290,8 @@ export function AnalyticsContainer() {
 
                 $scope.onClearFilters = () => {
                     $scope.changeReportParams();
+
+                    document.dispatchEvent(new Event('sda-source-filters--clear'));
                 };
 
                 $scope.beforeGenerateChart = () => {
