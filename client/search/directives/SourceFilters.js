@@ -194,9 +194,6 @@ export function SourceFilters(
 
                     filter.selected = [];
                     filter.exclude = false;
-
-                    scope.params.must = {};
-                    scope.params.must_not = {};
                 });
             }
             /**
@@ -574,3 +571,39 @@ export function SourceFilters(
         },
     };
 }
+
+export function SourceFiltersWrapper(
+
+) {
+    return {
+        // eslint-disable-next-line quotes
+        template: `
+<div
+    sda-source-filters
+    ng-if="active"
+    data-fields="fields"
+    data-params="params"
+    data-padding-bottom="paddingBottom"
+></div>
+`,
+        scope: {
+            active: '=?',
+            fields: '=?',
+            params: '=',
+            paddingBottom: '=?',
+        },
+        link: function(scope) {
+            function clearFilters() {
+                scope.params.must = {};
+                scope.params.must_not = {};
+            }
+
+            document.addEventListener('sda-source-filters--clear', clearFilters);
+
+            scope.$on('$destroy', () => {
+                document.removeEventListener('sda-source-filters--clear', clearFilters);
+            });
+        },
+    };
+}
+

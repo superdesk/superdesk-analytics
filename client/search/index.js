@@ -21,7 +21,8 @@ import * as directives from './directives';
 angular.module('superdesk.analytics.search', [])
     .service('searchReport', svc.SearchReport)
 
-    .directive('sdaSourceFilters', directives.SourceFilters)
+    .directive('sdaSourceFilters', directives.SourceFilters) // !!! used in superdesk-aap project
+    .directive('sdaSourceFiltersWrapper', directives.SourceFiltersWrapper)
     .directive('sdaDateFilters', directives.DateFilters)
 
     .directive('sdaPreviewDateFilter', directives.PreviewDateFilter)

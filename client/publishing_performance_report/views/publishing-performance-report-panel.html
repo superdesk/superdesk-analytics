@@ -66,8 +66,8 @@
                 <div ng-show="currentTab==='parameters'"
                      ng-include="'publishing-performance-report-parameters.html'"
                 ></div>
-                <div sda-source-filters
-                     ng-if="currentTab === 'filters'"
+                <div sda-source-filters-wrapper
+                     data-active="currentTab === 'filters'"
                      data-params="currentParams.params"
                 ></div>
 
