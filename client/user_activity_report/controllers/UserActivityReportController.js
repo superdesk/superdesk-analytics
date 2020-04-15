@@ -64,6 +64,10 @@ export function UserActivityReportController(
     $compile,
     reportConfigs
 ) {
+    function resetParams() {
+        $scope.currentParams = _.cloneDeep($scope.defaultReportParams);
+    }
+
     const reportName = 'user_activity_report';
 
     /**
@@ -103,6 +107,12 @@ export function UserActivityReportController(
 
         $scope.translatedOperations = getTranslatedOperations(gettext);
         $scope.selectedItem = null;
+
+        document.addEventListener('sda-source-filters--clear', resetParams);
+
+        $scope.$on('$destroy', () => {
+            document.removeEventListener('sda-source-filters--clear', resetParams);
+        });
     };
 
     /**
@@ -204,7 +214,7 @@ export function UserActivityReportController(
         if (_.get(newReport, '_id')) {
             $scope.currentParams = _.cloneDeep(savedReports.currentReport);
         } else {
-            $scope.currentParams = _.cloneDeep($scope.defaultReportParams);
+            resetParams();
         }
 
         $scope.updateChartConfig();
