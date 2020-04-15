@@ -194,9 +194,6 @@ export function SourceFilters(
 
                     filter.selected = [];
                     filter.exclude = false;
-
-                    scope.params.must = {};
-                    scope.params.must_not = {};
                 });
             }
             /**
