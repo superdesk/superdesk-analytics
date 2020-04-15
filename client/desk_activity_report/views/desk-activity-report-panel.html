@@ -66,8 +66,8 @@
                 <div ng-show="currentTab==='parameters'"
                      ng-include="'desk-activity-report-parameters.html'"
                 ></div>
-                <div sda-source-filters-wrapper
-                     data-active="currentTab === 'filters'"
+                <div sda-source-filters
+                     ng-if="currentTab === 'filters'"
                      data-params="currentParams.params"
                      data-fields="sourceFilters"
                 ></div>
