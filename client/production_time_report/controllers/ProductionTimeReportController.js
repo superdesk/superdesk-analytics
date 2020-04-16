@@ -52,6 +52,10 @@ export function ProductionTimeReportController(
     $q,
     reportConfigs
 ) {
+    function resetParams() {
+        $scope.currentParams = _.cloneDeep($scope.defaultReportParams);
+    }
+
     const reportName = 'production_time_report';
 
     /**
@@ -91,6 +95,12 @@ export function ProductionTimeReportController(
             SOURCE_FILTERS.STATS.DESK_TRANSITIONS.ENTER,
             SOURCE_FILTERS.STATS.DESK_TRANSITIONS.EXIT,
         ];
+
+        document.addEventListener('sda-source-filters--clear', resetParams);
+
+        $scope.$on('$destroy', () => {
+            document.removeEventListener('sda-source-filters--clear', resetParams);
+        });
     };
 
     /**
@@ -193,7 +203,7 @@ export function ProductionTimeReportController(
         if (_.get(newReport, '_id')) {
             $scope.currentParams = _.cloneDeep(savedReports.currentReport);
         } else {
-            $scope.currentParams = _.cloneDeep($scope.defaultReportParams);
+            resetParams();
         }
 
         $scope.updateChartConfig();

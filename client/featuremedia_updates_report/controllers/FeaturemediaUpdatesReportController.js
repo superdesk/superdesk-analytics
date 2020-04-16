@@ -48,6 +48,10 @@ export function FeaturemediaUpdatesReportController(
     chartConfig,
     reportConfigs
 ) {
+    function resetParams() {
+        $scope.currentParams = _.cloneDeep($scope.defaultReportParams);
+    }
+
     const reportName = 'featuremedia_updates_report';
 
     /**
@@ -74,6 +78,12 @@ export function FeaturemediaUpdatesReportController(
 
         this.chart = chartConfig.newConfig('chart', 'table');
         $scope.updateChartConfig();
+
+        document.addEventListener('sda-source-filters--clear', resetParams);
+
+        $scope.$on('$destroy', () => {
+            document.removeEventListener('sda-source-filters--clear', resetParams);
+        });
     };
 
     /**
@@ -157,7 +167,7 @@ export function FeaturemediaUpdatesReportController(
         if (_.get(newReport, '_id')) {
             $scope.currentParams = _.cloneDeep(savedReports.currentReport);
         } else {
-            $scope.currentParams = _.cloneDeep($scope.defaultReportParams);
+            resetParams();
         }
     }, true);
 

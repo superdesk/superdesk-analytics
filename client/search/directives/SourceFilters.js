@@ -188,6 +188,14 @@ export function SourceFilters(
             paddingBottom: '=?',
         },
         link: function(scope) {
+            function clearFilters() {
+                Object.keys(scope.filters).forEach((key) => {
+                    const filter = scope.filters[key];
+
+                    filter.selected = [];
+                    filter.exclude = false;
+                });
+            }
             /**
              * @ngdoc method
              * @name SourceFilters#init
@@ -228,6 +236,8 @@ export function SourceFilters(
                         });
 
                         scope.flags.ready = true;
+
+                        document.addEventListener('sda-source-filters--clear', clearFilters);
                     });
             };
 
@@ -554,6 +564,10 @@ export function SourceFilters(
             };
 
             this.init();
+
+            scope.$on('$destroy', () => {
+                document.removeEventListener('sda-source-filters--clear', clearFilters);
+            });
         },
     };
 }

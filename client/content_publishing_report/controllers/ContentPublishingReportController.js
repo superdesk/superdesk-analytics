@@ -50,6 +50,10 @@ export function ContentPublishingReportController(
     $interpolate,
     reportConfigs
 ) {
+    function resetParams() {
+        $scope.currentParams = _.cloneDeep($scope.defaultReportParams);
+    }
+
     const reportName = 'content_publishing_report';
 
     /**
@@ -70,6 +74,12 @@ export function ContentPublishingReportController(
 
         this.chart = chartConfig.newConfig('chart', _.get($scope, 'currentParams.params.chart.type'));
         $scope.updateChartConfig();
+
+        document.addEventListener('sda-source-filters--clear', resetParams);
+
+        $scope.$on('$destroy', () => {
+            document.removeEventListener('sda-source-filters--clear', resetParams);
+        });
     };
 
     /**
@@ -199,7 +209,7 @@ export function ContentPublishingReportController(
         if (_.get(newReport, '_id')) {
             $scope.currentParams = _.cloneDeep(savedReports.currentReport);
         } else {
-            $scope.currentParams = _.cloneDeep($scope.defaultReportParams);
+            resetParams();
         }
     }, true);
 

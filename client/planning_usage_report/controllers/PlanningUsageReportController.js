@@ -45,6 +45,10 @@ export function PlanningUsageReportController(
     $q,
     reportConfigs
 ) {
+    function resetParams() {
+        $scope.currentParams = _.cloneDeep($scope.defaultReportParams);
+    }
+
     const reportName = 'planning_usage_report';
 
     /**
@@ -86,6 +90,12 @@ export function PlanningUsageReportController(
 
         this.chart = chartConfig.newConfig(reportName, 'bar');
         $scope.updateChartConfig();
+
+        document.addEventListener('sda-source-filters--clear', resetParams);
+
+        $scope.$on('$destroy', () => {
+            document.removeEventListener('sda-source-filters--clear', resetParams);
+        });
     };
 
     /**
@@ -162,7 +172,7 @@ export function PlanningUsageReportController(
         if (_.get(newReport, '_id')) {
             $scope.currentParams = _.cloneDeep(savedReports.currentReport);
         } else {
-            $scope.currentParams = _.cloneDeep($scope.defaultReportParams);
+            resetParams();
         }
     }, true);
 
