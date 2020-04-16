@@ -57,6 +57,10 @@ export function DeskActivityReportController(
     desks,
     reportConfigs
 ) {
+    function resetParams() {
+        $scope.currentParams = _.cloneDeep($scope.defaultReportParams);
+    }
+
     const reportName = 'desk_activity_report';
 
     /**
@@ -97,6 +101,12 @@ export function DeskActivityReportController(
             'states',
             'ingest_providers',
         ];
+
+        document.addEventListener('sda-source-filters--clear', resetParams);
+
+        $scope.$on('$destroy', () => {
+            document.removeEventListener('sda-source-filters--clear', resetParams);
+        });
     };
 
     this.updateConfig = () => {
@@ -250,7 +260,7 @@ export function DeskActivityReportController(
         if (_.get(newReport, '_id')) {
             $scope.currentParams = _.cloneDeep(savedReports.currentReport);
         } else {
-            $scope.currentParams = _.cloneDeep($scope.defaultReportParams);
+            resetParams();
         }
 
         $scope.updateChartConfig();
