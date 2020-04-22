@@ -1,5 +1,11 @@
 # Superdesk Analytics Changelog
 
+## [1.33.0-rc1] 2020-04-22
+### Fixes
+- [SDESK-5133] Use appConfig instead of config/deployConfig (#121)
+- [SDESK-5146] Clear filter values upon clicking the button (#122)
+- fix(appConfig): Improper path used when importing appConfig (#123)
+
 ## [1.7.4] 2020-03-03
 ### Fixes
 - fix(build): Use github/commit for highcharts export server version (#118)
