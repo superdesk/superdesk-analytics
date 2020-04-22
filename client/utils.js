@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import {appConfig} from 'superdesk-core/scripts/appConfig';
+import {appConfig} from 'appConfig';
 
 /**
  * @ngdoc method
