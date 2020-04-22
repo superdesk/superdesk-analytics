@@ -1,4 +1,4 @@
-import {appConfig} from 'superdesk-core/scripts/appConfig';
+import {appConfig} from 'appConfig';
 
 import {getErrorMessage, secondsToHumanReadable} from '../../utils';
 import {SOURCE_FILTERS} from '../../search/directives/SourceFilters';

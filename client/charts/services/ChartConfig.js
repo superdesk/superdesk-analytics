@@ -1,4 +1,4 @@
-import {appConfig} from 'superdesk-core/scripts/appConfig';
+import {appConfig} from 'appConfig';
 
 import {formatDate, getTranslatedOperations} from '../../utils';
 import {SDChart} from '../SDChart';
