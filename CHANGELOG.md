@@ -1,5 +1,8 @@
 # Superdesk Analytics Changelog
 
+## [1.33.0] 2020-04-28
+- Release 1.33.0
+
 ## [1.33.0-rc1] 2020-04-22
 ### Fixes
 - [SDESK-5133] Use appConfig instead of config/deployConfig (#121)
