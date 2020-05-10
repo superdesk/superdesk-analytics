@@ -12,6 +12,7 @@ from flask import json, current_app as app
 from eve_elastic.elastic import set_filters, ElasticCursor
 
 from superdesk import get_resource_service, es_utils
+from superdesk.resource import Resource
 from superdesk.utils import ListCursor
 from superdesk.utc import utcnow, get_timezone_offset
 from superdesk.errors import SuperdeskApiError
@@ -21,6 +22,32 @@ from apps.search import SearchService
 
 from analytics.common import MIME_TYPES, get_elastic_version, get_weekstart_offset_hr, DATE_FILTERS, \
     relative_to_absolute_datetime
+
+
+class BaseReportResource(Resource):
+    schema = {
+        'groups': {
+            'type': 'dict',
+            'required': False,
+            'schema': {},
+            'allow_unknown': True,
+        },
+        'subgroups': {
+            'type': 'dict',
+            'required': False,
+            'schema': {},
+            'allow_unknown': True,
+        },
+        'highcharts': {
+            'type': 'list',
+            'required': False,
+            'schema': {
+                'type': 'dict',
+                'schema': {},
+                'allow_unknown': True
+            }
+        }
+    }
 
 
 class BaseReportService(SearchService):

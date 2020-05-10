@@ -26,6 +26,27 @@ class FeaturemdiaUpdatesReportResource(Resource):
     resource_methods = ['GET']
     privileges = {'GET': 'featuremedia_updates_report'}
 
+    schema = {
+        'items': {
+            'type': 'list',
+            'required': False,
+            'schema': {
+                'type': 'dict',
+                'schema': {},
+                'allow_unknown': True
+            }
+        },
+        'highcharts': {
+            'type': 'list',
+            'required': False,
+            'schema': {
+                'type': 'dict',
+                'schema': {},
+                'allow_unknown': True
+            }
+        }
+    }
+
 
 class FeaturemediaUpdatesTimeReportService(StatsReportService):
     aggregations = None
