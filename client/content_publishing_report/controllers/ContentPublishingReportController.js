@@ -1,5 +1,5 @@
 import {appConfig} from 'appConfig';
-import {gettext} from "superdesk-core/scripts/core/utils";
+import {gettext} from 'superdesk-core/scripts/core/utils';
 
 import {getErrorMessage} from '../../utils';
 import {CHART_TYPES} from '../../charts/directives/ChartOptions';

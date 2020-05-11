@@ -1,5 +1,5 @@
 import moment from 'moment';
-import {gettext} from "superdesk-core/scripts/core/utils";
+import {gettext} from 'superdesk-core/scripts/core/utils';
 
 import {appConfig} from 'appConfig';
 
