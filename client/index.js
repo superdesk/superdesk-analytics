@@ -8,6 +8,8 @@
  * at https://www.sourcefabric.org/superdesk/license
  */
 
+import {gettext} from "superdesk-core/scripts/core/utils";
+
 import './styles/analytics.scss';
 import * as svc from './services';
 import * as directive from './directives';

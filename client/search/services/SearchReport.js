@@ -1,6 +1,7 @@
 import {appConfig} from 'appConfig';
+import {gettext} from 'superdesk-core/scripts/core/utils';
 
-SearchReport.$inject = ['lodash', 'moment', 'api', '$q', 'gettext', 'gettextCatalog'];
+SearchReport.$inject = ['lodash', 'moment', 'api', '$q'];
 
 /**
  * @ngdoc service
@@ -10,11 +11,9 @@ SearchReport.$inject = ['lodash', 'moment', 'api', '$q', 'gettext', 'gettextCata
  * @requires moment
  * @requires api
  * @requires $q
- * @requires gettext
- * @requires gettextCatalog
  * @description Search service used to query the reporting endpoints
  */
-export function SearchReport(_, moment, api, $q, gettext, gettextCatalog) {
+export function SearchReport(_, moment, api, $q) {
     /**
      * @ngdoc property
      * @name SearchReport#itemStates
@@ -65,7 +64,7 @@ export function SearchReport(_, moment, api, $q, gettext, gettextCatalog) {
         name: gettext('Source'),
     }, {
         qcode: 'urgency',
-        name: gettextCatalog.getString('Urgency'),
+        name: gettext('Urgency'),
     }, {
         qcode: 'task.desk',
         name: gettext('Desk'),

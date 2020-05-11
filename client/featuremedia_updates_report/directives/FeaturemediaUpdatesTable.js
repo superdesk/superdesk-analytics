@@ -3,7 +3,6 @@ import {appConfig} from 'appConfig';
 import {getTranslatedOperations} from '../../utils';
 
 FeaturemediaUpdatesTable.$inject = [
-    'gettext',
     'userList',
     'moment',
     'api',
@@ -16,7 +15,6 @@ FeaturemediaUpdatesTable.$inject = [
  * @ngdoc directive
  * @module superdesk.apps.analytics.featuremedia-updates-report
  * @name sdaFeaturemediaUpdatesTable
- * @requires gettext
  * @requires userList
  * @requires moment
  * @requires api
@@ -26,7 +24,6 @@ FeaturemediaUpdatesTable.$inject = [
  * @description Directive to render the interactive featuremedia updates table
  */
 export function FeaturemediaUpdatesTable(
-    gettext,
     userList,
     moment,
     api,
@@ -80,7 +77,7 @@ export function FeaturemediaUpdatesTable(
             const updateTable = () => {
                 const report = _.get(scope, 'reportConfigs.charts[0]') || {};
                 const items = _.get(report, 'items') || [];
-                const operations = getTranslatedOperations(gettext);
+                const operations = getTranslatedOperations();
 
                 const genDateStr = (date) => (
                     moment(date).format(appConfig.view.dateformat + ' ' + appConfig.view.timeformat)

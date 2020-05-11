@@ -1,4 +1,5 @@
 import {appConfig} from 'appConfig';
+import {gettext} from "superdesk-core/scripts/core/utils";
 
 import {formatDate, getTranslatedOperations} from '../../utils';
 import {SDChart} from '../SDChart';
@@ -7,8 +8,6 @@ import {DATE_FILTERS} from '../../search/common';
 ChartConfig.$inject = [
     'lodash',
     'notify',
-    'gettext',
-    'gettextCatalog',
     'moment',
     '$q',
     'userList',
@@ -24,8 +23,6 @@ ChartConfig.$inject = [
  * @name ChartConfig
  * @param lodash
  * @param notify
- * @param gettext
- * @param gettextCatalog
  * @param moment
  * @param $q
  * @param userList
@@ -38,8 +35,6 @@ ChartConfig.$inject = [
 export function ChartConfig(
     _,
     notify,
-    gettext,
-    gettextCatalog,
     moment,
     $q,
     userList,
@@ -561,7 +556,7 @@ export function ChartConfig(
                 .then(() => {
                     self.setTranslation(
                         'urgency',
-                        gettextCatalog.getString('Urgency'),
+                        gettext('Urgency'),
                         _.fromPairs(_.map(
                             _.get(metadata, 'values.urgency') || [],
                             (item) => [_.get(item, 'qcode'), _.get(item, 'name')]
@@ -639,7 +634,7 @@ export function ChartConfig(
             self.setTranslation(
                 'operation',
                 gettext('Operation'),
-                getTranslatedOperations(gettext)
+                getTranslatedOperations()
             );
         },
     };

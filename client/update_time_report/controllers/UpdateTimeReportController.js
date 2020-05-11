@@ -1,3 +1,5 @@
+import {gettext} from 'superdesk-core/scripts/core/utils';
+
 import {DATE_FILTERS} from '../../search/common';
 import {SOURCE_FILTERS} from '../../search/directives/SourceFilters';
 import {getErrorMessage} from '../../utils';
@@ -5,8 +7,6 @@ import {CHART_FIELDS, CHART_TYPES} from '../../charts/directives/ChartOptions';
 
 UpdateTimeReportController.$inject = [
     '$scope',
-    'gettext',
-    'gettextCatalog',
     'lodash',
     'savedReports',
     'searchReport',
@@ -22,8 +22,6 @@ UpdateTimeReportController.$inject = [
  * @module superdesk.apps.analytics.update-time-report
  * @name UpdateTimeReportController
  * @requires $scope
- * @requires gettext
- * @requires gettextCatalog
  * @requires lodash
  * @requires savedReports
  * @requires searchReport
@@ -36,8 +34,6 @@ UpdateTimeReportController.$inject = [
  */
 export function UpdateTimeReportController(
     $scope,
-    gettext,
-    gettextCatalog,
     _,
     savedReports,
     searchReport,

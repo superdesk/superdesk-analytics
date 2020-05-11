@@ -2,9 +2,7 @@ import {generateTitle} from '../controllers/PublishingPerformanceReportControlle
 
 PublishingPerformanceReportPreview.$inject = [
     'lodash',
-    'gettextCatalog',
     'chartConfig',
-    '$interpolate',
 ];
 
 /**
@@ -12,17 +10,10 @@ PublishingPerformanceReportPreview.$inject = [
  * @module superdesk.apps.analytics.publishing-performance-report
  * @name PublishingPerformanceReportPreview
  * @requires lodash
- * @requires gettextCatalog
  * @requires chartConfig
- * @requires $interpolate
  * @description Directive to render the preview for Publishing Performance report in Schedules page
  */
-export function PublishingPerformanceReportPreview(
-    _,
-    gettextCatalog,
-    chartConfig,
-    $interpolate
-) {
+export function PublishingPerformanceReportPreview(_, chartConfig) {
     return {
         template: require('../views/publishing-performance-report-preview.html'),
         link: function(scope) {
@@ -35,12 +26,7 @@ export function PublishingPerformanceReportPreview(
                 scope.group = '-';
                 scope.subgroup = '-';
 
-                scope.title = generateTitle(
-                    $interpolate,
-                    gettextCatalog,
-                    chart,
-                    params
-                );
+                scope.title = generateTitle(chart, params);
                 scope.subtitle = chartConfig.generateSubtitleForDates(params);
 
                 chartConfig.loadTranslations([

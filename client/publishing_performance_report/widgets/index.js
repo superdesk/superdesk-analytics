@@ -8,6 +8,8 @@
  * at https://www.sourcefabric.org/superdesk/license
  */
 
+import {gettext} from 'superdesk-core/scripts/core/utils';
+
 import {PublishingActionsWidgetController} from './publishing_actions/controller';
 
 function cacheIncludedTemplates($templateCache) {
@@ -40,23 +42,20 @@ angular.module('superdesk.analytics.publishing-performance-report.widgets', [
 
     .run(cacheIncludedTemplates)
 
-    .config([
-        'dashboardWidgetsProvider', 'gettext',
-        function(dashboardWidgetsProvider, gettext) {
-            dashboardWidgetsProvider.addWidget('publishing-actions', {
-                label: gettext('Publishing Actions'),
-                description: gettext('Publishing Actions Widget'),
-                multiple: true,
-                icon: 'signal',
-                max_sizex: 1,
-                max_sizey: 1,
-                sizex: 1,
-                sizey: 1,
-                thumbnail: 'scripts/apps/ingest/ingest-stats-widget/thumbnail.svg',
-                template: 'publishing-actions-widget.html',
-                configurationTemplate: 'publishing-actions-widget-settings.html',
-                custom: true,
-                removeHeader: true,
-            });
-        },
-    ]);
+    .config(['dashboardWidgetsProvider', function(dashboardWidgetsProvider) {
+        dashboardWidgetsProvider.addWidget('publishing-actions', {
+            label: gettext('Publishing Actions'),
+            description: gettext('Publishing Actions Widget'),
+            multiple: true,
+            icon: 'signal',
+            max_sizex: 1,
+            max_sizey: 1,
+            sizex: 1,
+            sizey: 1,
+            thumbnail: 'scripts/apps/ingest/ingest-stats-widget/thumbnail.svg',
+            template: 'publishing-actions-widget.html',
+            configurationTemplate: 'publishing-actions-widget-settings.html',
+            custom: true,
+            removeHeader: true,
+        });
+    }]);

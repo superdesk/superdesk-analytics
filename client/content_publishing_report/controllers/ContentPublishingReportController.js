@@ -1,12 +1,11 @@
 import {appConfig} from 'appConfig';
+import {gettext} from "superdesk-core/scripts/core/utils";
 
 import {getErrorMessage} from '../../utils';
 import {CHART_TYPES} from '../../charts/directives/ChartOptions';
 
 ContentPublishingReportController.$inject = [
     '$scope',
-    'gettext',
-    'gettextCatalog',
     'lodash',
     'savedReports',
     'searchReport',
@@ -23,8 +22,6 @@ ContentPublishingReportController.$inject = [
  * @module superdesk.apps.analytics.content-publishing-report
  * @name ContentPublishingReportController
  * @requires $scope
- * @requires gettext
- * @requires gettextCatalog
  * @requires lodash
  * @requires savedReports
  * @requires searchReport
@@ -38,8 +35,6 @@ ContentPublishingReportController.$inject = [
  */
 export function ContentPublishingReportController(
     $scope,
-    gettext,
-    gettextCatalog,
     _,
     savedReports,
     searchReport,
@@ -165,8 +160,6 @@ export function ContentPublishingReportController(
      * @description Returns the title to use for the Highcharts config
      */
     $scope.generateTitle = () => generateTitle(
-        $interpolate,
-        gettextCatalog,
         this.chart,
         _.get($scope, 'currentParams.params') || {}
     );
@@ -201,6 +194,11 @@ export function ContentPublishingReportController(
                 $scope.currentParams.params.aggs.subgroup.field = null;
             }
         }
+
+        chartConfig.loadTranslations([
+            _.get($scope, 'currentParams.params.aggs.group.field'),
+            _.get($scope, 'currentParams.params.aggs.subgroup.field'),
+        ]);
     };
 
     $scope.isDirty = () => true;
@@ -337,14 +335,12 @@ export function ContentPublishingReportController(
 /**
  * @ngdoc method
  * @name generateTitle
- * @param {angular.IInterpolateService} $interpolate
- * @param {Object} gettextCatalog - angular-gettext
  * @param {HighchartConfig} chart - HighchartConfig instance
  * @param {Object} params - Report parameters
  * @return {String}
  * @description Construct the title for the chart based on report parameters and results
  */
-export const generateTitle = ($interpolate, gettextCatalog, chart, params) => {
+export const generateTitle = (chart, params) => {
     if (_.get(params, 'chart.title')) {
         return params.chart.title;
     }
@@ -356,16 +352,11 @@ export const generateTitle = ($interpolate, gettextCatalog, chart, params) => {
         const childField = _.get(params, 'aggs.subgroup.field');
         const childName = chart.getSourceName(childField);
 
-        return $interpolate(
-            gettextCatalog.getString(
-                'Published Stories per {{ group }} with {{ subgroup }} breakdown'
-            )
-        )({group: parentName, subgroup: childName});
+        return gettext(
+            'Published Stories per {{group}} with {{subgroup}} breakdown',
+            {group: parentName, subgroup: childName}
+        );
     }
 
-    return $interpolate(
-        gettextCatalog.getString(
-            'Published Stories per {{ group }}'
-        )
-    )({group: parentName});
+    return gettext('Published Stories per {{group}}', {group: parentName});
 };

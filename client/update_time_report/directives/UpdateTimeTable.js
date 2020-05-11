@@ -1,7 +1,7 @@
 import {appConfig} from 'appConfig';
+import {gettext} from 'superdesk-core/scripts/core/utils';
 
 UpdateTimeTable.$inject = [
-    'gettext',
     'userList',
     'moment',
     'api',
@@ -17,7 +17,6 @@ UpdateTimeTable.$inject = [
  * @ngdoc directive
  * @module superdesk.apps.analytics.update-time-report
  * @name sdaUpdateTimeTable
- * @requires gettext
  * @requires userList
  * @requires moment
  * @requires api
@@ -30,7 +29,6 @@ UpdateTimeTable.$inject = [
  * @description Directive to render the interactive featuremedia updates table
  */
 export function UpdateTimeTable(
-    gettext,
     userList,
     moment,
     api,
@@ -99,14 +97,13 @@ export function UpdateTimeTable(
                         .split(':');
 
                     if (times[0] > 0) {
-                        return $interpolate(
-                            gettext('{{hours}} hours, {{minutes}} minutes')
-                        )({hours: times[0], minutes: times[1]});
+                        return gettext(
+                            '{{hours}} hours, {{minutes}} minutes',
+                            {hours: times[0], minutes: times[1]}
+                        );
                     }
 
-                    return $interpolate(
-                        gettext('{{minutes}} minutes')
-                    )({minutes: times[1]});
+                    return gettext('{{minutes}} minutes', {minutes: times[1]});
                 };
 
                 scope.rows = [];

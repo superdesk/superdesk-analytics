@@ -1,4 +1,5 @@
 import moment from 'moment';
+import {gettext} from "superdesk-core/scripts/core/utils";
 
 import {appConfig} from 'appConfig';
 
@@ -140,11 +141,10 @@ export const FEATUREMEDIA_OPERATIONS = [
 /**
  * @ngdoc method
  * @name analytics.utils#getTranslatedOperations
- * @param {Function} gettext
  * @return {Object}
  * @description Returns translated names for item operations
  */
-export const getTranslatedOperations = (gettext) => ({
+export const getTranslatedOperations = () => ({
     create: gettext('Create'),
     fetch: gettext('Fetch'),
     duplicated_from: gettext('Duplicated From'),
@@ -182,43 +182,33 @@ export const getTranslatedOperations = (gettext) => ({
  * @ngdoc method
  * @name analytics.utils#secondsToHumanReadable
  * @param {Number} seconds
- * @param {Function} gettext
- * @param {Function} $interpolate
  * @return {String}
  * @description Converts seconds to a human readable format
  */
-export const secondsToHumanReadable = (seconds, gettext, $interpolate) => {
+export const secondsToHumanReadable = (seconds) => {
     if (seconds >= 86400) {
         if (Math.floor(seconds / 86400) === 1) {
             return gettext('1 day');
         }
 
-        return $interpolate(
-            gettext('{{days}} days')
-        )({days: Math.floor(seconds / 86400)});
+        return gettext('{{days}} days', {days: Math.floor(seconds / 86400)});
     } else if (seconds >= 3600) {
         if (Math.floor(seconds / 3600) === 1) {
             return gettext('1 hour');
         }
 
-        return $interpolate(
-            gettext('{{hours}} hours')
-        )({hours: Math.floor(seconds / 3600)});
+        return gettext('{{hours}} hours', {hours: Math.floor(seconds / 3600)});
     } else if (seconds >= 60) {
         if (Math.floor(seconds / 60) === 1) {
             return gettext('1 minute');
         }
 
-        return $interpolate(
-            gettext('{{minutes}} minutes')
-        )({minutes: Math.floor(seconds / 60)});
+        return gettext('{{minutes}} minutes', {minutes: Math.floor(seconds / 60)});
     } else if (Math.floor(seconds) === 1) {
         return gettext('1 second');
     }
 
-    return $interpolate(
-        gettext('{{seconds}} seconds')
-    )({seconds: Math.floor(seconds)});
+    return gettext('{{seconds}} seconds', {seconds: Math.floor(seconds)});
 };
 
 

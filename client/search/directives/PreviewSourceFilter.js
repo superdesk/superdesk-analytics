@@ -1,7 +1,9 @@
+import {gettext} from 'superdesk-core/scripts/core/utils';
+
 import {SOURCE_FILTERS, SOURCE_FILTER_FIELDS} from './SourceFilters';
 
 
-PreviewSourceFilter.$inject = ['lodash', 'chartConfig', 'gettext', 'gettextCatalog'];
+PreviewSourceFilter.$inject = ['lodash', 'chartConfig'];
 
 /**
  * @ngdoc directive
@@ -9,11 +11,9 @@ PreviewSourceFilter.$inject = ['lodash', 'chartConfig', 'gettext', 'gettextCatal
  * @name sdaPreviewSourceFilter
  * @requires lodash
  * @requires chartConfig
- * @requires gettext
- * @requires gettextCatalog
  * @description A directive that renders a preview for the source filters
  */
-export function PreviewSourceFilter(_, chartConfig, gettext, gettextCatalog) {
+export function PreviewSourceFilter(_, chartConfig) {
     return {
         template: require('../views/preview-source-filter.html'),
         link: function(scope) {
@@ -106,61 +106,61 @@ export function PreviewSourceFilter(_, chartConfig, gettext, gettextCatalog) {
             const filters = {
                 [SOURCE_FILTERS.DESKS]: {
                     ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.DESKS],
-                    label: gettextCatalog.getString('Desks'),
+                    label: gettext('Desks'),
                     enabled: uniqueFields.indexOf('desks') > -1,
                     exclude: isExcluded(SOURCE_FILTERS.DESKS),
                 },
                 [SOURCE_FILTERS.USERS]: {
                     ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.USERS],
-                    label: gettextCatalog.getString('Users'),
+                    label: gettext('Users'),
                     enabled: uniqueFields.indexOf('users') > -1,
                     exclude: isExcluded(SOURCE_FILTERS.USERS),
                 },
                 [SOURCE_FILTERS.CATEGORIES]: {
                     ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.CATEGORIES],
-                    label: gettextCatalog.getString('Categories'),
+                    label: gettext('Categories'),
                     enabled: uniqueFields.indexOf('categories') > -1,
                     exclude: isExcluded(SOURCE_FILTERS.CATEGORIES),
                 },
                 [SOURCE_FILTERS.GENRE]: {
                     ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.GENRE],
-                    label: gettextCatalog.getString('Genre'),
+                    label: gettext('Genre'),
                     enabled: uniqueFields.indexOf('genre') > -1,
                     exclude: isExcluded(SOURCE_FILTERS.GENRE),
                 },
                 [SOURCE_FILTERS.SOURCES]: {
                     ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.SOURCES],
-                    label: gettextCatalog.getString('Sources'),
+                    label: gettext('Sources'),
                     enabled: uniqueFields.indexOf('sources') > -1,
                     exclude: isExcluded(SOURCE_FILTERS.SOURCES),
                 },
                 [SOURCE_FILTERS.URGENCY]: {
                     ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.URGENCY],
-                    label: gettextCatalog.getString('Urgency'),
+                    label: gettext('Urgency'),
                     enabled: uniqueFields.indexOf('urgency') > -1,
                     exclude: isExcluded(SOURCE_FILTERS.URGENCY),
                 },
                 [SOURCE_FILTERS.STATES]: {
                     ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.STATES],
-                    label: gettextCatalog.getString('States'),
+                    label: gettext('States'),
                     enabled: uniqueFields.indexOf('states') > -1,
                     exclude: isExcluded(SOURCE_FILTERS.STATES),
                 },
                 [SOURCE_FILTERS.INGEST_PROVIDERS]: {
                     ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.INGEST_PROVIDERS],
-                    label: gettextCatalog.getString('Ingest Providers'),
+                    label: gettext('Ingest Providers'),
                     enabled: uniqueFields.indexOf('ingest_providers') > -1,
                     exclude: isExcluded(SOURCE_FILTERS.INGEST_PROVIDERS),
                 },
                 [SOURCE_FILTERS.STAGES]: {
                     ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.STAGES],
-                    label: gettextCatalog.getString('Stages'),
+                    label: gettext('Stages'),
                     enabled: uniqueFields.indexOf('stages') > -1,
                     exclude: isExcluded(SOURCE_FILTERS.STAGES),
                 },
                 [SOURCE_FILTERS.STATS.DESK_TRANSITIONS.ENTER]: {
                     ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.STATS.DESK_TRANSITIONS.ENTER],
-                    label: gettextCatalog.getString('Enter Desk Actions'),
+                    label: gettext('Enter Desk Actions'),
                     enabled: uniqueFields.indexOf(
                         SOURCE_FILTER_FIELDS[SOURCE_FILTERS.STATS.DESK_TRANSITIONS.ENTER].paramName
                     ) > -1,
@@ -170,7 +170,7 @@ export function PreviewSourceFilter(_, chartConfig, gettext, gettextCatalog) {
                 },
                 [SOURCE_FILTERS.STATS.DESK_TRANSITIONS.EXIT]: {
                     ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.STATS.DESK_TRANSITIONS.EXIT],
-                    label: gettextCatalog.getString('Exit Desk Actions'),
+                    label: gettext('Exit Desk Actions'),
                     enabled: uniqueFields.indexOf(
                         SOURCE_FILTER_FIELDS[SOURCE_FILTERS.STATS.DESK_TRANSITIONS.EXIT].paramName
                     ) > -1,

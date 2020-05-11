@@ -1,4 +1,5 @@
 import {appConfig} from 'appConfig';
+import {gettext} from 'superdesk-core/scripts/core/utils';
 
 import {getErrorMessage} from '../../utils';
 import {CHART_FIELDS, CHART_TYPES} from '../../charts/directives/ChartOptions';
@@ -6,8 +7,6 @@ import {DATE_FILTERS} from '../../search/common';
 
 FeaturemediaUpdatesReportController.$inject = [
     '$scope',
-    'gettext',
-    'gettextCatalog',
     'lodash',
     'savedReports',
     'searchReport',
@@ -23,8 +22,6 @@ FeaturemediaUpdatesReportController.$inject = [
  * @module superdesk.apps.analytics.featuremedia-updates-report
  * @name FeaturemediaUpdatesReportController
  * @requires $scope
- * @requires gettext
- * @requires gettextCatalog
  * @requires lodash
  * @requires savedReports
  * @requires searchReport
@@ -37,8 +34,6 @@ FeaturemediaUpdatesReportController.$inject = [
  */
 export function FeaturemediaUpdatesReportController(
     $scope,
-    gettext,
-    gettextCatalog,
     _,
     savedReports,
     searchReport,

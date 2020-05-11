@@ -1,6 +1,8 @@
+import {gettext} from 'superdesk-core/scripts/core/utils';
+
 import {getErrorMessage} from '../../utils';
 
-EmailReportService.$inject = ['api', 'notify', 'gettext', 'savedReports', 'lodash'];
+EmailReportService.$inject = ['api', 'notify', 'savedReports', 'lodash'];
 
 /**
  * @ngdoc service
@@ -8,12 +10,11 @@ EmailReportService.$inject = ['api', 'notify', 'gettext', 'savedReports', 'lodas
  * @name emailReport
  * @requires api
  * @requires notify
- * @requires gettext
  * @requires savedReports
  * @requires lodash
  * @description Service to send email(s) containing report chart(s)
  */
-export function EmailReportService(api, notify, gettext, savedReports, _) {
+export function EmailReportService(api, notify, savedReports, _) {
     /**
      * @ngdoc method
      * @name init

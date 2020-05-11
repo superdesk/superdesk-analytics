@@ -1,3 +1,5 @@
+import {gettext} from "superdesk-core/scripts/core/utils";
+
 ChartManager.$inject = ['lodash', 'Highcharts', 'notify'];
 
 /**

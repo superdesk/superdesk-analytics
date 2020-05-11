@@ -1,4 +1,5 @@
 import {appConfig} from 'appConfig';
+import {gettext} from 'superdesk-core/scripts/core/utils';
 
 import {getErrorMessage} from '../../utils';
 import {CHART_FIELDS, CHART_TYPES} from '../../charts/directives/ChartOptions';
@@ -11,7 +12,6 @@ PlanningUsageReportController.$inject = [
     'moment',
     'lodash',
     'notify',
-    'gettext',
     'chartConfig',
     '$q',
     'reportConfigs',
@@ -27,7 +27,6 @@ PlanningUsageReportController.$inject = [
  * @requires moment
  * @requires lodash
  * @requires notify
- * @requires gettext
  * @requires chartConfig
  * @requires $q
  * @requires reportConfigs
@@ -40,7 +39,6 @@ export function PlanningUsageReportController(
     moment,
     _,
     notify,
-    gettext,
     chartConfig,
     $q,
     reportConfigs

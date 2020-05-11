@@ -1,4 +1,5 @@
 import {appConfig} from 'appConfig';
+import {gettext} from 'superdesk-core/scripts/core/utils';
 
 import {getErrorMessage} from '../../utils';
 
@@ -9,7 +10,6 @@ SavedReportsService.$inject = [
     'moment',
     '$location',
     'notify',
-    'gettext',
     '$rootScope',
 ];
 
@@ -29,7 +29,6 @@ export function SavedReportsService(
     moment,
     $location,
     notify,
-    gettext,
     $rootScope
 ) {
     const init = () => {

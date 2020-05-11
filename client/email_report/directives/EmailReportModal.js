@@ -1,4 +1,6 @@
-EmailReportModal.$inject = ['emailReport', 'lodash', 'gettext'];
+import {gettext} from 'superdesk-core/scripts/core/utils';
+
+EmailReportModal.$inject = ['emailReport', 'lodash'];
 
 /**
  * @ngdoc directive
@@ -6,10 +8,9 @@ EmailReportModal.$inject = ['emailReport', 'lodash', 'gettext'];
  * @name sdEmailReportModal
  * @requires emailReport
  * @requires lodash
- * @requires gettext
  * @description A directive that renders a modal to send a report via email
  */
-export function EmailReportModal(emailReport, _, gettext) {
+export function EmailReportModal(emailReport, _) {
     return {
         template: require('../views/email-report-modal.html'),
         link: function(scope) {

@@ -2,8 +2,6 @@ import {generateTitle} from '../controllers/ContentPublishingReportController';
 
 ContentPublishingReportPreview.$inject = [
     'lodash',
-    'gettextCatalog',
-    '$interpolate',
     'chartConfig',
 ];
 
@@ -12,15 +10,11 @@ ContentPublishingReportPreview.$inject = [
  * @module superdesk.apps.analytics.content-publishing-report
  * @name ContentPublishingReportPreview
  * @requires lodash
- * @requires gettextCatalog
- * @requires $interpolate
  * @requires chartConfig
  * @description Directive to render the preview for ContentPublishing report in Schedules page
  */
 export function ContentPublishingReportPreview(
     _,
-    gettextCatalog,
-    $interpolate,
     chartConfig
 ) {
     return {
@@ -35,12 +29,7 @@ export function ContentPublishingReportPreview(
                 scope.group = '-';
                 scope.subgroup = '-';
 
-                scope.title = generateTitle(
-                    $interpolate,
-                    gettextCatalog,
-                    chart,
-                    params
-                );
+                scope.title = generateTitle(chart, params);
                 scope.subtitle = chartConfig.generateSubtitleForDates(params);
 
                 chartConfig.loadTranslations([

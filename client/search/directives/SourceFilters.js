@@ -1,3 +1,5 @@
+import {gettext} from 'superdesk-core/scripts/core/utils';
+
 import {
     ENTER_DESK_OPERATIONS,
     EXIT_DESK_OPERATIONS,
@@ -148,8 +150,6 @@ SourceFilters.$inject = [
     'userList',
     'desks',
     'metadata',
-    'gettext',
-    'gettextCatalog',
     'searchReport',
     'ingestSources',
 ];
@@ -163,8 +163,6 @@ SourceFilters.$inject = [
  * @requires userList
  * @requires desks
  * @requires metadata
- * @requires gettext
- * @requires gettextCatalog
  * @requires searchReport
  * @requires ingestSources
  * @description A directive that provides desk, user, source and metadata filters for reports
@@ -175,8 +173,6 @@ export function SourceFilters(
     userList,
     desks,
     metadata,
-    gettext,
-    gettextCatalog,
     searchReport,
     ingestSources
 ) {
@@ -378,8 +374,8 @@ export function SourceFilters(
             scope.filters = {
                 [SOURCE_FILTERS.DESKS]: {
                     ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.DESKS],
-                    label: gettextCatalog.getString('Desks'),
-                    placeholder: gettextCatalog.getString('Search ') + gettextCatalog.getString('Desks'),
+                    label: gettext('Desks'),
+                    placeholder: gettext('Search Desks'),
                     items: [],
                     selected: [],
                     exclude: false,
@@ -390,8 +386,8 @@ export function SourceFilters(
                 },
                 [SOURCE_FILTERS.USERS]: {
                     ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.USERS],
-                    label: gettextCatalog.getString('Users'),
-                    placeholder: gettextCatalog.getString('Search ') + gettextCatalog.getString('Users'),
+                    label: gettext('Users'),
+                    placeholder: gettext('Search Users'),
                     items: [],
                     selected: [],
                     exclude: false,
@@ -408,8 +404,8 @@ export function SourceFilters(
                 },
                 [SOURCE_FILTERS.CATEGORIES]: {
                     ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.CATEGORIES],
-                    label: gettextCatalog.getString('Categories'),
-                    placeholder: gettextCatalog.getString('Search ') + gettextCatalog.getString('Categories'),
+                    label: gettext('Categories'),
+                    placeholder: gettext('Search Categories'),
                     items: [],
                     selected: [],
                     exclude: false,
@@ -420,8 +416,8 @@ export function SourceFilters(
                 },
                 [SOURCE_FILTERS.GENRE]: {
                     ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.GENRE],
-                    label: gettextCatalog.getString('Genre'),
-                    placeholder: gettextCatalog.getString('Search ') + gettextCatalog.getString('Genre'),
+                    label: gettext('Genre'),
+                    placeholder: gettext('Search Genre'),
                     items: [],
                     selected: [],
                     exclude: false,
@@ -432,8 +428,8 @@ export function SourceFilters(
                 },
                 [SOURCE_FILTERS.SOURCES]: {
                     ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.SOURCES],
-                    label: gettextCatalog.getString('Source'),
-                    placeholder: gettextCatalog.getString('Search ') + gettextCatalog.getString('Source'),
+                    label: gettext('Source'),
+                    placeholder: gettext('Search Source'),
                     items: [],
                     selected: [],
                     exclude: false,
@@ -444,8 +440,8 @@ export function SourceFilters(
                 },
                 [SOURCE_FILTERS.URGENCY]: {
                     ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.URGENCY],
-                    label: gettextCatalog.getString('Urgency'),
-                    placeholder: gettextCatalog.getString('Search ') + gettextCatalog.getString('Urgency'),
+                    label: gettext('Urgency'),
+                    placeholder: gettext('Search Urgency'),
                     items: [],
                     selected: [],
                     exclude: false,
@@ -456,8 +452,8 @@ export function SourceFilters(
                 },
                 [SOURCE_FILTERS.STATES]: {
                     ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.STATES],
-                    label: gettextCatalog.getString('Content State'),
-                    placeholder: gettextCatalog.getString('Search ') + gettextCatalog.getString('Content State'),
+                    label: gettext('Content State'),
+                    placeholder: gettext('Search Content State'),
                     items: searchReport.filterItemStates(
                         ['published', 'killed', 'corrected', 'recalled']
                     ),
@@ -470,8 +466,8 @@ export function SourceFilters(
                 },
                 [SOURCE_FILTERS.INGEST_PROVIDERS]: {
                     ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.INGEST_PROVIDERS],
-                    label: gettextCatalog.getString('Ingest Providers'),
-                    placeholder: gettextCatalog.getString('Search ') + gettextCatalog.getString('Ingest Providers'),
+                    label: gettext('Ingest Providers'),
+                    placeholder: gettext('Search Ingest Providers'),
                     items: [],
                     selected: [],
                     exclude: false,
@@ -485,8 +481,8 @@ export function SourceFilters(
                 },
                 [SOURCE_FILTERS.STAGES]: {
                     ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.STAGES],
-                    label: gettextCatalog.getString('Stages'),
-                    placeholder: gettextCatalog.getString('Search ') + gettextCatalog.getString('Stages'),
+                    label: gettext('Stages'),
+                    placeholder: gettext('Search Stages'),
                     items: [],
                     selected: [],
                     exclude: false,
@@ -512,15 +508,15 @@ export function SourceFilters(
                 },
                 [SOURCE_FILTERS.STATS.DESK_TRANSITIONS.ENTER]: {
                     ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.STATS.DESK_TRANSITIONS.ENTER],
-                    label: gettextCatalog.getString('Enter Desk Actions'),
-                    placeholder: gettextCatalog.getString('Search ') + gettextCatalog.getString('Enter Actions'),
+                    label: gettext('Enter Desk Actions'),
+                    placeholder: gettext('Search Enter Desk Actions'),
                     items: [],
                     selected: [],
                     exclude: false,
                     enabled: false,
                     fetch: () => $q.when(),
                     receive: () => {
-                        const operationTranslations = getTranslatedOperations(gettext);
+                        const operationTranslations = getTranslatedOperations();
 
                         return ENTER_DESK_OPERATIONS.map(
                             (operation) => ({
@@ -533,15 +529,15 @@ export function SourceFilters(
                 },
                 [SOURCE_FILTERS.STATS.DESK_TRANSITIONS.EXIT]: {
                     ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.STATS.DESK_TRANSITIONS.EXIT],
-                    label: gettextCatalog.getString('Exit Desk Actions'),
-                    placeholder: gettextCatalog.getString('Search ') + gettextCatalog.getString('Exit Actions'),
+                    label: gettext('Exit Desk Actions'),
+                    placeholder: gettext('Search Exit Desk Actions'),
                     items: [],
                     selected: [],
                     exclude: false,
                     enabled: false,
                     fetch: () => $q.when(),
                     receive: () => {
-                        const operationTranslations = getTranslatedOperations(gettext);
+                        const operationTranslations = getTranslatedOperations();
 
                         return EXIT_DESK_OPERATIONS.map(
                             (operation) => ({
@@ -554,7 +550,7 @@ export function SourceFilters(
                 },
                 [SOURCE_FILTERS.PUBLISH_PARS]: {
                     ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.PUBLISH_PARS],
-                    label: gettextCatalog.getString('Publish Pars'),
+                    label: gettext('Publish Pars'),
                     selected: [],
                     exclude: false,
                     enabled: false,

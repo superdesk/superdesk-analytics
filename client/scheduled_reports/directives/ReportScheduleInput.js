@@ -1,14 +1,15 @@
-ReportScheduleInput.$inject = ['gettext', 'lodash'];
+import {gettext} from 'superdesk-core/scripts/core/utils';
+
+ReportScheduleInput.$inject = ['lodash'];
 
 /**
  * @ngdoc directive
  * @module superdesk.apps.analytics.scheduled_reports
  * @name sdaReportScheduleInput
- * @requires gettext
  * @requires lodash
  * @description A directive that renders either the input or the label for the scheduling details
  */
-export function ReportScheduleInput(gettext, _) {
+export function ReportScheduleInput(_) {
     return {
         scope: {
             asLabel: '=',
@@ -63,15 +64,21 @@ export function ReportScheduleInput(gettext, _) {
                     const hour = scope.hours[_.get(scope.schedule, 'hour')].label;
 
                     if (frequency === 'daily') {
-                        scope.label = gettext('Daily at ') + hour;
+                        scope.label = gettext('Daily at {{hour}}', {hour: hour});
                     } else if (frequency === 'weekly') {
                         const days = _.get(scope.schedule, 'week_days');
 
-                        scope.label = gettext('Weekly on ') + days.join(', ') + gettext(' at ') + hour;
+                        scope.label = gettext(
+                            'Weekly on {{days}} at {{hour}}',
+                            {days: days.join(', '), hour: hour}
+                        );
                     } else if (frequency === 'monthly') {
                         const day = scope.days[_.get(scope.schedule, 'day') - 1].label;
 
-                        scope.label = gettext('Monthly on the ') + day + gettext(' day at ') + hour;
+                        scope.label = gettext(
+                            'Monthly on the {{day}} day at {{hour}}',
+                            {day: day, hour: hour}
+                        );
                     }
                 }
             };

@@ -1,6 +1,8 @@
+import {gettext} from 'superdesk-core/scripts/core/utils';
+
 import {getErrorMessage} from '../../utils';
 
-ScheduledReportsModal.$inject = ['lodash', 'savedReports', 'scheduledReports', 'notify', 'gettext'];
+ScheduledReportsModal.$inject = ['lodash', 'savedReports', 'scheduledReports', 'notify'];
 
 /**
  * @ngdoc directive
@@ -10,10 +12,9 @@ ScheduledReportsModal.$inject = ['lodash', 'savedReports', 'scheduledReports', '
  * @requires savedReports
  * @requires scheduledReports
  * @requires notify
- * @requires gettext
  * @description A directive that renders the editor popup modal
  */
-export function ScheduledReportsModal(_, savedReports, scheduledReports, notify, gettext) {
+export function ScheduledReportsModal(_, savedReports, scheduledReports, notify) {
     return {
         template: require('../views/scheduled-reports-modal.html'),
         link: function(scope) {

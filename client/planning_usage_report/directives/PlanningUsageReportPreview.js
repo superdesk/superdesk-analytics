@@ -1,15 +1,16 @@
-PlanningUsageReportPreview.$inject = ['chartConfig', 'gettext', 'lodash'];
+import {gettext} from 'superdesk-core/scripts/core/utils';
+
+PlanningUsageReportPreview.$inject = ['chartConfig', 'lodash'];
 
 /**
  * @ngdoc directive
  * @module superdesk.analytics.planning-usage-report
  * @name PlanningUsageReportPreview
  * @requires chartConfig
- * @requires gettext
  * @requires lodash
  * @description Directive to render the preview for PlanningUsage report in Schedules page
  */
-export function PlanningUsageReportPreview(chartConfig, gettext, _) {
+export function PlanningUsageReportPreview(chartConfig, _) {
     return {
         template: require('../views/planning-usage-report-preview.html'),
         link: function(scope) {

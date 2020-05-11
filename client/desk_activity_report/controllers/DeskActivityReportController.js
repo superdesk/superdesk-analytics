@@ -1,4 +1,5 @@
 import {appConfig} from 'appConfig';
+import {gettext} from 'superdesk-core/scripts/core/utils';
 
 import {
     getErrorMessage,
@@ -18,8 +19,6 @@ DeskActivityReportController.$inject = [
     'searchReport',
     'moment',
     'notify',
-    'gettext',
-    'gettextCatalog',
     '$q',
     'desks',
     'reportConfigs',
@@ -36,8 +35,6 @@ DeskActivityReportController.$inject = [
  * @requires searchReport
  * @requires moment
  * @requires notify
- * @requires gettext
- * @requires gettextCatalog
  * @requires $q
  * @requires desks
  * @requires reportConfigs
@@ -51,8 +48,6 @@ export function DeskActivityReportController(
     searchReport,
     moment,
     notify,
-    gettext,
-    gettextCatalog,
     $q,
     desks,
     reportConfigs

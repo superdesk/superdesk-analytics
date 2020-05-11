@@ -1,3 +1,5 @@
+import {gettext} from 'superdesk-core/scripts/core/utils';
+
 ScheduledReportsList.$inject = [
     'modal',
     'lodash',
@@ -5,7 +7,6 @@ ScheduledReportsList.$inject = [
     'scheduledReports',
     'notify',
     'savedReports',
-    'gettext',
     'moment',
     'emailReport',
     '$q',
@@ -22,7 +23,6 @@ ScheduledReportsList.$inject = [
  * @requires scheduledReports
  * @requires notify
  * @requires savedReports
- * @requires gettext
  * @requires emailReport
  * @requires $q
  * @requires $rootScope
@@ -35,7 +35,6 @@ export function ScheduledReportsList(
     scheduledReports,
     notify,
     savedReports,
-    gettext,
     moment,
     emailReport,
     $q,
