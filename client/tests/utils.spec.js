@@ -1,10 +1,7 @@
 import {secondsToHumanReadable} from '../utils';
 
 describe('utils', () => {
-    // TODO: Remove $interpolate anf gettext, use core/utils/gettext
-    beforeEach(window.module('gettext'));
-
-    it('can convert seconds to human readable string', inject((gettext, $interpolate) => {
+    it('can convert seconds to human readable string', () => {
         // Seconds
         expect(secondsToHumanReadable(1)).toBe('1 second');
         expect(secondsToHumanReadable(1.5)).toBe('1 second');
@@ -27,5 +24,5 @@ describe('utils', () => {
         expect(secondsToHumanReadable(129600)).toBe('1 day');
         expect(secondsToHumanReadable(172800)).toBe('2 days');
         expect(secondsToHumanReadable(216000)).toBe('2 days');
-    }));
+    });
 });
