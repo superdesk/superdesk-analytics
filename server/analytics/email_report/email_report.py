@@ -225,7 +225,7 @@ def send_email_report(
     txt_template='analytics_scheduled_report.txt',
     html_template='analytics_scheduled_report.html'
 ):
-    lock_id = 'analytics_email:%s'.format(str(_id))
+    lock_id = 'analytics_email:{}'.format(str(_id))
     if not lock(lock_id, expire=120):
         return
 
