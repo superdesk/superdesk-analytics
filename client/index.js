@@ -86,5 +86,8 @@ export default angular.module('superdesk.analytics', [
             priority: 100,
             adminTools: false,
             filters: [],
+            additionalCondition: ['reports', function(reports) {
+                return reports.length > 0;
+            }],
         });
     }]);
