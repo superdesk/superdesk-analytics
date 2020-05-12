@@ -1,10 +1,11 @@
+import {gettext} from '../../utils';
+
 SavedReportList.$inject = [
     'savedReports',
     'desks',
     'privileges',
     'session',
     'modal',
-    'gettext',
     'notify',
     'lodash',
     '$rootScope',
@@ -20,7 +21,6 @@ SavedReportList.$inject = [
  * @requires privileges
  * @requires session
  * @requires modal
- * @requires gettext
  * @requires notify
  * @requires lodash
  * @requires $rootScope
@@ -33,7 +33,6 @@ export function SavedReportList(
     privileges,
     session,
     modal,
-    gettext,
     notify,
     _,
     $rootScope,

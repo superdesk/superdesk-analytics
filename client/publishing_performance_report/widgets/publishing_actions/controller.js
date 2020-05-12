@@ -2,14 +2,13 @@ import {DATE_FILTERS} from '../../../search/common';
 import {CHART_FIELDS} from '../../../charts/directives/ChartOptions';
 import {SDChart} from '../../../charts/SDChart';
 import {CHART_COLOURS} from '../../../charts/directives/ChartColourPicker';
-import {getErrorMessage} from '../../../utils';
+import {getErrorMessage, gettext} from '../../../utils';
 
 
 PublishingActionsWidgetController.$inject = [
     '$scope',
     'lodash',
     'notify',
-    'gettext',
     'searchReport',
     'chartConfig',
     'desks',
@@ -24,7 +23,6 @@ PublishingActionsWidgetController.$inject = [
  * @requires $scope
  * @requires lodash
  * @requires notify
- * @requires gettext
  * @requires searchReport
  * @requires chartConfig
  * @requires desks
@@ -36,7 +34,6 @@ export function PublishingActionsWidgetController(
     $scope,
     _,
     notify,
-    gettext,
     searchReport,
     chartConfig,
     desks,

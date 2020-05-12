@@ -1,23 +1,16 @@
-UpdateTimeReportPreview.$inject = [
-    'lodash',
-    'gettext',
-    'chartConfig',
-];
+import {gettext} from '../../utils';
+
+UpdateTimeReportPreview.$inject = ['lodash', 'chartConfig'];
 
 /**
  * @ngdoc directive
  * @module superdesk.apps.analytics.update-time-report
  * @name sdaUpdateTimeReportPreview
  * @requires lodash
- * @requires gettext
  * @requires chartConfig
  * @description Directive to render the preview for UpdateTime report in Schedules page
  */
-export function UpdateTimeReportPreview(
-    _,
-    gettext,
-    chartConfig
-) {
+export function UpdateTimeReportPreview(_, chartConfig) {
     return {
         template: require('../views/update-time-report-preview.html'),
         link: function(scope) {

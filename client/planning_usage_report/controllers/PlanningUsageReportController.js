@@ -1,6 +1,6 @@
 import {appConfig} from 'appConfig';
 
-import {getErrorMessage} from '../../utils';
+import {getErrorMessage, gettext} from '../../utils';
 import {CHART_FIELDS, CHART_TYPES} from '../../charts/directives/ChartOptions';
 import {DATE_FILTERS} from '../../search/common';
 
@@ -11,7 +11,6 @@ PlanningUsageReportController.$inject = [
     'moment',
     'lodash',
     'notify',
-    'gettext',
     'chartConfig',
     '$q',
     'reportConfigs',
@@ -27,7 +26,6 @@ PlanningUsageReportController.$inject = [
  * @requires moment
  * @requires lodash
  * @requires notify
- * @requires gettext
  * @requires chartConfig
  * @requires $q
  * @requires reportConfigs
@@ -40,7 +38,6 @@ export function PlanningUsageReportController(
     moment,
     _,
     notify,
-    gettext,
     chartConfig,
     $q,
     reportConfigs

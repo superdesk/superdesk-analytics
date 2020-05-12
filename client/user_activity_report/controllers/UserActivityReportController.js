@@ -5,6 +5,7 @@ import {
     getUtcOffsetInMinutes,
     getTranslatedOperations,
     compileAndGetHTML,
+    gettext,
 } from '../../utils';
 import {DATE_FILTERS} from '../../search/common';
 import {SOURCE_FILTERS} from '../../search/directives/SourceFilters';
@@ -19,8 +20,6 @@ UserActivityReportController.$inject = [
     'searchReport',
     'moment',
     'notify',
-    'gettext',
-    'gettextCatalog',
     '$q',
     'userList',
     '$timeout',
@@ -39,8 +38,6 @@ UserActivityReportController.$inject = [
  * @requires searchReport
  * @requires moment
  * @requires notify
- * @requires gettext
- * @requires gettextCatalog
  * @requires $q
  * @requires userList
  * @requires $timeout
@@ -56,8 +53,6 @@ export function UserActivityReportController(
     searchReport,
     moment,
     notify,
-    gettext,
-    gettextCatalog,
     $q,
     userList,
     $timeout,
@@ -105,7 +100,7 @@ export function UserActivityReportController(
             SOURCE_FILTERS.INGEST_PROVIDERS,
         ];
 
-        $scope.translatedOperations = getTranslatedOperations(gettext);
+        $scope.translatedOperations = getTranslatedOperations();
         $scope.selectedItem = null;
 
         document.addEventListener('sda-source-filters--clear', resetParams);
@@ -189,7 +184,7 @@ export function UserActivityReportController(
         const userId = _.get($scope, 'currentParams.params.must.user_locks');
         const userName = (_.get($scope.usersById, userId) || {}).display_name || '';
 
-        return gettext('User Activity - ') + userName;
+        return gettext('User Activity - {{username}}', {username: userName});
     };
 
     /**

@@ -16,7 +16,6 @@ describe('sda-date-filters', () => {
     let config;
     let reportConfigs;
 
-    beforeEach(window.module('gettext'));
     beforeEach(window.module('angularMoment'));
     beforeEach(window.module('superdesk.core.activity'));
     beforeEach(window.module('superdesk.analytics.search'));

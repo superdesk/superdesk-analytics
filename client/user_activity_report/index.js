@@ -8,6 +8,8 @@
  * at https://www.sourcefabric.org/superdesk/license
  */
 
+import {gettext} from '../utils';
+
 import * as ctrl from './controllers';
 import * as directives from './directives';
 
@@ -38,7 +40,7 @@ angular.module('superdesk.analytics.user-activity-report', [])
 
     .run(cacheIncludedTemplates)
 
-    .config(['reportsProvider', 'gettext', function(reportsProvider, gettext) {
+    .config(['reportsProvider', function(reportsProvider) {
         reportsProvider.addReport({
             id: 'user_activity_report',
             label: gettext('User Activity'),

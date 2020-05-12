@@ -1,6 +1,6 @@
 import {appConfig} from 'appConfig';
 
-import {getErrorMessage} from '../../utils';
+import {getErrorMessage, gettext} from '../../utils';
 
 SavedReportsService.$inject = [
     'lodash',
@@ -9,7 +9,6 @@ SavedReportsService.$inject = [
     'moment',
     '$location',
     'notify',
-    'gettext',
     '$rootScope',
 ];
 
@@ -29,7 +28,6 @@ export function SavedReportsService(
     moment,
     $location,
     notify,
-    gettext,
     $rootScope
 ) {
     const init = () => {
