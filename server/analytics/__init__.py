@@ -119,6 +119,39 @@ def init_app(app):
             item_methods = ['GET']
             resource_methods = ['GET']
 
+            schema = {
+                'category': {
+                    'type': 'list',
+                    'required': False,
+                    'schema': {
+                        'type': 'dict',
+                        'schema': {
+                            'key': {'type': 'string'},
+                            'doc_count': {'type': 'number'},
+                        }
+                    }
+                },
+                'source': {
+                    'type': 'list',
+                    'required': False,
+                    'schema': {
+                        'type': 'dict',
+                        'schema': {
+                            'key': {'type': 'string'},
+                            'doc_count': {'type': 'number'},
+                        }
+                    }
+                },
+                '_items': {
+                    'type': 'list',
+                    'required': False,
+                    'schema': {
+                        'type': 'dict',
+                        'allow_unknown': True
+                    }
+                }
+            }
+
         endpoint_name = 'analytics_test_report'
         service = TestReportService(endpoint_name, backend=superdesk.get_backend())
         BaseReportResource(endpoint_name, app=app, service=service)

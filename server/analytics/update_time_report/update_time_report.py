@@ -11,12 +11,14 @@
 from superdesk.resource import Resource
 from superdesk.utc import utc_to_local, utcnow
 
+from analytics.stats.archive_statistics import ArchiveStatisticsResource
 from analytics.stats.stats_report_service import StatsReportService
 from analytics.chart_config import ChartConfig
 from analytics.common import REPORT_CONFIG, CHART_TYPES
 
 from flask import current_app as app
 from datetime import timedelta
+from copy import deepcopy
 
 
 class UpdateTimeReportResource(Resource):
@@ -25,6 +27,20 @@ class UpdateTimeReportResource(Resource):
     item_methods = ['GET']
     resource_methods = ['GET']
     privileges = {'GET': 'update_time_report'}
+
+    schema = deepcopy(ArchiveStatisticsResource.schema)
+    schema.pop('stats', None)
+    schema.update({
+        'highcharts': {
+            'type': 'list',
+            'required': False,
+            'schema': {
+                'type': 'dict',
+                'schema': {},
+                'allow_unknown': True
+            }
+        }
+    })
 
 
 class UpdateTimeReportService(StatsReportService):
