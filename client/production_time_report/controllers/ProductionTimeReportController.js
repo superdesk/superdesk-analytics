@@ -1,6 +1,6 @@
 import {appConfig} from 'appConfig';
 
-import {getErrorMessage, secondsToHumanReadable} from '../../utils';
+import {getErrorMessage, secondsToHumanReadable, gettext} from '../../utils';
 import {SOURCE_FILTERS} from '../../search/directives/SourceFilters';
 import {CHART_TYPES, CHART_FIELDS} from '../../charts/directives/ChartOptions';
 import {SDChart} from '../../charts/SDChart';
@@ -13,8 +13,6 @@ ProductionTimeReportController.$inject = [
     'searchReport',
     'moment',
     'notify',
-    'gettext',
-    'gettextCatalog',
     '$interpolate',
     '$q',
     'reportConfigs',
@@ -31,8 +29,6 @@ ProductionTimeReportController.$inject = [
  * @requires searchReport
  * @requires moment
  * @requires notify
- * @requires gettext
- * @requires gettextCatalog
  * @required $interpolate
  * @requires $q
  * @requires reportConfigs
@@ -46,8 +42,6 @@ export function ProductionTimeReportController(
     searchReport,
     moment,
     notify,
-    gettext,
-    gettextCatalog,
     $interpolate,
     $q,
     reportConfigs
@@ -305,22 +299,14 @@ export function ProductionTimeReportController(
                     defaultConfig: chartConfig.defaultConfig,
                     translations: chartConfig.translations,
                     dataLabelFormatter: function() {
-                        return secondsToHumanReadable(
-                            this.y,
-                            gettext,
-                            $interpolate
-                        );
+                        return secondsToHumanReadable(this.y);
                     },
                     tooltipFormatter: function() {
                         return this.x +
                             ' - ' +
                             this.series.name +
                             ' time: ' +
-                            secondsToHumanReadable(
-                                this.y,
-                                gettext,
-                                $interpolate
-                            );
+                            secondsToHumanReadable(this.y);
                     },
                 });
 
@@ -333,11 +319,7 @@ export function ProductionTimeReportController(
                         categories: sortedDeskIds,
                         stackLabels: false,
                         yAxisLabelFormatter: function() {
-                            return secondsToHumanReadable(
-                                this.value,
-                                gettext,
-                                $interpolate
-                            );
+                            return secondsToHumanReadable(this.value);
                         },
                     });
 

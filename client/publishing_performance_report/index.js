@@ -8,6 +8,8 @@
  * at https://www.sourcefabric.org/superdesk/license
  */
 
+import {gettext} from '../utils';
+
 import * as ctrl from './controllers';
 import * as directives from './directives';
 import './widgets';
@@ -40,7 +42,7 @@ angular.module('superdesk.analytics.publishing-performance-report',
 
     .run(cacheIncludedTemplates)
 
-    .config(['reportsProvider', 'gettext', function(reportsProvider, gettext) {
+    .config(['reportsProvider', function(reportsProvider) {
         reportsProvider.addReport({
             id: 'publishing_performance_report',
             label: gettext('Publishing Performance'),

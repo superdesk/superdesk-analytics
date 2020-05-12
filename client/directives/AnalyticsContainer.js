@@ -4,7 +4,6 @@
  * @name sdaAnalyticsContainer
  * @requires $location
  * @requires pageTitle
- * @requires gettext
  * @requires lodash
  * @requires reports
  * @requires $rootScope
@@ -22,13 +21,12 @@
 export function AnalyticsContainer() {
     return {
         controllerAs: 'analytics',
-        controller: ['$scope', '$location', 'pageTitle', 'gettext', 'lodash', 'reports', '$rootScope', '$timeout',
+        controller: ['$scope', '$location', 'pageTitle', 'lodash', 'reports', '$rootScope', '$timeout',
             'emailReport', 'savedReports', 'api', 'desks', 'metadata', 'searchReport', 'reportConfigs', 'privileges',
             function AnalyticsContainerController(
                 $scope,
                 $location,
                 pageTitle,
-                gettext,
                 _,
                 reports,
                 $rootScope,

@@ -1,13 +1,11 @@
 import {appConfig} from 'appConfig';
 
-import {getErrorMessage} from '../../utils';
+import {getErrorMessage, gettext} from '../../utils';
 import {CHART_FIELDS, CHART_TYPES} from '../../charts/directives/ChartOptions';
 
 
 PublishingPerformanceReportController.$inject = [
     '$scope',
-    'gettext',
-    'gettextCatalog',
     'lodash',
     'savedReports',
     'searchReport',
@@ -24,8 +22,6 @@ PublishingPerformanceReportController.$inject = [
  * @module superdesk.apps.analytics.publishing-performance-report
  * @name PublishingPerformanceReportController
  * @requires $scope
- * @requires gettext
- * @requires gettextCatalog
  * @requires lodash
  * @requires savedReports
  * @requires searchReport
@@ -39,8 +35,6 @@ PublishingPerformanceReportController.$inject = [
  */
 export function PublishingPerformanceReportController(
     $scope,
-    gettext,
-    gettextCatalog,
     _,
     savedReports,
     searchReport,
@@ -81,7 +75,7 @@ export function PublishingPerformanceReportController(
         savedReports.selectReportFromURL();
 
         this.chart = chartConfig.newConfig('chart', _.get($scope, 'currentParams.params.chart.type'));
-        $scope.updateChartConfig();
+        $scope.updateChartConfig(true);
 
         document.addEventListener('sda-source-filters--clear', resetParams);
 
@@ -190,8 +184,6 @@ export function PublishingPerformanceReportController(
      * @description Returns the title to use for the Highcharts config
      */
     $scope.generateTitle = (report) => generateTitle(
-        $interpolate,
-        gettextCatalog,
         this.chart,
         _.get($scope, 'currentParams.params') || {},
         report
@@ -346,15 +338,13 @@ export function PublishingPerformanceReportController(
 /**
  * @ngdoc method
  * @name generateTitle
- * @param {angular.IInterpolateService} $interpolate
- * @param {Object} gettextCatalog - angular-gettext
  * @param {HighchartConfig} chart - HighchartConfig instance
  * @param {Object} params - Report parameters
  * @param {Object} report - Report results
  * @return {String}
  * @description Construct the title for the chart based on report parameters and results
  */
-export const generateTitle = ($interpolate, gettextCatalog, chart, params, report = null) => {
+export const generateTitle = (chart, params, report = null) => {
     if (_.get(params, 'chart.title')) {
         return params.chart.title;
     }
@@ -368,14 +358,11 @@ export const generateTitle = ($interpolate, gettextCatalog, chart, params, repor
             Object.keys(report.groups)[0]
         );
 
-        return $interpolate(
-            gettextCatalog.getString('Published Stories for {{ group }}: {{ data }}')
-        )({group: parentName, data: dataName});
+        return gettext(
+            'Published Stories for {{group}}: {{data}}',
+            {group: parentName, data: dataName}
+        );
     }
 
-    return $interpolate(
-        gettextCatalog.getString(
-            'Published Stories per {{ group }}'
-        )
-    )({group: parentName});
+    return gettext('Published Stories per {{group}}', {group: parentName});
 };

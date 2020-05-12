@@ -8,6 +8,8 @@
  * at https://www.sourcefabric.org/superdesk/license
  */
 
+import {gettext} from '../utils';
+
 import * as ctrl from './controllers';
 import * as directives from './directives';
 
@@ -42,7 +44,7 @@ angular.module('superdesk.analytics.update-time-report', [])
 
     .run(cacheIncludedTemplates)
 
-    .config(['reportsProvider', 'gettext', function(reportsProvider, gettext) {
+    .config(['reportsProvider', function(reportsProvider) {
         reportsProvider.addReport({
             id: 'update_time_report',
             label: gettext('Update Time'),

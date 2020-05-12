@@ -5,6 +5,7 @@ import {
     getUtcOffsetInMinutes,
     ENTER_DESK_OPERATIONS,
     EXIT_DESK_OPERATIONS,
+    gettext,
 } from '../../utils';
 import {CHART_FIELDS, CHART_TYPES} from '../../charts/directives/ChartOptions';
 import {SDChart} from '../../charts/SDChart';
@@ -18,8 +19,6 @@ DeskActivityReportController.$inject = [
     'searchReport',
     'moment',
     'notify',
-    'gettext',
-    'gettextCatalog',
     '$q',
     'desks',
     'reportConfigs',
@@ -36,8 +35,6 @@ DeskActivityReportController.$inject = [
  * @requires searchReport
  * @requires moment
  * @requires notify
- * @requires gettext
- * @requires gettextCatalog
  * @requires $q
  * @requires desks
  * @requires reportConfigs
@@ -51,8 +48,6 @@ export function DeskActivityReportController(
     searchReport,
     moment,
     notify,
-    gettext,
-    gettextCatalog,
     $q,
     desks,
     reportConfigs

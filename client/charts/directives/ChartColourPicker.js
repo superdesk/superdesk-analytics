@@ -1,4 +1,6 @@
-ChartColourPicker.$inject = ['gettext'];
+import {gettext} from '../../utils';
+
+ChartColourPicker.$inject = [];
 
 
 export const CHART_COLOURS = {
@@ -30,7 +32,7 @@ export const CHART_COLOURS = {
     NAVY: 'sda-navy',
 };
 
-export function ChartColourPicker(gettext) {
+export function ChartColourPicker() {
     return {
         scope: {
             field: '=',

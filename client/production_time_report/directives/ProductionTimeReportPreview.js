@@ -1,15 +1,16 @@
-ProductionTimeReportPreview.$inject = ['chartConfig', 'gettext', 'lodash'];
+import {gettext} from '../../utils';
+
+ProductionTimeReportPreview.$inject = ['chartConfig', 'lodash'];
 
 /**
  * @ngdoc directive
  * @module superdesk.analytics.production-time-report
  * @name ProductionTimeReportPreviewReportPreview
  * @requires chartConfig
- * @requires gettext
  * @requires lodash
  * @description Directive to render the preview for ProductionTime report in Schedules page
  */
-export function ProductionTimeReportPreview(chartConfig, gettext, _) {
+export function ProductionTimeReportPreview(chartConfig, _) {
     return {
         template: require('../views/production-time-report-preview.html'),
         link: function(scope) {

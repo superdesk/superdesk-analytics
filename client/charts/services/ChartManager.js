@@ -1,3 +1,5 @@
+import {gettext} from '../../utils';
+
 ChartManager.$inject = ['lodash', 'Highcharts', 'notify'];
 
 /**
