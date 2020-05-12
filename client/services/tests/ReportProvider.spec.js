@@ -28,13 +28,7 @@ describe('reportsProvider', () => {
         });
 
         it('default values', () => {
-            expect(reports).toEqual([{
-                id: null,
-                priority: 0,
-                privileges: {},
-                showSidePanel: true,
-                allowScheduling: false,
-            }]);
+            expect(reports).toEqual([]);
         });
     });
 
