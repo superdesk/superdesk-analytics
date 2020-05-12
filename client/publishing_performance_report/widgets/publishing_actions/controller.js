@@ -1,10 +1,8 @@
-import {gettext} from 'superdesk-core/scripts/core/utils';
-
 import {DATE_FILTERS} from '../../../search/common';
 import {CHART_FIELDS} from '../../../charts/directives/ChartOptions';
 import {SDChart} from '../../../charts/SDChart';
 import {CHART_COLOURS} from '../../../charts/directives/ChartColourPicker';
-import {getErrorMessage} from '../../../utils';
+import {getErrorMessage, gettext} from '../../../utils';
 
 
 PublishingActionsWidgetController.$inject = [

@@ -1,7 +1,6 @@
 import {appConfig} from 'appConfig';
-import {gettext} from 'superdesk-core/scripts/core/utils';
 
-import {formatDate, getTranslatedOperations} from '../../utils';
+import {formatDate, getTranslatedOperations, gettext} from '../../utils';
 import {SDChart} from '../SDChart';
 import {DATE_FILTERS} from '../../search/common';
 

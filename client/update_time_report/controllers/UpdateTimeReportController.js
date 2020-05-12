@@ -1,8 +1,6 @@
-import {gettext} from 'superdesk-core/scripts/core/utils';
-
 import {DATE_FILTERS} from '../../search/common';
 import {SOURCE_FILTERS} from '../../search/directives/SourceFilters';
-import {getErrorMessage} from '../../utils';
+import {getErrorMessage, gettext} from '../../utils';
 import {CHART_FIELDS, CHART_TYPES} from '../../charts/directives/ChartOptions';
 
 UpdateTimeReportController.$inject = [

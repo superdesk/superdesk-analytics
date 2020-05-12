@@ -1,11 +1,11 @@
 import {appConfig} from 'appConfig';
-import {gettext} from 'superdesk-core/scripts/core/utils';
 
 import {
     getErrorMessage,
     getUtcOffsetInMinutes,
     getTranslatedOperations,
     compileAndGetHTML,
+    gettext,
 } from '../../utils';
 import {DATE_FILTERS} from '../../search/common';
 import {SOURCE_FILTERS} from '../../search/directives/SourceFilters';

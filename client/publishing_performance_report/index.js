@@ -8,7 +8,7 @@
  * at https://www.sourcefabric.org/superdesk/license
  */
 
-import {gettext} from 'superdesk-core/scripts/core/utils';
+import {gettext} from '../utils';
 
 import * as ctrl from './controllers';
 import * as directives from './directives';

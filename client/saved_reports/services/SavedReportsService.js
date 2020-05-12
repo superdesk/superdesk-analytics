@@ -1,7 +1,6 @@
 import {appConfig} from 'appConfig';
-import {gettext} from 'superdesk-core/scripts/core/utils';
 
-import {getErrorMessage} from '../../utils';
+import {getErrorMessage, gettext} from '../../utils';
 
 SavedReportsService.$inject = [
     'lodash',

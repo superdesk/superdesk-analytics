@@ -1,7 +1,9 @@
 import moment from 'moment';
-import {gettext} from 'superdesk-core/scripts/core/utils';
+import {gettext as _gettext} from 'superdesk-core/scripts/core/utils';
 
 import {appConfig} from 'appConfig';
+
+export const gettext = (text, params = {}) => _gettext(text, params);
 
 /**
  * @ngdoc method

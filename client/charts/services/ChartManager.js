@@ -1,4 +1,4 @@
-import {gettext} from 'superdesk-core/scripts/core/utils';
+import {gettext} from '../../utils';
 
 ChartManager.$inject = ['lodash', 'Highcharts', 'notify'];
 

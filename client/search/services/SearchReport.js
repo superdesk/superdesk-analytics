@@ -1,5 +1,6 @@
 import {appConfig} from 'appConfig';
-import {gettext} from 'superdesk-core/scripts/core/utils';
+
+import {gettext} from '../../utils';
 
 SearchReport.$inject = ['lodash', 'moment', 'api', '$q'];
 

@@ -1,11 +1,11 @@
 import {appConfig} from 'appConfig';
-import {gettext} from 'superdesk-core/scripts/core/utils';
 
 import {
     getErrorMessage,
     getUtcOffsetInMinutes,
     ENTER_DESK_OPERATIONS,
     EXIT_DESK_OPERATIONS,
+    gettext,
 } from '../../utils';
 import {CHART_FIELDS, CHART_TYPES} from '../../charts/directives/ChartOptions';
 import {SDChart} from '../../charts/SDChart';

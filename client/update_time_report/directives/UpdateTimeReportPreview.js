@@ -1,4 +1,4 @@
-import {gettext} from 'superdesk-core/scripts/core/utils';
+import {gettext} from '../../utils';
 
 UpdateTimeReportPreview.$inject = ['lodash', 'chartConfig'];
 

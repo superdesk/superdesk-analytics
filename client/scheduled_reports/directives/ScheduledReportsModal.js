@@ -1,6 +1,4 @@
-import {gettext} from 'superdesk-core/scripts/core/utils';
-
-import {getErrorMessage} from '../../utils';
+import {getErrorMessage, gettext} from '../../utils';
 
 ScheduledReportsModal.$inject = ['lodash', 'savedReports', 'scheduledReports', 'notify'];
 

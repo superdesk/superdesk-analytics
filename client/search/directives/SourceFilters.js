@@ -1,9 +1,8 @@
-import {gettext} from 'superdesk-core/scripts/core/utils';
-
 import {
     ENTER_DESK_OPERATIONS,
     EXIT_DESK_OPERATIONS,
     getTranslatedOperations,
+    gettext,
 } from '../../utils';
 
 /**

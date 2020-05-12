@@ -1,7 +1,6 @@
 import {appConfig} from 'appConfig';
-import {gettext} from 'superdesk-core/scripts/core/utils';
 
-import {getErrorMessage, secondsToHumanReadable} from '../../utils';
+import {getErrorMessage, secondsToHumanReadable, gettext} from '../../utils';
 import {SOURCE_FILTERS} from '../../search/directives/SourceFilters';
 import {CHART_TYPES, CHART_FIELDS} from '../../charts/directives/ChartOptions';
 import {SDChart} from '../../charts/SDChart';
