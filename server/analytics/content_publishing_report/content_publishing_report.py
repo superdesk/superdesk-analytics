@@ -8,13 +8,11 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-from superdesk.resource import Resource
-
-from analytics.base_report import BaseReportService
+from analytics.base_report import BaseReportService, BaseReportResource
 from analytics.chart_config import ChartConfig
 
 
-class ContentPublishingReportResource(Resource):
+class ContentPublishingReportResource(BaseReportResource):
     """Content Publishing Report schema
     """
 
