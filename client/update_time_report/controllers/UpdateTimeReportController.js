@@ -1,18 +1,15 @@
 import {DATE_FILTERS} from '../../search/common';
 import {SOURCE_FILTERS} from '../../search/directives/SourceFilters';
-import {getErrorMessage} from '../../utils';
+import {getErrorMessage, gettext} from '../../utils';
 import {CHART_FIELDS, CHART_TYPES} from '../../charts/directives/ChartOptions';
 
 UpdateTimeReportController.$inject = [
     '$scope',
-    'gettext',
-    'gettextCatalog',
     'lodash',
     'savedReports',
     'searchReport',
     'notify',
     'moment',
-    'config',
     '$q',
     'chartConfig',
     'reportConfigs',
@@ -23,14 +20,11 @@ UpdateTimeReportController.$inject = [
  * @module superdesk.apps.analytics.update-time-report
  * @name UpdateTimeReportController
  * @requires $scope
- * @requires gettext
- * @requires gettextCatalog
  * @requires lodash
  * @requires savedReports
  * @requires searchReport
  * @requires notify
  * @requires moment
- * @requires config
  * @requires $q
  * @requires chartConfig
  * @requires reportConfigs
@@ -38,18 +32,19 @@ UpdateTimeReportController.$inject = [
  */
 export function UpdateTimeReportController(
     $scope,
-    gettext,
-    gettextCatalog,
     _,
     savedReports,
     searchReport,
     notify,
     moment,
-    config,
     $q,
     chartConfig,
     reportConfigs
 ) {
+    function resetParams() {
+        $scope.currentParams = _.cloneDeep($scope.defaultReportParams);
+    }
+
     const reportName = 'update_time_report';
 
     /**
@@ -88,6 +83,12 @@ export function UpdateTimeReportController(
 
         this.chart = chartConfig.newConfig('chart', 'table');
         $scope.updateChartConfig();
+
+        document.addEventListener('sda-source-filters--clear', resetParams);
+
+        $scope.$on('$destroy', () => {
+            document.removeEventListener('sda-source-filters--clear', resetParams);
+        });
     };
 
     /**
@@ -179,7 +180,7 @@ export function UpdateTimeReportController(
         if (_.get(newReport, '_id')) {
             $scope.currentParams = _.cloneDeep(savedReports.currentReport);
         } else {
-            $scope.currentParams = _.cloneDeep($scope.defaultReportParams);
+            resetParams();
         }
     }, true);
 

@@ -1,3 +1,5 @@
+import {gettext} from '../../utils';
+
 ChartManager.$inject = ['lodash', 'Highcharts', 'notify'];
 
 /**
@@ -103,13 +105,18 @@ export function ChartManager(_, Highcharts, notify) {
     /**
      * @ngdoc method
      * @name ChartManager#downloadCSV
-     * @param {String} id - The ID assocaited with the chart instance
-     * @param {String} filename - The name of the downloaded file
+     * @param {Object} config - The chart config object, containing the ID of the ID associated with the chart instance
      * @description Converts the chart data to a CSV string, then downloads as a CSV file
      */
-    this.downloadCSV = function(id, filename) {
+    this.downloadCSV = function(config) {
+        const id = config.id;
+        const filename = `${id}.csv`;
+
         if (_.get(this.charts, `${id}.getCSV`)) {
-            const csv = this.charts[id].getCSV();
+            // Either use a custom defined genCSV or the one from Highcharts
+            const csv = config.genCSV ?
+                config.genCSV() :
+                this.charts[id].getCSV();
             const link = document.createElement('a');
 
             link.setAttribute('href', 'data:text/text;charset=utf-8,' + encodeURIComponent(csv));

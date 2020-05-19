@@ -8,6 +8,8 @@
  * at https://www.sourcefabric.org/superdesk/license
  */
 
+import {gettext} from './utils';
+
 import './styles/analytics.scss';
 import * as svc from './services';
 import * as directive from './directives';
@@ -86,5 +88,8 @@ export default angular.module('superdesk.analytics', [
             priority: 100,
             adminTools: false,
             filters: [],
+            additionalCondition: ['reports', function(reports) {
+                return reports.length > 0;
+            }],
         });
     }]);

@@ -1,44 +1,20 @@
+import moment from 'moment';
+import {gettext as _gettext} from 'superdesk-core/scripts/core/utils';
 
-/**
- * @ngdoc method
- * @name analytics.utils#formatDateForServer
- * @param {Object} moment
- * @param {Object} config
- * @param {String} date
- * @param {Number} addDays
- * @returns {String|null}
- * @description Format given date for use with API calls
-*/
-export function formatDateForServer(moment, config, date, addDays = 0) {
-    if (date) {
-        const timeSuffix = addDays ? 'T23:59:59' : 'T00:00:00';
-        let local = moment(date, config.model.dateformat).format('YYYY-MM-DD') + timeSuffix;
+import {appConfig} from 'appConfig';
 
-        if (config.search && config.search.useDefaultTimezone) {
-            // use the default timezone of the server
-            local += moment.tz(config.defaultTimezone).format('ZZ');
-        } else {
-            local += moment().format('ZZ');
-        }
-
-        return local;
-    }
-
-    return null;
-}
+export const gettext = (text, params = {}) => _gettext(text, params);
 
 /**
  * @ngdoc method
  * @name analytics.utils#formatDate
- * @param {Function} moment
- * @param {Object} config
  * @param {String} dateTime
  * @param {String} format
  * @returns {String}
  * @description Format the date/time based on the supplied format
  */
-export function formatDate(moment, config, dateTime, format = 'LL') {
-    return moment(dateTime, config.model.dateformat).format(format);
+export function formatDate(dateTime, format = 'LL') {
+    return moment(dateTime, appConfig.model.dateformat).format(format);
 }
 
 /**
@@ -72,11 +48,10 @@ export const getErrorMessage = (error, defaultMessage) => {
  * @name analytics.utils#getUtcOffsetInMinutes
  * @param {moment} utcDatetime The moment date/time instance used to calculate utc offset
  * @param {String} timezone - The timezone name
- * @param {Function} moment - The moment js module
  * @return {Number}
  * @description Calculates the UTC Offset in minutes for the supplied datetime instance
  */
-export const getUtcOffsetInMinutes = (utcDatetime, timezone, moment) => (
+export const getUtcOffsetInMinutes = (utcDatetime, timezone) => (
     moment(utcDatetime)
         .tz(timezone)
         .utcOffset()
@@ -168,11 +143,10 @@ export const FEATUREMEDIA_OPERATIONS = [
 /**
  * @ngdoc method
  * @name analytics.utils#getTranslatedOperations
- * @param {Function} gettext
  * @return {Object}
  * @description Returns translated names for item operations
  */
-export const getTranslatedOperations = (gettext) => ({
+export const getTranslatedOperations = () => ({
     create: gettext('Create'),
     fetch: gettext('Fetch'),
     duplicated_from: gettext('Duplicated From'),
@@ -210,43 +184,33 @@ export const getTranslatedOperations = (gettext) => ({
  * @ngdoc method
  * @name analytics.utils#secondsToHumanReadable
  * @param {Number} seconds
- * @param {Function} gettext
- * @param {Function} $interpolate
  * @return {String}
  * @description Converts seconds to a human readable format
  */
-export const secondsToHumanReadable = (seconds, gettext, $interpolate) => {
+export const secondsToHumanReadable = (seconds) => {
     if (seconds >= 86400) {
         if (Math.floor(seconds / 86400) === 1) {
             return gettext('1 day');
         }
 
-        return $interpolate(
-            gettext('{{days}} days')
-        )({days: Math.floor(seconds / 86400)});
+        return gettext('{{days}} days', {days: Math.floor(seconds / 86400)});
     } else if (seconds >= 3600) {
         if (Math.floor(seconds / 3600) === 1) {
             return gettext('1 hour');
         }
 
-        return $interpolate(
-            gettext('{{hours}} hours')
-        )({hours: Math.floor(seconds / 3600)});
+        return gettext('{{hours}} hours', {hours: Math.floor(seconds / 3600)});
     } else if (seconds >= 60) {
         if (Math.floor(seconds / 60) === 1) {
             return gettext('1 minute');
         }
 
-        return $interpolate(
-            gettext('{{minutes}} minutes')
-        )({minutes: Math.floor(seconds / 60)});
+        return gettext('{{minutes}} minutes', {minutes: Math.floor(seconds / 60)});
     } else if (Math.floor(seconds) === 1) {
         return gettext('1 second');
     }
 
-    return $interpolate(
-        gettext('{{seconds}} seconds')
-    )({seconds: Math.floor(seconds)});
+    return gettext('{{seconds}} seconds', {seconds: Math.floor(seconds)});
 };
 
 
@@ -275,4 +239,56 @@ export const compileAndGetHTML = ($compile, scope, template, data = {}) => {
     tmpScope.$destroy();
 
     return html;
+};
+
+/**
+ * Utility to select and copy the text within a parent node
+ * @param {Node} node - The parent node used to select all text from
+ * @returns {string}
+ */
+export const getTextFromDOMNode = (node) => {
+    let innerText;
+
+    if (typeof document.selection !== 'undefined' && typeof document.body.createTextRange !== 'undefined') {
+        const range = document.body.createTextRange();
+
+        range.moveToElementText(node);
+        innerText = range.text;
+    } else if (typeof window.getSelection !== 'undefined' && typeof document.createRange !== 'undefined') {
+        const selection = window.getSelection();
+
+        selection.selectAllChildren(node);
+        innerText = '' + selection;
+        selection.removeAllRanges();
+    }
+    return innerText;
+};
+
+/**
+ * Utility to convert text into HTML DOM Nodes, then select and return the text shown
+ * This replicates the user highlighting the text within those nodes, using the Browser
+ * to do the grunt work for us.
+ * @param {String|Number} data - The html in string format, i.e. '<div><p>testing</p></div>'
+ * @returns {string|Number}
+ */
+export const convertHtmlStringToText = (data) => {
+    if (typeof data !== 'string' || !data.startsWith('<')) {
+        return data;
+    }
+
+    const node = document.createElement('div');
+    let text;
+
+    node.innerHTML = data;
+
+    // Attach the node to the document before selecting
+    // This is required otherwise the browser won't be able to
+    // select the text
+    document.body.appendChild(node);
+    text = getTextFromDOMNode(node);
+
+    // Make sure we clean up after adding the node to the document
+    document.body.removeChild(node);
+
+    return text;
 };

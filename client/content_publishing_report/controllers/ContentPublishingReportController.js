@@ -1,16 +1,15 @@
-import {getErrorMessage} from '../../utils';
+import {appConfig} from 'appConfig';
+
+import {getErrorMessage, gettext} from '../../utils';
 import {CHART_TYPES} from '../../charts/directives/ChartOptions';
 
 ContentPublishingReportController.$inject = [
     '$scope',
-    'gettext',
-    'gettextCatalog',
     'lodash',
     'savedReports',
     'searchReport',
     'notify',
     'moment',
-    'config',
     '$q',
     'chartConfig',
     '$interpolate',
@@ -22,14 +21,11 @@ ContentPublishingReportController.$inject = [
  * @module superdesk.apps.analytics.content-publishing-report
  * @name ContentPublishingReportController
  * @requires $scope
- * @requires gettext
- * @requires gettextCatalog
  * @requires lodash
  * @requires savedReports
  * @requires searchReport
  * @requires notify
  * @requires moment
- * @requires config
  * @requires $q
  * @requires chartConfig
  * @requires $interpolate
@@ -38,19 +34,20 @@ ContentPublishingReportController.$inject = [
  */
 export function ContentPublishingReportController(
     $scope,
-    gettext,
-    gettextCatalog,
     _,
     savedReports,
     searchReport,
     notify,
     moment,
-    config,
     $q,
     chartConfig,
     $interpolate,
     reportConfigs
 ) {
+    function resetParams() {
+        $scope.currentParams = _.cloneDeep($scope.defaultReportParams);
+    }
+
     const reportName = 'content_publishing_report';
 
     /**
@@ -71,6 +68,12 @@ export function ContentPublishingReportController(
 
         this.chart = chartConfig.newConfig('chart', _.get($scope, 'currentParams.params.chart.type'));
         $scope.updateChartConfig();
+
+        document.addEventListener('sda-source-filters--clear', resetParams);
+
+        $scope.$on('$destroy', () => {
+            document.removeEventListener('sda-source-filters--clear', resetParams);
+        });
     };
 
     /**
@@ -84,7 +87,7 @@ export function ContentPublishingReportController(
         );
 
         $scope.report_groups = searchReport.filterDataFields(
-            ['anpa_category.qcode', 'genre.qcode', 'source', 'urgency']
+            ['anpa_category.qcode', 'genre.qcode', 'source', 'urgency', 'subject.qcode']
         );
 
         $scope.currentParams = {
@@ -94,8 +97,8 @@ export function ContentPublishingReportController(
                     filter: 'range',
                     start: moment()
                         .subtract(30, 'days')
-                        .format(config.model.dateformat),
-                    end: moment().format(config.model.dateformat),
+                        .format(appConfig.model.dateformat),
+                    end: moment().format(appConfig.model.dateformat),
                 },
                 must: {},
                 must_not: {},
@@ -156,8 +159,6 @@ export function ContentPublishingReportController(
      * @description Returns the title to use for the Highcharts config
      */
     $scope.generateTitle = () => generateTitle(
-        $interpolate,
-        gettextCatalog,
         this.chart,
         _.get($scope, 'currentParams.params') || {}
     );
@@ -192,6 +193,11 @@ export function ContentPublishingReportController(
                 $scope.currentParams.params.aggs.subgroup.field = null;
             }
         }
+
+        chartConfig.loadTranslations([
+            _.get($scope, 'currentParams.params.aggs.group.field'),
+            _.get($scope, 'currentParams.params.aggs.subgroup.field'),
+        ]);
     };
 
     $scope.isDirty = () => true;
@@ -200,7 +206,7 @@ export function ContentPublishingReportController(
         if (_.get(newReport, '_id')) {
             $scope.currentParams = _.cloneDeep(savedReports.currentReport);
         } else {
-            $scope.currentParams = _.cloneDeep($scope.defaultReportParams);
+            resetParams();
         }
     }, true);
 
@@ -328,14 +334,12 @@ export function ContentPublishingReportController(
 /**
  * @ngdoc method
  * @name generateTitle
- * @param {angular.IInterpolateService} $interpolate
- * @param {Object} gettextCatalog - angular-gettext
  * @param {HighchartConfig} chart - HighchartConfig instance
  * @param {Object} params - Report parameters
  * @return {String}
  * @description Construct the title for the chart based on report parameters and results
  */
-export const generateTitle = ($interpolate, gettextCatalog, chart, params) => {
+export const generateTitle = (chart, params) => {
     if (_.get(params, 'chart.title')) {
         return params.chart.title;
     }
@@ -347,16 +351,11 @@ export const generateTitle = ($interpolate, gettextCatalog, chart, params) => {
         const childField = _.get(params, 'aggs.subgroup.field');
         const childName = chart.getSourceName(childField);
 
-        return $interpolate(
-            gettextCatalog.getString(
-                'Published Stories per {{ group }} with {{ subgroup }} breakdown'
-            )
-        )({group: parentName, subgroup: childName});
+        return gettext(
+            'Published Stories per {{group}} with {{subgroup}} breakdown',
+            {group: parentName, subgroup: childName}
+        );
     }
 
-    return $interpolate(
-        gettextCatalog.getString(
-            'Published Stories per {{ group }}'
-        )
-    )({group: parentName});
+    return gettext('Published Stories per {{group}}', {group: parentName});
 };

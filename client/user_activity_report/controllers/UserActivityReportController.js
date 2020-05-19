@@ -1,8 +1,11 @@
+import {appConfig} from 'appConfig';
+
 import {
     getErrorMessage,
     getUtcOffsetInMinutes,
     getTranslatedOperations,
     compileAndGetHTML,
+    gettext,
 } from '../../utils';
 import {DATE_FILTERS} from '../../search/common';
 import {SOURCE_FILTERS} from '../../search/directives/SourceFilters';
@@ -17,11 +20,7 @@ UserActivityReportController.$inject = [
     'searchReport',
     'moment',
     'notify',
-    'gettext',
-    'gettextCatalog',
     '$q',
-    'config',
-    'deployConfig',
     'userList',
     '$timeout',
     '$compile',
@@ -39,11 +38,7 @@ UserActivityReportController.$inject = [
  * @requires searchReport
  * @requires moment
  * @requires notify
- * @requires gettext
- * @requires gettextCatalog
  * @requires $q
- * @requires config
- * @requires deployConfig
  * @requires userList
  * @requires $timeout
  * @requires $compile
@@ -58,16 +53,16 @@ export function UserActivityReportController(
     searchReport,
     moment,
     notify,
-    gettext,
-    gettextCatalog,
     $q,
-    config,
-    deployConfig,
     userList,
     $timeout,
     $compile,
     reportConfigs
 ) {
+    function resetParams() {
+        $scope.currentParams = _.cloneDeep($scope.defaultReportParams);
+    }
+
     const reportName = 'user_activity_report';
 
     /**
@@ -105,8 +100,14 @@ export function UserActivityReportController(
             SOURCE_FILTERS.INGEST_PROVIDERS,
         ];
 
-        $scope.translatedOperations = getTranslatedOperations(gettext);
+        $scope.translatedOperations = getTranslatedOperations();
         $scope.selectedItem = null;
+
+        document.addEventListener('sda-source-filters--clear', resetParams);
+
+        $scope.$on('$destroy', () => {
+            document.removeEventListener('sda-source-filters--clear', resetParams);
+        });
     };
 
     /**
@@ -124,7 +125,7 @@ export function UserActivityReportController(
             params: $scope.config.defaultParams({
                 dates: {
                     filter: DATE_FILTERS.DAY,
-                    date: moment().format(config.model.dateformat),
+                    date: moment().format(appConfig.model.dateformat),
                 },
                 must: {
                     user_locks: null,
@@ -183,7 +184,7 @@ export function UserActivityReportController(
         const userId = _.get($scope, 'currentParams.params.must.user_locks');
         const userName = (_.get($scope.usersById, userId) || {}).display_name || '';
 
-        return gettext('User Activity - ') + userName;
+        return gettext('User Activity - {{username}}', {username: userName});
     };
 
     /**
@@ -208,7 +209,7 @@ export function UserActivityReportController(
         if (_.get(newReport, '_id')) {
             $scope.currentParams = _.cloneDeep(savedReports.currentReport);
         } else {
-            $scope.currentParams = _.cloneDeep($scope.defaultReportParams);
+            resetParams();
         }
 
         $scope.updateChartConfig();
@@ -329,8 +330,7 @@ export function UserActivityReportController(
         // Any data after the daylight savings change will be 1 hour out
         getUtcOffsetInMinutes(
             report.start,
-            config.defaultTimezone,
-            moment
+            appConfig.defaultTimezone
         )
     );
 

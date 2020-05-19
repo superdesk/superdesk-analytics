@@ -20,6 +20,10 @@ describe('chartConfig', () => {
         config = {};
     }));
 
+    beforeEach(inject(($httpBackend) => {
+        $httpBackend.whenGET(/api$/).respond({_links: {child: []}});
+    }));
+
     mockAll();
 
     const genSingleChart = (chartId, chartType) => {
@@ -313,6 +317,7 @@ describe('chartConfig', () => {
             chart: {type: 'column'},
             title: 'Tables',
             subtitle: 'For Today',
+            genCSV: jasmine.any(Function),
             xAxis: [{
                 title: {text: 'Category'},
                 categories: ['Basketball', 'Advisories', 'Cricket'],
@@ -397,6 +402,7 @@ describe('chartConfig', () => {
             chart: {type: 'column'},
             title: 'Tables',
             subtitle: 'For Today',
+            genCSV: jasmine.any(Function),
             xAxis: [{
                 title: {text: 'Category'},
                 categories: ['Cricket', 'Basketball', 'Advisories'],

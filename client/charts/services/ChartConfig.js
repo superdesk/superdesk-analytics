@@ -1,14 +1,13 @@
-import {formatDate, getTranslatedOperations} from '../../utils';
+import {appConfig} from 'appConfig';
+
+import {formatDate, getTranslatedOperations, gettext} from '../../utils';
 import {SDChart} from '../SDChart';
 import {DATE_FILTERS} from '../../search/common';
 
 ChartConfig.$inject = [
     'lodash',
     'notify',
-    'gettext',
-    'gettextCatalog',
     'moment',
-    'config',
     '$q',
     'userList',
     'desks',
@@ -23,10 +22,7 @@ ChartConfig.$inject = [
  * @name ChartConfig
  * @param lodash
  * @param notify
- * @param gettext
- * @param gettextCatalog
  * @param moment
- * @param config
  * @param $q
  * @param userList
  * @param desks
@@ -38,10 +34,7 @@ ChartConfig.$inject = [
 export function ChartConfig(
     _,
     notify,
-    gettext,
-    gettextCatalog,
     moment,
-    config,
     $q,
     userList,
     desks,
@@ -544,12 +537,25 @@ export function ChartConfig(
                     );
                 })
         ),
+        'subject.qcode': () => (
+            metadata.initialize()
+                .then(() => {
+                    self.setTranslation(
+                        'subject.qcode',
+                        gettext('Subject'),
+                        _.fromPairs(_.map(
+                            _.get(metadata, 'values.subjectcodes') || [],
+                            (item) => [_.get(item, 'qcode'), _.get(item, 'name')]
+                        ))
+                    );
+                })
+        ),
         urgency: () => (
             metadata.initialize()
                 .then(() => {
                     self.setTranslation(
                         'urgency',
-                        gettextCatalog.getString('Urgency'),
+                        gettext('Urgency'),
                         _.fromPairs(_.map(
                             _.get(metadata, 'values.urgency') || [],
                             (item) => [_.get(item, 'qcode'), _.get(item, 'name')]
@@ -627,7 +633,7 @@ export function ChartConfig(
             self.setTranslation(
                 'operation',
                 gettext('Operation'),
-                getTranslatedOperations(gettext)
+                getTranslatedOperations()
             );
         },
     };
@@ -690,16 +696,14 @@ export function ChartConfig(
                 const start = _.get(params, 'dates.start');
                 const end = _.get(params, 'dates.end');
 
-                if (moment(start, config.model.dateformat).isValid() &&
-                    moment(end, config.model.dateformat).isValid()
+                if (moment(start, appConfig.model.dateformat).isValid() &&
+                    moment(end, appConfig.model.dateformat).isValid()
                 ) {
-                    return formatDate(moment, config, start) +
-                        ' - ' +
-                        formatDate(moment, config, end);
+                    return formatDate(start) + ' - ' + formatDate(end);
                 }
             },
             [DATE_FILTERS.DAY]: () => (
-                moment(_.get(params, 'dates.date'), config.model.dateformat)
+                moment(_.get(params, 'dates.date'), appConfig.model.dateformat)
                     .format('dddd Do MMMM YYYY')
             ),
 

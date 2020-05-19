@@ -1,4 +1,6 @@
-import {getErrorMessage} from '../../utils';
+import {appConfig} from 'appConfig';
+
+import {getErrorMessage, gettext} from '../../utils';
 import {CHART_FIELDS, CHART_TYPES} from '../../charts/directives/ChartOptions';
 import {DATE_FILTERS} from '../../search/common';
 
@@ -7,10 +9,8 @@ PlanningUsageReportController.$inject = [
     'savedReports',
     'searchReport',
     'moment',
-    'config',
     'lodash',
     'notify',
-    'gettext',
     'chartConfig',
     '$q',
     'reportConfigs',
@@ -24,10 +24,8 @@ PlanningUsageReportController.$inject = [
  * @requires savedReports
  * @requires searchReport
  * @requires moment
- * @requires config
  * @requires lodash
  * @requires notify
- * @requires gettext
  * @requires chartConfig
  * @requires $q
  * @requires reportConfigs
@@ -38,14 +36,16 @@ export function PlanningUsageReportController(
     savedReports,
     searchReport,
     moment,
-    config,
     _,
     notify,
-    gettext,
     chartConfig,
     $q,
     reportConfigs
 ) {
+    function resetParams() {
+        $scope.currentParams = _.cloneDeep($scope.defaultReportParams);
+    }
+
     const reportName = 'planning_usage_report';
 
     /**
@@ -87,6 +87,12 @@ export function PlanningUsageReportController(
 
         this.chart = chartConfig.newConfig(reportName, 'bar');
         $scope.updateChartConfig();
+
+        document.addEventListener('sda-source-filters--clear', resetParams);
+
+        $scope.$on('$destroy', () => {
+            document.removeEventListener('sda-source-filters--clear', resetParams);
+        });
     };
 
     /**
@@ -102,8 +108,8 @@ export function PlanningUsageReportController(
                     filter: DATE_FILTERS.RANGE,
                     start: moment()
                         .subtract(30, 'days')
-                        .format(config.model.dateformat),
-                    end: moment().format(config.model.dateformat),
+                        .format(appConfig.model.dateformat),
+                    end: moment().format(appConfig.model.dateformat),
                 },
                 must: {},
                 must_not: {},
@@ -163,7 +169,7 @@ export function PlanningUsageReportController(
         if (_.get(newReport, '_id')) {
             $scope.currentParams = _.cloneDeep(savedReports.currentReport);
         } else {
-            $scope.currentParams = _.cloneDeep($scope.defaultReportParams);
+            resetParams();
         }
     }, true);
 

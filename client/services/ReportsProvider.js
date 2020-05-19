@@ -49,13 +49,17 @@ export function ReportsProvider(_) {
             ));
         };
 
-        return _.sortBy(
+        const filteredReports = _.sortBy(
             _.filter(
                 _.values(reports),
                 filterReport
             ),
             'priority'
         );
+
+        // First entry is an empty entry, so if there is only 1 report registered
+        // then there are no actual reports available;
+        return filteredReports.length === 1 ? [] : filteredReports;
     }];
 
     this.addReport({id: null, priority: 0});

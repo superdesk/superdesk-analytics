@@ -1,14 +1,14 @@
-import {getErrorMessage} from '../../utils';
+import {appConfig} from 'appConfig';
+
+import {getErrorMessage, gettext} from '../../utils';
 
 SavedReportsService.$inject = [
     'lodash',
     'api',
     'session',
     'moment',
-    'config',
     '$location',
     'notify',
-    'gettext',
     '$rootScope',
 ];
 
@@ -26,10 +26,8 @@ export function SavedReportsService(
     api,
     session,
     moment,
-    config,
     $location,
     notify,
-    gettext,
     $rootScope
 ) {
     const init = () => {
@@ -48,17 +46,17 @@ export function SavedReportsService(
         const report = _.cloneDeep(params);
 
         if (_.get(report, 'params.dates.start')) {
-            report.params.dates.start = moment(report.params.dates.start, config.model.dateformat)
+            report.params.dates.start = moment(report.params.dates.start, appConfig.model.dateformat)
                 .format('YYYY-MM-DD');
         }
 
         if (_.get(report, 'params.dates.end')) {
-            report.params.dates.end = moment(report.params.dates.end, config.model.dateformat)
+            report.params.dates.end = moment(report.params.dates.end, appConfig.model.dateformat)
                 .format('YYYY-MM-DD');
         }
 
         if (_.get(report, 'params.dates.date')) {
-            report.params.dates.date = moment(report.params.dates.date, config.model.dateformat)
+            report.params.dates.date = moment(report.params.dates.date, appConfig.model.dateformat)
                 .format('YYYY-MM-DD');
         }
 
@@ -82,17 +80,17 @@ export function SavedReportsService(
 
         if (_.get(report, 'params.dates.start')) {
             report.params.dates.start = moment(report.params.dates.start, 'YYYY-MM-DD')
-                .format(config.model.dateformat);
+                .format(appConfig.model.dateformat);
         }
 
         if (_.get(report, 'params.dates.end')) {
             report.params.dates.end = moment(report.params.dates.end, 'YYYY-MM-DD')
-                .format(config.model.dateformat);
+                .format(appConfig.model.dateformat);
         }
 
         if (_.get(report, 'params.dates.date')) {
             report.params.dates.date = moment(report.params.dates.date, 'YYYY-MM-DD')
-                .format(config.model.dateformat);
+                .format(appConfig.model.dateformat);
         }
 
         return report;

@@ -22,6 +22,24 @@ class ProductionTimeReportResource(Resource):
     resource_methods = ['GET']
     privileges = {'GET': 'production_time_report'}
 
+    schema = {
+        'desk_state': {
+            'type': 'dict',
+            'required': False,
+            'schema': {},
+            'allow_unknown': True
+        },
+        'highcharts': {
+            'type': 'list',
+            'required': False,
+            'schema': {
+                'type': 'dict',
+                'schema': {},
+                'allow_unknown': True
+            }
+        }
+    }
+
 
 class ProductionTimeReportService(StatsReportService):
     aggregations = {

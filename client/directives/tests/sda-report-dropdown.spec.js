@@ -17,6 +17,10 @@ describe('sda-report-dropdown', () => {
         $rootScope = _$rootScope_;
     }));
 
+    beforeEach(inject(($httpBackend) => {
+        $httpBackend.whenGET(/api$/).respond({_links: {child: []}});
+    }));
+
     beforeEach(() => {
         reports = [
             {},

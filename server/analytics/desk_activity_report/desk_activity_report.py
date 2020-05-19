@@ -27,6 +27,30 @@ class DeskActivityReportResource(Resource):
     resource_methods = ['GET']
     privileges = {'GET': 'desk_activity_report'}
 
+    schema = {
+        'start': {'type': 'string'},
+        'start_epoch': {'type': 'number'},
+        'interval': {'type': 'number'},
+        'incoming': {
+            'type': 'list',
+            'schema': {'type': 'number'}
+        },
+        'outgoing': {
+            'type': 'list',
+            'schema': {'type': 'number'}
+        },
+        'histogram': {
+            'type': 'list',
+            'schema': {'type': 'number'}
+        },
+        'highcharts': {
+            'type': 'dict',
+            'required': False,
+            'schema': {},
+            'allow_unknown': True,
+        }
+    }
+
 
 class DeskActivityReportService(BaseReportService):
     aggregations = {

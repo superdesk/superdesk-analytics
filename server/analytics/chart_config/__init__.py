@@ -318,6 +318,12 @@ class ChartConfig:
                 'Genre',
                 get_cv_by_qcode('genre', 'name')
             )
+        elif field == 'subject.qcode':
+            self._set_translation(
+                'subject.qcode',
+                'Subject',
+                get_cv_by_qcode('subjectcodes', 'name')
+            )
         elif field == 'urgency':
             self._set_translation(
                 'urgency',

@@ -22,6 +22,29 @@ class PlanningUsageReportResource(Resource):
     item_methods = ['GET']
     resource_methods = ['GET']
     privileges = {'GET': 'planning_usage_report'}
+    schema = {
+        'group': {
+            'type': 'dict',
+            'required': False,
+            'schema': {},
+            'allow_unknown': True
+        },
+        'subgroup': {
+            'type': 'dict',
+            'required': False,
+            'schema': {},
+            'allow_unknown': True
+        },
+        'highcharts': {
+            'type': 'list',
+            'required': False,
+            'schema': {
+                'type': 'dict',
+                'schema': {},
+                'allow_unknown': True
+            }
+        }
+    }
 
 
 class PlanningUsageReportService(BaseReportService):

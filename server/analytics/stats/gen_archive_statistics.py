@@ -387,7 +387,7 @@ class GenArchiveStatistics(Command):
             item['updates']['firstcreated'] = created
 
         for field in fields:
-            if history['update'].get(field):
+            if field in history['update']:
                 item['updates'][field] = history['update'][field]
 
     def process_timelines(self, items, failed_ids):

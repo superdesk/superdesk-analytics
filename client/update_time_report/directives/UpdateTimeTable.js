@@ -1,8 +1,10 @@
+import {appConfig} from 'appConfig';
+
+import {gettext} from '../../utils';
+
 UpdateTimeTable.$inject = [
-    'gettext',
     'userList',
     'moment',
-    'config',
     'api',
     'lodash',
     '$interpolate',
@@ -16,10 +18,8 @@ UpdateTimeTable.$inject = [
  * @ngdoc directive
  * @module superdesk.apps.analytics.update-time-report
  * @name sdaUpdateTimeTable
- * @requires gettext
  * @requires userList
  * @requires moment
- * @requires config
  * @requires api
  * @requires lodash
  * @requires $interpolate
@@ -30,10 +30,8 @@ UpdateTimeTable.$inject = [
  * @description Directive to render the interactive featuremedia updates table
  */
 export function UpdateTimeTable(
-    gettext,
     userList,
     moment,
-    config,
     api,
     _,
     $interpolate,
@@ -89,7 +87,7 @@ export function UpdateTimeTable(
                 scope.page.max = Math.ceil(meta.total / report.size);
 
                 const genDateStr = (date) => (
-                    moment(date).format(config.view.dateformat + ' ' + config.view.timeformat)
+                    moment(date).format(appConfig.view.dateformat + ' ' + appConfig.view.timeformat)
                 );
 
                 const getUpdateString = (seconds) => {
@@ -100,14 +98,13 @@ export function UpdateTimeTable(
                         .split(':');
 
                     if (times[0] > 0) {
-                        return $interpolate(
-                            gettext('{{hours}} hours, {{minutes}} minutes')
-                        )({hours: times[0], minutes: times[1]});
+                        return gettext(
+                            '{{hours}} hours, {{minutes}} minutes',
+                            {hours: times[0], minutes: times[1]}
+                        );
                     }
 
-                    return $interpolate(
-                        gettext('{{minutes}} minutes')
-                    )({minutes: times[1]});
+                    return gettext('{{minutes}} minutes', {minutes: times[1]});
                 };
 
                 scope.rows = [];

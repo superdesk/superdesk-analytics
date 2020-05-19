@@ -36,7 +36,7 @@ class PostInstallCommand(install):
 
 setup(
     name="superdesk-analytics",
-    version="0.1",
+    version="1.33.0",
     package_dir={'': 'server'},
     packages=find_packages('server'),
     author='Sourcefabric',

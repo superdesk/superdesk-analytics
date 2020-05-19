@@ -30,6 +30,8 @@ from analytics.common import is_highcharts_installed, register_report
 from superdesk.celery_app import celery
 from superdesk.default_settings import celery_queue, crontab
 
+__version__ = '1.33.0'
+
 
 def init_schedule_task(app):
     # Now check the application config to see if scheduled reports is enabled
@@ -116,6 +118,39 @@ def init_app(app):
         class BaseReportResource(superdesk.resource.Resource):
             item_methods = ['GET']
             resource_methods = ['GET']
+
+            schema = {
+                'category': {
+                    'type': 'list',
+                    'required': False,
+                    'schema': {
+                        'type': 'dict',
+                        'schema': {
+                            'key': {'type': 'string'},
+                            'doc_count': {'type': 'number'},
+                        }
+                    }
+                },
+                'source': {
+                    'type': 'list',
+                    'required': False,
+                    'schema': {
+                        'type': 'dict',
+                        'schema': {
+                            'key': {'type': 'string'},
+                            'doc_count': {'type': 'number'},
+                        }
+                    }
+                },
+                '_items': {
+                    'type': 'list',
+                    'required': False,
+                    'schema': {
+                        'type': 'dict',
+                        'allow_unknown': True
+                    }
+                }
+            }
 
         endpoint_name = 'analytics_test_report'
         service = TestReportService(endpoint_name, backend=superdesk.get_backend())

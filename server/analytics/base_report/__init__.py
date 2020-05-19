@@ -12,6 +12,7 @@ from flask import json, current_app as app
 from eve_elastic.elastic import set_filters, ElasticCursor
 
 from superdesk import get_resource_service, es_utils
+from superdesk.resource import Resource
 from superdesk.utils import ListCursor
 from superdesk.utc import utcnow, get_timezone_offset
 from superdesk.errors import SuperdeskApiError
@@ -19,7 +20,34 @@ from superdesk.es_utils import REPOS
 
 from apps.search import SearchService
 
-from analytics.common import MIME_TYPES, get_elastic_version, get_weekstart_offset_hr, DATE_FILTERS
+from analytics.common import MIME_TYPES, get_elastic_version, get_weekstart_offset_hr, DATE_FILTERS, \
+    relative_to_absolute_datetime
+
+
+class BaseReportResource(Resource):
+    schema = {
+        'groups': {
+            'type': 'dict',
+            'required': False,
+            'schema': {},
+            'allow_unknown': True,
+        },
+        'subgroups': {
+            'type': 'dict',
+            'required': False,
+            'schema': {},
+            'allow_unknown': True,
+        },
+        'highcharts': {
+            'type': 'list',
+            'required': False,
+            'schema': {
+                'type': 'dict',
+                'schema': {},
+                'allow_unknown': True
+            }
+        }
+    }
 
 
 class BaseReportService(SearchService):
@@ -99,6 +127,19 @@ class BaseReportService(SearchService):
         # starting day of the week, based on app.config['START_OF_WEEK']
         offset = 0 if interval != 'week' else get_weekstart_offset_hr()
 
+        if lt.startswith('now'):
+            extended_bounds = {
+                'max': relative_to_absolute_datetime(lt, '%Y-%m-%dT%H:%M:%S'),
+                'min': relative_to_absolute_datetime(gte, '%Y-%m-%dT%H:%M:%S')
+            }
+        else:
+            extended_bounds = {
+                'min': gte[:-5],  # remove timezone part
+                'max': lt[:-5]  # remove timezone part
+            }
+
+        # dates.extended_bounds.min & dates.extended_bounds.max should use dates.format
+
         aggs = {
             'dates': {
                 'date_histogram': {
@@ -107,10 +148,7 @@ class BaseReportService(SearchService):
                     'time_zone': time_zone,
                     'min_doc_count': 0,
                     'offset': '{}h'.format(offset),
-                    'extended_bounds': {
-                        'min': gte[:-5],  # remove timezone part
-                        'max': lt[:-5]  # remove timezone part
-                    },
+                    'extended_bounds': extended_bounds,
                     'format': 'yyyy-MM-dd\'T\'HH:mm:ss'
                 },
                 'aggs': aggregations
@@ -420,10 +458,10 @@ class BaseReportService(SearchService):
             gte = 'now-1M/M'
         elif date_filter == DATE_FILTERS.RELATIVE_HOURS:
             lt = 'now'
-            gte = 'now-{}h'.format(relative)
+            gte = 'now-{}h/h'.format(relative)
         elif date_filter == DATE_FILTERS.RELATIVE_DAYS:
             lt = 'now'
-            gte = 'now-{}d'.format(relative)
+            gte = 'now-{}d/d'.format(relative)
         elif date_filter == DATE_FILTERS.TODAY:
             lt = 'now'
             gte = 'now/d'
@@ -435,10 +473,10 @@ class BaseReportService(SearchService):
             gte = 'now/M'
         elif date_filter == DATE_FILTERS.RELATIVE_WEEKS:
             lt = 'now'
-            gte = 'now-{}w/w'.format(relative)
+            gte = 'now-{}w/d'.format(relative)
         elif date_filter == DATE_FILTERS.RELATIVE_MONTHS:
             lt = 'now'
-            gte = 'now-{}M/M'.format(relative)
+            gte = 'now-{}M/d'.format(relative)
         elif date_filter == DATE_FILTERS.LAST_YEAR:
             lt = 'now/y'
             gte = 'now-1y/y'

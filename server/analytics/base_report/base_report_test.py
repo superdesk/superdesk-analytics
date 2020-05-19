@@ -229,7 +229,7 @@ class BaseReportServiceTestCase(TestCase):
                     'range': {
                         'versioncreated': {
                             'lt': 'now',
-                            'gte': 'now-12h',
+                            'gte': 'now-12h/h',
                             'time_zone': '+1000'
                         }
                     }
@@ -251,7 +251,7 @@ class BaseReportServiceTestCase(TestCase):
                     'range': {
                         'versioncreated': {
                             'lt': 'now',
-                            'gte': 'now-7d',
+                            'gte': 'now-7d/d',
                             'time_zone': '+1000'
                         }
                     }

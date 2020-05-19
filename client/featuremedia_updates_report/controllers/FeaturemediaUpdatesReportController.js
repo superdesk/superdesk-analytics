@@ -1,17 +1,16 @@
-import {getErrorMessage} from '../../utils';
+import {appConfig} from 'appConfig';
+
+import {getErrorMessage, gettext} from '../../utils';
 import {CHART_FIELDS, CHART_TYPES} from '../../charts/directives/ChartOptions';
 import {DATE_FILTERS} from '../../search/common';
 
 FeaturemediaUpdatesReportController.$inject = [
     '$scope',
-    'gettext',
-    'gettextCatalog',
     'lodash',
     'savedReports',
     'searchReport',
     'notify',
     'moment',
-    'config',
     '$q',
     'chartConfig',
     'reportConfigs',
@@ -22,14 +21,11 @@ FeaturemediaUpdatesReportController.$inject = [
  * @module superdesk.apps.analytics.featuremedia-updates-report
  * @name FeaturemediaUpdatesReportController
  * @requires $scope
- * @requires gettext
- * @requires gettextCatalog
  * @requires lodash
  * @requires savedReports
  * @requires searchReport
  * @requires notify
  * @requires moment
- * @requires config
  * @requires $q
  * @requires chartConfig
  * @requires reportConfigs
@@ -37,18 +33,19 @@ FeaturemediaUpdatesReportController.$inject = [
  */
 export function FeaturemediaUpdatesReportController(
     $scope,
-    gettext,
-    gettextCatalog,
     _,
     savedReports,
     searchReport,
     notify,
     moment,
-    config,
     $q,
     chartConfig,
     reportConfigs
 ) {
+    function resetParams() {
+        $scope.currentParams = _.cloneDeep($scope.defaultReportParams);
+    }
+
     const reportName = 'featuremedia_updates_report';
 
     /**
@@ -75,6 +72,12 @@ export function FeaturemediaUpdatesReportController(
 
         this.chart = chartConfig.newConfig('chart', 'table');
         $scope.updateChartConfig();
+
+        document.addEventListener('sda-source-filters--clear', resetParams);
+
+        $scope.$on('$destroy', () => {
+            document.removeEventListener('sda-source-filters--clear', resetParams);
+        });
     };
 
     /**
@@ -98,8 +101,8 @@ export function FeaturemediaUpdatesReportController(
                     filter: DATE_FILTERS.RANGE,
                     start: moment()
                         .subtract(30, 'days')
-                        .format(config.model.dateformat),
-                    end: moment().format(config.model.dateformat),
+                        .format(appConfig.model.dateformat),
+                    end: moment().format(appConfig.model.dateformat),
                 },
                 must: {},
                 must_not: {},
@@ -158,7 +161,7 @@ export function FeaturemediaUpdatesReportController(
         if (_.get(newReport, '_id')) {
             $scope.currentParams = _.cloneDeep(savedReports.currentReport);
         } else {
-            $scope.currentParams = _.cloneDeep($scope.defaultReportParams);
+            resetParams();
         }
     }, true);
 

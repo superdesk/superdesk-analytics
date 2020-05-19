@@ -1,8 +1,11 @@
+import {appConfig} from 'appConfig';
+
 import {
     getErrorMessage,
     getUtcOffsetInMinutes,
     ENTER_DESK_OPERATIONS,
     EXIT_DESK_OPERATIONS,
+    gettext,
 } from '../../utils';
 import {CHART_FIELDS, CHART_TYPES} from '../../charts/directives/ChartOptions';
 import {SDChart} from '../../charts/SDChart';
@@ -16,11 +19,7 @@ DeskActivityReportController.$inject = [
     'searchReport',
     'moment',
     'notify',
-    'gettext',
-    'gettextCatalog',
     '$q',
-    'config',
-    'deployConfig',
     'desks',
     'reportConfigs',
 ];
@@ -36,11 +35,7 @@ DeskActivityReportController.$inject = [
  * @requires searchReport
  * @requires moment
  * @requires notify
- * @requires gettext
- * @requires gettextCatalog
  * @requires $q
- * @requires config
- * @requires deployConfig
  * @requires desks
  * @requires reportConfigs
  * @description Controller for Desk Activity Reports
@@ -53,14 +48,14 @@ export function DeskActivityReportController(
     searchReport,
     moment,
     notify,
-    gettext,
-    gettextCatalog,
     $q,
-    config,
-    deployConfig,
     desks,
     reportConfigs
 ) {
+    function resetParams() {
+        $scope.currentParams = _.cloneDeep($scope.defaultReportParams);
+    }
+
     const reportName = 'desk_activity_report';
 
     /**
@@ -101,6 +96,12 @@ export function DeskActivityReportController(
             'states',
             'ingest_providers',
         ];
+
+        document.addEventListener('sda-source-filters--clear', resetParams);
+
+        $scope.$on('$destroy', () => {
+            document.removeEventListener('sda-source-filters--clear', resetParams);
+        });
     };
 
     this.updateConfig = () => {
@@ -138,8 +139,8 @@ export function DeskActivityReportController(
                     filter: 'range',
                     start: moment()
                         .subtract(30, 'days')
-                        .format(config.model.dateformat),
-                    end: moment().format(config.model.dateformat),
+                        .format(appConfig.model.dateformat),
+                    end: moment().format(appConfig.model.dateformat),
                 },
                 must: {},
                 must_not: {},
@@ -254,7 +255,7 @@ export function DeskActivityReportController(
         if (_.get(newReport, '_id')) {
             $scope.currentParams = _.cloneDeep(savedReports.currentReport);
         } else {
-            $scope.currentParams = _.cloneDeep($scope.defaultReportParams);
+            resetParams();
         }
 
         $scope.updateChartConfig();
@@ -353,8 +354,7 @@ export function DeskActivityReportController(
         // Any data after the daylight savings change will be 1 hour out
         const utcOffset = getUtcOffsetInMinutes(
             report.start,
-            config.defaultTimezone,
-            moment
+            appConfig.defaultTimezone
         );
 
         const chart = new SDChart.Chart({
@@ -362,7 +362,7 @@ export function DeskActivityReportController(
             chartType: 'highcharts',
             title: $scope.generateTitle(),
             subtitle: $scope.generateSubtitle(),
-            startOfWeek: deployConfig.getSync('start_of_week', 0),
+            startOfWeek: appConfig.start_of_week || appConfig.startingDay || 0,
             timezoneOffset: utcOffset,
             useUTC: false,
             fullHeight: false,

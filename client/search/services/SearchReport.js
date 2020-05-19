@@ -1,19 +1,20 @@
-SearchReport.$inject = ['lodash', 'config', 'moment', 'api', '$q', 'gettext', 'gettextCatalog'];
+import {appConfig} from 'appConfig';
+
+import {gettext} from '../../utils';
+
+SearchReport.$inject = ['lodash', 'moment', 'api', '$q'];
 
 /**
  * @ngdoc service
  * @module superdesk.apps.analytics
  * @name SearchReport
  * @requires lodash
- * @requires config
  * @requires moment
  * @requires api
  * @requires $q
- * @requires gettext
- * @requires gettextCatalog
  * @description Search service used to query the reporting endpoints
  */
-export function SearchReport(_, config, moment, api, $q, gettext, gettextCatalog) {
+export function SearchReport(_, moment, api, $q) {
     /**
      * @ngdoc property
      * @name SearchReport#itemStates
@@ -64,13 +65,16 @@ export function SearchReport(_, config, moment, api, $q, gettext, gettextCatalog
         name: gettext('Source'),
     }, {
         qcode: 'urgency',
-        name: gettextCatalog.getString('Urgency'),
+        name: gettext('Urgency'),
     }, {
         qcode: 'task.desk',
         name: gettext('Desk'),
     }, {
         qcode: 'task.user',
         name: gettext('User'),
+    }, {
+        qcode: 'subject.qcode',
+        name: gettext('Subject'),
     }];
 
     /**
@@ -97,17 +101,17 @@ export function SearchReport(_, config, moment, api, $q, gettext, gettextCatalog
         const report = _.cloneDeep(params);
 
         if (_.get(report, 'dates.start')) {
-            report.dates.start = moment(report.dates.start, config.model.dateformat)
+            report.dates.start = moment(report.dates.start, appConfig.model.dateformat)
                 .format('YYYY-MM-DD');
         }
 
         if (_.get(report, 'dates.end')) {
-            report.dates.end = moment(report.dates.end, config.model.dateformat)
+            report.dates.end = moment(report.dates.end, appConfig.model.dateformat)
                 .format('YYYY-MM-DD');
         }
 
         if (_.get(report, 'dates.date')) {
-            report.dates.date = moment(report.dates.date, config.model.dateformat)
+            report.dates.date = moment(report.dates.date, appConfig.model.dateformat)
                 .format('YYYY-MM-DD');
         }
 

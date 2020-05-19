@@ -1,17 +1,19 @@
+import {appConfig} from 'appConfig';
+
 describe('searchReport', () => {
     let searchReport;
     let api;
     let $q;
 
-    beforeEach(window.module(($provide) => {
+    beforeEach(() => {
         // Use the superdesk.config.js/webpack.config.js application config
-        $provide.constant('config', {
+        Object.assign(appConfig, {
             // eslint-disable-next-line no-undef
             ...__SUPERDESK_CONFIG__,
             server: {url: ''},
             defaultTimezone: 'UTC',
         });
-    }));
+    });
 
     beforeEach(window.module('superdesk.core.activity'));
     beforeEach(window.module('angularMoment'));

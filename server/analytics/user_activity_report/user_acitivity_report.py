@@ -23,6 +23,35 @@ class UserActivityReportResource(Resource):
     resource_methods = ['GET']
     privileges = {'GET': 'user_activity_report'}
 
+    schema = {
+        'items': {
+            'type': 'list',
+            'required': False,
+            'schema': {
+                'type': 'dict',
+                'schema': {},
+                'allow_unknown': True
+            }
+        },
+        'min': {
+            'type': 'datetime',
+            'required': False
+        },
+        'max': {
+            'type': 'datetime',
+            'required': False
+        },
+        'highcharts': {
+            'type': 'list',
+            'required': False,
+            'schema': {
+                'type': 'dict',
+                'schema': {},
+                'allow_unknown': True
+            }
+        }
+    }
+
 
 class UserActivityReportService(StatsReportService):
     date_filter_field = 'versioncreated'
