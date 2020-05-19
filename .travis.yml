@@ -4,9 +4,6 @@ python: 3.6
 
 dist: bionic
 
-services:
-    - docker
-
 env:
   global:
     - TRAVIS_NODE_VERSION="10"
