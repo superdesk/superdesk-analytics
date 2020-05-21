@@ -7,7 +7,6 @@ import {DATE_FILTERS} from '../../search/common';
 PlanningUsageReportController.$inject = [
     '$scope',
     'savedReports',
-    'searchReport',
     'moment',
     'lodash',
     'notify',
@@ -22,7 +21,6 @@ PlanningUsageReportController.$inject = [
  * @name PlanningUsageReportController
  * @requires $scope
  * @requires savedReports
- * @requires searchReport
  * @requires moment
  * @requires lodash
  * @requires notify
@@ -34,7 +32,6 @@ PlanningUsageReportController.$inject = [
 export function PlanningUsageReportController(
     $scope,
     savedReports,
-    searchReport,
     moment,
     _,
     notify,

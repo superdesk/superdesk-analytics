@@ -1,13 +1,13 @@
 import {appConfig} from 'appConfig';
 
 import {getTranslatedOperations} from '../../utils';
+import {searchReport} from '../../search/services/SearchReport';
 
 FeaturemediaUpdatesTable.$inject = [
     'userList',
     'moment',
     'api',
     'lodash',
-    'searchReport',
     'notify',
 ];
 
@@ -19,7 +19,6 @@ FeaturemediaUpdatesTable.$inject = [
  * @requires moment
  * @requires api
  * @requires lodash
- * @requires searchReport
  * @requires notify
  * @description Directive to render the interactive featuremedia updates table
  */
@@ -28,7 +27,6 @@ export function FeaturemediaUpdatesTable(
     moment,
     api,
     _,
-    searchReport,
     notify
 ) {
     return {

@@ -8,6 +8,11 @@
  * at https://www.sourcefabric.org/superdesk/license
  */
 
+import {getSuperdeskApiImplementation} from 'superdesk-core/scripts/core/get-superdesk-api-implementation';
+import {superdeskApi} from './superdeskApi';
+import {appConfig, extensions} from 'appConfig';
+import ng from 'superdesk-core/scripts/core/services/ng';
+
 import {gettext} from './utils';
 
 import './styles/analytics.scss';
@@ -92,4 +97,43 @@ export default angular.module('superdesk.analytics', [
                 return reports.length > 0;
             }],
         });
-    }]);
+    }])
+
+    .run([
+        '$injector',
+        'modal',
+        'privileges',
+        'lock',
+        'session',
+        'authoringWorkspace',
+        'metadata',
+        (
+            $injector,
+            modal,
+            privileges,
+            lock,
+            session,
+            authoringWorkspace,
+            metadata
+        ) => {
+            ng.register($injector);
+
+            ng.waitForServicesToBeAvailable()
+                .then(() => {
+                    Object.assign(
+                        superdeskApi,
+                        getSuperdeskApiImplementation(
+                            null,
+                            extensions,
+                            modal,
+                            privileges,
+                            lock,
+                            session,
+                            authoringWorkspace,
+                            metadata,
+                            appConfig
+                        )
+                    );
+                });
+        },
+    ]);

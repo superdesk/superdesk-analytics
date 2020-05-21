@@ -1,11 +1,12 @@
+import {searchReport} from '../search/services/SearchReport';
 
 export function mockAll() {
-    beforeEach(inject((_$q_, _userList_, _desks_, _metadata_, _searchReport_, _ingestSources_) => {
+    beforeEach(inject((_$q_, _userList_, _desks_, _metadata_, _ingestSources_) => {
         mockUsers(_userList_, _$q_);
         mockDesks(_desks_, _$q_);
         mockMetadata(_metadata_, _$q_);
-        mockSearchQuery(_searchReport_, _$q_);
         mockIngestSources(_ingestSources_, _$q_);
+        mockSearchQuery(_$q_);
     }));
 }
 
@@ -95,7 +96,7 @@ export function mockIngestSources(ingestSources, $q) {
     });
 }
 
-export function mockSearchQuery(searchReport, $q) {
+export function mockSearchQuery($q) {
     // eslint-disable-next-line jasmine/no-unsafe-spy
     spyOn(searchReport, 'query').and.returnValue(
         $q.when({groups: {aap: 1, test: 2}})

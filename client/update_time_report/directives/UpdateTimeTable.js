@@ -1,6 +1,7 @@
 import {appConfig} from 'appConfig';
 
 import {gettext} from '../../utils';
+import {searchReport} from '../../search/services/SearchReport';
 
 UpdateTimeTable.$inject = [
     'userList',
@@ -11,7 +12,6 @@ UpdateTimeTable.$inject = [
     '$q',
     'notify',
     '$rootScope',
-    'searchReport',
 ];
 
 /**
@@ -26,7 +26,6 @@ UpdateTimeTable.$inject = [
  * @requires $q
  * @requires notify
  * @requires $rootScope
- * @requires searchReport
  * @description Directive to render the interactive featuremedia updates table
  */
 export function UpdateTimeTable(
@@ -37,8 +36,7 @@ export function UpdateTimeTable(
     $interpolate,
     $q,
     notify,
-    $rootScope,
-    searchReport
+    $rootScope
 ) {
     return {
         replace: true,

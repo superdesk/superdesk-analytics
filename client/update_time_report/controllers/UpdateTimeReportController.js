@@ -2,12 +2,12 @@ import {DATE_FILTERS} from '../../search/common';
 import {SOURCE_FILTERS} from '../../search/directives/SourceFilters';
 import {getErrorMessage, gettext} from '../../utils';
 import {CHART_FIELDS, CHART_TYPES} from '../../charts/directives/ChartOptions';
+import {searchReport} from '../../search/services/SearchReport';
 
 UpdateTimeReportController.$inject = [
     '$scope',
     'lodash',
     'savedReports',
-    'searchReport',
     'notify',
     'moment',
     '$q',
@@ -22,7 +22,6 @@ UpdateTimeReportController.$inject = [
  * @requires $scope
  * @requires lodash
  * @requires savedReports
- * @requires searchReport
  * @requires notify
  * @requires moment
  * @requires $q
@@ -34,7 +33,6 @@ export function UpdateTimeReportController(
     $scope,
     _,
     savedReports,
-    searchReport,
     notify,
     moment,
     $q,

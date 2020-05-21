@@ -2,12 +2,12 @@ import {appConfig} from 'appConfig';
 
 import {getErrorMessage, gettext} from '../../utils';
 import {CHART_TYPES} from '../../charts/directives/ChartOptions';
+import {searchReport} from '../../search/services/SearchReport';
 
 ContentPublishingReportController.$inject = [
     '$scope',
     'lodash',
     'savedReports',
-    'searchReport',
     'notify',
     'moment',
     '$q',
@@ -23,7 +23,6 @@ ContentPublishingReportController.$inject = [
  * @requires $scope
  * @requires lodash
  * @requires savedReports
- * @requires searchReport
  * @requires notify
  * @requires moment
  * @requires $q
@@ -36,7 +35,6 @@ export function ContentPublishingReportController(
     $scope,
     _,
     savedReports,
-    searchReport,
     notify,
     moment,
     $q,

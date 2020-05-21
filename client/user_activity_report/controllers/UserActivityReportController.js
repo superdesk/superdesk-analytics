@@ -11,13 +11,13 @@ import {DATE_FILTERS} from '../../search/common';
 import {SOURCE_FILTERS} from '../../search/directives/SourceFilters';
 import {CHART_FIELDS} from '../../charts/directives/ChartOptions';
 import {SDChart} from '../../charts/SDChart';
+import {searchReport} from '../../search/services/SearchReport';
 
 UserActivityReportController.$inject = [
     '$scope',
     'savedReports',
     'chartConfig',
     'lodash',
-    'searchReport',
     'moment',
     'notify',
     '$q',
@@ -35,7 +35,6 @@ UserActivityReportController.$inject = [
  * @requires savedReports
  * @requires chartConfig
  * @requires lodash
- * @requires searchReport
  * @requires moment
  * @requires notify
  * @requires $q
@@ -50,7 +49,6 @@ export function UserActivityReportController(
     savedReports,
     chartConfig,
     _,
-    searchReport,
     moment,
     notify,
     $q,

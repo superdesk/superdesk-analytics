@@ -2,6 +2,8 @@ import {appConfig} from 'appConfig';
 
 import {mockAll} from '../../tests/mocks';
 
+import {searchReport} from '../services/SearchReport';
+
 describe('sda-source-filters', () => {
     let $compile;
     let $rootScope;
@@ -13,7 +15,6 @@ describe('sda-source-filters', () => {
     let userList;
     let desks;
     let metadata;
-    let searchReport;
     let ingestSources;
 
     beforeEach(() => {
@@ -37,11 +38,10 @@ describe('sda-source-filters', () => {
         $rootScope = _$rootScope_;
     }));
 
-    beforeEach(inject((_userList_, _desks_, _metadata_, _searchReport_, _ingestSources_) => {
+    beforeEach(inject((_userList_, _desks_, _metadata_, _ingestSources_) => {
         userList = _userList_;
         desks = _desks_;
         metadata = _metadata_;
-        searchReport = _searchReport_;
         ingestSources = _ingestSources_;
 
         fields = undefined;

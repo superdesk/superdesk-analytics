@@ -10,13 +10,13 @@ import {
 import {CHART_FIELDS, CHART_TYPES} from '../../charts/directives/ChartOptions';
 import {SDChart} from '../../charts/SDChart';
 import {REPORT_CONFIG} from '../../services/ReportConfigService';
+import {searchReport} from '../../search/services/SearchReport';
 
 DeskActivityReportController.$inject = [
     '$scope',
     'savedReports',
     'chartConfig',
     'lodash',
-    'searchReport',
     'moment',
     'notify',
     '$q',
@@ -32,7 +32,6 @@ DeskActivityReportController.$inject = [
  * @requires savedReports
  * @requires chartConfig
  * @requires lodash
- * @requires searchReport
  * @requires moment
  * @requires notify
  * @requires $q
@@ -45,7 +44,6 @@ export function DeskActivityReportController(
     savedReports,
     chartConfig,
     _,
-    searchReport,
     moment,
     notify,
     $q,

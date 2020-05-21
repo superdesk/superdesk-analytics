@@ -4,6 +4,7 @@ import {
     getTranslatedOperations,
     gettext,
 } from '../../utils';
+import {searchReport} from '../services/SearchReport';
 
 /**
  * @ngdoc property
@@ -149,7 +150,6 @@ SourceFilters.$inject = [
     'userList',
     'desks',
     'metadata',
-    'searchReport',
     'ingestSources',
 ];
 
@@ -162,7 +162,6 @@ SourceFilters.$inject = [
  * @requires userList
  * @requires desks
  * @requires metadata
- * @requires searchReport
  * @requires ingestSources
  * @description A directive that provides desk, user, source and metadata filters for reports
  */
@@ -172,7 +171,6 @@ export function SourceFilters(
     userList,
     desks,
     metadata,
-    searchReport,
     ingestSources
 ) {
     return {
