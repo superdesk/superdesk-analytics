@@ -2,7 +2,7 @@ import {appConfig} from 'appConfig';
 
 import {getErrorMessage, gettext} from '../../utils';
 import {CHART_TYPES} from '../../charts/directives/ChartOptions';
-import {searchReport} from '../../search/services/SearchReport';
+import {searchReportService} from '../../search/services/SearchReport';
 
 ContentPublishingReportController.$inject = [
     '$scope',
@@ -80,11 +80,11 @@ export function ContentPublishingReportController(
      * @description Initialises the default report parameters
      */
     this.initDefaultParams = () => {
-        $scope.item_states = searchReport.filterItemStates(
+        $scope.item_states = searchReportService.filterItemStates(
             ['published', 'killed', 'corrected', 'recalled']
         );
 
-        $scope.report_groups = searchReport.filterDataFields(
+        $scope.report_groups = searchReportService.filterDataFields(
             ['anpa_category.qcode', 'genre.qcode', 'source', 'urgency', 'subject.qcode']
         );
 

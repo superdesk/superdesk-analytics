@@ -1,4 +1,4 @@
-import {searchReport} from '../search/services/SearchReport';
+import {searchReportService} from '../search/services/SearchReport';
 
 /**
  * @ngdoc directive
@@ -280,7 +280,7 @@ export function AnalyticsContainer() {
                  * @return {Object}
                  * @description Queries the DeskActivityReport API and returns it's response
                  */
-                $scope.runQuery = (params) => searchReport.query(
+                $scope.runQuery = (params) => searchReportService.query(
                     _.get($scope.currentReport, 'id'),
                     params,
                     true

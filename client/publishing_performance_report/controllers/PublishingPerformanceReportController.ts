@@ -2,10 +2,11 @@ import {cloneDeep} from 'lodash';
 import moment from 'moment';
 
 import {appConfig, superdeskApi} from '../../superdeskApi';
+import {DATA_FIELD, ITEM_STATE, CHART_SORT, DATE_FILTER} from '../../interfaces';
 
 import {getErrorMessage} from '../../utils';
 import {CHART_FIELDS, CHART_TYPES} from '../../charts/directives/ChartOptions';
-import {searchReport} from '../../search/services/SearchReport';
+import {searchReportService} from '../../search/services/SearchReport';
 
 
 PublishingPerformanceReportController.$inject = [
@@ -84,28 +85,28 @@ export function PublishingPerformanceReportController(
      * @description Initialises the default report parameters
      */
     this.initDefaultParams = () => {
-        $scope.item_states = searchReport.filterItemStates([
-            'published',
-            'killed',
-            'corrected',
-            'recalled',
+        $scope.item_states = searchReportService.filterItemStates([
+            ITEM_STATE.PUBLISHED,
+            ITEM_STATE.KILLED,
+            ITEM_STATE.CORRECTED,
+            ITEM_STATE.RECALLED,
         ]);
 
-        $scope.report_groups = searchReport.filterDataFields([
-            'task.desk',
-            'task.user',
-            'anpa_category.qcode',
-            'source',
-            'urgency',
-            'genre.qcode',
-            'subject.qcode',
+        $scope.report_groups = searchReportService.filterDataFields([
+            DATA_FIELD.DESK,
+            DATA_FIELD.USER,
+            DATA_FIELD.CATEGORY,
+            DATA_FIELD.SOURCE,
+            DATA_FIELD.URGENCY,
+            DATA_FIELD.GENRE,
+            DATA_FIELD.SUBJECT,
         ]);
 
         $scope.currentParams = {
             report: reportName,
             params: $scope.config.defaultParams({
                 dates: {
-                    filter: 'range',
+                    filter: DATE_FILTER.RANGE,
                     start: moment()
                         .subtract(30, 'days')
                         .format(appConfig.model.dateformat),
@@ -131,7 +132,7 @@ export function PublishingPerformanceReportController(
                 min: 1,
                 aggs: {
                     group: {
-                        field: $scope?.report_groups?.[0].qcode ?? 'task.desk',
+                        field: $scope?.report_groups?.[0].qcode ?? DATA_FIELD.DESK,
                         size: 0,
                     },
                     subgroup: {
@@ -140,7 +141,7 @@ export function PublishingPerformanceReportController(
                 },
                 chart: {
                     type: CHART_TYPES.COLUMN,
-                    sort_order: 'desc',
+                    sort_order: CHART_SORT.DESCENDING,
                     title: null,
                     subtitle: null,
                 },

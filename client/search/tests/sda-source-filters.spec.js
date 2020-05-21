@@ -2,7 +2,7 @@ import {appConfig} from 'appConfig';
 
 import {mockAll} from '../../tests/mocks';
 
-import {searchReport} from '../services/SearchReport';
+import {searchReportService} from '../services/SearchReport';
 
 describe('sda-source-filters', () => {
     let $compile;
@@ -73,7 +73,7 @@ describe('sda-source-filters', () => {
         fields = ['sources'];
         compileElement();
 
-        expect(searchReport.query).toHaveBeenCalledWith(
+        expect(searchReportService.query).toHaveBeenCalledWith(
             'content_publishing_report',
             {
                 aggs: {group: {field: 'source'}},

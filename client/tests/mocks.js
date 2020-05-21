@@ -1,4 +1,4 @@
-import {searchReport} from '../search/services/SearchReport';
+import {searchReportService} from '../search/services/SearchReport';
 
 export function mockAll() {
     beforeEach(inject((_$q_, _userList_, _desks_, _metadata_, _ingestSources_) => {
@@ -98,7 +98,7 @@ export function mockIngestSources(ingestSources, $q) {
 
 export function mockSearchQuery($q) {
     // eslint-disable-next-line jasmine/no-unsafe-spy
-    spyOn(searchReport, 'query').and.returnValue(
+    spyOn(searchReportService, 'query').and.returnValue(
         $q.when({groups: {aap: 1, test: 2}})
     );
 }

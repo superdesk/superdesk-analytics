@@ -3,7 +3,7 @@ import {CHART_FIELDS} from '../../../charts/directives/ChartOptions';
 import {SDChart} from '../../../charts/SDChart';
 import {CHART_COLOURS} from '../../../charts/directives/ChartColourPicker';
 import {getErrorMessage, gettext} from '../../../utils';
-import {searchReport} from '../../../search/services/SearchReport';
+import {searchReportService} from '../../../search/services/SearchReport';
 
 
 PublishingActionsWidgetController.$inject = [
@@ -136,7 +136,7 @@ export function PublishingActionsWidgetController(
          * @return {Promise<Object>}
          * @description Sends the query to the API and returns the generated report
          */
-        this.runQuery = (params) => searchReport.query(
+        this.runQuery = (params) => searchReportService.query(
             'publishing_performance_report',
             params,
             true

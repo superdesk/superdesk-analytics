@@ -10,7 +10,7 @@ import {
 import {CHART_FIELDS, CHART_TYPES} from '../../charts/directives/ChartOptions';
 import {SDChart} from '../../charts/SDChart';
 import {REPORT_CONFIG} from '../../services/ReportConfigService';
-import {searchReport} from '../../search/services/SearchReport';
+import {searchReportService} from '../../search/services/SearchReport';
 
 DeskActivityReportController.$inject = [
     '$scope',
@@ -118,7 +118,7 @@ export function DeskActivityReportController(
      * @description Initialises the default report parameters
      */
     this.initDefaultParams = () => {
-        $scope.item_states = searchReport.filterItemStates(
+        $scope.item_states = searchReportService.filterItemStates(
             ['published', 'killed', 'corrected', 'recalled']
         );
 

@@ -1,7 +1,7 @@
 import {appConfig} from 'appConfig';
 
 import {gettext} from '../../utils';
-import {searchReport} from '../../search/services/SearchReport';
+import {searchReportService} from '../../search/services/SearchReport';
 
 UpdateTimeTable.$inject = [
     'userList',
@@ -141,7 +141,7 @@ export function UpdateTimeTable(
              * @description Loads the item then opens it in the preview
              */
             scope.onCellClicked = (data) => {
-                searchReport.loadArchiveItem(_.get(data, 'id'))
+                searchReportService.loadArchiveItem(_.get(data, 'id'))
                     .then((newsItem) => {
                         scope.openPreview(newsItem);
                     }, (error) => {

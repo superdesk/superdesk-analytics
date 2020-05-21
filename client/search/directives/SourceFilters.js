@@ -4,7 +4,7 @@ import {
     getTranslatedOperations,
     gettext,
 } from '../../utils';
-import {searchReport} from '../services/SearchReport';
+import {searchReportService} from '../services/SearchReport';
 
 /**
  * @ngdoc property
@@ -261,7 +261,7 @@ export function SourceFilters(
              * @description Load the list of sources from published and archived collections
              */
             this.loadSources = () => (
-                searchReport.query(
+                searchReportService.query(
                     'content_publishing_report',
                     {
                         aggs: {group: {field: 'source'}},
@@ -451,7 +451,7 @@ export function SourceFilters(
                     ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.STATES],
                     label: gettext('Content State'),
                     placeholder: gettext('Search Content State'),
-                    items: searchReport.filterItemStates(
+                    items: searchReportService.filterItemStates(
                         ['published', 'killed', 'corrected', 'recalled']
                     ),
                     selected: [],

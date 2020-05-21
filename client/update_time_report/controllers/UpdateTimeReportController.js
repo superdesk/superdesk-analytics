@@ -2,7 +2,7 @@ import {DATE_FILTERS} from '../../search/common';
 import {SOURCE_FILTERS} from '../../search/directives/SourceFilters';
 import {getErrorMessage, gettext} from '../../utils';
 import {CHART_FIELDS, CHART_TYPES} from '../../charts/directives/ChartOptions';
-import {searchReport} from '../../search/services/SearchReport';
+import {searchReportService} from '../../search/services/SearchReport';
 
 UpdateTimeReportController.$inject = [
     '$scope',
@@ -95,7 +95,7 @@ export function UpdateTimeReportController(
      * @description Initialises the default report parameters
      */
     this.initDefaultParams = () => {
-        $scope.item_states = searchReport.filterItemStates(
+        $scope.item_states = searchReportService.filterItemStates(
             ['published', 'killed', 'corrected', 'recalled']
         );
 

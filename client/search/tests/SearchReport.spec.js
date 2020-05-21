@@ -1,8 +1,8 @@
 import {appConfig} from 'appConfig';
 
-import {searchReport} from '../services/SearchReport';
+import {searchReportService} from '../services/SearchReport';
 
-describe('searchReport', () => {
+describe('searchReportService', () => {
     let api;
 
     beforeEach(() => {
@@ -25,7 +25,7 @@ describe('searchReport', () => {
 
     describe('can send query as param object', () => {
         it('param object for dates', (done) => {
-            searchReport.query(
+            searchReportService.query(
                 'source_category_report',
                 {
                     dates: {
@@ -49,7 +49,7 @@ describe('searchReport', () => {
                         },
                     });
 
-                    return searchReport.query(
+                    return searchReportService.query(
                         'source_category_report',
                         {
                             dates: {
@@ -70,7 +70,7 @@ describe('searchReport', () => {
                         },
                     });
 
-                    return searchReport.query(
+                    return searchReportService.query(
                         'source_category_report',
                         {
                             dates: {
@@ -95,7 +95,7 @@ describe('searchReport', () => {
                         },
                     });
 
-                    return searchReport.query(
+                    return searchReportService.query(
                         'source_category_report',
                         {
                             dates: {
@@ -121,7 +121,7 @@ describe('searchReport', () => {
         });
 
         it('param object for filtered must/must_not', (done) => {
-            searchReport.query(
+            searchReportService.query(
                 'source_category_report',
                 {
                     dates: {filter: 'yesterday'},
@@ -160,7 +160,7 @@ describe('searchReport', () => {
         });
 
         it('includes aggregations', (done) => {
-            searchReport.query(
+            searchReportService.query(
                 'source_category_report',
                 {
                     dates: {filter: 'yesterday'},
@@ -189,7 +189,7 @@ describe('searchReport', () => {
         });
 
         it('includes repos', (done) => {
-            searchReport.query(
+            searchReportService.query(
                 'source_category_report',
                 {
                     dates: {filter: 'yesterday'},
@@ -220,7 +220,7 @@ describe('searchReport', () => {
         });
 
         it('includes return_type', (done) => {
-            searchReport.query(
+            searchReportService.query(
                 'source_category_report',
                 {
                     dates: {filter: 'yesterday'},
