@@ -627,6 +627,30 @@ describe('chartConfig', () => {
             });
         });
 
+        it('translates authors.parent', () => {
+            const chart = chartConfig.newConfig('author', 'bar');
+
+            chart.addSource('authors.parent', {user1: 3, user2: 4, user3: 5});
+
+            expect(chartConfig.translations).toEqual({});
+
+            chart.loadTranslations();
+            $rootScope.$digest();
+            expect(chartConfig.translations).toEqual({
+                authors_parent: {
+                    title: 'Author',
+                    names: {
+                        user1: 'first user',
+                        user2: 'second user',
+                        user3: 'last user',
+                        user4: 'inactive',
+                        user5: 'disabled',
+                        user6: 'waiting',
+                    },
+                },
+            });
+        });
+
         it('translates state', () => {
             const chart = chartConfig.newConfig('state', 'bar');
 

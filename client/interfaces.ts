@@ -34,6 +34,8 @@ export enum DATA_FIELD {
     URGENCY = 'urgency',
     GENRE = 'genre.qcode',
     SUBJECT = 'subject.qcode',
+    AUTHOR = 'authors.parent',
+    STATE = 'state',
 }
 
 export enum REPORT_RESPONSE_TYPE {

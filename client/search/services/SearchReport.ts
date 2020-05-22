@@ -115,6 +115,12 @@ function getSupportedDataFields(): Array<IDataFilter> {
     }, {
         qcode: DATA_FIELD.SUBJECT,
         name: gettext('Subject'),
+    }, {
+        qcode: DATA_FIELD.AUTHOR,
+        name: gettext('Author'),
+    }, {
+        qcode: DATA_FIELD.STATE,
+        name: gettext('State'),
     }];
 }
 

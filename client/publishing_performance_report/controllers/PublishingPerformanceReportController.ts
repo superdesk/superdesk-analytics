@@ -2,7 +2,14 @@ import {cloneDeep} from 'lodash';
 import moment from 'moment';
 
 import {appConfig, superdeskApi} from '../../superdeskApi';
-import {DATA_FIELD, ITEM_STATE, CHART_SORT, DATE_FILTER} from '../../interfaces';
+import {
+    CHART_SORT,
+    CHART_TYPE,
+    DATA_FIELD,
+    DATE_FILTER,
+    ITEM_STATE,
+    REPORT_RESPONSE_TYPE,
+} from '../../interfaces';
 
 import {getErrorMessage} from '../../utils';
 import {CHART_FIELDS, CHART_TYPES} from '../../charts/directives/ChartOptions';
@@ -100,6 +107,7 @@ export function PublishingPerformanceReportController(
             DATA_FIELD.URGENCY,
             DATA_FIELD.GENRE,
             DATA_FIELD.SUBJECT,
+            DATA_FIELD.AUTHOR,
         ]);
 
         $scope.currentParams = {
@@ -136,7 +144,7 @@ export function PublishingPerformanceReportController(
                         size: 0,
                     },
                     subgroup: {
-                        field: 'state',
+                        field: DATA_FIELD.STATE,
                     },
                 },
                 chart: {
@@ -145,6 +153,7 @@ export function PublishingPerformanceReportController(
                     title: null,
                     subtitle: null,
                 },
+                return_type: REPORT_RESPONSE_TYPE.AGGREGATIONS,
             }),
         };
 
@@ -219,7 +228,7 @@ export function PublishingPerformanceReportController(
      * @description When the date filter changes, clear the date input fields if the filter is not 'range'
      */
     $scope.onDateFilterChange = () => {
-        if ($scope.currentParams.params.dates.filter !== 'range') {
+        if ($scope.currentParams.params.dates.filter !== DATE_FILTER.RANGE) {
             $scope.currentParams.params.dates.start = null;
             $scope.currentParams.params.dates.end = null;
         }
@@ -300,13 +309,19 @@ export function PublishingPerformanceReportController(
 
         this.chart.getTitle = () => $scope.generateTitle(report);
         this.chart.getSubtitle = $scope.generateSubtitle;
-        this.chart.getChildKeys = () => ['published', 'recalled', 'killed', 'corrected', 'updated'];
+        this.chart.getChildKeys = () => [
+            ITEM_STATE.PUBLISHED,
+            ITEM_STATE.RECALLED,
+            ITEM_STATE.KILLED,
+            ITEM_STATE.CORRECTED,
+            'updated',
+        ];
 
         return this.chart.loadTranslations(report?.aggs?.group?.field)
             .then(() => this.chart.genConfig())
             .then((config) => ({
                 charts: [config],
-                wrapCharts: report.chart.type === 'table',
+                wrapCharts: report.chart.type === CHART_TYPE.TABLE,
                 height500: false,
                 fullWidth: true,
                 multiChart: false,
