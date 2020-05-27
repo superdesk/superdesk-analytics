@@ -118,7 +118,7 @@ Feature: Saved Reports
         """
         When we patch "/users/#CONTEXT_USER_ID#"
         """
-        {"user_type": "user", "privileges": {"global_saved_reports": 1}}
+        {"user_type": "user", "privileges": {"global_saved_reports": 1, "saved_reports": 1}}
         """
         Then we get OK response
         When we post to "/saved_reports"
@@ -204,7 +204,7 @@ Feature: Saved Reports
         """
         When we patch "/users/#CONTEXT_USER_ID#"
         """
-        {"user_type": "user", "privileges": {"global_saved_reports": 1}}
+        {"user_type": "user", "privileges": {"global_saved_reports": 1, "saved_reports": 1}}
         """
         Then we get OK response
         When we patch "/saved_reports/#REPORT1#"
