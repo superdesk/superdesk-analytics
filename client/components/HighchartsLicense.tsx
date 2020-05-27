@@ -23,7 +23,8 @@ class HighchartsLicenseModal extends React.PureComponent<IProps> {
         const gettext = superdeskApi.localization.gettext;
         const config: IAnalyticsConfig = appConfig as IAnalyticsConfig;
         const highchartsVersionLink = `https://www.highcharts.com/blog/changelog/#highcharts-v${hc.version}`;
-        const licenseType = config.highcharts_license_type ?? gettext('OEM');
+        const license = config.highcharts?.license ?? {};
+        const licenseType = license.type ?? gettext('OEM');
 
         return (
             <Modal>
@@ -44,41 +45,41 @@ class HighchartsLicenseModal extends React.PureComponent<IProps> {
                                     <td>{gettext('License Type')}:</td>
                                     <td>{licenseType}</td>
                                 </tr>
-                                {config.highcharts_licensee && (
+                                {license.licensee && (
                                     <tr>
                                         <td>{gettext('Licensee:')}</td>
-                                        <td>{config.highcharts_licensee}</td>
+                                        <td>{license.licensee}</td>
                                     </tr>
                                 )}
-                                {config.highcharts_licensee_contact && (
+                                {license.contact && (
                                     <tr>
                                         <td>{gettext('Licensee Contact:')}</td>
                                         <td>
-                                            <a href={`mailto:${config.highcharts_licensee_contact}`}
+                                            <a href={`mailto:${license.contact}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                             >
-                                                {config.highcharts_licensee_contact}
+                                                {license.contact}
                                             </a>
                                         </td>
                                     </tr>
                                 )}
-                                {config.highcharts_license_id && (
+                                {license.id && (
                                     <tr>
                                         <td>{gettext('License ID:')}</td>
-                                        <td>{config.highcharts_license_id}</td>
+                                        <td>{license.id}</td>
                                     </tr>
                                 )}
-                                {config.highcharts_license_customer_id && (
+                                {license.customer_id && (
                                     <tr>
                                         <td>{gettext('Customer Installation No.:')}</td>
-                                        <td>{config.highcharts_license_customer_id}</td>
+                                        <td>{license.customer_id}</td>
                                     </tr>
                                 )}
-                                {config.highcharts_license_expiry && (
+                                {license.expiry && (
                                     <tr>
                                         <td>{gettext('Expiry Date:')}</td>
-                                        <td>{config.highcharts_license_expiry}</td>
+                                        <td>{license.expiry}</td>
                                     </tr>
                                 )}
                                 <tr>
