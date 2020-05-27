@@ -21,6 +21,7 @@ The Highcharts JS library is used to render the charts. It is available under di
     * [Client](#client-enable-the-superdesk-analytics-module)
     * [Server](#server-load-the-superdesk-analytics-module)
     * [Development](#development-setup)
+* [Highcharts License](#highcharts-license)
 * [Config Options](#config-options)
 * [Highcharts Export Server](#highcharts-export-server)
     * [Installing the Service](#installing-the-service)
@@ -115,6 +116,21 @@ cd /path/to/superdesk-core
 source env/bin/activate
 pip install -e /path/to/superdesk-analytics
 ```
+
+
+## Highcharts License
+You must have a valid license for [Highcharts](https://www.highcharts.com/) JS v6.x to use this plugin.
+
+The Highcharts JS library is used to render the charts. It is available under different licenses depending on whether it is intended for commercial/government use, or for a personal or non-profit project.
+
+To have the license details available to the end user in the Analytics page of Superdesk, provide the following config options in your settings.py:
+
+* HIGHCHARTS_LICENSE_TYPE (High-Five, Develop or OEM)
+* HIGHCHARTS_LICENSEE (Name of the entity that owns the license)
+* HIGHCHARTS_LICENSEE_CONTACT (A contact email address for the licensee)
+* HIGHCHARTS_LICENSE_ID (The license ID provided by Highsoft)
+* HIGHCHARTS_LICENSE_CUSTOMER_ID (A custom license field to use an internal customer number, if required)
+* HIGHCHARTS_LICENSE_EXPIRY (the expiry of the license)
 
 
 ## Config Options

@@ -106,6 +106,16 @@ def init_app(app):
     init_featuremedia_updates_report(app)
     init_update_time_report(app)
 
+    app.client_config.setdefault('highcharts', {})
+    app.client_config['highcharts']['license'] = {
+        'id': app.config.get('HIGHCHARTS_LICENSE_ID') or '',
+        'type': app.config.get('HIGHCHARTS_LICENSE_TYPE') or 'OEM',
+        'licensee': app.config.get('HIGHCHARTS_LICENSEE') or '',
+        'contact': app.config.get('HIGHCHARTS_LICENSEE_CONTACT') or '',
+        'customer_id': app.config.get('HIGHCHARTS_LICENSE_CUSTOMER_ID') or '',
+        'expiry': app.config.get('HIGHCHARTS_LICENSE_EXPIRY') or ''
+    }
+
     # If this app is for testing, then create an endpoint for the base reporting service
     # so the core searching/aggregation functionality can be tested
     if app.testing:
