@@ -1,4 +1,5 @@
 import {Moment} from 'moment';
+import {ISuperdeskGlobalConfig} from 'superdesk-api';
 
 // Copied from superdesk-api.d.ts as the following error occurs if importing ITEM_STATE here and another ts file
 // "Module not found: Error: Can't resolve 'superdesk-api'"
@@ -132,4 +133,17 @@ export interface IReportPayload {
     max_results?: number;
     page?: number;
     sort?: Array<{ [key: string]: string }>;
+}
+
+export interface IAnalyticsConfig extends ISuperdeskGlobalConfig {
+    highcharts?: {
+        license?: {
+            id?: string;
+            type?: string;
+            licensee?: string;
+            contact?: string;
+            customer_id?: string;
+            expiry?: string;
+        };
+    };
 }
