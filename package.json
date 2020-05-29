@@ -44,7 +44,7 @@
     "moment-timezone": "^0.5.14",
     "rangy": "1.3.0",
     "superdesk-code-style": "^1.2.0",
-    "superdesk-core": "github:petrjasek/superdesk-client-core#elastic7",
+    "superdesk-core": "github:superdesk/superdesk-client-core#develop",
     "typescript-eslint-parser": "^18.0.0"
   }
 }
