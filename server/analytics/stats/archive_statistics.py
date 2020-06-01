@@ -57,7 +57,7 @@ class ArchiveStatisticsResource(Resource):
                                 'type': 'string',
                                 'mapping': not_indexed
                             },
-                            'operation': {'type': 'string'},
+                            'operation': {'type': 'string', 'mapping': not_indexed},
                             'operation_created': {'type': 'datetime'},
                             ITEM_STATE: metadata_schema[ITEM_STATE],
                             'pubstatus': {'type': 'string'},
