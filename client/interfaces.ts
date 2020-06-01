@@ -8,6 +8,9 @@ export enum ITEM_STATE {
     CORRECTED = 'corrected',
     KILLED = 'killed',
     RECALLED = 'recalled',
+
+    // Special state in analytics for published items that have 'rewrite_of' attribute (i.e. an update)
+    UPDATED = 'updated',
 }
 
 export enum DATE_FILTER {

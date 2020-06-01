@@ -314,7 +314,7 @@ export function PublishingPerformanceReportController(
             ITEM_STATE.RECALLED,
             ITEM_STATE.KILLED,
             ITEM_STATE.CORRECTED,
-            'updated',
+            ITEM_STATE.UPDATED,
         ];
 
         return this.chart.loadTranslations(report?.aggs?.group?.field)
