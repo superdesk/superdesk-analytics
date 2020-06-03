@@ -57,7 +57,6 @@ class DeskActivityReportService(BaseReportService):
         'operations': {
             'terms': {
                 'field': 'stats.timeline.operation',
-                'size': 0
             }
         }
     }

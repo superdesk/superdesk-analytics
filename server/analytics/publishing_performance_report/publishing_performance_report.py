@@ -27,7 +27,6 @@ class PublishingPerformanceReportService(BaseReportService):
         'source': {
             'terms': {
                 'field': 'source',
-                'size': 0,
             }
         }
     }
@@ -39,7 +38,6 @@ class PublishingPerformanceReportService(BaseReportService):
         query = {
             'terms': {
                 'field': agg.get('field'),
-                'size': agg.get('size') or 0
             },
             'aggs': {
                 'no_rewrite_of': {
@@ -76,6 +74,9 @@ class PublishingPerformanceReportService(BaseReportService):
                 }
             }
         }
+
+        if agg.get('size'):
+            query['terms']['size'] = agg['size']
 
         if include != 'all':
             query['terms']['include'] = include

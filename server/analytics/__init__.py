@@ -121,8 +121,8 @@ def init_app(app):
     if app.testing:
         class TestReportService(BaseReportService):
             aggregations = {
-                'category': {'terms': {'field': 'anpa_category.qcode', 'size': 0}},
-                'source': {'terms': {'field': 'source', 'size': 0}}
+                'category': {'terms': {'field': 'anpa_category.qcode'}},
+                'source': {'terms': {'field': 'source'}}
             }
 
         class BaseReportResource(superdesk.resource.Resource):

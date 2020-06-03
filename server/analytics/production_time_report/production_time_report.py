@@ -46,7 +46,6 @@ class ProductionTimeReportService(StatsReportService):
         'operations': {
             'terms': {
                 'field': 'stats.timeline.operation',
-                'size': 0
             }
         }
     }
@@ -75,7 +74,6 @@ class ProductionTimeReportService(StatsReportService):
                             'desks': {
                                 'terms': {
                                     'field': 'stats.desk_transitions.desk',
-                                    'size': 0
                                 },
                                 'aggs': {
                                     'stats': {

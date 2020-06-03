@@ -57,7 +57,7 @@ class ArchiveStatisticsResource(Resource):
                                 'type': 'string',
                                 'mapping': not_indexed
                             },
-                            'operation': {'type': 'string'},
+                            'operation': {'type': 'string', 'mapping': not_indexed},
                             'operation_created': {'type': 'datetime'},
                             ITEM_STATE: metadata_schema[ITEM_STATE],
                             'pubstatus': {'type': 'string'},
@@ -82,7 +82,7 @@ class ArchiveStatisticsResource(Resource):
                         'properties': {
                             'history_id': not_indexed,
                             'related_history_id': not_indexed,
-                            'operation': {'type': 'string'},
+                            'operation': not_analyzed,
                             'operation_created': {'type': 'date'},
                             ITEM_STATE: {'type': 'string'},
                             'pubstatus': {'type': 'string'},
@@ -166,7 +166,7 @@ class ArchiveStatisticsResource(Resource):
                         'type': 'nested',
                         'properties': {
                             'related_history_id': not_analyzed,
-                            'operation': {'type': 'string'},
+                            'operation': not_analyzed,
                             'operation_created': {'type': 'date'},
                             ITEM_STATE: {'type': 'string'},
                             'pubstatus': {'type': 'string'},

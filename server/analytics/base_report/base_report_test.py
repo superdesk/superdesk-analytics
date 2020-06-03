@@ -16,7 +16,7 @@ from analytics import init_app
 
 from eve.utils import ParsedRequest
 from werkzeug.datastructures import ImmutableMultiDict
-import mock
+from unittest import mock
 
 aggregation_response = {
     'aggregations': {
