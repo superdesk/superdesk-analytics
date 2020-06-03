@@ -28,7 +28,6 @@ class ContentPublishingReportService(BaseReportService):
         'source': {
             'terms': {
                 'field': 'source',
-                'size': 0,
             }
         }
     }
@@ -40,9 +39,11 @@ class ContentPublishingReportService(BaseReportService):
         query = {
             'terms': {
                 'field': agg.get('field'),
-                'size': agg.get('size') or 0
             }
         }
+
+        if agg.get('size'):
+            query['terms']['size'] = agg['size']
 
         if include != 'all':
             query['terms']['include'] = include
