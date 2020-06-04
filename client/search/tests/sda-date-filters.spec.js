@@ -118,11 +118,11 @@ describe('sda-date-filters', () => {
             expectNoError();
 
             params.dates.end = '30/06/2013';
-            expectError('Range cannot be greater than 72 days');
+            expectError('Range cannot be greater than {{max}} days');
 
             config.date_filters[DATE_FILTERS.RANGE].max = '7';
             params.dates.end = '09/06/2012';
-            expectError('Range cannot be greater than 7 days');
+            expectError('Range cannot be greater than {{max}} days');
 
             params.dates.start = moment()
                 .add(1, 'day')
