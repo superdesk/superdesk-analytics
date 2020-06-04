@@ -1,19 +1,26 @@
-import {appConfig} from 'appConfig';
+import {cloneDeep} from 'lodash';
+import moment from 'moment';
 
-import {getErrorMessage, gettext} from '../../utils';
+import {appConfig, superdeskApi} from '../../superdeskApi';
+import {
+    CHART_SORT,
+    CHART_TYPE,
+    DATA_FIELD,
+    DATE_FILTER,
+    ITEM_STATE,
+    REPORT_RESPONSE_TYPE,
+} from '../../interfaces';
+
+import {getErrorMessage} from '../../utils';
 import {CHART_FIELDS, CHART_TYPES} from '../../charts/directives/ChartOptions';
+import {searchReportService} from '../../search/services/SearchReport';
 
 
 PublishingPerformanceReportController.$inject = [
     '$scope',
-    'lodash',
     'savedReports',
-    'searchReport',
     'notify',
-    'moment',
-    '$q',
     'chartConfig',
-    '$interpolate',
     'reportConfigs',
 ];
 
@@ -22,31 +29,23 @@ PublishingPerformanceReportController.$inject = [
  * @module superdesk.apps.analytics.publishing-performance-report
  * @name PublishingPerformanceReportController
  * @requires $scope
- * @requires lodash
  * @requires savedReports
- * @requires searchReport
  * @requires notify
- * @requires moment
- * @requires $q
  * @requires chartConfig
- * @requires $interpolate
  * @requires reportConfigs
  * @description Controller for Publishing Performance reports
  */
 export function PublishingPerformanceReportController(
     $scope,
-    _,
     savedReports,
-    searchReport,
     notify,
-    moment,
-    $q,
     chartConfig,
-    $interpolate,
-    reportConfigs
+    reportConfigs,
 ) {
+    const gettext = superdeskApi.localization.gettext;
+
     function resetParams() {
-        $scope.currentParams = _.cloneDeep($scope.defaultReportParams);
+        $scope.currentParams = cloneDeep($scope.defaultReportParams);
     }
 
     const reportName = 'publishing_performance_report';
@@ -74,7 +73,10 @@ export function PublishingPerformanceReportController(
         this.initDefaultParams();
         savedReports.selectReportFromURL();
 
-        this.chart = chartConfig.newConfig('chart', _.get($scope, 'currentParams.params.chart.type'));
+        this.chart = chartConfig.newConfig(
+            'chart',
+            $scope?.currentParams?.params?.chart?.type ?? CHART_TYPES.COLUMN,
+        );
         $scope.updateChartConfig(true);
 
         document.addEventListener('sda-source-filters--clear', resetParams);
@@ -90,19 +92,29 @@ export function PublishingPerformanceReportController(
      * @description Initialises the default report parameters
      */
     this.initDefaultParams = () => {
-        $scope.item_states = searchReport.filterItemStates(
-            ['published', 'killed', 'corrected', 'recalled']
-        );
+        $scope.item_states = searchReportService.filterItemStates([
+            ITEM_STATE.PUBLISHED,
+            ITEM_STATE.KILLED,
+            ITEM_STATE.CORRECTED,
+            ITEM_STATE.RECALLED,
+        ]);
 
-        $scope.report_groups = searchReport.filterDataFields(
-            ['task.desk', 'task.user', 'anpa_category.qcode', 'source', 'urgency', 'genre.qcode', 'subject.qcode']
-        );
+        $scope.report_groups = searchReportService.filterDataFields([
+            DATA_FIELD.DESK,
+            DATA_FIELD.USER,
+            DATA_FIELD.CATEGORY,
+            DATA_FIELD.SOURCE,
+            DATA_FIELD.URGENCY,
+            DATA_FIELD.GENRE,
+            DATA_FIELD.SUBJECT,
+            DATA_FIELD.AUTHOR,
+        ]);
 
         $scope.currentParams = {
             report: reportName,
             params: $scope.config.defaultParams({
                 dates: {
-                    filter: 'range',
+                    filter: DATE_FILTER.RANGE,
                     start: moment()
                         .subtract(30, 'days')
                         .format(appConfig.model.dateformat),
@@ -128,25 +140,26 @@ export function PublishingPerformanceReportController(
                 min: 1,
                 aggs: {
                     group: {
-                        field: _.get($scope, 'report_groups[0].qcode') || 'task.desk',
+                        field: $scope?.report_groups?.[0].qcode ?? DATA_FIELD.DESK,
                         size: 0,
                     },
                     subgroup: {
-                        field: 'state',
+                        field: DATA_FIELD.STATE,
                     },
                 },
                 chart: {
                     type: CHART_TYPES.COLUMN,
-                    sort_order: 'desc',
+                    sort_order: CHART_SORT.DESCENDING,
                     title: null,
                     subtitle: null,
                 },
+                return_type: REPORT_RESPONSE_TYPE.AGGREGATIONS,
             }),
         };
 
-        $scope.defaultReportParams = _.cloneDeep($scope.currentParams);
+        $scope.defaultReportParams = cloneDeep($scope.currentParams);
 
-        $scope.group_by = _.cloneDeep($scope.report_groups);
+        $scope.group_by = cloneDeep($scope.report_groups);
     };
 
     /**
@@ -156,20 +169,20 @@ export function PublishingPerformanceReportController(
      * @description Updates the local HighchartConfig instance parameters
      */
     $scope.updateChartConfig = (reloadTranslations = false) => {
-        this.chart.chartType = _.get($scope, 'currentParams.params.chart.type');
-        this.chart.sortOrder = _.get($scope, 'currentParams.params.chart.sort_order');
-        this.chart.title = _.get($scope, 'currentParams.params.chart.title');
-        this.chart.subtitle = _.get($scope, 'currentParams.params.chart.subtitle');
+        this.chart.chartType = $scope?.currentParams?.params?.chart.type;
+        this.chart.sortOrder = $scope?.currentParams?.params?.chart?.sort_order;
+        this.chart.title = $scope?.currentParams?.params?.chart?.title;
+        this.chart.subtitle = $scope?.currentParams?.params?.chart?.subtitle;
 
         this.chart.clearSources();
         this.chart.addSource(
-            _.get($scope, 'currentParams.params.aggs.group.field'),
-            {}
+            $scope?.currentParams?.params?.aggs?.group?.field,
+            {},
         );
 
         this.chart.addSource(
-            _.get($scope, 'currentParams.params.aggs.subgroup.field'),
-            {}
+            $scope?.currentParams?.params?.aggs?.subgroup?.field,
+            {},
         );
 
         if (reloadTranslations) {
@@ -185,8 +198,8 @@ export function PublishingPerformanceReportController(
      */
     $scope.generateTitle = (report) => generateTitle(
         this.chart,
-        _.get($scope, 'currentParams.params') || {},
-        report
+        $scope?.currentParams?.params ?? {},
+        report,
     );
 
     /**
@@ -196,14 +209,14 @@ export function PublishingPerformanceReportController(
      * @description Returns the subtitle to use for the Highcharts config based on the date parameters
      */
     $scope.generateSubtitle = () => chartConfig.generateSubtitleForDates(
-        _.get($scope, 'currentParams.params') || {}
+        $scope?.currentParams?.params ?? {},
     );
 
     $scope.isDirty = () => true;
 
     $scope.$watch(() => savedReports.currentReport, (newReport) => {
-        if (_.get(newReport, '_id')) {
-            $scope.currentParams = _.cloneDeep(savedReports.currentReport);
+        if (newReport?._id != null) {
+            $scope.currentParams = cloneDeep(savedReports.currentReport);
         } else {
             resetParams();
         }
@@ -215,7 +228,7 @@ export function PublishingPerformanceReportController(
      * @description When the date filter changes, clear the date input fields if the filter is not 'range'
      */
     $scope.onDateFilterChange = () => {
-        if ($scope.currentParams.params.dates.filter !== 'range') {
+        if ($scope.currentParams.params.dates.filter !== DATE_FILTER.RANGE) {
             $scope.currentParams.params.dates.start = null;
             $scope.currentParams.params.dates.end = null;
         }
@@ -240,7 +253,7 @@ export function PublishingPerformanceReportController(
         $scope.form.showErrors = false;
         $scope.beforeGenerateChart();
 
-        const params = _.cloneDeep($scope.currentParams.params);
+        const params = cloneDeep($scope.currentParams.params);
 
         $scope.runQuery(params)
             .then((data) => {
@@ -248,8 +261,8 @@ export function PublishingPerformanceReportController(
                     Object.assign(
                         {},
                         $scope.currentParams.params,
-                        data
-                    )
+                        data,
+                    ),
                 )
                     .then((chartConfig) => {
                         $scope.changeReportParams(chartConfig);
@@ -259,8 +272,8 @@ export function PublishingPerformanceReportController(
                 notify.error(
                     getErrorMessage(
                         error,
-                        gettext('Error. The Publishing Report could not be generated!')
-                    )
+                        gettext('Error. The Publishing Report could not be generated!'),
+                    ),
                 );
             });
     };
@@ -275,34 +288,40 @@ export function PublishingPerformanceReportController(
     this.createChart = (report) => {
         this.chart.clearSources();
 
-        if (Object.keys(report.groups).length === 1 && _.get(report, 'subgroups')) {
+        if (Object.keys(report.groups).length === 1 && report?.subgroups != null) {
             this.chart.addSource(
-                _.get(report, 'aggs.subgroup.field'),
-                report.subgroups
+                report?.aggs?.subgroup?.field,
+                report.subgroups,
             );
         } else {
             this.chart.addSource(
-                _.get(report, 'aggs.group.field'),
-                report.groups
+                report?.aggs?.group?.field,
+                report.groups,
             );
 
-            if (_.get(report, 'subgroups')) {
+            if (report?.subgroups != null) {
                 this.chart.addSource(
-                    _.get(report, 'aggs.subgroup.field'),
-                    report.subgroups
+                    report?.aggs?.subgroup?.field,
+                    report.subgroups,
                 );
             }
         }
 
         this.chart.getTitle = () => $scope.generateTitle(report);
         this.chart.getSubtitle = $scope.generateSubtitle;
-        this.chart.getChildKeys = () => ['published', 'recalled', 'killed', 'corrected', 'updated'];
+        this.chart.getChildKeys = () => [
+            ITEM_STATE.PUBLISHED,
+            ITEM_STATE.RECALLED,
+            ITEM_STATE.KILLED,
+            ITEM_STATE.CORRECTED,
+            ITEM_STATE.UPDATED,
+        ];
 
-        return this.chart.loadTranslations(_.get(report, 'aggs.group.field'))
+        return this.chart.loadTranslations(report?.aggs?.group?.field)
             .then(() => this.chart.genConfig())
             .then((config) => ({
                 charts: [config],
-                wrapCharts: report.chart.type === 'table',
+                wrapCharts: report.chart.type === CHART_TYPE.TABLE,
                 height500: false,
                 fullWidth: true,
                 multiChart: false,
@@ -317,18 +336,14 @@ export function PublishingPerformanceReportController(
      * This is used so that saving this report will also save the translations with it
      */
     $scope.getReportParams = () => {
-        const groupField = _.get($scope.currentParams, 'params.aggs.group.field');
-        const subgroupField = _.get($scope.currentParams, 'params.aggs.subgroup.field');
+        const groupField = $scope?.currentParams?.params?.aggs?.group?.field;
+        const subgroupField = $scope?.currentParams?.params?.aggs?.subgroup?.field;
 
         return chartConfig.loadTranslations([groupField, subgroupField], true)
-            .then(() => (
-                $q.when(
-                    Object.assign(
-                        {},
-                        $scope.currentParams,
-                        {translations: chartConfig.translations}
-                    )
-                )
+            .then(() => Object.assign(
+                {},
+                $scope.currentParams,
+                {translations: chartConfig.translations},
             ));
     };
 
@@ -345,22 +360,24 @@ export function PublishingPerformanceReportController(
  * @description Construct the title for the chart based on report parameters and results
  */
 export const generateTitle = (chart, params, report = null) => {
-    if (_.get(params, 'chart.title')) {
+    const gettext = superdeskApi.localization.gettext;
+
+    if (params?.chart?.title != null) {
         return params.chart.title;
     }
 
-    const parentField = _.get(params, 'aggs.group.field');
+    const parentField = params?.aggs?.group?.field;
     const parentName = chart.getSourceName(parentField);
 
-    if (report && Object.keys(report.groups).length === 1 && _.get(report, 'subgroups')) {
+    if (report && Object.keys(report.groups).length === 1 && report?.subgroups != null) {
         const dataName = chart.getSourceTitle(
             parentField,
-            Object.keys(report.groups)[0]
+            Object.keys(report.groups)[0],
         );
 
         return gettext(
             'Published Stories for {{group}}: {{data}}',
-            {group: parentName, data: dataName}
+            {group: parentName, data: dataName},
         );
     }
 

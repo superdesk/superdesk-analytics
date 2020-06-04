@@ -1,5 +1,7 @@
 import {appConfig} from 'appConfig';
 
+import {DATA_FIELD} from '../../interfaces';
+
 import {formatDate, getTranslatedOperations, gettext} from '../../utils';
 import {SDChart} from '../SDChart';
 import {DATE_FILTERS} from '../../search/common';
@@ -636,6 +638,19 @@ export function ChartConfig(
                 getTranslatedOperations()
             );
         },
+        [DATA_FIELD.AUTHOR]: () => (
+            userList.getAll()
+                .then((users) => {
+                    self.setTranslation(
+                        DATA_FIELD.AUTHOR,
+                        gettext('Author'),
+                        _.fromPairs(_.map(
+                            users || [],
+                            (user) => [_.get(user, '_id'), _.get(user, 'display_name')]
+                        ))
+                    );
+                })
+        ),
     };
 
     /**

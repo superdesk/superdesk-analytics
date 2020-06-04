@@ -1,9 +1,9 @@
 import {appConfig} from 'appConfig';
 
-describe('searchReport', () => {
-    let searchReport;
+import {searchReportService} from '../services/SearchReport';
+
+describe('searchReportService', () => {
     let api;
-    let $q;
 
     beforeEach(() => {
         // Use the superdesk.config.js/webpack.config.js application config
@@ -16,20 +16,16 @@ describe('searchReport', () => {
     });
 
     beforeEach(window.module('superdesk.core.activity'));
-    beforeEach(window.module('angularMoment'));
-    beforeEach(window.module('superdesk.analytics.search'));
 
-    beforeEach(inject((_searchReport_, _api_, _$q_) => {
-        searchReport = _searchReport_;
+    beforeEach(inject((_api_) => {
         api = _api_;
-        $q = _$q_;
 
-        spyOn(api, 'query').and.returnValue($q.when({_items: []}));
+        spyOn(api, 'query').and.returnValue(Promise.resolve({_items: []}));
     }));
 
     describe('can send query as param object', () => {
-        it('param object for dates', () => {
-            searchReport.query(
+        it('param object for dates', (done) => {
+            searchReportService.query(
                 'source_category_report',
                 {
                     dates: {
@@ -38,88 +34,94 @@ describe('searchReport', () => {
                         end: '30/06/2018',
                     },
                 }
-            );
+            )
+                .then(() => {
+                    expect(api.query).toHaveBeenCalledWith('source_category_report', {
+                        params: {
+                            dates: {
+                                filter: 'range',
+                                start: '2018-06-01',
+                                end: '2018-06-30',
+                            },
+                            must: {},
+                            must_not: {},
+                            chart: {},
+                        },
+                    });
 
-            expect(api.query).toHaveBeenCalledWith('source_category_report', {
-                params: {
-                    dates: {
-                        filter: 'range',
-                        start: '2018-06-01',
-                        end: '2018-06-30',
-                    },
-                    must: {},
-                    must_not: {},
-                    chart: {},
-                },
-            });
+                    return searchReportService.query(
+                        'source_category_report',
+                        {
+                            dates: {
+                                filter: 'yesterday',
+                                start: '01/06/2018',
+                                end: '30/06/2018',
+                            },
+                        }
+                    );
+                })
+                .then(() => {
+                    expect(api.query).toHaveBeenCalledWith('source_category_report', {
+                        params: {
+                            dates: {filter: 'yesterday'},
+                            must: {},
+                            must_not: {},
+                            chart: {},
+                        },
+                    });
 
-            searchReport.query(
-                'source_category_report',
-                {
-                    dates: {
-                        filter: 'yesterday',
-                        start: '01/06/2018',
-                        end: '30/06/2018',
-                    },
-                }
-            );
+                    return searchReportService.query(
+                        'source_category_report',
+                        {
+                            dates: {
+                                filter: 'range',
+                                start: '01/06/2018',
+                                end: '30/06/2018',
+                            },
+                        }
+                    );
+                })
+                .then(() => {
+                    expect(api.query).toHaveBeenCalledWith('source_category_report', {
+                        params: {
+                            dates: {
+                                filter: 'range',
+                                start: '2018-06-01',
+                                end: '2018-06-30',
+                            },
+                            must: {},
+                            must_not: {},
+                            chart: {},
+                        },
+                    });
 
-            expect(api.query).toHaveBeenCalledWith('source_category_report', {
-                params: {
-                    dates: {filter: 'yesterday'},
-                    must: {},
-                    must_not: {},
-                    chart: {},
-                },
-            });
+                    return searchReportService.query(
+                        'source_category_report',
+                        {
+                            dates: {
+                                filter: 'yesterday',
+                                start: '01/06/2018',
+                                end: '30/06/2018',
+                            },
+                        }
+                    );
+                })
+                .then(() => {
+                    expect(api.query).toHaveBeenCalledWith('source_category_report', {
+                        params: {
+                            dates: {filter: 'yesterday'},
+                            must: {},
+                            must_not: {},
+                            chart: {},
+                        },
+                    });
 
-            searchReport.query(
-                'source_category_report',
-                {
-                    dates: {
-                        filter: 'range',
-                        start: '01/06/2018',
-                        end: '30/06/2018',
-                    },
-                }
-            );
-
-            expect(api.query).toHaveBeenCalledWith('source_category_report', {
-                params: {
-                    dates: {
-                        filter: 'range',
-                        start: '2018-06-01',
-                        end: '2018-06-30',
-                    },
-                    must: {},
-                    must_not: {},
-                    chart: {},
-                },
-            });
-
-            searchReport.query(
-                'source_category_report',
-                {
-                    dates: {
-                        filter: 'yesterday',
-                        start: '01/06/2018',
-                        end: '30/06/2018',
-                    },
-                }
-            );
-
-            expect(api.query).toHaveBeenCalledWith('source_category_report', {
-                params: {
-                    dates: {filter: 'yesterday'},
-                    must: {},
-                    must_not: {},
-                    chart: {},
-                },
-            });
+                    done();
+                });
         });
 
-        it('param object for filtered must/must_not', () => {
-            searchReport.query(
+        it('param object for filtered must/must_not', (done) => {
+            searchReportService.query(
                 'source_category_report',
                 {
                     dates: {filter: 'yesterday'},
@@ -137,25 +139,28 @@ describe('searchReport', () => {
                         rewrites: false,
                     },
                 }
-            );
+            )
+                .then(() => {
+                    expect(api.query).toHaveBeenCalledWith('source_category_report', {
+                        params: {
+                            dates: {filter: 'yesterday'},
+                            must: {
+                                users: ['user1', 'user2'],
+                                states: {published: true},
+                            },
+                            must_not: {
+                                categories: ['a', 'b'],
+                            },
+                            chart: {},
+                        },
+                    });
 
-            expect(api.query).toHaveBeenCalledWith('source_category_report', {
-                params: {
-                    dates: {filter: 'yesterday'},
-                    must: {
-                        users: ['user1', 'user2'],
-                        states: {published: true},
-                    },
-                    must_not: {
-                        categories: ['a', 'b'],
-                    },
-                    chart: {},
-                },
-            });
+                    done();
+                });
         });
 
-        it('includes aggregations', () => {
-            searchReport.query(
+        it('includes aggregations', (done) => {
+            searchReportService.query(
                 'source_category_report',
                 {
                     dates: {filter: 'yesterday'},
@@ -164,24 +169,27 @@ describe('searchReport', () => {
                         subgroup: {field: 'urgency'},
                     },
                 }
-            );
+            )
+                .then(() => {
+                    expect(api.query).toHaveBeenCalledWith('source_category_report', {
+                        params: {
+                            dates: {filter: 'yesterday'},
+                            must: {},
+                            must_not: {},
+                            chart: {},
+                        },
+                        aggs: {
+                            group: {field: 'anpa_category.qcode'},
+                            subgroup: {field: 'urgency'},
+                        },
+                    });
 
-            expect(api.query).toHaveBeenCalledWith('source_category_report', {
-                params: {
-                    dates: {filter: 'yesterday'},
-                    must: {},
-                    must_not: {},
-                    chart: {},
-                },
-                aggs: {
-                    group: {field: 'anpa_category.qcode'},
-                    subgroup: {field: 'urgency'},
-                },
-            });
+                    done();
+                });
         });
 
-        it('includes repos', () => {
-            searchReport.query(
+        it('includes repos', (done) => {
+            searchReportService.query(
                 'source_category_report',
                 {
                     dates: {filter: 'yesterday'},
@@ -192,40 +200,46 @@ describe('searchReport', () => {
                         archived: true,
                     },
                 }
-            );
+            )
+                .then(() => {
+                    expect(api.query).toHaveBeenCalledWith('source_category_report', {
+                        params: {
+                            dates: {filter: 'yesterday'},
+                            must: {},
+                            must_not: {},
+                            chart: {},
+                        },
+                        repo: {
+                            published: true,
+                            archived: true,
+                        },
+                    });
 
-            expect(api.query).toHaveBeenCalledWith('source_category_report', {
-                params: {
-                    dates: {filter: 'yesterday'},
-                    must: {},
-                    must_not: {},
-                    chart: {},
-                },
-                repo: {
-                    published: true,
-                    archived: true,
-                },
-            });
+                    done();
+                });
         });
 
-        it('includes return_type', () => {
-            searchReport.query(
+        it('includes return_type', (done) => {
+            searchReportService.query(
                 'source_category_report',
                 {
                     dates: {filter: 'yesterday'},
                     return_type: 'highcharts_config',
                 }
-            );
+            )
+                .then(() => {
+                    expect(api.query).toHaveBeenCalledWith('source_category_report', {
+                        params: {
+                            dates: {filter: 'yesterday'},
+                            must: {},
+                            must_not: {},
+                            chart: {},
+                        },
+                        return_type: 'highcharts_config',
+                    });
 
-            expect(api.query).toHaveBeenCalledWith('source_category_report', {
-                params: {
-                    dates: {filter: 'yesterday'},
-                    must: {},
-                    must_not: {},
-                    chart: {},
-                },
-                return_type: 'highcharts_config',
-            });
+                    done();
+                });
         });
     });
 });

@@ -1,1 +1,1 @@
-export {SearchReport} from './SearchReport';
+export {searchReportService} from './SearchReport';

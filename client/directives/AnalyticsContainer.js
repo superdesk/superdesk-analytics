@@ -1,3 +1,5 @@
+import {searchReportService} from '../search/services/SearchReport';
+
 /**
  * @ngdoc directive
  * @module superdesk.apps.analytics
@@ -13,7 +15,6 @@
  * @required api
  * @required desks
  * @required metadata
- * @required searchReport
  * @required reportConfigs
  * @required privileges
  * @description A directive that encapsulates the entire analytics module view
@@ -22,7 +23,7 @@ export function AnalyticsContainer() {
     return {
         controllerAs: 'analytics',
         controller: ['$scope', '$location', 'pageTitle', 'lodash', 'reports', '$rootScope', '$timeout',
-            'emailReport', 'savedReports', 'api', 'desks', 'metadata', 'searchReport', 'reportConfigs', 'privileges',
+            'emailReport', 'savedReports', 'api', 'desks', 'metadata', 'reportConfigs', 'privileges',
             function AnalyticsContainerController(
                 $scope,
                 $location,
@@ -36,7 +37,6 @@ export function AnalyticsContainer() {
                 api,
                 desks,
                 metadata,
-                searchReport,
                 reportConfigs,
                 privileges
             ) {
@@ -280,7 +280,7 @@ export function AnalyticsContainer() {
                  * @return {Object}
                  * @description Queries the DeskActivityReport API and returns it's response
                  */
-                $scope.runQuery = (params) => searchReport.query(
+                $scope.runQuery = (params) => searchReportService.query(
                     _.get($scope.currentReport, 'id'),
                     params,
                     true

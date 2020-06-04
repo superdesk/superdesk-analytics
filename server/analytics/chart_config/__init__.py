@@ -345,6 +345,15 @@ class ChartConfig:
             self._set_translation('source', 'Source')
         elif field == 'operation':
             self._set_translation('operation', 'Operation', OPERATION_NAMES)
+        elif field == 'authors.parent':
+            self._set_translation(
+                'authors.parent',
+                'Author',
+                {
+                    str(user.get('_id')): user.get('display_name')
+                    for user in list(get_resource_service('users').get(req=None, lookup={}))
+                }
+            )
 
     def _set_translation(self, field, title, names=None):
         """Saves the provided field translations
