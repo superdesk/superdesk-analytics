@@ -1,5 +1,16 @@
 # Superdesk Analytics Changelog
 
+## [1.33.1-rc1] 2020-06-04
+### Features
+- [SDESK-5220] Modal to show Highcharts license (#127)
+
+### Improvements
+- [SDESK-3882] Replace ng-gettext with gettext from superdesk (#125)
+- [SDESK-5276] Add group by author to Publishing Performance report (#128)
+
+### Bugs
+- [SDESK-5234] Hide Analytics menu if no reports available (#126)
+
 ## [1.33.0] 2020-04-28
 - Release 1.33.0
 
