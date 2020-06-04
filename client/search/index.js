@@ -8,7 +8,6 @@
  * at https://www.sourcefabric.org/superdesk/license
  */
 
-import * as svc from './services';
 import * as directives from './directives';
 
 /**
@@ -19,8 +18,6 @@ import * as directives from './directives';
  * @description Analytics Report Search
  */
 angular.module('superdesk.analytics.search', [])
-    .service('searchReport', svc.SearchReport)
-
     .directive('sdaSourceFilters', directives.SourceFilters) // !!! used in superdesk-aap project
     .directive('sdaDateFilters', directives.DateFilters)
 

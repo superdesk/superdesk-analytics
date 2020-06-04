@@ -4,13 +4,13 @@ import {getErrorMessage, secondsToHumanReadable, gettext} from '../../utils';
 import {SOURCE_FILTERS} from '../../search/directives/SourceFilters';
 import {CHART_TYPES, CHART_FIELDS} from '../../charts/directives/ChartOptions';
 import {SDChart} from '../../charts/SDChart';
+import {searchReportService} from '../../search/services/SearchReport';
 
 ProductionTimeReportController.$inject = [
     '$scope',
     'savedReports',
     'chartConfig',
     'lodash',
-    'searchReport',
     'moment',
     'notify',
     '$interpolate',
@@ -26,7 +26,6 @@ ProductionTimeReportController.$inject = [
  * @requires savedReports
  * @requires chartConfig
  * @requires lodash
- * @requires searchReport
  * @requires moment
  * @requires notify
  * @required $interpolate
@@ -39,7 +38,6 @@ export function ProductionTimeReportController(
     savedReports,
     chartConfig,
     _,
-    searchReport,
     moment,
     notify,
     $interpolate,
@@ -103,7 +101,7 @@ export function ProductionTimeReportController(
      * @description Initialises the default report parameters
      */
     this.initDefaultParams = () => {
-        $scope.item_states = searchReport.filterItemStates(
+        $scope.item_states = searchReportService.filterItemStates(
             ['published', 'killed', 'corrected', 'recalled']
         );
 

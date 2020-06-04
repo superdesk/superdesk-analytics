@@ -1,13 +1,13 @@
 import {appConfig} from 'appConfig';
 
 import {getTranslatedOperations} from '../../utils';
+import {searchReportService} from '../../search/services/SearchReport';
 
 FeaturemediaUpdatesTable.$inject = [
     'userList',
     'moment',
     'api',
     'lodash',
-    'searchReport',
     'notify',
 ];
 
@@ -19,7 +19,6 @@ FeaturemediaUpdatesTable.$inject = [
  * @requires moment
  * @requires api
  * @requires lodash
- * @requires searchReport
  * @requires notify
  * @description Directive to render the interactive featuremedia updates table
  */
@@ -28,7 +27,6 @@ export function FeaturemediaUpdatesTable(
     moment,
     api,
     _,
-    searchReport,
     notify
 ) {
     return {
@@ -113,7 +111,7 @@ export function FeaturemediaUpdatesTable(
              * @description Loads the item then opens it in the preview
              */
             scope.onSluglineClicked = (item) => {
-                searchReport.loadArchiveItem(_.get(item, '_id'))
+                searchReportService.loadArchiveItem(_.get(item, '_id'))
                     .then((newsItem) => {
                         scope.openPreview(newsItem);
                     }, (error) => {
@@ -128,7 +126,7 @@ export function FeaturemediaUpdatesTable(
              * @description Loads the original image then opens the item in the preview
              */
             scope.onOriginalClicked = (item) => {
-                searchReport.loadArchiveItem(_.get(item, 'original._id'))
+                searchReportService.loadArchiveItem(_.get(item, 'original._id'))
                     .then((newsItem) => {
                         scope.openPreview(newsItem);
                     }, (error) => {

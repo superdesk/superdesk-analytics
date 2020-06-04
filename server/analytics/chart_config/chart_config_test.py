@@ -571,6 +571,24 @@ class ChartConfigTestCase(TestCase):
             }
         })
 
+    def test_translate_authors(self):
+        chart = ChartConfig('author', 'bar')
+        chart.add_source('authors.parent', {'user1': 3, 'user2': 4, 'user3': 5})
+
+        self.assertEqual(chart.translations, {})
+
+        chart.load_translations()
+        self.assertEqual(chart.translations, {
+            'authors_parent': {
+                'title': 'Author',
+                'names': {
+                    'user1': 'first user',
+                    'user2': 'second user',
+                    'user3': 'last user'
+                }
+            }
+        })
+
     def test_translate_state(self):
         chart = ChartConfig('state', 'bar')
         chart.add_source('state', {'published': 3, 'killed': 1, 'updated': 5})

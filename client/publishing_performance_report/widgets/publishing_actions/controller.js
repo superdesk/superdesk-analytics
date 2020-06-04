@@ -3,13 +3,13 @@ import {CHART_FIELDS} from '../../../charts/directives/ChartOptions';
 import {SDChart} from '../../../charts/SDChart';
 import {CHART_COLOURS} from '../../../charts/directives/ChartColourPicker';
 import {getErrorMessage, gettext} from '../../../utils';
+import {searchReportService} from '../../../search/services/SearchReport';
 
 
 PublishingActionsWidgetController.$inject = [
     '$scope',
     'lodash',
     'notify',
-    'searchReport',
     'chartConfig',
     'desks',
     '$interval',
@@ -23,7 +23,6 @@ PublishingActionsWidgetController.$inject = [
  * @requires $scope
  * @requires lodash
  * @requires notify
- * @requires searchReport
  * @requires chartConfig
  * @requires desks
  * @requires $interval
@@ -34,7 +33,6 @@ export function PublishingActionsWidgetController(
     $scope,
     _,
     notify,
-    searchReport,
     chartConfig,
     desks,
     $interval,
@@ -138,7 +136,7 @@ export function PublishingActionsWidgetController(
          * @return {Promise<Object>}
          * @description Sends the query to the API and returns the generated report
          */
-        this.runQuery = (params) => searchReport.query(
+        this.runQuery = (params) => searchReportService.query(
             'publishing_performance_report',
             params,
             true

@@ -3,12 +3,12 @@ import {appConfig} from 'appConfig';
 import {getErrorMessage, gettext} from '../../utils';
 import {CHART_FIELDS, CHART_TYPES} from '../../charts/directives/ChartOptions';
 import {DATE_FILTERS} from '../../search/common';
+import {searchReportService} from '../../search/services/SearchReport';
 
 FeaturemediaUpdatesReportController.$inject = [
     '$scope',
     'lodash',
     'savedReports',
-    'searchReport',
     'notify',
     'moment',
     '$q',
@@ -23,7 +23,6 @@ FeaturemediaUpdatesReportController.$inject = [
  * @requires $scope
  * @requires lodash
  * @requires savedReports
- * @requires searchReport
  * @requires notify
  * @requires moment
  * @requires $q
@@ -35,7 +34,6 @@ export function FeaturemediaUpdatesReportController(
     $scope,
     _,
     savedReports,
-    searchReport,
     notify,
     moment,
     $q,
@@ -86,11 +84,11 @@ export function FeaturemediaUpdatesReportController(
      * @description Initialises the default report parameters
      */
     this.initDefaultParams = () => {
-        $scope.item_states = searchReport.filterItemStates(
+        $scope.item_states = searchReportService.filterItemStates(
             ['published', 'killed', 'corrected', 'recalled']
         );
 
-        $scope.report_groups = searchReport.filterDataFields(
+        $scope.report_groups = searchReportService.filterDataFields(
             ['task.desk', 'task.user', 'anpa_category.qcode', 'source', 'urgency', 'genre.qcode']
         );
 
