@@ -1,5 +1,8 @@
 # Superdesk Analytics Changelog
 
+## [1.33.1] 2020-06-10
+- Release 1.33.1
+
 ## [1.33.1-rc1] 2020-06-04
 ### Features
 - [SDESK-5220] Modal to show Highcharts license (#127)
