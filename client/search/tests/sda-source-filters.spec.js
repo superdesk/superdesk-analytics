@@ -434,7 +434,7 @@ describe('sda-source-filters', () => {
             {qcode: 'published', name: 'Published'},
             {qcode: 'killed', name: 'Killed'},
             {qcode: 'corrected', name: 'Corrected'},
-            {qcode: 'recalled', name: 'Recalled'},
+            {qcode: 'recalled', name: 'Taken Down'},
         ]);
 
         fields = ['states'];
@@ -454,7 +454,7 @@ describe('sda-source-filters', () => {
         compileElement();
         expect(isoScope.filters.states.selected).toEqual([
             {qcode: 'corrected', name: 'Corrected'},
-            {qcode: 'recalled', name: 'Recalled'},
+            {qcode: 'recalled', name: 'Taken Down'},
         ]);
         expect(isoScope.filters.states.exclude).toBe(true);
     });
