@@ -1,6 +1,6 @@
 {
   "name": "superdesk-analytics",
-  "version": "1.33.0",
+  "version": "1.33.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -35,7 +35,7 @@
     "eslint-plugin-react": "7.16.0",
     "jasmine-core": "^2.99.1",
     "jasmine-reporters": "^2.3.0",
-    "jquery": "3.3.1",
+    "jquery": "^3.4.1",
     "jquery.gridster": "github:dustmoo/gridster.js#c306335397816beceb74e4a176067baef34a0359",
     "karma": "^2.0.0",
     "karma-chrome-launcher": "^2.2.0",
