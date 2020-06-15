@@ -87,7 +87,7 @@ function getSupportedItemStates(): Array<IStateFilter> {
         name: gettext('Corrected'),
     }, {
         qcode: ITEM_STATE.RECALLED,
-        name: gettext('Recalled'),
+        name: gettext('Taken Down'),
     }];
 }
 

@@ -117,7 +117,7 @@ describe('sda-preview-source-filter', () => {
         });
         expect(html).toContain('States');
         expect(html).toContain('Exclude</span>');
-        expect(html).toContain('>Kills, Recalls</p>');
+        expect(html).toContain('>Kills, Takedowns</p>');
     });
 
     it('can render ingest providers', () => {

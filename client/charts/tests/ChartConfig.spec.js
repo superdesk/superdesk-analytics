@@ -668,7 +668,7 @@ describe('chartConfig', () => {
                         killed: 'Kills',
                         corrected: 'Corrections',
                         updated: 'Updates',
-                        recalled: 'Recalls',
+                        recalled: 'Takedowns',
                     },
                 },
             });
