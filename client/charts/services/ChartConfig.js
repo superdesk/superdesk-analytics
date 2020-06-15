@@ -574,7 +574,7 @@ export function ChartConfig(
                     killed: gettext('Kills'),
                     corrected: gettext('Corrections'),
                     updated: gettext('Updates'),
-                    recalled: gettext('Recalls'),
+                    recalled: gettext('Takedowns'),
                 }
             );
 
