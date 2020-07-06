@@ -1,4 +1,4 @@
-import moment from 'moment';
+import moment from 'moment-timezone';
 import {gettext as _gettext} from 'superdesk-core/scripts/core/utils';
 
 import {appConfig} from 'appConfig';
