@@ -257,7 +257,7 @@ export function PublishingPerformanceReportController(
         const params = cloneDeep($scope.currentParams.params);
 
         if (params.chart.type === 'table' && params.aggs.group.field == 'task.desk') {
-            params.show_all_desks = 1
+            params.show_all_desks = 1;
         }
 
         $scope.runQuery(params)
