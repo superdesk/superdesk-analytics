@@ -153,6 +153,7 @@ export function PublishingPerformanceReportController(
                     title: null,
                     subtitle: null,
                 },
+                show_all_desks: 0,
                 return_type: REPORT_RESPONSE_TYPE.AGGREGATIONS,
             }),
         };
@@ -254,6 +255,10 @@ export function PublishingPerformanceReportController(
         $scope.beforeGenerateChart();
 
         const params = cloneDeep($scope.currentParams.params);
+
+        if (params.chart.type === 'table' && params.aggs.group.field == 'task.desk') {
+            params.show_all_desks = 1
+        }
 
         $scope.runQuery(params)
             .then((data) => {
