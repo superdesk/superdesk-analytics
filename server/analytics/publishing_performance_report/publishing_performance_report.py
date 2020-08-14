@@ -10,6 +10,7 @@
 
 from analytics.base_report import BaseReportService, BaseReportResource
 from analytics.chart_config import ChartConfig
+from superdesk import get_resource_service
 
 
 class PublishingPerformanceReportResource(BaseReportResource):
@@ -146,6 +147,16 @@ class PublishingPerformanceReportService(BaseReportService):
 
                 report['groups'][parent_key][state_key] += doc_count
                 report['subgroups'][state_key] += doc_count
+
+        if args and args.get('show_all_desks'):
+
+            desk_with_no_articles = {'killed': 0, 'corrected': 0, 'updated': 0, 'published': 0, 'recalled': 0}
+            report_groups = list(report['groups'])
+            desks = get_resource_service('desks').get(req=None, lookup={})
+
+            for desk in list(desks):
+                if str(desk['_id']) not in report_groups:
+                    report['groups'][str(desk['_id'])] = desk_with_no_articles
 
         return report
 

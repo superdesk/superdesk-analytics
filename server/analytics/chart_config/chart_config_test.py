@@ -53,9 +53,9 @@ class ChartConfigTestCase(TestCase):
             ])
 
             self.app.data.insert('users', [
-                {'_id': 'user1', 'display_name': 'first user'},
-                {'_id': 'user2', 'display_name': 'second user'},
-                {'_id': 'user3', 'display_name': 'last user'}
+                {'_id': 'user1', 'display_name': 'first user', 'is_active': True, 'is_enabled': True},
+                {'_id': 'user2', 'display_name': 'second user', 'is_active': True, 'is_enabled': True},
+                {'_id': 'user3', 'display_name': 'last user', 'is_active': True, 'is_enabled': True}
             ])
 
     @staticmethod

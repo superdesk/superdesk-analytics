@@ -212,6 +212,7 @@ function constructParams(args: IReportParams): IReportPayload {
     delete params.aggs;
     delete params.repos;
     delete params.return_type;
+    delete params.show_all_desks;
 
     const payload: IReportPayload = {params};
 
@@ -225,6 +226,10 @@ function constructParams(args: IReportParams): IReportPayload {
 
     if (args.return_type != null) {
         payload.return_type = args.return_type;
+    }
+
+    if (args.show_all_desks != null) {
+        payload.show_all_desks = args.show_all_desks;
     }
 
     if (args.size != null) {
