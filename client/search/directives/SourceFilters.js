@@ -30,6 +30,7 @@ export const SOURCE_FILTERS = {
         },
     },
     PUBLISH_PARS: 'publish_pars',
+    CONTENT_TYPES: 'content_types',
 };
 
 /**
@@ -46,6 +47,13 @@ export const SOURCE_FILTER_FIELDS = {
         labelField: 'name',
         source: 'desks',
         field: 'task.desk',
+    },
+    [SOURCE_FILTERS.CONTENT_TYPES]: {
+        paramName: SOURCE_FILTERS.CONTENT_TYPES,
+        keyField: 'qcode',
+        labelField: 'name',
+        source: null,
+        field: 'type',
     },
     [SOURCE_FILTERS.USERS]: {
         paramName: SOURCE_FILTERS.USERS,
@@ -141,6 +149,7 @@ export const DEFAULT_SOURCE_FILTERS = [
     SOURCE_FILTERS.STATES,
     SOURCE_FILTERS.INGEST_PROVIDERS,
     SOURCE_FILTERS.STAGES,
+    SOURCE_FILTERS.CONTENT_TYPES,
 ];
 
 
@@ -379,6 +388,24 @@ export function SourceFilters(
                     enabled: false,
                     fetch: () => desks.initialize(),
                     receive: () => _.get(desks, 'desks._items') || [],
+                    minLength: 1,
+                },
+                [SOURCE_FILTERS.CONTENT_TYPES]: {
+                    ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.CONTENT_TYPES],
+                    label: gettext('Content Types'),
+                    placeholder: gettext('Search Content Type'),
+                    items: [
+                        {'qcode': 'text', 'name': gettext('text')},
+                        {'qcode': 'picture', 'name': gettext('picture')},
+                        {'qcode': 'composite', 'name': gettext('package')},
+                        {'qcode': 'audio', 'name': gettext('audio')},
+                        {'qcode': 'video', 'name': gettext('video')},
+                    ],
+                    selected: [],
+                    exclude: false,
+                    enabled: false,
+                    fetch: () => $q.when(),
+                    receive: (data) => scope.filters.content_types.items || [],
                     minLength: 1,
                 },
                 [SOURCE_FILTERS.USERS]: {
