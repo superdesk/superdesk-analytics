@@ -394,7 +394,6 @@ class BaseReportService(SearchService):
             'terms': {'type': sorted(content_types)}
         })
 
-
     def _es_filter_rewrites(self, query, value, must, params):
         if value:
             query[must].append({

@@ -394,12 +394,12 @@ export function SourceFilters(
                     ...SOURCE_FILTER_FIELDS[SOURCE_FILTERS.CONTENT_TYPES],
                     label: gettext('Content Types'),
                     placeholder: gettext('Search Content Type'),
-                    items:[
+                    items: [
                         {'qcode': 'text', 'name': 'text'},
                         {'qcode': 'picture', 'name': 'picture'},
                         {'qcode': 'composite', 'name': 'composite'},
                         {'qcode': 'audio', 'name': 'audio'},
-                        {'qcode': 'video', 'name': 'video'}
+                        {'qcode': 'video', 'name': 'video'},
                     ],
                     selected: [],
                     exclude: false,
