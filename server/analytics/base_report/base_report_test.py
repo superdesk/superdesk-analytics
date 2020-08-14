@@ -493,6 +493,28 @@ class BaseReportServiceTestCase(TestCase):
                 ]
             })
 
+    def test_generate_elastic_query_for_content_types(self):
+        with self.app.app_context():
+            query = self.service.generate_elastic_query(
+                {'params': {'must': {'content_types': ['text', 'picture']}}}
+            )
+            self.assert_bool_query(query, {
+                'must': [
+                    {'terms': {'type': ['picture', 'text']}}
+                ],
+                'must_not': []
+            })
+
+            query = self.service.generate_elastic_query(
+                {'params': {'must_not': {'content_types': ['text', 'picture']}}}
+            )
+            self.assert_bool_query(query, {
+                'must': [],
+                'must_not': [
+                    {'terms': {'type': ['picture', 'text']}}
+                ]
+            })
+
     def test_generate_elastic_query_for_states(self):
         with self.app.app_context():
             query = self.service.generate_elastic_query(

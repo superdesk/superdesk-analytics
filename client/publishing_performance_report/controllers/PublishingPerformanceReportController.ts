@@ -381,10 +381,10 @@ export const generateTitle = (chart, params, report = null) => {
         );
 
         return gettext(
-            'Published Stories for {{group}}: {{data}}',
+            'Published Content for {{group}}: {{data}}',
             {group: parentName, data: dataName},
         );
     }
 
-    return gettext('Published Stories per {{group}}', {group: parentName});
+    return gettext('Published Content per {{group}}', {group: parentName});
 };
