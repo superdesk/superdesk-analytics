@@ -155,7 +155,7 @@ class PublishingPerformanceReportService(BaseReportService):
             desks = get_resource_service('desks').get(req=None, lookup={})
 
             for desk in list(desks):
-                if str(desk['_id']) not in list(report['groups']):
+                if str(desk['_id']) not in report_groups:
                     report['groups'][str(desk['_id'])] = desk_with_no_articles
 
         return report
