@@ -389,6 +389,12 @@ class BaseReportService(SearchService):
             'terms': {'state': sorted(states)}
         })
 
+    def _es_filter_content_types(self, query, content_types, must, params):
+        query[must].append({
+            'terms': {'type': sorted(content_types)}
+        })
+
+
     def _es_filter_rewrites(self, query, value, must, params):
         if value:
             query[must].append({
@@ -532,6 +538,10 @@ class BaseReportService(SearchService):
             },
             'stages': {
                 'query': self._es_filter_stages,
+                'values': self._es_get_filter_values
+            },
+            'content_types': {
+                'query': self._es_filter_content_types,
                 'values': self._es_get_filter_values
             },
             'states': {
