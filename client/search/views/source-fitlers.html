@@ -64,6 +64,35 @@
         </div>
     </toggle-box-next>
 
+    <toggle-box-next data-title="filters.content_types.label"
+                     data-style="'circle'"
+                     ng-if="filters.content_types.enabled"
+    >
+        <div class="sda-report-filters__filter">
+            <div class="sda-report-filters__exclude">
+                <label translate>Exclude</label>
+                <span sd-switch
+                      ng-model="filters.content_types.exclude"
+                      ng-change="onFilterChanged(filters.content_types)"
+                ></span>
+            </div>
+            <div class="form__row form__row--no-padding">
+                <sd-tag-input
+                        ng-model="filters.content_types.selected"
+                        data-field="{{filters.content_types.labelField}}"
+                        data-key-property="{{filters.content_types.keyField}}"
+                        data-items="filters.content_types.items"
+                        data-on-change="onFilterChanged(filters.content_types)"
+                        data-freetext="false"
+                        data-replace-spaces-with-dashes="false"
+                        data-min-length="filters.content_types.minLength"
+                        data-placeholder="{{filters.content_types.placeholder}}"
+                        data-max-results-to-show="0"
+                ></sd-tag-input>
+            </div>
+        </div>
+    </toggle-box-next>
+
     <toggle-box-next data-title="filters.users.label"
                      data-style="'circle'"
                      ng-if="filters.users.enabled"
