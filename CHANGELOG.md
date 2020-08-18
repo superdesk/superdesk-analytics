@@ -1,5 +1,14 @@
 # Superdesk Analytics Changelog
 
+## [1.33.2-rc1] 2020-08-18
+### Improvements
+- [SDESK-5322] Change Recall labels to Takedown (#130)
+- [SDCP-271] Display desks with zero new stories in Superdesk Analytics reports (#132)
+- [SDCP-270] Add ContentType filter to PublishingPerformance report. (#133)
+
+### Fixes
+- [SDESK-5392] fix: Incorrect moment import in utils (#131)
+
 ## [1.33.1] 2020-06-10
 - Release 1.33.1
 
