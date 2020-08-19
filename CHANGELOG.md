@@ -1,5 +1,8 @@
 # Superdesk Analytics Changelog
 
+## [1.33.2] 2020-08-19
+- Release 1.33.2
+
 ## [1.33.2-rc1] 2020-08-18
 ### Improvements
 - [SDESK-5322] Change Recall labels to Takedown (#130)
