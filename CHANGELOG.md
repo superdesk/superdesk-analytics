@@ -1,5 +1,11 @@
 # Superdesk Analytics Changelog
 
+## [1.33.3] 2020-08-20
+- Release 1.33.3
+
+### Bugs
+- Incorrect versions published to npmjs and pypi
+
 ## [1.33.2] 2020-08-19
 - Release 1.33.2
 
