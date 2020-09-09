@@ -1,5 +1,15 @@
 # Superdesk Analytics Changelog
 
+## [2.0.0-rc1] 2020-09-09
+### Features
+
+### Improvements
+- elastic7 support (#129)
+
+### Fixes
+- [SDESK-5471] Minor UI issue when creating analytics report schedule. (#134)
+- [SDESK-5205] fix errors after eve/flask upgrade (#124)
+
 ## [1.33.3] 2020-08-20
 - Release 1.33.3
 
