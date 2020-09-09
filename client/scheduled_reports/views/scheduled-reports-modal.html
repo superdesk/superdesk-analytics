@@ -216,14 +216,12 @@
                     translate
             >Save
             </button>
-            <input class="btn btn--primary"
+            <button class="btn btn--primary"
                     ng-if="!schedule._id"
                     ng-disabled="submitting"
                     ng-click="save(scheduleForm, schedule)"
-                    type="submit"
-                    value="Create"
                     translate
-            />
+            >Create</button>
         </div>
     </div>
 </form>
