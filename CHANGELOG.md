@@ -1,5 +1,8 @@
 # Superdesk Analytics Changelog
 
+## [1.33.4] 2020-09-17
+- Release 1.33.4
+
 ## [1.33.4-rc1] 2020-09-16
 ### Fixes
 - move jquery and gridster to dev dependencies
