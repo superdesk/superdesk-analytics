@@ -1,6 +1,6 @@
 {
   "name": "superdesk-analytics",
-  "version": "1.33.3",
+  "version": "1.33.4-rc1",
   "description": "",
   "main": "index.js",
   "scripts": {
