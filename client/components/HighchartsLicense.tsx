@@ -55,7 +55,8 @@ class HighchartsLicenseModal extends React.PureComponent<IProps> {
                                     <tr>
                                         <td>{gettext('Licensee Contact:')}</td>
                                         <td>
-                                            <a href={`mailto:${license.contact}`}
+                                            <a
+                                                href={`mailto:${license.contact}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                             >
@@ -85,7 +86,8 @@ class HighchartsLicenseModal extends React.PureComponent<IProps> {
                                 <tr>
                                     <td>{gettext('Installed Version:')}</td>
                                     <td>
-                                        <a href={highchartsVersionLink}
+                                        <a
+                                            href={highchartsVersionLink}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                         >
@@ -114,7 +116,8 @@ function showHighchartsModal(): void {
 export class HighchartsLicense extends React.PureComponent {
     render() {
         return (
-            <button className="btn btn--success btn--icon-only btn--hollow"
+            <button
+                className="btn btn--success btn--icon-only btn--hollow"
                 data-sd-tooltip="Highcharts License"
                 data-flow="left"
                 onClick={showHighchartsModal}
