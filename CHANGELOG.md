@@ -10,6 +10,16 @@
 - [SDESK-5471] Minor UI issue when creating analytics report schedule. (#134)
 - [SDESK-5205] fix errors after eve/flask upgrade (#124)
 
+## [1.33.5] 2020-10-01
+- Bump ui-framework version
+
+## [1.33.4] 2020-09-17
+- Release 1.33.4
+
+## [1.33.4-rc1] 2020-09-16
+### Fixes
+- move jquery and gridster to dev dependencies
+
 ## [1.33.3] 2020-08-20
 - Release 1.33.3
 
@@ -157,7 +167,7 @@
 ## [1.3.0] 2018-10-25
 ### Features
 - [SDESK-3430]: Publishing Performance Report
-- [SDESK-3496]: Store gettext translations with the SavedReport 
+- [SDESK-3496]: Store gettext translations with the SavedReport
 
 ### Bug Fixes
 - [SDESK-3504]: (fix) Update ScheduleReports list when changing ReportType
