@@ -1,6 +1,6 @@
 # Superdesk Analytics Changelog
 
-## [2.0.0-rc1] 2020-09-09
+## [2.0.0] 2020-10-28
 ### Features
 
 ### Improvements
