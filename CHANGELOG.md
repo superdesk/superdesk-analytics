@@ -1,5 +1,8 @@
 # Superdesk Analytics Changelog
 
+## [2.1.0-rc.1] 2021-01-28
+- Update Superdesk & Planning to release/2.1 branch
+
 ## [2.0.0] 2020-10-28
 ### Features
 
