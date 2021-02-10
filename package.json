@@ -1,6 +1,6 @@
 {
   "name": "superdesk-analytics",
-  "version": "2.1.0-rc.1",
+  "version": "2.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -49,7 +49,7 @@
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^2.0.13",
     "superdesk-code-style": "1.5.0",
-    "superdesk-core": "github:superdesk/superdesk-client-core#release/2.1",
+    "superdesk-core": "github:superdesk/superdesk-client-core#master",
     "superdesk-ui-framework": "2.3.1"
   }
 }
