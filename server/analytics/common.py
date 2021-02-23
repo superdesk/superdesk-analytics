@@ -22,7 +22,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-MAX_TERMS_SIZE = 2_147_483_647
+MAX_TERMS_SIZE = 1000
 
 
 mime_types = [
