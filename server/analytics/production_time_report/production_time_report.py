@@ -12,7 +12,7 @@ from superdesk.resource import Resource
 
 from analytics.stats.stats_report_service import StatsReportService
 from analytics.chart_config import SDChart, ChartConfig
-from analytics.common import seconds_to_human_readable
+from analytics.common import seconds_to_human_readable, MAX_TERMS_SIZE
 
 
 class ProductionTimeReportResource(Resource):
@@ -46,6 +46,7 @@ class ProductionTimeReportService(StatsReportService):
         'operations': {
             'terms': {
                 'field': 'stats.timeline.operation',
+                'size': MAX_TERMS_SIZE
             }
         }
     }
@@ -74,6 +75,7 @@ class ProductionTimeReportService(StatsReportService):
                             'desks': {
                                 'terms': {
                                     'field': 'stats.desk_transitions.desk',
+                                    'size': MAX_TERMS_SIZE
                                 },
                                 'aggs': {
                                     'stats': {

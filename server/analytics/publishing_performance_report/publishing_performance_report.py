@@ -8,9 +8,10 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
+from superdesk import get_resource_service
 from analytics.base_report import BaseReportService, BaseReportResource
 from analytics.chart_config import ChartConfig
-from superdesk import get_resource_service
+from analytics.common import MAX_TERMS_SIZE
 
 
 class PublishingPerformanceReportResource(BaseReportResource):
@@ -28,6 +29,7 @@ class PublishingPerformanceReportService(BaseReportService):
         'source': {
             'terms': {
                 'field': 'source',
+                'size': MAX_TERMS_SIZE
             }
         }
     }
@@ -39,6 +41,7 @@ class PublishingPerformanceReportService(BaseReportService):
         query = {
             'terms': {
                 'field': agg.get('field'),
+                'size': agg.get('size') or MAX_TERMS_SIZE,
             },
             'aggs': {
                 'no_rewrite_of': {
@@ -54,7 +57,8 @@ class PublishingPerformanceReportService(BaseReportService):
                     'aggs': {
                         'state': {
                             'terms': {
-                                'field': 'state'
+                                'field': 'state',
+                                'size': MAX_TERMS_SIZE,
                             }
                         }
                     }
@@ -68,16 +72,14 @@ class PublishingPerformanceReportService(BaseReportService):
                     'aggs': {
                         'state': {
                             'terms': {
-                                'field': 'state'
+                                'field': 'state',
+                                'size': MAX_TERMS_SIZE,
                             }
                         }
                     }
                 }
             }
         }
-
-        if agg.get('size'):
-            query['terms']['size'] = agg['size']
 
         if include != 'all':
             query['terms']['include'] = include
