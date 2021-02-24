@@ -8,10 +8,12 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-from superdesk.tests.steps import when, then, assert_200, assert_equal, get_json_data, json,\
+from superdesk import get_resource_service
+from superdesk.tests.steps import given, when, then, assert_200, assert_equal, get_json_data, json,\
     fail_and_print_body, apply_placeholders, json_match
 
 from analytics.stats.gen_archive_statistics import GenArchiveStatistics
+from .fixtures import FIXTURES
 
 
 @then('we get {total_count} charts')
@@ -169,3 +171,14 @@ def step_impl_then_get_stats_for_item(context):
                 stat_index += 1
 
         return response_data
+
+
+@given('the vocab fixture "{resource}"')
+def step_impl_given_the_test_vocabularies(context, resource):
+    with context.app.test_request_context(context.app.config["URL_PREFIX"]):
+        service = get_resource_service('vocabularies')
+        service.delete_action()
+        service.post([{
+            '_id': resource,
+            'items': FIXTURES[resource]
+        }])

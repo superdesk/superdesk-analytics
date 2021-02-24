@@ -13,6 +13,7 @@ from superdesk.resource import Resource
 
 from analytics.chart_config import ChartConfig
 from analytics.base_report import BaseReportService
+from analytics.common import MAX_TERMS_SIZE
 
 
 class PlanningUsageReportResource(Resource):
@@ -57,6 +58,7 @@ class PlanningUsageReportService(BaseReportService):
                 'users': {
                     'terms': {
                         'field': 'original_creator',
+                        'size': MAX_TERMS_SIZE,
                     }
                 }
             }
@@ -67,6 +69,7 @@ class PlanningUsageReportService(BaseReportService):
                 'users': {
                     'terms': {
                         'field': 'original_creator',
+                        'size': MAX_TERMS_SIZE,
                     }
                 }
             }
@@ -77,6 +80,7 @@ class PlanningUsageReportService(BaseReportService):
                 'users': {
                     'terms': {
                         'field': 'original_creator',
+                        'size': MAX_TERMS_SIZE
                     }
                 }
             }
@@ -87,6 +91,7 @@ class PlanningUsageReportService(BaseReportService):
                 'users': {
                     'terms': {
                         'field': 'coverages.original_creator',
+                        'size': MAX_TERMS_SIZE
                     }
                 }
             }

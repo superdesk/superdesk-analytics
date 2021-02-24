@@ -22,6 +22,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+MAX_TERMS_SIZE = 1000
+
 
 mime_types = [
     'image/png',

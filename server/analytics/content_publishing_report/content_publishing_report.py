@@ -10,6 +10,7 @@
 
 from analytics.base_report import BaseReportService, BaseReportResource
 from analytics.chart_config import ChartConfig
+from analytics.common import MAX_TERMS_SIZE
 
 
 class ContentPublishingReportResource(BaseReportResource):
@@ -28,6 +29,7 @@ class ContentPublishingReportService(BaseReportService):
         'source': {
             'terms': {
                 'field': 'source',
+                'size': MAX_TERMS_SIZE,
             }
         }
     }
@@ -39,11 +41,9 @@ class ContentPublishingReportService(BaseReportService):
         query = {
             'terms': {
                 'field': agg.get('field'),
+                'size': agg.get('size') or MAX_TERMS_SIZE
             }
         }
-
-        if agg.get('size'):
-            query['terms']['size'] = agg['size']
 
         if include != 'all':
             query['terms']['include'] = include

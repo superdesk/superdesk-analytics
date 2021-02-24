@@ -14,7 +14,7 @@ from superdesk.errors import SuperdeskApiError
 from analytics.base_report import BaseReportService
 from analytics.stats.common import ENTER_DESK_OPERATIONS, EXIT_DESK_OPERATIONS
 from analytics.chart_config import SDChart, ChartConfig
-from analytics.common import get_utc_offset_in_minutes, REPORT_CONFIG, CHART_TYPES
+from analytics.common import get_utc_offset_in_minutes, REPORT_CONFIG, CHART_TYPES, MAX_TERMS_SIZE
 
 from flask import current_app as app
 from datetime import datetime
@@ -57,6 +57,7 @@ class DeskActivityReportService(BaseReportService):
         'operations': {
             'terms': {
                 'field': 'stats.timeline.operation',
+                'size': MAX_TERMS_SIZE,
             }
         }
     }
