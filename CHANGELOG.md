@@ -1,5 +1,9 @@
 # Superdesk Analytics Changelog
 
+## [2.1.1] 2021-02-26
+### Fixes
+- [SDESK-5839] fix(elastic): Show more than 10 entries in reports (#136)
+
 ## * Release 2.1.0 - 2021-02-11
 
 ## [2.1.0-rc.1] 2021-01-28
