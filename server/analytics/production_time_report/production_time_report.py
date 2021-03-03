@@ -23,7 +23,7 @@ class ProductionTimeReportResource(Resource):
     privileges = {'GET': 'production_time_report'}
 
     schema = {
-        'desk_state': {
+        'desk_stats': {
             'type': 'dict',
             'required': False,
             'schema': {},
