@@ -1,5 +1,9 @@
 # Superdesk Analytics Changelog
 
+## [2.1.2] 2021-03-03
+### Fixes
+- fix(schema): Production Time not returning data (#137)
+
 ## [2.1.1] 2021-02-26
 ### Fixes
 - [SDESK-5839] fix(elastic): Show more than 10 entries in reports (#136)
