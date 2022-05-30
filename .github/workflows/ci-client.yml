@@ -1,0 +1,34 @@
+name: "CI-Client"
+
+on: [push, pull_request]
+
+jobs:
+  client:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [14.x]
+    env:
+      CLIENT: true
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Set up NodeJS ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Cache NPM
+        uses: actions/cache@v2
+        with:
+          # npm cache files are stored in `~/.npm on Linux/MacOS
+          path: ~/.npm
+          key: ${{ runner.OS }}-node-${{ hashFiles('package.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-node-
+            ${{ runner.OS }}-
+      - name: Install dependencies
+        run: npm install
+      - name: Lint
+        run: npm run hint
+      - name: Unit Tests
+        run: npm run unit_test
