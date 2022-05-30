@@ -22,6 +22,9 @@ from eve.utils import config
 
 class FeaturemediaUpdates:
     def __init__(self, sender=None):
+        self.on_start()
+
+    def on_start(self):
         self.rewrite_ids = set()
 
     def store_update_fields(self, sender, entry, update):
@@ -376,7 +379,7 @@ class FeaturemediaUpdates:
 featuremedia_updates = FeaturemediaUpdates()
 
 connect_stats_signals(
-    on_start=featuremedia_updates.__init__,
+    on_start=featuremedia_updates.on_start,
     on_generate=featuremedia_updates.store_update_fields,
     on_init_timeline=featuremedia_updates.init,
     on_process=featuremedia_updates.process,

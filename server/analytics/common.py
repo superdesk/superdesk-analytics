@@ -8,9 +8,9 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
+from typing import NamedTuple
 from superdesk import get_resource_service
 from superdesk.utc import utcnow, utc_to_local
-from collections import namedtuple
 from subprocess import check_call, PIPE
 from flask import current_app as app
 import pytz
@@ -25,7 +25,17 @@ logger = logging.getLogger(__name__)
 MAX_TERMS_SIZE = 1000
 
 
-mime_types = [
+class MimeTypes(NamedTuple):
+    PNG: str
+    JPEG: str
+    GIF: str
+    PDF: str
+    SVG: str
+    CSV: str
+    HTML: str
+
+
+MIME_TYPES: MimeTypes = MimeTypes(
     "image/png",
     "image/jpeg",
     "image/gif",
@@ -33,13 +43,27 @@ mime_types = [
     "image/svg+xml",
     "text/csv",
     "text/html",
-]
+)
 
-MIME_TYPES = namedtuple(
-    "MIME_TYPES", ["PNG", "JPEG", "GIF", "PDF", "SVG", "CSV", "HTML"]
-)(*mime_types)
 
-date_filters = [
+class DateFilters(NamedTuple):
+    RANGE: str
+    DAY: str
+    RELATIVE_HOURS: str
+    RELATIVE_DAYS: str
+    YESTERDAY: str
+    TODAY: str
+    RELATIVE_WEEKS: str
+    LAST_WEEK: str
+    THIS_WEEK: str
+    RELATIVE_MONTHS: str
+    LAST_MONTH: str
+    THIS_MONTH: str
+    LAST_YEAR: str
+    THIS_YEAR: str
+
+
+DATE_FILTERS: DateFilters = DateFilters(
     # ABSOLUTE
     "range",
     "day",
@@ -60,46 +84,34 @@ date_filters = [
     # YEARS
     "last_year",
     "this_year",
-]
+)
 
-DATE_FILTERS = namedtuple(
-    "DATE_FILTERS",
-    [
-        # ABSOLUTE
-        "RANGE",
-        "DAY",
-        # HOURS
-        "RELATIVE_HOURS",
-        # DAYS
-        "RELATIVE_DAYS",
-        "YESTERDAY",
-        "TODAY",
-        # WEEKS
-        "RELATIVE_WEEKS",
-        "LAST_WEEK",
-        "THIS_WEEK",
-        # MONTHS
-        "RELATIVE_MONTHS",
-        "LAST_MONTH",
-        "THIS_MONTH",
-        # YEARS
-        "LAST_YEAR",
-        "THIS_YEAR",
-    ],
-)(*date_filters)
 
-chart_types = ["bar", "column", "table", "area", "line", "pie", "scatter", "spline"]
+class ChartTypes(NamedTuple):
+    BAR: str
+    COLUMN: str
+    TABLE: str
+    AREA: str
+    LINE: str
+    PIE: str
+    SCATTER: str
+    SPLINE: str
 
-CHART_TYPES = namedtuple(
-    "CHART_TYPES",
-    ["BAR", "COLUMN", "TABLE", "AREA", "LINE", "PIE", "SCATTER", "SPLINE"],
-)(*chart_types)
 
-report_config = ["date_filters", "chart_types", "default_params"]
+CHART_TYPES: ChartTypes = ChartTypes(
+    "bar", "column", "table", "area", "line", "pie", "scatter", "spline"
+)
 
-REPORT_CONFIG = namedtuple(
-    "REPORT_CONFIG", ["DATE_FILTERS", "CHART_TYPES", "DEFAULT_PARAMS"]
-)(*report_config)
+
+class ReportConfigs(NamedTuple):
+    DATE_FILTERS: str
+    CHART_TYPES: str
+    DEFAULT_PARAMS: str
+
+
+REPORT_CONFIG: ReportConfigs = ReportConfigs(
+    "date_filters", "chart_types", "default_params"
+)
 
 
 def get_mime_type_extension(mimetype):

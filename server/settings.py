@@ -12,13 +12,8 @@
 
 import os
 import json
+from urllib.parse import urlparse
 from superdesk.default_settings import strtobool
-
-
-try:
-    from urllib.parse import urlparse
-except ImportError:
-    from urlparse import urlparse
 
 
 def env(variable, fallback_value=None):
@@ -43,7 +38,7 @@ CLIENT_URL = env("SUPERDESK_CLIENT_URL", "http://localhost:9000")
 URL_PROTOCOL = server_url.scheme or None
 SERVER_NAME = server_url.netloc or None
 URL_PREFIX = server_url.path.lstrip("/") or ""
-if SERVER_NAME.endswith(":80"):
+if SERVER_NAME and SERVER_NAME.endswith(":80"):
     SERVER_NAME = SERVER_NAME[:-3]
 
 INSTALLED_APPS = [

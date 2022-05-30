@@ -14,7 +14,7 @@ from superdesk.resource import Resource
 from superdesk.notification import push_notification
 from superdesk.errors import SuperdeskApiError
 
-from analytics.common import mime_types, MIME_TYPES
+from analytics.common import MIME_TYPES
 
 from collections import namedtuple
 from copy import deepcopy
@@ -71,7 +71,7 @@ class ScheduledReportsResource(Resource):
         "mimetype": {
             "type": "string",
             "required": True,
-            "allowed": mime_types,
+            "allowed": tuple(MIME_TYPES),
             "default": MIME_TYPES.PNG,
         },
         "report_width": {"type": "integer", "default": 800},

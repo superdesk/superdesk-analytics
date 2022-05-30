@@ -17,7 +17,6 @@ from superdesk.celery_app import celery
 
 from analytics.common import (
     get_report_service,
-    mime_types,
     MIME_TYPES,
     get_mime_type_extension,
 )
@@ -48,7 +47,7 @@ class EmailReportResource(Resource):
                 "mimetype": {
                     "type": "string",
                     "required": True,
-                    "allowed": mime_types,
+                    "allowed": tuple(MIME_TYPES),
                     "default": MIME_TYPES.JPEG,
                 },
                 "width": {"type": "integer", "required": False, "default": 800},

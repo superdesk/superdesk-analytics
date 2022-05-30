@@ -8,17 +8,53 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-from collections import namedtuple
+from typing import NamedTuple
 
 
-stat_type = ["timeline", "desk_transitions", "featuremedia_updates"]
+class StatTypes(NamedTuple):
+    TIMELINE: str
+    DESK_TRANSITIONS: str
+    FEATUREMEDIA_UPDATES: str
 
-STAT_TYPE = namedtuple(
-    "STAT_TYPE", ["TIMELINE", "DESK_TRANSITIONS", "FEATUREMEDIA_UPDATES"]
-)(*stat_type)
+
+STAT_TYPE: StatTypes = StatTypes("timeline", "desk_transitions", "featuremedia_updates")
 
 
-operation = [
+class Operations(NamedTuple):
+    CREATE: str
+    FETCH: str
+    DUPLICATED_FROM: str
+    UPDATE: str
+    PUBLISH: str
+    PUBLISH_SCHEDULED: str
+    DESCHEDULE: str
+    PUBLISH_EMBARGO: str
+    REWRITE: str
+    CORRECT: str
+    LINK: str
+    UNLINK: str
+    KILL: str
+    TAKEDOWN: str
+    SPIKE: str
+    UNSPIKE: str
+    MOVE: str
+    MOVE_FROM: str
+    MOVE_TO: str
+    DUPLICATE: str
+    ITEM_LOCK: str
+    ITEM_UNLOCK: str
+    MARK: str
+    UNMARK: str
+    EXPORT_HIGHLIGHT: str
+    CREATE_HIGHLIGHT: str
+    ADD_FEATUREMEDIA: str
+    CHANGE_IMAGE_POI: str
+    UPDATE_FEATUREMEDIA_POI: str
+    REMOVE_FEATUREMEDIA: str
+    UPDATE_FEATUREMEDIA_IMAGE: str
+
+
+OPERATION: Operations = Operations(
     # Create based operations
     "create",
     "fetch",
@@ -52,44 +88,7 @@ operation = [
     "update_featuremedia_poi",
     "remove_featuremedia",
     "update_featuremedia_image",
-]
-
-OPERATION = namedtuple(
-    "OPERATION",
-    [
-        "CREATE",
-        "FETCH",
-        "DUPLICATED_FROM",
-        "UPDATE",
-        "PUBLISH",
-        "PUBLISH_SCHEDULED",
-        "DESCHEDULE",
-        "PUBLISH_EMBARGO",
-        "REWRITE",
-        "CORRECT",
-        "LINK",
-        "UNLINK",
-        "KILL",
-        "TAKEDOWN",
-        "SPIKE",
-        "UNSPIKE",
-        "MOVE",
-        "MOVE_FROM",
-        "MOVE_TO",
-        "DUPLICATE",
-        "ITEM_LOCK",
-        "ITEM_UNLOCK",
-        "MARK",
-        "UNMARK",
-        "EXPORT_HIGHLIGHT",
-        "CREATE_HIGHLIGHT",
-        "ADD_FEATUREMEDIA",
-        "CHANGE_IMAGE_POI",
-        "UPDATE_FEATUREMEDIA_POI",
-        "REMOVE_FEATUREMEDIA",
-        "UPDATE_FEATUREMEDIA_IMAGE",
-    ],
-)(*operation)
+)
 
 
 ENTER_DESK_OPERATIONS = [
