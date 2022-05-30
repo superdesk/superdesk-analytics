@@ -24,7 +24,7 @@ class FeaturemediaUpdates:
     def __init__(self, sender=None):
         self.on_start()
 
-    def on_start(self):
+    def on_start(self, sender=None):
         self.rewrite_ids = set()
 
     def store_update_fields(self, sender, entry, update):
