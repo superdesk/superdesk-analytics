@@ -39,6 +39,11 @@ def init_app(app):
     if not app.config.get('STATISTICS_ELASTIC_INDEX'):
         app.config['STATISTICS_ELASTIC_INDEX'] = env('STATISTICS_ELASTIC_INDEX', db_name)
 
+    if not app.config.get("STATISTICS_ELASTIC_SETTINGS"):
+        # Copy the ``ContentAPI` elastic mapping for the ``Statistics`` type
+        # This is so the ``html_field_analyzer`` is used (for the ``headline`` field)
+        app.config["STATISTICS_ELASTIC_SETTINGS"] = app.config["CONTENTAPI_ELASTICSEARCH_SETTINGS"]
+
     init_gen_stats_task(app)
 
     endpoint_name = ArchiveStatisticsResource.endpoint_name
