@@ -21,9 +21,7 @@ from datetime import datetime, timedelta
 class ChartConfig:
     """Class to generate Highcharts config"""
 
-    defaultConfig = {
-        'credits': {'enabled': False}
-    }
+    defaultConfig = {"credits": {"enabled": False}}
 
     def __init__(self, chart_id, chart_type):
         """Initialise the data for the chart config
@@ -34,11 +32,11 @@ class ChartConfig:
 
         self.id = chart_id
         self.config = {}
-        self.title = ''
-        self.subtitle = ''
+        self.title = ""
+        self.subtitle = ""
         self.chart_type = chart_type
         self.sources = []
-        self.sort_order = 'desc'
+        self.sort_order = "desc"
 
         self.translations = {}
 
@@ -62,10 +60,7 @@ class ChartConfig:
         except IndexError:
             source = {}
 
-        return {
-            'field': source.get('field') or '',
-            'data': source.get('data') or {}
-        }
+        return {"field": source.get("field") or "", "data": source.get("data") or {}}
 
     def get_parent(self):
         """Returns the parent data source's field and data attributes
@@ -113,7 +108,7 @@ class ChartConfig:
         :return str: The title for the Y Axis
         """
 
-        return 'Published Stories'
+        return "Published Stories"
 
     def get_source_title(self, field, qcode):
         """Generates the name for the specific data source
@@ -131,8 +126,11 @@ class ChartConfig:
         :return list: Key names
         """
 
-        return self.get_single_sorted_keys(data) if not self.is_multi_source() \
+        return (
+            self.get_single_sorted_keys(data)
+            if not self.is_multi_source()
             else self.get_multi_sorted_keys(data)
+        )
 
     def get_single_sorted_keys(self, data):
         """Generates array of keys for single series data
@@ -142,10 +140,10 @@ class ChartConfig:
         """
 
         return [
-            category for category, count
-            in sorted(
+            category
+            for category, count in sorted(
                 data.items(),
-                key=lambda kv: kv[1] if self.sort_order == 'asc' else -kv[1]
+                key=lambda kv: kv[1] if self.sort_order == "asc" else -kv[1],
             )
         ]
 
@@ -157,11 +155,12 @@ class ChartConfig:
         """
 
         return [
-            category for category, count
-            in sorted(
+            category
+            for category, count in sorted(
                 data.items(),
-                key=lambda kv: sum(kv[1].values()) if self.sort_order == 'asc'
-                else -sum(kv[1].values())
+                key=lambda kv: sum(kv[1].values())
+                if self.sort_order == "asc"
+                else -sum(kv[1].values()),
             )
         ]
 
@@ -172,78 +171,75 @@ class ChartConfig:
         :param dict data: A dictionary containing the source data
         """
 
-        self.sources.append({
-            'field': field,
-            'data': data
-        })
+        self.sources.append({"field": field, "data": data})
 
     def gen_highcharts_config(self):
         """Generates and returns the Highcharts config
 
         :return dict: Highcharts config
         """
-        config_type = 'table' if self.chart_type == 'table' else 'highcharts'
+        config_type = "table" if self.chart_type == "table" else "highcharts"
         chart = SDChart.Chart(
             self.id,
             chart_type=config_type,
             title=self.get_title(),
             subtitle=self.get_subtitle(),
-            default_config=self.defaultConfig
+            default_config=self.defaultConfig,
         )
 
         chart.translations = self.translations
-        chart.tooltip_point = ''
+        chart.tooltip_point = ""
 
         parent = self.get_parent()
 
         axis_options = {
-            'type': 'category',
-            'default_chart_type': 'column' if self.chart_type == 'table' else self.chart_type,
-            'y_title': self.get_y_axis_title(),
-            'x_title': chart.get_translation_title(parent['field']),
-            'category_field': parent['field'],
-            'categories': self.get_sorted_keys(parent['data']),
+            "type": "category",
+            "default_chart_type": "column"
+            if self.chart_type == "table"
+            else self.chart_type,
+            "y_title": self.get_y_axis_title(),
+            "x_title": chart.get_translation_title(parent["field"]),
+            "category_field": parent["field"],
+            "categories": self.get_sorted_keys(parent["data"]),
         }
 
         if not self.is_multi_source():
-            chart.tooltip_header = '{point.x}: {point.y}'
+            chart.tooltip_header = "{point.x}: {point.y}"
             chart.data_labels = True
             chart.colour_by_point = True
-            axis_options['stack_labels'] = False
+            axis_options["stack_labels"] = False
 
-            axis = chart.add_axis() \
-                .set_options(**axis_options)
+            axis = chart.add_axis().set_options(**axis_options)
 
             axis.add_series().set_options(
-                field=parent['field'],
+                field=parent["field"],
                 data=[
-                    parent['data'][key]
-                    for key in self.get_sorted_keys(parent['data'])
-                ]
+                    parent["data"][key] for key in self.get_sorted_keys(parent["data"])
+                ],
             )
         else:
             child = self.get_child()
-            chart.legend_title = self.get_source_name(child['field'])
-            chart.tooltip_header = '{series.name}/{point.x}: {point.y}'
+            chart.legend_title = self.get_source_name(child["field"])
+            chart.tooltip_header = "{series.name}/{point.x}: {point.y}"
             chart.data_labels = False
             chart.colour_by_point = False
-            axis_options['stack_labels'] = True
+            axis_options["stack_labels"] = True
 
-            axis = chart.add_axis() \
-                .set_options(**axis_options)
+            axis = chart.add_axis().set_options(**axis_options)
 
-            for child_key in child['data'].keys():
+            for child_key in child["data"].keys():
                 axis.add_series().set_options(
-                    field=child['field'],
+                    field=child["field"],
                     name=child_key,
                     stack=0,
-                    stackType='normal',
+                    stackType="normal",
                     data=[
                         counts.get(child_key) or 0
                         for counts in [
-                            parent['data'][key] for key in self.get_sorted_keys(parent['data'])
+                            parent["data"][key]
+                            for key in self.get_sorted_keys(parent["data"])
                         ]
-                    ]
+                    ],
                 )
 
         return chart.gen_config()
@@ -260,7 +256,7 @@ class ChartConfig:
 
     @staticmethod
     def get_translations(fields):
-        chart = ChartConfig('tmp', 'chart')
+        chart = ChartConfig("tmp", "chart")
         for field in fields:
             chart.load_translations_for_field(field)
         return chart.translations
@@ -273,11 +269,11 @@ class ChartConfig:
         """
         if parent_field is None:
             parent = self.get_parent()
-            parent_field = parent['field']
+            parent_field = parent["field"]
 
         if child_field is None:
             child = self.get_child()
-            child_field = child['field']
+            child_field = child["field"]
 
         self.load_translations_for_field(parent_field)
         self.load_translations_for_field(child_field)
@@ -288,71 +284,69 @@ class ChartConfig:
         if field in self.translations:
             return
 
-        elif field == 'task.desk':
+        elif field == "task.desk":
             self._set_translation(
-                'task.desk',
-                'Desk',
+                "task.desk",
+                "Desk",
                 {
-                    str(desk.get('_id')): desk.get('name')
-                    for desk in list(get_resource_service('desks').get(req=None, lookup={}))
-                }
+                    str(desk.get("_id")): desk.get("name")
+                    for desk in list(
+                        get_resource_service("desks").get(req=None, lookup={})
+                    )
+                },
             )
-        elif field == 'task.user':
+        elif field == "task.user":
             self._set_translation(
-                'task.user',
-                'User',
+                "task.user",
+                "User",
                 {
-                    str(user.get('_id')): user.get('display_name')
-                    for user in list(get_resource_service('users').get(req=None, lookup={}))
-                }
+                    str(user.get("_id")): user.get("display_name")
+                    for user in list(
+                        get_resource_service("users").get(req=None, lookup={})
+                    )
+                },
             )
-        elif field == 'anpa_category.qcode':
+        elif field == "anpa_category.qcode":
             self._set_translation(
-                'anpa_category.qcode',
-                'Category',
-                get_cv_by_qcode('categories', 'name')
+                "anpa_category.qcode", "Category", get_cv_by_qcode("categories", "name")
             )
-        elif field == 'genre.qcode':
+        elif field == "genre.qcode":
             self._set_translation(
-                'genre.qcode',
-                'Genre',
-                get_cv_by_qcode('genre', 'name')
+                "genre.qcode", "Genre", get_cv_by_qcode("genre", "name")
             )
-        elif field == 'subject.qcode':
+        elif field == "subject.qcode":
             self._set_translation(
-                'subject.qcode',
-                'Subject',
-                get_cv_by_qcode('subjectcodes', 'name')
+                "subject.qcode", "Subject", get_cv_by_qcode("subjectcodes", "name")
             )
-        elif field == 'urgency':
+        elif field == "urgency":
             self._set_translation(
-                'urgency',
-                'Urgency',
-                get_cv_by_qcode('urgency', 'name')
+                "urgency", "Urgency", get_cv_by_qcode("urgency", "name")
             )
-        elif field == 'state':
+        elif field == "state":
             self._set_translation(
-                'state',
-                'State',
+                "state",
+                "State",
                 {
-                    'published': 'Published',
-                    'killed': 'Killed',
-                    'corrected': 'Corrected',
-                    'updated': 'Updated'
-                }
+                    "published": "Published",
+                    "killed": "Killed",
+                    "corrected": "Corrected",
+                    "updated": "Updated",
+                },
             )
-        elif field == 'source':
-            self._set_translation('source', 'Source')
-        elif field == 'operation':
-            self._set_translation('operation', 'Operation', OPERATION_NAMES)
-        elif field == 'authors.parent':
+        elif field == "source":
+            self._set_translation("source", "Source")
+        elif field == "operation":
+            self._set_translation("operation", "Operation", OPERATION_NAMES)
+        elif field == "authors.parent":
             self._set_translation(
-                'authors.parent',
-                'Author',
+                "authors.parent",
+                "Author",
                 {
-                    str(user.get('_id')): user.get('display_name')
-                    for user in list(get_resource_service('users').get(req=None, lookup={}))
-                }
+                    str(user.get("_id")): user.get("display_name")
+                    for user in list(
+                        get_resource_service("users").get(req=None, lookup={})
+                    )
+                },
             )
 
     def _set_translation(self, field, title, names=None):
@@ -362,9 +356,9 @@ class ChartConfig:
         :param str title: The title of the field name
         :param dict names: Map of id/qcode to display names
         """
-        self.translations[field.replace('.', '_')] = {
-            'title': title,
-            'names': names or {}
+        self.translations[field.replace(".", "_")] = {
+            "title": title,
+            "names": names or {},
         }
 
     def _get_translations(self, field):
@@ -373,7 +367,7 @@ class ChartConfig:
         :param str field: Name of the field to get translations for
         :return dict: Title and name translations
         """
-        return self.translations.get(field.replace('.', '_')) or {}
+        return self.translations.get(field.replace(".", "_")) or {}
 
     def _get_translation_title(self, field):
         """Helper function to get the translated title for a field
@@ -381,7 +375,7 @@ class ChartConfig:
         :param str field: Name of the field to get translated title for
         :return str: Title of the field
         """
-        return self._get_translations(field).get('title') or field
+        return self._get_translations(field).get("title") or field
 
     def _get_translation_names(self, field):
         """Helper function to get the translated id/qcode to name map for a field
@@ -389,97 +383,93 @@ class ChartConfig:
         :param str field: Name of the field to get translated names for
         :return dict: id/qcode to name map
         """
-        return self._get_translations(field).get('names') or {}
+        return self._get_translations(field).get("names") or {}
 
     @staticmethod
     def gen_subtitle_for_dates(params):
-        chart = params.get('chart') or {}
+        chart = params.get("chart") or {}
 
-        if chart.get('subtitle'):
-            return chart['subtitle']
+        if chart.get("subtitle"):
+            return chart["subtitle"]
 
-        dates = params.get('dates') or {}
-        date_filter = dates.get('filter')
+        dates = params.get("dates") or {}
+        date_filter = dates.get("filter")
 
         # ABSOLUTE
         if date_filter == DATE_FILTERS.RANGE:
-            start = datetime.strptime(dates.get('start'), '%Y-%m-%d')
-            end = datetime.strptime(dates.get('end'), '%Y-%m-%d')
+            start = datetime.strptime(dates.get("start"), "%Y-%m-%d")
+            end = datetime.strptime(dates.get("end"), "%Y-%m-%d")
 
-            return '{} - {}'.format(
-                start.strftime('%B %-d, %Y'),
-                end.strftime('%B %-d, %Y')
+            return "{} - {}".format(
+                start.strftime("%B %-d, %Y"), end.strftime("%B %-d, %Y")
             )
         elif date_filter == DATE_FILTERS.DAY:
-            date_str = params.get('date') or dates.get('date')
-            date = datetime.strptime(date_str, '%Y-%m-%d')
+            date_str = params.get("date") or dates.get("date")
+            date = datetime.strptime(date_str, "%Y-%m-%d")
 
-            return date.strftime('%A %-d %B %Y')
+            return date.strftime("%A %-d %B %Y")
 
         # HOURS
         elif date_filter == DATE_FILTERS.RELATIVE_HOURS:
-            hours = dates.get('relative')
+            hours = dates.get("relative")
 
-            return 'Last {} hours'.format(hours)
+            return "Last {} hours".format(hours)
 
         # DAYS
         elif date_filter == DATE_FILTERS.RELATIVE_DAYS:
-            days = dates.get('relative')
+            days = dates.get("relative")
 
-            return 'Last {} days'.format(days)
+            return "Last {} days".format(days)
         elif date_filter == DATE_FILTERS.YESTERDAY:
-            return (datetime.today() - timedelta(days=1)) \
-                .strftime('%A %-d %B %Y')
+            return (datetime.today() - timedelta(days=1)).strftime("%A %-d %B %Y")
         elif date_filter == DATE_FILTERS.TODAY:
-            return datetime.today().strftime('%A %-d %B %Y')
+            return datetime.today().strftime("%A %-d %B %Y")
 
         # WEEKS
         elif date_filter == DATE_FILTERS.RELATIVE_WEEKS:
-            weeks = dates.get('relative')
+            weeks = dates.get("relative")
 
-            return 'Last {} weeks'.format(weeks)
+            return "Last {} weeks".format(weeks)
         elif date_filter == DATE_FILTERS.LAST_WEEK:
             week = datetime.today() - timedelta(weeks=1)
             start = week - timedelta(days=week.weekday() + 1)
             end = start + timedelta(days=6)
 
-            return '{} - {}'.format(
-                start.strftime('%B %-d, %Y'),
-                end.strftime('%B %-d, %Y')
+            return "{} - {}".format(
+                start.strftime("%B %-d, %Y"), end.strftime("%B %-d, %Y")
             )
         elif date_filter == DATE_FILTERS.THIS_WEEK:
             week = datetime.today()
             start = week - timedelta(days=week.weekday() + 1)
             end = start + timedelta(days=6)
 
-            return '{} - {}'.format(
-                start.strftime('%B %-d, %Y'),
-                end.strftime('%B %-d, %Y')
+            return "{} - {}".format(
+                start.strftime("%B %-d, %Y"), end.strftime("%B %-d, %Y")
             )
 
         # MONTHS
         elif date_filter == DATE_FILTERS.RELATIVE_MONTHS:
-            months = dates.get('relative')
+            months = dates.get("relative")
 
-            return 'Last {} months'.format(months)
+            return "Last {} months".format(months)
         elif date_filter == DATE_FILTERS.LAST_MONTH:
             first = datetime.today().replace(day=1)
             month = first - timedelta(days=1)
 
-            return month.strftime('%B %Y')
+            return month.strftime("%B %Y")
         elif date_filter == DATE_FILTERS.THIS_MONTH:
             month = datetime.today()
 
-            return month.strftime('%B %Y')
+            return month.strftime("%B %Y")
 
         # YEARS
         elif date_filter == DATE_FILTERS.LAST_YEAR:
             year = datetime.today() - timedelta(weeks=52)
 
-            return year.strftime('%Y')
+            return year.strftime("%Y")
         elif date_filter == DATE_FILTERS.THIS_YEAR:
             year = datetime.today()
 
-            return year.strftime('%Y')
+            return year.strftime("%Y")
 
         return None

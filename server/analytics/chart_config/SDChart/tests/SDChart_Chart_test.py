@@ -18,7 +18,7 @@ class SDChartChartTestCase(TestCase):
         self.maxDiff = None
 
     def _gen_config(self, **chart_config):
-        chart = SDChart.Chart('test_chart', **chart_config)
+        chart = SDChart.Chart("test_chart", **chart_config)
 
         return chart.gen_config()
 
@@ -30,97 +30,82 @@ class SDChartChartTestCase(TestCase):
         self.assertEqual(
             self._gen_config(),
             {
-                'id': 'test_chart',
-                'type': 'highcharts',
-                'chart': {},
-                'time': {'useUTC': True},
-                'legend': {'enabled': False},
-                'tooltip': {},
-                'plotOptions': {'series': {'dataLabels': {'enabled': False}}},
-                'fullHeight': False
-            }
+                "id": "test_chart",
+                "type": "highcharts",
+                "chart": {},
+                "time": {"useUTC": True},
+                "legend": {"enabled": False},
+                "tooltip": {},
+                "plotOptions": {"series": {"dataLabels": {"enabled": False}}},
+                "fullHeight": False,
+            },
         )
 
         self.assertEqual(
             self._gen_config(
                 default_config={
-                    'credits': {'enabled': False},
-                    'title': {'text': 'Default Title'},
-                    'subtitle': {'text': 'Default Subtitle'},
-                    'plotOptions': {'series': {'shadow': True}}
+                    "credits": {"enabled": False},
+                    "title": {"text": "Default Title"},
+                    "subtitle": {"text": "Default Subtitle"},
+                    "plotOptions": {"series": {"shadow": True}},
                 }
             ),
             {
-                'id': 'test_chart',
-                'type': 'highcharts',
-                'chart': {},
-                'time': {'useUTC': True},
-                'legend': {'enabled': False},
-                'tooltip': {},
-                'plotOptions': {
-                    'series': {
-                        'dataLabels': {'enabled': False},
-                        'shadow': True
-                    }
+                "id": "test_chart",
+                "type": "highcharts",
+                "chart": {},
+                "time": {"useUTC": True},
+                "legend": {"enabled": False},
+                "tooltip": {},
+                "plotOptions": {
+                    "series": {"dataLabels": {"enabled": False}, "shadow": True}
                 },
-                'credits': {'enabled': False},
-                'title': {'text': 'Default Title'},
-                'subtitle': {'text': 'Default Subtitle'},
-                'fullHeight': False
-            }
+                "credits": {"enabled": False},
+                "title": {"text": "Default Title"},
+                "subtitle": {"text": "Default Subtitle"},
+                "fullHeight": False,
+            },
         )
 
     def test_set_options(self):
+        self.assertConfigEqual(self._gen_config(chart_type="table"), {"type": "table"})
+
         self.assertConfigEqual(
-            self._gen_config(chart_type='table'),
-            {'type': 'table'}
+            self._gen_config(title="Test Title"), {"title": {"text": "Test Title"}}
         )
 
         self.assertConfigEqual(
-            self._gen_config(title='Test Title'),
-            {'title': {'text': 'Test Title'}}
-        )
-
-        self.assertConfigEqual(
-            self._gen_config(subtitle='Test Subtitle'),
-            {'subtitle': {'text': 'Test Subtitle'}}
+            self._gen_config(subtitle="Test Subtitle"),
+            {"subtitle": {"text": "Test Subtitle"}},
         )
 
         self.assertConfigEqual(
             self._gen_config(timezone_offset=660),
-            {'time': {
-                'timezoneOffset': 660,
-                'useUTC': True
-            }}
+            {"time": {"timezoneOffset": 660, "useUTC": True}},
         )
 
         self.assertConfigEqual(
-            self._gen_config(use_utc=False),
-            {'time': {'useUTC': False}}
+            self._gen_config(use_utc=False), {"time": {"useUTC": False}}
         )
 
-        self.assertConfigEqual(
-            self._gen_config(height=400),
-            {'chart': {'height': 400}}
-        )
+        self.assertConfigEqual(self._gen_config(height=400), {"chart": {"height": 400}})
 
         self.assertConfigEqual(
-            self._gen_config(legend_title='Test Legend'),
-            {'legend': {
-                'enabled': True,
-                'title': {'text': 'Test Legend'}
-            }}
+            self._gen_config(legend_title="Test Legend"),
+            {"legend": {"enabled": True, "title": {"text": "Test Legend"}}},
         )
 
         self.assertConfigEqual(
             self._gen_config(
-                tooltip_header='Tool Header {point.x}',
-                tooltip_point='Tool Point {point.y}',
+                tooltip_header="Tool Header {point.x}",
+                tooltip_point="Tool Point {point.y}",
             ),
-            {'tooltip': {
-                'headerFormat': 'Tool Header {point.x}',
-                'pointFormat': 'Tool Point {point.y}'
-            }}
+            {
+                "tooltip": {
+                    "headerFormat": "Tool Header {point.x}",
+                    "pointFormat": "Tool Point {point.y}",
+                }
+            },
         )
 
         self.assertConfigEqual(
@@ -128,11 +113,13 @@ class SDChartChartTestCase(TestCase):
                 data_labels=True,
                 colour_by_point=True,
             ),
-            {'plotOptions': {
-                'series': {'dataLabels': {'enabled': True}},
-                'bar': {'colorByPoint': True},
-                'column': {'colorByPoint': True}
-            }}
+            {
+                "plotOptions": {
+                    "series": {"dataLabels": {"enabled": True}},
+                    "bar": {"colorByPoint": True},
+                    "column": {"colorByPoint": True},
+                }
+            },
         )
 
         self.assertConfigEqual(
@@ -140,14 +127,13 @@ class SDChartChartTestCase(TestCase):
                 data_labels=False,
                 colour_by_point=False,
             ),
-            {'plotOptions': {
-                'series': {'dataLabels': {'enabled': False}},
-                'bar': {'colorByPoint': False},
-                'column': {'colorByPoint': False}
-            }}
+            {
+                "plotOptions": {
+                    "series": {"dataLabels": {"enabled": False}},
+                    "bar": {"colorByPoint": False},
+                    "column": {"colorByPoint": False},
+                }
+            },
         )
 
-        self.assertConfigEqual(
-            self._gen_config(full_height=True),
-            {'fullHeight': True}
-        )
+        self.assertConfigEqual(self._gen_config(full_height=True), {"fullHeight": True})

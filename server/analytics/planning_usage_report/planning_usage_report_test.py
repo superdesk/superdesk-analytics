@@ -19,52 +19,60 @@ class PlanningUsageReportTestCase(TestCase):
         with self.app.app_context():
             # Remove the 'Planning' app and 'planning_usage_report' endpoint if they are already configured
             try:
-                self.app.settings['INSTALLED_APPS'].remove('planning')
-                resources.pop('planning_usage_report', None)
+                self.app.settings["INSTALLED_APPS"].remove("planning")
+                resources.pop("planning_usage_report", None)
             except ValueError:
                 pass
 
             # Test PlanningUsage not registering if 'Planning' module is not configured
             init_app(self.app)
-            self.assertRaises(KeyError, get_resource_service, 'planning_usage_report')
+            self.assertRaises(KeyError, get_resource_service, "planning_usage_report")
 
             # Test PlanningUsage registering when 'Planning' module is configured
-            self.app.settings['INSTALLED_APPS'].append('planning')
+            self.app.settings["INSTALLED_APPS"].append("planning")
             init_app(self.app)
-            service = get_resource_service('planning_usage_report')
+            service = get_resource_service("planning_usage_report")
 
-        self.app.data.insert('roles', [{
-            '_id': 'role1',
-            'privileges': {'planning': 0}
-        }, {
-            '_id': 'role2',
-            'privileges': {'planning': 1}
-        }])
+        self.app.data.insert(
+            "roles",
+            [
+                {"_id": "role1", "privileges": {"planning": 0}},
+                {"_id": "role2", "privileges": {"planning": 1}},
+            ],
+        )
 
-        self.app.data.insert('users', [{
-            '_id': 'user1',
-            'privileges': {'planning': 0},
-            'is_active': True,
-            'is_enabled': True
-        }, {
-            '_id': 'user2',
-            'privileges': {'planning': 1},
-            'is_active': True,
-            'is_enabled': True
-        }, {
-            '_id': 'user3',
-            'privileges': {},
-            'role': 'role1',
-            'is_active': True,
-            'is_enabled': True
-        }, {
-            '_id': 'user4',
-            'privileges': {},
-            'role': 'role2',
-            'is_active': True,
-            'is_enabled': True
-        }])
+        self.app.data.insert(
+            "users",
+            [
+                {
+                    "_id": "user1",
+                    "privileges": {"planning": 0},
+                    "is_active": True,
+                    "is_enabled": True,
+                },
+                {
+                    "_id": "user2",
+                    "privileges": {"planning": 1},
+                    "is_active": True,
+                    "is_enabled": True,
+                },
+                {
+                    "_id": "user3",
+                    "privileges": {},
+                    "role": "role1",
+                    "is_active": True,
+                    "is_enabled": True,
+                },
+                {
+                    "_id": "user4",
+                    "privileges": {},
+                    "role": "role2",
+                    "is_active": True,
+                    "is_enabled": True,
+                },
+            ],
+        )
 
         users = service._get_users_with_planning()
 
-        self.assertEqual(users, ['user2', 'user4'])
+        self.assertEqual(users, ["user2", "user4"])

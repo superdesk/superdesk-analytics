@@ -15,17 +15,17 @@ from analytics.common import register_report
 
 def init_app(app):
     # Don't register this endpoint if archive stats aren't being generated
-    if not app.config.get('ANALYTICS_ENABLE_ARCHIVE_STATS', False):
+    if not app.config.get("ANALYTICS_ENABLE_ARCHIVE_STATS", False):
         return
 
-    endpoint_name = 'desk_activity_report'
+    endpoint_name = "desk_activity_report"
     service = DeskActivityReportService(endpoint_name, backend=superdesk.get_backend())
     DeskActivityReportResource(endpoint_name, app=app, service=service)
 
-    register_report('desk_activity_report', 'desk_activity_report')
+    register_report("desk_activity_report", "desk_activity_report")
 
     superdesk.privilege(
-        name='desk_activity_report',
-        label='Analytics - Desk Activity Reports',
-        description='User can view Desk Activity Reports'
+        name="desk_activity_report",
+        label="Analytics - Desk Activity Reports",
+        description="User can view Desk Activity Reports",
     )

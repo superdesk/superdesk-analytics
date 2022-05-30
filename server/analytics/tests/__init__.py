@@ -13,11 +13,10 @@ from superdesk.factory.app import get_app
 
 
 class TestCase(_TestCase):
-
     def setUp(self):
         config = {
-            'INSTALLED_APPS': ['analytics'],
-            'STATISTICS_MONGO_DBNAME': 'sptests_statistics'
+            "INSTALLED_APPS": ["analytics"],
+            "STATISTICS_MONGO_DBNAME": "sptests_statistics",
         }
         update_config(config)
         self.app = get_app(config)

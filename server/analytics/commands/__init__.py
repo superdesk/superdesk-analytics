@@ -1,1 +1,1 @@
-from .send_scheduled_reports import SendScheduledReports # noqa
+from .send_scheduled_reports import SendScheduledReports  # noqa

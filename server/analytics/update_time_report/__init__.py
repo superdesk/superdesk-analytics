@@ -16,11 +16,12 @@ from analytics.common import register_report
 def init_app(app):
     # Don't register this endpoint if archive stats aren't being generated
     # Generating stats with PUBLISH_ASSOCIATED_ITEMS=True is currently not supported
-    if not app.config.get('ANALYTICS_ENABLE_ARCHIVE_STATS', False) or \
-            app.config.get('PUBLISH_ASSOCIATED_ITEMS', False):
+    if not app.config.get("ANALYTICS_ENABLE_ARCHIVE_STATS", False) or app.config.get(
+        "PUBLISH_ASSOCIATED_ITEMS", False
+    ):
         return
 
-    endpoint_name = 'update_time_report'
+    endpoint_name = "update_time_report"
     service = UpdateTimeReportService(endpoint_name, backend=superdesk.get_backend())
     UpdateTimeReportResource(endpoint_name, app=app, service=service)
 
@@ -28,6 +29,6 @@ def init_app(app):
 
     superdesk.privilege(
         name=endpoint_name,
-        label='Analytics - Update Time Report',
-        description='User can view Update Time Report'
+        label="Analytics - Update Time Report",
+        description="User can view Update Time Report",
     )
