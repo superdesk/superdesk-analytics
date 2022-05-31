@@ -1,19 +1,14 @@
 name: "CI"
 
-on:
-  push:
-    branches: [develop, master, release/**]
-  pull_request:
-    # The branches below must be a subset of the branches above
-    branches: [develop]
+on: [push, pull_request]
 
 jobs:
   server:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.6]
-        node-version: [12.x]
+        python-version: [3.8]
+        node-version: [14.x]
     env:
       SERVER: true
     steps:
@@ -35,13 +30,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip
             ${{ runner.os }}-
+      - run: git config --global url."https://git@".insteadOf git://
       - name: Setup Environment
         run: ./scripts/ci-install.sh
       - name: Start Services
         run: ./scripts/ci-start-services.sh
-      - name: Flake8
-        working-directory: ./server
-        run: flake8
       - name: Nosetests
         working-directory: ./server
         run: nosetests --logging-level=ERROR
@@ -53,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [12.x]
+        node-version: [14.x]
     env:
       CLIENT: true
     steps:
@@ -72,10 +65,9 @@ jobs:
           restore-keys: |
             ${{ runner.OS }}-node-
             ${{ runner.OS }}-
-      - name: Setup Environment
-        run: ./scripts/ci-install.sh
-      - name: Start Services
-        run: ./scripts/ci-start-services.sh
+      - run: git config --global url."https://git@".insteadOf git://
+      - name: Install dependencies
+        run: npm install
       - name: Lint
         run: npm run hint
       - name: Unit Tests

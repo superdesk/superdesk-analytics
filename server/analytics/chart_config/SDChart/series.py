@@ -53,15 +53,9 @@ class Series:
             return self.data
         elif isinstance(self.data, dict):
             if self.axis.categories is not None:
-                return [
-                    self.data.get(source) or 0
-                    for source in self.axis.categories
-                ]
+                return [self.data.get(source) or 0 for source in self.axis.categories]
 
-            return [
-                item.get(source) or 0
-                for item, source in self.data.items()
-            ]
+            return [item.get(source) or 0 for item, source in self.data.items()]
 
         return None
 
@@ -71,7 +65,9 @@ class Series:
         if self.field is None:
             return self.name
         elif self.name is not None:
-            name = (self.chart.get_translation_names(self.field) or {}).get(self.name) or self.name
+            name = (self.chart.get_translation_names(self.field) or {}).get(
+                self.name
+            ) or self.name
         else:
             name = self.chart.get_translation_title(self.field) or self.name
 
@@ -81,26 +77,26 @@ class Series:
         """Sets the series config for the axis"""
 
         series = {
-            'xAxis': self.axis.index,
-            'type': self.type or self.axis.default_chart_type or 'bar'
+            "xAxis": self.axis.index,
+            "type": self.type or self.axis.default_chart_type or "bar",
         }
         name = self.get_name()
         data = self.get_data()
 
         if name is not None:
-            series['name'] = name
+            series["name"] = name
 
         if data is not None:
-            series['data'] = data
+            series["data"] = data
 
         if self.stack is not None:
-            series['stacking'] = self.stack_type or 'normal'
-            series['stack'] = self.stack
+            series["stacking"] = self.stack_type or "normal"
+            series["stack"] = self.stack
 
         if self.axis.point_start is not None:
-            series['pointStart'] = self.axis.point_start
+            series["pointStart"] = self.axis.point_start
 
         if self.axis.point_interval is not None:
-            series['pointInterval'] = self.axis.point_interval
+            series["pointInterval"] = self.axis.point_interval
 
         return series

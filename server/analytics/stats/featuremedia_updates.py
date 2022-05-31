@@ -22,16 +22,19 @@ from eve.utils import config
 
 class FeaturemediaUpdates:
     def __init__(self, sender=None):
+        self.on_start()
+
+    def on_start(self, sender=None):
         self.rewrite_ids = set()
 
     def store_update_fields(self, sender, entry, update):
-        if entry.get('operation') not in FEATUREMEDIA_OPERATIONS:
+        if entry.get("operation") not in FEATUREMEDIA_OPERATIONS:
             return
 
         # Store the featuremedia updates for use during future iterations
-        update.update({
-            ASSOCIATIONS: (entry.get('update') or {}).get(ASSOCIATIONS) or None
-        })
+        update.update(
+            {ASSOCIATIONS: (entry.get("update") or {}).get(ASSOCIATIONS) or None}
+        )
 
     def init(self, sender, stats):
         # Clear the featuremedia stats as we'll recalculate them here
@@ -39,22 +42,22 @@ class FeaturemediaUpdates:
 
     def process(self, sender, entry, new_timeline, updates, update, stats):
         # Generating stats with PUBLISH_ASSOCIATED_ITEMS=True is currently not supported
-        if app.config.get('PUBLISH_ASSOCIATED_ITEMS', False):
+        if app.config.get("PUBLISH_ASSOCIATED_ITEMS", False):
             return
 
-        operation = entry.get('operation')
+        operation = entry.get("operation")
 
-        updates.setdefault('_featuremedia', None)
-        updates.setdefault('_published', False)
+        updates.setdefault("_featuremedia", None)
+        updates.setdefault("_published", False)
 
-        item_type = updates.get('type') or 'text'
+        item_type = updates.get("type") or "text"
 
-        if entry.get('_auto_generated', False):
-            entry['update'] = update
+        if entry.get("_auto_generated", False):
+            entry["update"] = update
 
         # If this is the initial publish operation and featuremedia has been added already
         # Then add this operation as the first in the featuremedia changes
-        if operation == OPERATION.PUBLISH and updates.get('_featuremedia'):
+        if operation == OPERATION.PUBLISH and updates.get("_featuremedia"):
             self._add_media_operation(
                 entry,
                 operation,
@@ -62,24 +65,30 @@ class FeaturemediaUpdates:
                 updates,
                 stats,
                 OPERATION.PUBLISH,
-                updates.get('_featuremedia')
+                updates.get("_featuremedia"),
             )
             # return
         elif item_type == CONTENT_TYPE.TEXT:
             # Calculate featuremedia stats
             associations = update.get(ASSOCIATIONS) or None
 
-            media = None if associations is None else associations.get('featuremedia') or None
+            media = (
+                None
+                if associations is None
+                else associations.get("featuremedia") or None
+            )
 
             # If there are no associations in this update, then media has not changed
             if associations is None:
                 return
 
-            if updates['_featuremedia'] is not None and \
-                operation in [OPERATION.UPDATE, OPERATION.CORRECT] and \
-                    (associations is None or media is None or not media.get('_id')):
+            if (
+                updates["_featuremedia"] is not None
+                and operation in [OPERATION.UPDATE, OPERATION.CORRECT]
+                and (associations is None or media is None or not media.get("_id"))
+            ):
                 # If featuremedia is removed
-                updates['_featuremedia'] = None
+                updates["_featuremedia"] = None
                 self._add_media_operation(
                     entry,
                     operation,
@@ -87,17 +96,17 @@ class FeaturemediaUpdates:
                     updates,
                     stats,
                     OPERATION.REMOVE_FEATUREMEDIA,
-                    media
+                    media,
                 )
 
                 return
 
             # If there is no featuremedia, then don't calculate any timeline entries
-            if media is None and updates['_featuremedia'] is None:
+            if media is None and updates["_featuremedia"] is None:
                 return
 
-            if updates['_featuremedia'] is None:
-                updates['_featuremedia'] = media
+            if updates["_featuremedia"] is None:
+                updates["_featuremedia"] = media
 
                 self._add_media_operation(
                     entry,
@@ -106,11 +115,11 @@ class FeaturemediaUpdates:
                     updates,
                     stats,
                     OPERATION.ADD_FEATUREMEDIA,
-                    media
+                    media,
                 )
             elif media is not None:
-                if media.get('_id') != updates['_featuremedia'].get('_id'):
-                    updates['_featuremedia'] = media
+                if media.get("_id") != updates["_featuremedia"].get("_id"):
+                    updates["_featuremedia"] = media
 
                     self._add_media_operation(
                         entry,
@@ -119,10 +128,10 @@ class FeaturemediaUpdates:
                         updates,
                         stats,
                         OPERATION.UPDATE_FEATUREMEDIA_IMAGE,
-                        media
+                        media,
                     )
-                elif self._renditions_changed(updates['_featuremedia'], media):
-                    updates['_featuremedia'] = media
+                elif self._renditions_changed(updates["_featuremedia"], media):
+                    updates["_featuremedia"] = media
 
                     self._add_media_operation(
                         entry,
@@ -131,13 +140,13 @@ class FeaturemediaUpdates:
                         updates,
                         stats,
                         OPERATION.UPDATE_FEATUREMEDIA_POI,
-                        media
+                        media,
                     )
         elif item_type == CONTENT_TYPE.PICTURE:
-            if updates['_featuremedia'] is None:
-                updates['_featuremedia'] = deepcopy(update)
-            elif self._renditions_changed(updates['_featuremedia'], update):
-                updates['_featuremedia'] = update
+            if updates["_featuremedia"] is None:
+                updates["_featuremedia"] = deepcopy(update)
+            elif self._renditions_changed(updates["_featuremedia"], update):
+                updates["_featuremedia"] = update
 
                 self._add_media_operation(
                     entry,
@@ -146,51 +155,59 @@ class FeaturemediaUpdates:
                     updates,
                     stats,
                     OPERATION.CHANGE_IMAGE_POI,
-                    update
+                    update,
                 )
 
-    def _add_media_operation(self, entry, operation, new_timeline, updates, stats, name, media=None):
+    def _add_media_operation(
+        self, entry, operation, new_timeline, updates, stats, name, media=None
+    ):
         media_operation = deepcopy(entry)
-        media_operation['_auto_generated'] = True
-        media_operation['operation'] = name
+        media_operation["_auto_generated"] = True
+        media_operation["operation"] = name
 
         if media is not None:
-            media_operation['update'] = {
-                ASSOCIATIONS: {
-                    'featuremedia': media
-                }
-            }
+            media_operation["update"] = {ASSOCIATIONS: {"featuremedia": media}}
 
-        if operation != name and not entry.get('_processed', False):  # and name != OPERATION.PUBLISH:
+        if operation != name and not entry.get(
+            "_processed", False
+        ):  # and name != OPERATION.PUBLISH:
             new_timeline.append(media_operation)
 
-        if updates['_published']:  # and not operation == OPERATION.PUBLISH:
+        if updates["_published"]:  # and not operation == OPERATION.PUBLISH:
             stats[STAT_TYPE.FEATUREMEDIA_UPDATES].append(media_operation)
 
     def _renditions_changed(self, original, updates):
         def poi_changed(original_poi, updated_poi):
-            if original_poi.get('x') != updated_poi.get('x') or \
-                    original_poi.get('y') != updated_poi.get('y'):
+            if original_poi.get("x") != updated_poi.get("x") or original_poi.get(
+                "y"
+            ) != updated_poi.get("y"):
                 return True
             return False
 
-        if poi_changed(original.get('poi') or {}, updates.get('poi') or {}):
+        if poi_changed(original.get("poi") or {}, updates.get("poi") or {}):
             return True
 
-        original_renditions = original.get('renditions') or {}
-        updated_renditions = updates.get('renditions') or {}
+        original_renditions = original.get("renditions") or {}
+        updated_renditions = updates.get("renditions") or {}
 
         if original_renditions.keys() != updated_renditions.keys():
             return True
 
-        attribs = ['width', 'height', 'media', 'CropLeft', 'CropRight', 'CropTop', 'CropBottom']
+        attribs = [
+            "width",
+            "height",
+            "media",
+            "CropLeft",
+            "CropRight",
+            "CropTop",
+            "CropBottom",
+        ]
 
         for key, original_rendition in original_renditions.items():
             updated_rendition = updated_renditions[key]
 
             if poi_changed(
-                original_rendition.get('poi') or {},
-                updated_rendition.get('poi') or {}
+                original_rendition.get("poi") or {}, updated_rendition.get("poi") or {}
             ):
                 return True
 
@@ -204,42 +221,49 @@ class FeaturemediaUpdates:
         num_featuremedia_updates = len(stats.get(STAT_TYPE.FEATUREMEDIA_UPDATES) or [])
         if num_featuremedia_updates < 1:
             stats[STAT_TYPE.FEATUREMEDIA_UPDATES] = None
-            updates['num_featuremedia_updates'] = 0
+            updates["num_featuremedia_updates"] = 0
         else:
-            updates['num_featuremedia_updates'] = num_featuremedia_updates
+            updates["num_featuremedia_updates"] = num_featuremedia_updates
 
-        if updates.get('rewrite_of'):
-            self.rewrite_ids.add(updates.get('rewrite_of'))
-            self.rewrite_ids.add(orig['_id'])
+        if updates.get("rewrite_of"):
+            self.rewrite_ids.add(updates.get("rewrite_of"))
+            self.rewrite_ids.add(orig["_id"])
 
     def _get_featuremedia(self, entry):
-        return None if entry is None else ((entry.get('update') or {}).get('associations') or {}).get('featuremedia')
+        return (
+            None
+            if entry is None
+            else ((entry.get("update") or {}).get("associations") or {}).get(
+                "featuremedia"
+            )
+        )
 
     def finish(self, sender):
-        service = get_resource_service('archive_statistics')
+        service = get_resource_service("archive_statistics")
 
-        query = {'query': {'bool': {'must': {'terms': {'_id': list(self.rewrite_ids)}}}}}
-        docs = {
-            doc['_id']: doc
-            for doc in service.search(query)
+        query = {
+            "query": {"bool": {"must": {"terms": {"_id": list(self.rewrite_ids)}}}}
         }
+        docs = {doc["_id"]: doc for doc in service.search(query)}
 
         def get_parent_id(doc):
-            if not doc.get('rewrite_of'):
+            if not doc.get("rewrite_of"):
                 return doc[config.ID_FIELD]
-            elif doc['rewrite_of'] not in docs:
+            elif doc["rewrite_of"] not in docs:
                 # If the parent item was not part of this stats iteration
                 # then load it now
-                parent = service.find_one(req=None, _id=doc['rewrite_of'])
+                parent = service.find_one(req=None, _id=doc["rewrite_of"])
 
                 if not parent:
                     # Stats entry for the parent item was not found
-                    logger.warn('Failed to get parent item {}'.format(doc['rewrite_of']))
+                    logger.warn(
+                        "Failed to get parent item {}".format(doc["rewrite_of"])
+                    )
                     return None
                 else:
-                    docs[doc['rewrite_of']] = parent
+                    docs[doc["rewrite_of"]] = parent
 
-            return get_parent_id(docs[doc['rewrite_of']])
+            return get_parent_id(docs[doc["rewrite_of"]])
 
         parent_docs = {}
         for doc_id in list(docs.keys()):
@@ -252,16 +276,22 @@ class FeaturemediaUpdates:
                 # So we ignore this entry
                 continue
 
-            updates = (doc.get('stats') or {}).get('featuremedia_updates') or []
+            updates = (doc.get("stats") or {}).get("featuremedia_updates") or []
 
             if len(updates) < 1:
                 # This would indicate that there are no featuremedia updates recorded for this single item
                 # find the previous featuremedia operation before the publish operation
                 # and use that as the basis for the featuremedia updates
-                last_entry = next((
-                    entry for entry in reversed((doc.get('stats') or {}).get('timeline') or [])
-                    if entry.get('operation') in FEATUREMEDIA_OPERATIONS
-                ), None)
+                last_entry = next(
+                    (
+                        entry
+                        for entry in reversed(
+                            (doc.get("stats") or {}).get("timeline") or []
+                        )
+                        if entry.get("operation") in FEATUREMEDIA_OPERATIONS
+                    ),
+                    None,
+                )
 
                 if last_entry is not None:
                     updates = [last_entry]
@@ -274,7 +304,7 @@ class FeaturemediaUpdates:
 
         for doc_id, stats in parent_docs.items():
             # get the archive_family stats item (if it exists)
-            merged_id = '{}_family'.format(doc_id)
+            merged_id = "{}_family".format(doc_id)
             original = service.find_one(req=None, _id=merged_id)
             is_new = False
 
@@ -284,10 +314,14 @@ class FeaturemediaUpdates:
                 is_new = True
                 original = service.find_one(req=None, _id=doc_id) or {}
 
-            sorted_entries = sorted(stats, key=lambda k: (k['operation_created'], k['history_id']))
+            sorted_entries = sorted(
+                stats, key=lambda k: (k["operation_created"], k["history_id"])
+            )
 
             last_stat = sorted_entries[0]
-            merged_stats = [sorted_entries[0]] if self._get_featuremedia(last_stat) else []
+            merged_stats = (
+                [sorted_entries[0]] if self._get_featuremedia(last_stat) else []
+            )
 
             for entry in sorted_entries[1:]:
                 current_media = self._get_featuremedia(last_stat)
@@ -296,59 +330,59 @@ class FeaturemediaUpdates:
                 if current_media and not next_media:
                     # previous entry has featuremedia
                     # current entry does not
-                    entry['operation'] = OPERATION.REMOVE_FEATUREMEDIA
+                    entry["operation"] = OPERATION.REMOVE_FEATUREMEDIA
                     merged_stats.append(entry)
                 elif next_media and not current_media:
                     # previous entry does not have featuremedia
                     # current entry does
-                    entry['operation'] = OPERATION.ADD_FEATUREMEDIA
+                    entry["operation"] = OPERATION.ADD_FEATUREMEDIA
                     merged_stats.append(entry)
-                elif current_media.get('_id') != next_media.get('_id'):
+                elif current_media.get("_id") != next_media.get("_id"):
                     # previous entry has different featuremedia id to the current entry
-                    entry['operation'] = OPERATION.UPDATE_FEATUREMEDIA_IMAGE
+                    entry["operation"] = OPERATION.UPDATE_FEATUREMEDIA_IMAGE
                     merged_stats.append(entry)
                 elif self._renditions_changed(current_media, next_media):
                     # previous entry has different poi
-                    entry['operation'] = OPERATION.UPDATE_FEATUREMEDIA_POI
+                    entry["operation"] = OPERATION.UPDATE_FEATUREMEDIA_POI
                     merged_stats.append(entry)
 
                 last_stat = entry
 
             updates = deepcopy(original)
-            updates['stats_type'] = 'archive_family'
+            updates["stats_type"] = "archive_family"
 
             num_featuremedia_updates = len(merged_stats)
             if num_featuremedia_updates < 1:
                 merged_stats = None
-                updates['num_featuremedia_updates'] = 0
+                updates["num_featuremedia_updates"] = 0
             else:
-                updates['num_featuremedia_updates'] = num_featuremedia_updates
+                updates["num_featuremedia_updates"] = num_featuremedia_updates
 
-            if 'stats' not in updates:
-                updates['stats'] = {}
+            if "stats" not in updates:
+                updates["stats"] = {}
 
-            updates['stats']['featuremedia_updates'] = merged_stats
+            updates["stats"]["featuremedia_updates"] = merged_stats
 
             if is_new:
-                updates['_id'] = merged_id
+                updates["_id"] = merged_id
                 service.post([updates])
             else:
                 service.patch(
                     merged_id,
                     {
-                        'stats': updates['stats'],
-                        'num_featuremedia_updates': updates['num_featuremedia_updates']
-                    }
+                        "stats": updates["stats"],
+                        "num_featuremedia_updates": updates["num_featuremedia_updates"],
+                    },
                 )
 
 
 featuremedia_updates = FeaturemediaUpdates()
 
 connect_stats_signals(
-    on_start=featuremedia_updates.__init__,
+    on_start=featuremedia_updates.on_start,
     on_generate=featuremedia_updates.store_update_fields,
     on_init_timeline=featuremedia_updates.init,
     on_process=featuremedia_updates.process,
     on_complete=featuremedia_updates.complete,
-    on_finish=featuremedia_updates.finish
+    on_finish=featuremedia_updates.finish,
 )

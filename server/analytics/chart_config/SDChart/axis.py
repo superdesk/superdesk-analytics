@@ -21,7 +21,7 @@ class Axis:
         """
 
         self.chart = chart
-        self.type = 'linear'
+        self.type = "linear"
         self.index = 0
         self.allow_decimals = False
         self.series = []
@@ -69,29 +69,26 @@ class Axis:
         if self.categories is not None and self.category_field is not None:
             names = self.chart.get_translation_names(self.category_field)
 
-            return [
-                names.get(category) or category
-                for category in self.categories
-            ]
+            return [names.get(category) or category for category in self.categories]
 
         return self.categories
 
     def gen_x_axis_config(self, config):
         """Generate the x-axis config"""
 
-        axis_config = {'type': self.type}
+        axis_config = {"type": self.type}
 
         if self.categories is not None:
-            axis_config['categories'] = self.get_categories()
+            axis_config["categories"] = self.get_categories()
 
         if self.allow_decimals is not None:
-            axis_config['allowDecimals'] = self.allow_decimals
+            axis_config["allowDecimals"] = self.allow_decimals
 
         if self.chart.start_of_week is not None:
-            axis_config['startOfWeek'] = self.chart.start_of_week
+            axis_config["startOfWeek"] = self.chart.start_of_week
 
         if self.x_title is not None:
-            axis_config['title'] = {'text': self.x_title}
+            axis_config["title"] = {"text": self.x_title}
 
         return axis_config
 
@@ -101,33 +98,33 @@ class Axis:
         axis_config = {}
 
         if self.allow_decimals is not None:
-            axis_config['allowDecimals'] = self.allow_decimals
+            axis_config["allowDecimals"] = self.allow_decimals
 
         if self.stack_labels is not None:
-            axis_config['stackLabels'] = {'enabled': self.stack_labels}
+            axis_config["stackLabels"] = {"enabled": self.stack_labels}
 
         if self.y_title is not None:
-            axis_config['title'] = {'text': self.y_title}
+            axis_config["title"] = {"text": self.y_title}
 
         return axis_config
 
     def gen_config(self, config):
         """Generate the config"""
 
-        if not config.get('xAxis'):
-            config['xAxis'] = []
+        if not config.get("xAxis"):
+            config["xAxis"] = []
 
-        config['xAxis'].append(self.gen_x_axis_config(config))
+        config["xAxis"].append(self.gen_x_axis_config(config))
 
-        if not config.get('yAxis'):
-            config['yAxis'] = []
+        if not config.get("yAxis"):
+            config["yAxis"] = []
 
-        config['yAxis'].append(self.gen_y_axis_config(config))
+        config["yAxis"].append(self.gen_y_axis_config(config))
 
-        if not config.get('series'):
-            config['series'] = []
+        if not config.get("series"):
+            config["series"] = []
 
         for series in self.series:
-            config['series'].append(series.gen_config(config))
+            config["series"].append(series.gen_config(config))
 
         return config

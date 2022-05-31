@@ -63,10 +63,6 @@ Feature: Archive Timeline Stats
         Then we get OK response
         When we publish "#archive._id#" with "publish" type and "published" state
         Then we get OK response
-        When we post to "/archive/#archive._id#/unlock" with success
-        """
-        {}
-        """
         When we generate stats from archive history
         When we get "/archive_statistics/#archive._id#"
         Then we get stats
@@ -76,8 +72,7 @@ Feature: Archive Timeline Stats
                 {"operation": "create"},
                 {"operation": "item_lock"},
                 {"operation": "update"},
-                {"operation": "publish"},
-                {"operation": "item_unlock"}
+                {"operation": "publish"}
             ]
         }
         """
@@ -121,10 +116,6 @@ Feature: Archive Timeline Stats
         Then we get OK response
         When we publish "#archive._id#" with "publish" type and "published" state
         Then we get OK response
-        When we post to "/archive/#archive._id#/unlock" with success
-        """
-        {}
-        """
         When we generate stats from archive history
         When we get "/archive_statistics/#archive._id#"
         Then we get stats
@@ -134,8 +125,7 @@ Feature: Archive Timeline Stats
                 {"operation": "fetch"},
                 {"operation": "item_lock"},
                 {"operation": "update"},
-                {"operation": "publish"},
-                {"operation": "item_unlock"}
+                {"operation": "publish"}
             ]
         }
         """
@@ -309,10 +299,6 @@ Feature: Archive Timeline Stats
         """
         When we publish "#archive._id#" with "publish" type and "published" state
         Then we get OK response
-        When we post to "/archive/#archive._id#/unlock" with success
-        """
-        {}
-        """
         When we generate stats from archive history
         When we get "/archive_statistics/#archive._id#"
         Then we get stats
@@ -326,8 +312,7 @@ Feature: Archive Timeline Stats
                 {"operation": "spike"},
                 {"operation": "unspike"},
                 {"operation": "item_lock"},
-                {"operation": "publish"},
-                {"operation": "item_unlock"}
+                {"operation": "publish"}
             ]
         }
         """
@@ -361,10 +346,6 @@ Feature: Archive Timeline Stats
         {"publish_schedule": "2029-01-01T02:00:00+0000"}
         """
         Then we get OK response
-        When we post to "/archive/#archive._id#/unlock" with success
-        """
-        {}
-        """
         When we patch "/archive/#archive._id#"
         """
         {"publish_schedule": null}
@@ -380,7 +361,6 @@ Feature: Archive Timeline Stats
                 {"operation": "item_lock"},
                 {"operation": "update"},
                 {"operation": "publish_scheduled"},
-                {"operation": "item_unlock"},
                 {"operation": "deschedule"}
             ]
         }
@@ -415,10 +395,6 @@ Feature: Archive Timeline Stats
         {"embargo": "2029-01-01T02:00:00+0000"}
         """
         Then we get OK response
-        When we post to "/archive/#archive._id#/unlock" with success
-        """
-        {}
-        """
         When we generate stats from archive history
         When we get "/archive_statistics/#archive._id#"
         Then we get stats
@@ -428,8 +404,7 @@ Feature: Archive Timeline Stats
                 {"operation": "create"},
                 {"operation": "item_lock"},
                 {"operation": "update"},
-                {"operation": "publish_embargo"},
-                {"operation": "item_unlock"}
+                {"operation": "publish_embargo"}
             ]
         }
         """
@@ -460,10 +435,6 @@ Feature: Archive Timeline Stats
         Then we get OK response
         When we publish "#archive._id#" with "publish" type and "published" state
         Then we get OK response
-        When we post to "/archive/#archive._id#/unlock" with success
-        """
-        {}
-        """
         When we rewrite "#archive._id#"
         """
         {"desk_id": "#desks._id#"}
@@ -497,7 +468,6 @@ Feature: Archive Timeline Stats
             {"operation": "item_lock"},
             {"operation": "update"},
             {"operation": "publish"},
-            {"operation": "item_unlock"},
             {"operation": "rewrite"},
             {"operation": "unlink"},
             {"operation": "rewrite"}
@@ -543,10 +513,6 @@ Feature: Archive Timeline Stats
         Then we get OK response
         When we publish "#archive._id#" with "publish" type and "published" state
         Then we get OK response
-        When we post to "/archive/#archive._id#/unlock" with success
-        """
-        {}
-        """
         When we publish "#archive._id#" with "correct" type and "corrected" state
         """
         {"headline": "corrected"}
@@ -561,7 +527,6 @@ Feature: Archive Timeline Stats
             {"operation": "item_lock"},
             {"operation": "update"},
             {"operation": "publish"},
-            {"operation": "item_unlock"},
             {"operation": "correct"}
         ]}
         """
@@ -592,10 +557,6 @@ Feature: Archive Timeline Stats
         Then we get OK response
         When we publish "#archive._id#" with "publish" type and "published" state
         Then we get OK response
-        When we post to "/archive/#archive._id#/unlock" with success
-        """
-        {}
-        """
         When we publish "#archive._id#" with "kill" type and "killed" state
         Then we get OK response
         When we generate stats from archive history
@@ -607,7 +568,6 @@ Feature: Archive Timeline Stats
             {"operation": "item_lock"},
             {"operation": "update"},
             {"operation": "publish"},
-            {"operation": "item_unlock"},
             {"operation": "kill"}
         ]}
         """
@@ -638,10 +598,6 @@ Feature: Archive Timeline Stats
         Then we get OK response
         When we publish "#archive._id#" with "publish" type and "published" state
         Then we get OK response
-        When we post to "/archive/#archive._id#/unlock" with success
-        """
-        {}
-        """
         When we publish "#archive._id#" with "takedown" type and "recalled" state
         Then we get OK response
         When we generate stats from archive history
@@ -653,7 +609,6 @@ Feature: Archive Timeline Stats
             {"operation": "item_lock"},
             {"operation": "update"},
             {"operation": "publish"},
-            {"operation": "item_unlock"},
             {"operation": "takedown"}
         ]}
         """

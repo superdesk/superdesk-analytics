@@ -17,85 +17,77 @@ from analytics.common import MAX_TERMS_SIZE
 
 
 class PlanningUsageReportResource(Resource):
-    """Planning Usage Report schema
-    """
+    """Planning Usage Report schema"""
 
-    item_methods = ['GET']
-    resource_methods = ['GET']
-    privileges = {'GET': 'planning_usage_report'}
+    item_methods = ["GET"]
+    resource_methods = ["GET"]
+    privileges = {"GET": "planning_usage_report"}
     schema = {
-        'group': {
-            'type': 'dict',
-            'required': False,
-            'schema': {},
-            'allow_unknown': True
+        "group": {
+            "type": "dict",
+            "required": False,
+            "schema": {},
+            "allow_unknown": True,
         },
-        'subgroup': {
-            'type': 'dict',
-            'required': False,
-            'schema': {},
-            'allow_unknown': True
+        "subgroup": {
+            "type": "dict",
+            "required": False,
+            "schema": {},
+            "allow_unknown": True,
         },
-        'highcharts': {
-            'type': 'list',
-            'required': False,
-            'schema': {
-                'type': 'dict',
-                'schema': {},
-                'allow_unknown': True
-            }
-        }
+        "highcharts": {
+            "type": "list",
+            "required": False,
+            "schema": {"type": "dict", "schema": {}, "allow_unknown": True},
+        },
     }
 
 
 class PlanningUsageReportService(BaseReportService):
-    repos = ['events', 'planning', 'assignments']
-    date_filter_field = '_created'
+    repos = ["events", "planning", "assignments"]
+    date_filter_field = "_created"
     aggregations = {
-        'events': {
-            'filter': {'term': {'type': 'event'}},
-            'aggs': {
-                'users': {
-                    'terms': {
-                        'field': 'original_creator',
-                        'size': MAX_TERMS_SIZE,
+        "events": {
+            "filter": {"term": {"type": "event"}},
+            "aggs": {
+                "users": {
+                    "terms": {
+                        "field": "original_creator",
+                        "size": MAX_TERMS_SIZE,
                     }
                 }
-            }
+            },
         },
-        'planning': {
-            'filter': {'term': {'type': 'planning'}},
-            'aggs': {
-                'users': {
-                    'terms': {
-                        'field': 'original_creator',
-                        'size': MAX_TERMS_SIZE,
+        "planning": {
+            "filter": {"term": {"type": "planning"}},
+            "aggs": {
+                "users": {
+                    "terms": {
+                        "field": "original_creator",
+                        "size": MAX_TERMS_SIZE,
                     }
                 }
-            }
+            },
         },
-        'assignments': {
-            'filter': {'term': {'type': 'assignment'}},
-            'aggs': {
-                'users': {
-                    'terms': {
-                        'field': 'original_creator',
-                        'size': MAX_TERMS_SIZE
-                    }
+        "assignments": {
+            "filter": {"term": {"type": "assignment"}},
+            "aggs": {
+                "users": {
+                    "terms": {"field": "original_creator", "size": MAX_TERMS_SIZE}
                 }
-            }
+            },
         },
-        'coverages': {
-            'nested': {'path': 'coverages'},
-            'aggs': {
-                'users': {
-                    'terms': {
-                        'field': 'coverages.original_creator',
-                        'size': MAX_TERMS_SIZE
+        "coverages": {
+            "nested": {"path": "coverages"},
+            "aggs": {
+                "users": {
+                    "terms": {
+                        "field": "coverages.original_creator",
+                        "size": MAX_TERMS_SIZE,
                     }
                 }
-            }
-        }
+            },
+        },
     }
 
     def _get_filters(self, repos, invisible_stages):
@@ -121,53 +113,44 @@ class PlanningUsageReportService(BaseReportService):
             }
         }
         """
-        aggs = (getattr(docs, 'hits') or {}).get('aggregations') or {}
+        aggs = (getattr(docs, "hits") or {}).get("aggregations") or {}
         users_with_planning = self._get_users_with_planning()
 
         report = {
-            'group': {
-                user_id: {
-                    'events': 0,
-                    'planning': 0,
-                    'coverages': 0,
-                    'assignments': 0
-                } for user_id in users_with_planning
+            "group": {
+                user_id: {"events": 0, "planning": 0, "coverages": 0, "assignments": 0}
+                for user_id in users_with_planning
             },
-            'subgroup': {
-                'events': 0,
-                'planning': 0,
-                'coverages': 0,
-                'assignments': 0
-            }
+            "subgroup": {"events": 0, "planning": 0, "coverages": 0, "assignments": 0},
         }
 
         def add_creators(item_type):
-            stats = (aggs.get(item_type) or {}).get('users') or {}
+            stats = (aggs.get(item_type) or {}).get("users") or {}
 
-            for item in stats.get('buckets') or []:
-                user_id = str(item.get('key') or '')
+            for item in stats.get("buckets") or []:
+                user_id = str(item.get("key") or "")
                 if not user_id:
                     continue
 
-                create_count = item.get('doc_count')
+                create_count = item.get("doc_count")
                 if create_count < 1:
                     continue
 
-                if user_id not in report['group']:
-                    report['group'][user_id] = {
-                        'events': 0,
-                        'planning': 0,
-                        'coverages': 0,
-                        'assignments': 0
+                if user_id not in report["group"]:
+                    report["group"][user_id] = {
+                        "events": 0,
+                        "planning": 0,
+                        "coverages": 0,
+                        "assignments": 0,
                     }
 
-                report['group'][user_id][item_type] += create_count
-                report['subgroup'][item_type] += create_count
+                report["group"][user_id][item_type] += create_count
+                report["subgroup"][item_type] += create_count
 
-        add_creators('coverages')
-        add_creators('events')
-        add_creators('planning')
-        add_creators('assignments')
+        add_creators("coverages")
+        add_creators("events")
+        add_creators("planning")
+        add_creators("assignments")
 
         return report
 
@@ -175,64 +158,62 @@ class PlanningUsageReportService(BaseReportService):
         """Returns a list of users with the Planning privilege"""
 
         planning_role_ids = [
-            str(role.get('_id'))
-            for role in get_resource_service('roles').get(
-                req=None,
-                lookup={'privileges.planning': 1}
+            str(role.get("_id"))
+            for role in get_resource_service("roles").get(
+                req=None, lookup={"privileges.planning": 1}
             )
         ]
 
-        active_users = get_resource_service('users').get(
-            req=None,
-            lookup={'is_enabled': True}
+        active_users = get_resource_service("users").get(
+            req=None, lookup={"is_enabled": True}
         )
 
         users_with_planning = []
         for user in active_users:
-            user_id = str(user.get('_id'))
-            privileges = user.get('privileges') or {}
+            user_id = str(user.get("_id"))
+            privileges = user.get("privileges") or {}
 
-            if (privileges.get('planning') or 0) != 0:
+            if (privileges.get("planning") or 0) != 0:
                 users_with_planning.append(user_id)
-            elif str(user.get('role')) in planning_role_ids:
+            elif str(user.get("role")) in planning_role_ids:
                 users_with_planning.append(user_id)
 
         return users_with_planning
 
     def generate_highcharts_config(self, docs, args):
-        params = args.get('params') or {}
+        params = args.get("params") or {}
 
-        chart = params.get('chart') or {}
-        chart_type = chart.get('type') or 'bar'
+        chart = params.get("chart") or {}
+        chart_type = chart.get("type") or "bar"
 
         report = self.generate_report(docs, args)
 
-        chart_config = ChartConfig('planning_usage', chart_type)
+        chart_config = ChartConfig("planning_usage", chart_type)
 
-        chart_config.add_source('task.user', report.get('group'))
-        chart_config.add_source('planning_usage', report.get('subgroup'))
+        chart_config.add_source("task.user", report.get("group"))
+        chart_config.add_source("planning_usage", report.get("subgroup"))
 
         def gen_title():
-            if chart.get('title'):
-                return chart['title']
+            if chart.get("title"):
+                return chart["title"]
 
-            return 'Planning Module Usage'
+            return "Planning Module Usage"
 
         def gen_subtitle():
             return ChartConfig.gen_subtitle_for_dates(params)
 
         def get_y_axis_title():
-            return 'Items Created'
+            return "Items Created"
 
         chart_config.get_title = gen_title
         chart_config.get_subtitle = gen_subtitle
         chart_config.get_y_axis_title = get_y_axis_title
-        chart_config.sort_order = chart.get('sort_order') or 'desc'
+        chart_config.sort_order = chart.get("sort_order") or "desc"
 
-        translations = args.get('translations') or {}
+        translations = args.get("translations") or {}
         chart_config.translations = translations
 
-        report['highcharts'] = [chart_config.gen_config()]
+        report["highcharts"] = [chart_config.gen_config()]
 
         return report
 

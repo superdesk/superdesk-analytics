@@ -53,7 +53,10 @@ Feature: Featuremedia Stats
         {
             "headline": "bike vroom",
             "alt_text": "bike",
-            "description_text": "a nice motor-bike"
+            "description_text": "a nice motor-bike",
+            "slugline": "bike",
+            "subject": [{"name": "subject", "parent": "05000000", "qcode": "05007000"}],
+            "anpa_category": [{"qcode": "category", "name": "categories"}]
         }
         """
         Then we get OK response
@@ -67,7 +70,10 @@ Feature: Featuremedia Stats
         {
             "headline": "bike2 vroom",
             "alt_text": "bike2",
-            "description_text": "a nice motor-bike 2"
+            "description_text": "a nice motor-bike 2",
+            "slugline": "bike",
+            "subject": [{"name": "subject", "parent": "05000000", "qcode": "05007000"}],
+            "anpa_category": [{"qcode": "category", "name": "categories"}]
         }
         """
 
@@ -87,7 +93,13 @@ Feature: Featuremedia Stats
             "associations": {
                 "featuremedia": {
                     "_id": "bike",
-                    "poi": {"x": 0.75, "y": 0.4}
+                    "poi": {"x": 0.75, "y": 0.4},
+                    "headline": "bike vroom",
+                    "alt_text": "bike",
+                    "description_text": "a nice motor-bike",
+                    "slugline": "bike",
+                    "subject": [{"name": "subject", "parent": "05000000", "qcode": "05007000"}],
+                    "anpa_category": [{"qcode": "category", "name": "categories"}]
                 }
             },
             "state": "in_progress"
@@ -162,7 +174,10 @@ Feature: Featuremedia Stats
                     "headline": "bike vroom",
                     "alt_text": "bike",
                     "description_text": "a nice motor-bike",
-                    "type": "picture"
+                    "type": "picture",
+                    "slugline": "bike",
+                    "subject": [{"name": "subject", "parent": "05000000", "qcode": "05007000"}],
+                    "anpa_category": [{"qcode": "category", "name": "categories"}]
                 }
             }
         }
@@ -195,7 +210,10 @@ Feature: Featuremedia Stats
                     "headline": "bike2 vroom",
                     "alt_text": "bike2",
                     "description_text": "a nice motor-bike 2",
-                    "type": "picture"
+                    "type": "picture",
+                    "slugline": "bike",
+                    "subject": [{"name": "subject", "parent": "05000000", "qcode": "05007000"}],
+                    "anpa_category": [{"qcode": "category", "name": "categories"}]
                 }
             }
         }
@@ -211,7 +229,10 @@ Feature: Featuremedia Stats
                     "headline": "bike2 vroom",
                     "alt_text": "bike2",
                     "description_text": "a nice motor-bike 2",
-                    "type": "picture"
+                    "type": "picture",
+                    "slugline": "bike",
+                    "subject": [{"name": "subject", "parent": "05000000", "qcode": "05007000"}],
+                    "anpa_category": [{"qcode": "category", "name": "categories"}]
                 }
             }
         }
@@ -267,7 +288,10 @@ Feature: Featuremedia Stats
                 "featuremedia": {
                     "_id": "bike",
                     "poi": {"x": 0.75, "y": 0.4},
-                    "type": "picture"
+                    "type": "picture",
+                    "slugline": "bike",
+                    "subject": [{"name": "subject", "parent": "05000000", "qcode": "05007000"}],
+                    "anpa_category": [{"qcode": "category", "name": "categories"}]
                 }
             },
             "state": "in_progress"
@@ -286,7 +310,10 @@ Feature: Featuremedia Stats
                     "headline": "bike vroom",
                     "alt_text": "bike",
                     "description_text": "a nice motor-bike",
-                    "type": "picture"
+                    "type": "picture",
+                    "slugline": "bike",
+                    "subject": [{"name": "subject", "parent": "05000000", "qcode": "05007000"}],
+                    "anpa_category": [{"qcode": "category", "name": "categories"}]
                 }
             }
         }
@@ -357,7 +384,10 @@ Feature: Featuremedia Stats
                 "featuremedia": {
                     "_id": "bike",
                     "poi": {"x": 0.75, "y": 0.4},
-                    "type": "picture"
+                    "type": "picture",
+                    "slugline": "bike",
+                    "subject": [{"name": "subject", "parent": "05000000", "qcode": "05007000"}],
+                    "anpa_category": [{"qcode": "category", "name": "categories"}]
                 }
             },
             "state": "in_progress"
@@ -426,7 +456,10 @@ Feature: Featuremedia Stats
                     "headline": "bike vroom",
                     "alt_text": "bike",
                     "description_text": "a nice motor-bike",
-                    "type": "picture"
+                    "type": "picture",
+                    "slugline": "bike",
+                    "subject": [{"name": "subject", "parent": "05000000", "qcode": "05007000"}],
+                    "anpa_category": [{"qcode": "category", "name": "categories"}]
                 }
             }
         }
@@ -497,7 +530,10 @@ Feature: Featuremedia Stats
                 "featuremedia": {
                     "_id": "bike",
                     "poi": {"x": 0.75, "y": 0.4},
-                    "type": "picture"
+                    "type": "picture",
+                    "slugline": "bike",
+                    "subject": [{"name": "subject", "parent": "05000000", "qcode": "05007000"}],
+                    "anpa_category": [{"qcode": "category", "name": "categories"}]
                 }
             },
             "state": "in_progress"
@@ -516,7 +552,10 @@ Feature: Featuremedia Stats
                     "headline": "bike2 vroom",
                     "alt_text": "bike2",
                     "description_text": "a nice motor-bike 2",
-                    "type": "picture"
+                    "type": "picture",
+                    "slugline": "bike",
+                    "subject": [{"name": "subject", "parent": "05000000", "qcode": "05007000"}],
+                    "anpa_category": [{"qcode": "category", "name": "categories"}]
                 }
             }
         }
@@ -587,7 +626,11 @@ Feature: Featuremedia Stats
                 "featuremedia": {
                     "_id": "bike",
                     "poi": {"x": 0.75, "y": 0.4},
-                    "type": "picture"
+                    "type": "picture",
+                    "headline": "bike vroom",
+                    "slugline": "bike",
+                    "subject": [{"name": "subject", "parent": "05000000", "qcode": "05007000"}],
+                    "anpa_category": [{"qcode": "category", "name": "categories"}]
                 }
             },
             "state": "in_progress"
@@ -656,7 +699,10 @@ Feature: Featuremedia Stats
                     "headline": "bike2 vroom",
                     "alt_text": "bike2",
                     "description_text": "a nice motor-bike 2",
-                    "type": "picture"
+                    "type": "picture",
+                    "slugline": "bike",
+                    "subject": [{"name": "subject", "parent": "05000000", "qcode": "05007000"}],
+                    "anpa_category": [{"qcode": "category", "name": "categories"}]
                 }
             }
         }

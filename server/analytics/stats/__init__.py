@@ -19,54 +19,56 @@ from .featuremedia_updates import *  # noqa
 
 
 def init_app(app):
-    if not app.config.get('STATISTICS_MONGO_DBNAME'):
-        app.config['STATISTICS_MONGO_DBNAME'] = env('STATISTICS_MONGO_DBNAME', 'statistics')
-
-    db_name = app.config['STATISTICS_MONGO_DBNAME']
-
-    if not app.config.get('STATISTICS_MONGO_URI'):
-        app.config['STATISTICS_MONGO_URI'] = env(
-            'STATISTICS_MONGO_URI',
-            'mongodb://localhost/%s' % db_name
+    if not app.config.get("STATISTICS_MONGO_DBNAME"):
+        app.config["STATISTICS_MONGO_DBNAME"] = env(
+            "STATISTICS_MONGO_DBNAME", "statistics"
         )
 
-    if not app.config.get('STATISTICS_ELASTIC_URL'):
-        app.config['STATISTICS_ELASTIC_URL'] = env(
-            'STATISTICS_ELASTIC_URL',
-            app.config['ELASTICSEARCH_URL']
+    db_name = app.config["STATISTICS_MONGO_DBNAME"]
+
+    if not app.config.get("STATISTICS_MONGO_URI"):
+        app.config["STATISTICS_MONGO_URI"] = env(
+            "STATISTICS_MONGO_URI", "mongodb://localhost/%s" % db_name
         )
 
-    if not app.config.get('STATISTICS_ELASTIC_INDEX'):
-        app.config['STATISTICS_ELASTIC_INDEX'] = env('STATISTICS_ELASTIC_INDEX', db_name)
+    if not app.config.get("STATISTICS_ELASTIC_URL"):
+        app.config["STATISTICS_ELASTIC_URL"] = env(
+            "STATISTICS_ELASTIC_URL", app.config["ELASTICSEARCH_URL"]
+        )
+
+    if not app.config.get("STATISTICS_ELASTIC_INDEX"):
+        app.config["STATISTICS_ELASTIC_INDEX"] = env(
+            "STATISTICS_ELASTIC_INDEX", db_name
+        )
+
+    if not app.config.get("STATISTICS_ELASTIC_SETTINGS"):
+        # Copy the ``ContentAPI` elastic mapping for the ``Statistics`` type
+        # This is so the ``html_field_analyzer`` is used (for the ``headline`` field)
+        app.config["STATISTICS_ELASTIC_SETTINGS"] = app.config[
+            "CONTENTAPI_ELASTICSEARCH_SETTINGS"
+        ]
 
     init_gen_stats_task(app)
 
     endpoint_name = ArchiveStatisticsResource.endpoint_name
-    service = ArchiveStatisticsService(
-        endpoint_name,
-        backend=superdesk.get_backend()
-    )
-    ArchiveStatisticsResource(
-        endpoint_name,
-        app=app,
-        service=service
-    )
+    service = ArchiveStatisticsService(endpoint_name, backend=superdesk.get_backend())
+    ArchiveStatisticsResource(endpoint_name, app=app, service=service)
 
 
 def init_gen_stats_task(app):
     # Check the application config to see if archive stats is enabled
-    if not app.config.get('ANALYTICS_ENABLE_ARCHIVE_STATS', False):
+    if not app.config.get("ANALYTICS_ENABLE_ARCHIVE_STATS", False):
         return
 
     # Make sure the BEAT_SCHEDULE are set
-    if not app.config.get('CELERY_BEAT_SCHEDULE'):
-        app.config['CELERY_BEAT_SCHEDULE'] = {}
+    if not app.config.get("CELERY_BEAT_SCHEDULE"):
+        app.config["CELERY_BEAT_SCHEDULE"] = {}
 
     # If the celery schedule is not configured, then set the default now
-    if not app.config['CELERY_BEAT_SCHEDULE'].get('analytics:gen_archive_stats'):
-        app.config['CELERY_BEAT_SCHEDULE']['analytics:gen_archive_stats'] = {
-            'task': 'analytics.stats.gen_archive_stats',
-            'schedule': crontab(minute='0')  # Runs every hour
+    if not app.config["CELERY_BEAT_SCHEDULE"].get("analytics:gen_archive_stats"):
+        app.config["CELERY_BEAT_SCHEDULE"]["analytics:gen_archive_stats"] = {
+            "task": "analytics.stats.gen_archive_stats",
+            "schedule": crontab(minute="0"),  # Runs every hour
         }
 
 

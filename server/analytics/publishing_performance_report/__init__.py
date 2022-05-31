@@ -9,20 +9,24 @@
 # at https://www.sourcefabric.org/superdesk/license
 
 import superdesk
-from .publishing_performance_report import PublishingPerformanceReportResource, \
-    PublishingPerformanceReportService
+from .publishing_performance_report import (
+    PublishingPerformanceReportResource,
+    PublishingPerformanceReportService,
+)
 
 from analytics.common import register_report
 
 
 def init_app(app):
-    endpoint_name = 'publishing_performance_report'
-    service = PublishingPerformanceReportService(endpoint_name, backend=superdesk.get_backend())
+    endpoint_name = "publishing_performance_report"
+    service = PublishingPerformanceReportService(
+        endpoint_name, backend=superdesk.get_backend()
+    )
     PublishingPerformanceReportResource(endpoint_name, app=app, service=service)
-    register_report('publishing_performance_report', 'publishing_performance_report')
+    register_report("publishing_performance_report", "publishing_performance_report")
 
     superdesk.privilege(
-        name='publishing_performance_report',
-        label='Analytics - Publishing Performance Reports',
-        description='User can view Publishing Performance Reports'
+        name="publishing_performance_report",
+        label="Analytics - Publishing Performance Reports",
+        description="User can view Publishing Performance Reports",
     )

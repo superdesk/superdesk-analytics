@@ -8,9 +8,9 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
+from typing import NamedTuple
 from superdesk import get_resource_service
 from superdesk.utc import utcnow, utc_to_local
-from collections import namedtuple
 from subprocess import check_call, PIPE
 from flask import current_app as app
 import pytz
@@ -25,132 +25,110 @@ logger = logging.getLogger(__name__)
 MAX_TERMS_SIZE = 1000
 
 
-mime_types = [
-    'image/png',
-    'image/jpeg',
-    'image/gif',
-    'application/pdf',
-    'image/svg+xml',
-    'text/csv',
-    'text/html'
-]
+class MimeTypes(NamedTuple):
+    PNG: str
+    JPEG: str
+    GIF: str
+    PDF: str
+    SVG: str
+    CSV: str
+    HTML: str
 
-MIME_TYPES = namedtuple('MIME_TYPES', [
-    'PNG',
-    'JPEG',
-    'GIF',
-    'PDF',
-    'SVG',
-    'CSV',
-    'HTML'
-])(*mime_types)
 
-date_filters = [
+MIME_TYPES: MimeTypes = MimeTypes(
+    "image/png",
+    "image/jpeg",
+    "image/gif",
+    "application/pdf",
+    "image/svg+xml",
+    "text/csv",
+    "text/html",
+)
+
+
+class DateFilters(NamedTuple):
+    RANGE: str
+    DAY: str
+    RELATIVE_HOURS: str
+    RELATIVE_DAYS: str
+    YESTERDAY: str
+    TODAY: str
+    RELATIVE_WEEKS: str
+    LAST_WEEK: str
+    THIS_WEEK: str
+    RELATIVE_MONTHS: str
+    LAST_MONTH: str
+    THIS_MONTH: str
+    LAST_YEAR: str
+    THIS_YEAR: str
+
+
+DATE_FILTERS: DateFilters = DateFilters(
     # ABSOLUTE
-    'range',
-    'day',
-
+    "range",
+    "day",
     # HOURS
-    'relative_hours',
-
+    "relative_hours",
     # DAYS
-    'relative_days',
-    'yesterday',
-    'today',
-
+    "relative_days",
+    "yesterday",
+    "today",
     # WEEKS
-    'relative_weeks',
-    'last_week',
-    'this_week',
-
+    "relative_weeks",
+    "last_week",
+    "this_week",
     # MONTHS
-    'relative_months',
-    'last_month',
-    'this_month',
-
+    "relative_months",
+    "last_month",
+    "this_month",
     # YEARS
-    'last_year',
-    'this_year'
-]
+    "last_year",
+    "this_year",
+)
 
-DATE_FILTERS = namedtuple('DATE_FILTERS', [
-    # ABSOLUTE
-    'RANGE',
-    'DAY',
 
-    # HOURS
-    'RELATIVE_HOURS',
+class ChartTypes(NamedTuple):
+    BAR: str
+    COLUMN: str
+    TABLE: str
+    AREA: str
+    LINE: str
+    PIE: str
+    SCATTER: str
+    SPLINE: str
 
-    # DAYS
-    'RELATIVE_DAYS',
-    'YESTERDAY',
-    'TODAY',
 
-    # WEEKS
-    'RELATIVE_WEEKS',
-    'LAST_WEEK',
-    'THIS_WEEK',
+CHART_TYPES: ChartTypes = ChartTypes(
+    "bar", "column", "table", "area", "line", "pie", "scatter", "spline"
+)
 
-    # MONTHS
-    'RELATIVE_MONTHS',
-    'LAST_MONTH',
-    'THIS_MONTH',
 
-    # YEARS
-    'LAST_YEAR',
-    'THIS_YEAR'
-])(*date_filters)
+class ReportConfigs(NamedTuple):
+    DATE_FILTERS: str
+    CHART_TYPES: str
+    DEFAULT_PARAMS: str
 
-chart_types = [
-    'bar',
-    'column',
-    'table',
-    'area',
-    'line',
-    'pie',
-    'scatter',
-    'spline'
-]
 
-CHART_TYPES = namedtuple('CHART_TYPES', [
-    'BAR',
-    'COLUMN',
-    'TABLE',
-    'AREA',
-    'LINE',
-    'PIE',
-    'SCATTER',
-    'SPLINE'
-])(*chart_types)
-
-report_config = [
-    'date_filters',
-    'chart_types',
-    'default_params'
-]
-
-REPORT_CONFIG = namedtuple('REPORT_CONFIG', [
-    'DATE_FILTERS',
-    'CHART_TYPES',
-    'DEFAULT_PARAMS'
-])(*report_config)
+REPORT_CONFIG: ReportConfigs = ReportConfigs(
+    "date_filters", "chart_types", "default_params"
+)
 
 
 def get_mime_type_extension(mimetype):
     if mimetype == MIME_TYPES.PNG:
-        return 'png'
+        return "png"
     elif mimetype == MIME_TYPES.JPEG:
-        return 'jpeg'
+        return "jpeg"
     elif mimetype == MIME_TYPES.GIF:
-        return 'gif'
+        return "gif"
     elif mimetype == MIME_TYPES.PDF:
-        return 'pdf'
+        return "pdf"
     elif mimetype == MIME_TYPES.SVG:
-        return 'svg'
+        return "svg"
     elif mimetype == MIME_TYPES.CSV:
-        return 'csv'
+        return "csv"
     elif mimetype == MIME_TYPES.HTML:
-        return 'html'
+        return "html"
 
 
 registered_reports = {}
@@ -162,32 +140,34 @@ def register_report(report_type, report_endpoint):
 
 def get_report_service(report_type):
     try:
-        return get_resource_service(
-            registered_reports[report_type]
-        )
+        return get_resource_service(registered_reports[report_type])
     except KeyError:
         return None
 
 
 def is_highcharts_installed():
     try:
-        check_call(['which', 'highcharts-export-server'], stdout=PIPE, stderr=PIPE)
+        check_call(["which", "highcharts-export-server"], stdout=PIPE, stderr=PIPE)
         return True
     except Exception:
         return False
 
 
 def get_cv_by_qcode(name, field=None):
-    cvs = get_resource_service('vocabularies').find_one(req=None, _id=name)
-    return {} if not cvs else {
-        item.get('qcode'): item if field is None else item.get(field)
-        for item in cvs.get('items') or []
-        if item.get('is_active', True)
-    }
+    cvs = get_resource_service("vocabularies").find_one(req=None, _id=name)
+    return (
+        {}
+        if not cvs
+        else {
+            item.get("qcode"): item if field is None else item.get(field)
+            for item in cvs.get("items") or []
+            if item.get("is_active", True)
+        }
+    )
 
 
 def get_elastic_version():
-    return app.data.elastic.es.info()['version']['number']
+    return app.data.elastic.es.info()["version"]["number"]
 
 
 def get_weekstart_offset_hr():
@@ -200,7 +180,7 @@ def get_weekstart_offset_hr():
     """
     offset = 0
 
-    start_of_week = app.config.get('START_OF_WEEK') or 0
+    start_of_week = app.config.get("START_OF_WEEK") or 0
     if start_of_week == 0:
         offset -= 24
     elif start_of_week > 1:
@@ -215,7 +195,7 @@ def get_utc_offset_in_minutes(utc_datetime):
     :param datetime utc_datetime: The date/time instance used to calculate utc offset
     :return: UTC Offset in minutes
     """
-    timezone = pytz.timezone(app.config['DEFAULT_TIMEZONE'])
+    timezone = pytz.timezone(app.config["DEFAULT_TIMEZONE"])
     return timezone.utcoffset(utc_datetime).total_seconds() / 60
 
 
@@ -227,23 +207,23 @@ def seconds_to_human_readable(seconds):
     """
     if seconds >= 86400:
         if floor(seconds / 86400) == 1:
-            return '1 day'
+            return "1 day"
 
-        return '{} days'.format(floor(seconds / 86400))
+        return "{} days".format(floor(seconds / 86400))
     elif seconds >= 3600:
         if floor(seconds / 3600) == 1:
-            return '1 hour'
+            return "1 hour"
 
-        return '{} hours'.format(floor(seconds / 3600))
+        return "{} hours".format(floor(seconds / 3600))
     elif seconds >= 60:
         if floor(seconds / 60) == 1:
-            return '1 minute'
+            return "1 minute"
 
-        return '{} minutes'.format(floor(seconds / 60))
+        return "{} minutes".format(floor(seconds / 60))
     elif floor(seconds) == 1:
-        return '1 second'
+        return "1 second"
 
-    return '{} seconds'.format(floor(seconds))
+    return "{} seconds".format(floor(seconds))
 
 
 def relative_to_absolute_datetime(value, format, now=None, offset=None):
@@ -280,53 +260,48 @@ def relative_to_absolute_datetime(value, format, now=None, offset=None):
     """
 
     try:
-        values = re.search(r'^now(?P<offset>(-\d+[mhdwMy])?)(?P<granularity>(/[mhdwMy])?)$', value).groupdict()
+        values = re.search(
+            r"^now(?P<offset>(-\d+[mhdwMy])?)(?P<granularity>(/[mhdwMy])?)$", value
+        ).groupdict()
     except AttributeError as e:
-        logger.exception('Value {} is in incorrect relative format'.format(value))
+        logger.exception("Value {} is in incorrect relative format".format(value))
         raise
 
     if now is None:
-        now = utc_to_local(app.config.get('DEFAULT_TIMEZONE'), utcnow())
+        now = utc_to_local(app.config.get("DEFAULT_TIMEZONE"), utcnow())
 
-    if values.get('offset'):
+    if values.get("offset"):
         # Retrieve the offset value and granularity, then shift the datetime
 
-        granularity = values['offset'][-1]
-        offset = int(values['offset'][1:-1])
+        granularity = values["offset"][-1]
+        offset = int(values["offset"][1:-1])
 
-        if granularity == 'm':
+        if granularity == "m":
             now = now - timedelta(minutes=offset)
-        elif granularity == 'h':
+        elif granularity == "h":
             now = now - timedelta(hours=offset)
-        elif granularity == 'd':
+        elif granularity == "d":
             now = now - timedelta(days=offset)
-        elif granularity == 'w':
+        elif granularity == "w":
             now = now - timedelta(weeks=offset)
-        elif granularity == 'M':
+        elif granularity == "M":
             now = now - relativedelta(months=offset)
-        elif granularity == 'y':
+        elif granularity == "y":
             now = now - relativedelta(years=offset)
 
-    if values.get('granularity'):
+    if values.get("granularity"):
         # Round the value down using the granularity provided
 
-        granularity = values['granularity'][1:]
+        granularity = values["granularity"][1:]
 
         parts = None
-        if granularity == 'm':
-            parts = {'second': 0}
-        elif granularity == 'h':
-            parts = {
-                'second': 0,
-                'minute': 0
-            }
-        elif granularity == 'd':
-            parts = {
-                'second': 0,
-                'minute': 0,
-                'hour': 0
-            }
-        elif granularity == 'w':
+        if granularity == "m":
+            parts = {"second": 0}
+        elif granularity == "h":
+            parts = {"second": 0, "minute": 0}
+        elif granularity == "d":
+            parts = {"second": 0, "minute": 0, "hour": 0}
+        elif granularity == "w":
             # Using START_OF_WEEK to calculate the number of days to shift for the beginning of the week
             # START_OF_WEEK
             #   0: Sunday
@@ -336,7 +311,7 @@ def relative_to_absolute_datetime(value, format, now=None, offset=None):
             if isoweekday == 7:
                 isoweekday = 0
 
-            start_of_week = app.config.get('START_OF_WEEK') or 0
+            start_of_week = app.config.get("START_OF_WEEK") or 0
             offset = 7 - start_of_week + isoweekday
 
             if offset < 7:
@@ -344,26 +319,11 @@ def relative_to_absolute_datetime(value, format, now=None, offset=None):
             elif offset > 7:
                 now -= timedelta(days=offset - 7)
 
-            parts = {
-                'second': 0,
-                'minute': 0,
-                'hour': 0
-            }
-        elif granularity == 'M':
-            parts = {
-                'second': 0,
-                'minute': 0,
-                'hour': 0,
-                'day': 1
-            }
-        elif granularity == 'y':
-            parts = {
-                'second': 0,
-                'minute': 0,
-                'hour': 0,
-                'day': 1,
-                'month': 1
-            }
+            parts = {"second": 0, "minute": 0, "hour": 0}
+        elif granularity == "M":
+            parts = {"second": 0, "minute": 0, "hour": 0, "day": 1}
+        elif granularity == "y":
+            parts = {"second": 0, "minute": 0, "hour": 0, "day": 1, "month": 1}
 
         if parts:
             # Sets the second, minute, hour, day and/or month of the shifted value provided
