@@ -45,7 +45,7 @@ class GenerateReportTestCase(TestCase):
     def test_generate_png(self):
         with self.app.app_context():
             report = generate_report(
-                options, mimetype=MIME_TYPES.PNG, base64=False, width="800"
+                options, mimetype=MIME_TYPES.PNG, base64=False, width=800
             )
 
             # Report is a buffer of bytes with size > 0
@@ -67,7 +67,7 @@ class GenerateReportTestCase(TestCase):
     def test_generate_jpg(self):
         with self.app.app_context():
             report = generate_report(
-                options, mimetype=MIME_TYPES.JPEG, base64=False, width="1200"
+                options, mimetype=MIME_TYPES.JPEG, base64=False, width=1200
             )
 
             # Report is a buffer of bytes with size > 0
@@ -89,7 +89,7 @@ class GenerateReportTestCase(TestCase):
     def test_generate_pdf(self):
         with self.app.app_context():
             report = generate_report(
-                options, mimetype=MIME_TYPES.PDF, base64=False, width="1200"
+                options, mimetype=MIME_TYPES.PDF, base64=False, width=1200
             )
 
             # Report is a buffer of bytes with size > 0

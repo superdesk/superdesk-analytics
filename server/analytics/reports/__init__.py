@@ -8,20 +8,28 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
+from typing import Dict, Any, Optional
 import logging
-import requests
-from flask import current_app as app
 import csv
 from io import StringIO
+import subprocess
+import tempfile
+from os import path
+from base64 import b64encode
 
+from flask import json
 from superdesk.errors import SuperdeskApiError
+from superdesk.timer import timer
 from analytics.common import MIME_TYPES
 
 logger = logging.getLogger(__name__)
 
 
 def generate_report(
-    options, mimetype=MIME_TYPES.PNG, base64=True, scale=1, width=None, no_download=True
+    options: Dict[str, Any],
+    mimetype: str = MIME_TYPES.PNG,
+    base64: bool = True,
+    width: Optional[int] = None,
 ):
     if not isinstance(options, dict):
         raise SuperdeskApiError.badRequestError("Provided options must be a dictionary")
@@ -36,9 +44,7 @@ def generate_report(
         MIME_TYPES.PDF,
         MIME_TYPES.SVG,
     ]:
-        return generate_from_highcharts(
-            options, mimetype, base64, scale, width, no_download
-        )
+        return generate_from_highcharts(options, mimetype, base64, width)
     elif mimetype == MIME_TYPES.CSV:
         return generate_csv(options)
     elif mimetype == MIME_TYPES.HTML:
@@ -50,45 +56,26 @@ def generate_report(
 
 
 def generate_from_highcharts(
-    options, mimetype=MIME_TYPES.PNG, base64=True, scale=1, width=None, no_download=True
+    options: Dict[str, Any],
+    mimetype: str = MIME_TYPES.PNG,
+    base64: bool = True,
+    width: Optional[int] = None,
 ):
     try:
-        host = app.config.get("HIGHCHARTS_SERVER_HOST", "localhost")
-        port = app.config.get("HIGHCHARTS_SERVER_PORT", "6060")
-    except RuntimeError:
-        # This can happen when working outside of the Flask context
-        # So default to host=localhost, port=6060
-        host = "localhost"
-        port = "6060"
+        with timer(
+            "generate_highcharts_report_file"
+        ), tempfile.TemporaryDirectory() as tmpdir:
+            in_file = f"{tmpdir}/infile"
+            out_file = f"{tmpdir}/outfile"
 
-    url = "http://{}:{}".format(host, port)
-    headers = {"Content-Type": "application/json"}
+            _write_options_to_file(options, in_file)
+            _run_highcharts_cli(in_file, out_file, mimetype, width)
+            output = _load_report_from_file(out_file)
 
-    # Set the width size of the image to generate
-    if "exporting" not in options:
-        options["exporting"] = {}
-    options["exporting"]["sourceWidth"] = width
-
-    payload = {
-        "options": options,
-        "type": mimetype,
-        "b64": base64,
-        "scale": scale,
-        "noDownload": no_download,
-    }
-
-    try:
-        response = requests.post(url, headers=headers, json=payload)
-    except requests.exceptions.ConnectionError as e:
-        raise SuperdeskApiError.internalError("Socket connection error: {}".format(e))
-
-    try:
-        response.raise_for_status()
+            return b64encode(output) if base64 else output
     except Exception as e:
-        logger.exception(e)
-        raise SuperdeskApiError.internalError(e)
-
-    return response.content
+        logger.error(e)
+        raise SuperdeskApiError.internalError(f"Failed to generate report. {e}")
 
 
 def generate_csv(options):
@@ -130,3 +117,81 @@ def generate_html(options):
 <div>""".format(
         title, thead, tbody
     )
+
+
+def _write_options_to_file(options: Dict[str, Any], in_file: str):
+    try:
+        with open(in_file, "w") as f:
+            f.write(json.dumps(options))
+    except IOError as e:
+        logger.exception(e)
+        raise SuperdeskApiError.internalError(
+            "Failed to write highcharts options to file"
+        )
+
+
+def _get_mimetype_short(mimetype: str):
+    if mimetype == MIME_TYPES.PNG:
+        return "png"
+    elif mimetype == MIME_TYPES.PDF:
+        return "pdf"
+    elif mimetype == MIME_TYPES.SVG:
+        return "svg"
+    elif mimetype == MIME_TYPES.GIF:
+        return "gif"
+    elif mimetype == MIME_TYPES.JPEG:
+        return "jpg"
+
+
+def _run_highcharts_cli(in_file: str, out_file: str, mimetype: str, width: int = None):
+    try:
+        args = [
+            "highcharts-export-server",
+            "--infile",
+            in_file,
+            "--outfile",
+            out_file,
+            "--logLevel",
+            "4",
+            "--nologo",
+            "1",
+            "--type",
+            _get_mimetype_short(mimetype),
+        ]
+
+        if width:
+            args.extend(["--width", str(width)])
+
+        response = subprocess.run(
+            args,
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            timeout=5,  # Don't allow process to run for more than 5 seconds,
+        )
+
+        if not path.exists(out_file):
+            logger.error("Failed to run highcharts cli")
+            logger.error(response.stdout)
+            raise SuperdeskApiError.internalError("Failed to run highcharts cli")
+
+        return response
+    except FileNotFoundError as e:
+        logger.exception(e)
+        raise SuperdeskApiError.internalError(
+            "'highcharts-export-server' is not installed"
+        )
+    except subprocess.SubprocessError as e:
+        logger.exception(e)
+        raise SuperdeskApiError.internalError("Failed to run highcharts cli")
+
+
+def _load_report_from_file(out_file: str):
+    try:
+        with open(out_file, "rb") as f:
+            return f.read()
+    except IOError as e:
+        logger.exception(e)
+        raise SuperdeskApiError.internalError(
+            "Failed to read highcharts report from file"
+        )
