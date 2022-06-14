@@ -14,6 +14,7 @@ def install_highcharts():
         )
     except Exception as e:
         log.error('\t**NodeJs not found, report scheduling will not work**:\n\t{}'.format(e))
+        raise e
 
 
 class PostDevelopCommand(develop):
