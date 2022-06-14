@@ -21,6 +21,7 @@ from flask import json
 from superdesk.errors import SuperdeskApiError
 from superdesk.timer import timer
 from analytics.common import MIME_TYPES
+from analytics import ANALYTICS_ROOT
 
 logger = logging.getLogger(__name__)
 
@@ -145,8 +146,13 @@ def _get_mimetype_short(mimetype: str):
 
 def _run_highcharts_cli(in_file: str, out_file: str, mimetype: str, width: int = None):
     try:
+        highcharts_cli = path.join(
+            ANALYTICS_ROOT,
+            "node_modules/.bin/highcharts-export-server",
+        )
         args = [
-            "highcharts-export-server",
+            "node",
+            highcharts_cli,
             "--infile",
             in_file,
             "--outfile",

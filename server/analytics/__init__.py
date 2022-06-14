@@ -8,7 +8,10 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
+from os import path
 import superdesk
+
+ANALYTICS_ROOT = path.abspath(path.dirname(path.realpath(__file__)))
 
 from analytics.report_configs import ReportConfigsResource, ReportConfigsService
 from analytics.base_report import BaseReportService
