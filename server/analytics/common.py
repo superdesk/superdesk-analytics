@@ -9,6 +9,8 @@
 # at https://www.sourcefabric.org/superdesk/license
 
 from typing import NamedTuple
+from os import path
+
 from superdesk import get_resource_service
 from superdesk.utc import utcnow, utc_to_local
 from subprocess import check_call, PIPE
@@ -19,6 +21,8 @@ from dateutil.relativedelta import relativedelta
 from math import floor
 import re
 import logging
+
+ANALYTICS_PATH = path.abspath(path.dirname(path.realpath(__file__)))
 
 logger = logging.getLogger(__name__)
 
@@ -145,12 +149,13 @@ def get_report_service(report_type):
         return None
 
 
-def is_highcharts_installed():
-    try:
-        check_call(["which", "highcharts-export-server"], stdout=PIPE, stderr=PIPE)
-        return True
-    except Exception:
-        return False
+def get_highcharts_cli_path():
+    highcharts_cli_path = path.join(
+        ANALYTICS_PATH,
+        "node_modules/.bin/highcharts-export-server",
+    )
+
+    return highcharts_cli_path if path.exists(highcharts_cli_path) else None
 
 
 def get_cv_by_qcode(name, field=None):
