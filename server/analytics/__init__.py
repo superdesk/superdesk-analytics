@@ -8,7 +8,6 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-from os import path
 import superdesk
 
 from analytics.report_configs import ReportConfigsResource, ReportConfigsService
