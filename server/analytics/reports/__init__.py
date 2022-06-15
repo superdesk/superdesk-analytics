@@ -20,7 +20,7 @@ from base64 import b64encode
 from flask import json
 from superdesk.errors import SuperdeskApiError
 from superdesk.timer import timer
-from analytics.common import MIME_TYPES
+from analytics.common import MIME_TYPES, get_highcharts_cli_path
 
 logger = logging.getLogger(__name__)
 
@@ -145,8 +145,16 @@ def _get_mimetype_short(mimetype: str):
 
 def _run_highcharts_cli(in_file: str, out_file: str, mimetype: str, width: int = None):
     try:
+        highcharts_cli = get_highcharts_cli_path()
+
+        if not highcharts_cli:
+            raise SuperdeskApiError.internalError(
+                "'highcharts-export-server' is not installed"
+            )
+
         args = [
-            "highcharts-export-server",
+            "node",
+            highcharts_cli,
             "--infile",
             in_file,
             "--outfile",

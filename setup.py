@@ -30,11 +30,18 @@ class PostInstallCommand(install):
         install.run(self)
 
 
+package_data = {
+    "scripts": ["*.sh"],
+}
+
+
 setup(
     name="superdesk-analytics",
     version="2.0.0",
     package_dir={'': 'server'},
     packages=find_packages('server'),
+    package_data=package_data,
+    include_package_data=True,
     author='Sourcefabric',
     author_email='contact@sourcefabric.org',
     license='MIT',

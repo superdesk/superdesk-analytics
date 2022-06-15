@@ -35,7 +35,7 @@ from analytics.featuremedia_updates_report import (
 from analytics.update_time_report import init_app as init_update_time_report
 
 from analytics.commands import SendScheduledReports  # noqa
-from analytics.common import is_highcharts_installed, register_report
+from analytics.common import get_highcharts_cli_path, register_report
 from superdesk.celery_app import celery
 from superdesk.default_settings import celery_queue, crontab
 
@@ -48,7 +48,7 @@ def init_schedule_task(app):
         return
 
     # First check to see if highcharts-export-server is installed and globally accessible
-    if not is_highcharts_installed():
+    if not get_highcharts_cli_path():
         superdesk.logger.warn("Highcharts export server is not installed")
         return
 
