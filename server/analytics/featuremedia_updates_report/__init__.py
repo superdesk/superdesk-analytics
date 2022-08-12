@@ -19,15 +19,11 @@ from analytics.common import register_report
 def init_app(app):
     # Don't register this endpoint if archive stats aren't being generated
     # Generating stats with PUBLISH_ASSOCIATED_ITEMS=True is currently not supported
-    if not app.config.get("ANALYTICS_ENABLE_ARCHIVE_STATS", False) or app.config.get(
-        "PUBLISH_ASSOCIATED_ITEMS", False
-    ):
+    if not app.config.get("ANALYTICS_ENABLE_ARCHIVE_STATS", False) or app.config.get("PUBLISH_ASSOCIATED_ITEMS", False):
         return
 
     endpoint_name = "featuremedia_updates_report"
-    service = FeaturemediaUpdatesTimeReportService(
-        endpoint_name, backend=superdesk.get_backend()
-    )
+    service = FeaturemediaUpdatesTimeReportService(endpoint_name, backend=superdesk.get_backend())
     FeaturemdiaUpdatesReportResource(endpoint_name, app=app, service=service)
 
     register_report("featuremedia_updates_report", "featuremedia_updates_report")

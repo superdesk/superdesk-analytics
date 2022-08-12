@@ -50,9 +50,7 @@ def generate_report(
     elif mimetype == MIME_TYPES.HTML:
         return generate_html(options)
 
-    raise SuperdeskApiError.badRequestError(
-        "Unsupported mimetype '{}'".format(mimetype)
-    )
+    raise SuperdeskApiError.badRequestError("Unsupported mimetype '{}'".format(mimetype))
 
 
 def generate_from_highcharts(
@@ -62,9 +60,7 @@ def generate_from_highcharts(
     width: Optional[int] = None,
 ):
     try:
-        with timer(
-            "generate_highcharts_report_file"
-        ), tempfile.TemporaryDirectory() as tmpdir:
+        with timer("generate_highcharts_report_file"), tempfile.TemporaryDirectory() as tmpdir:
             in_file = f"{tmpdir}/infile"
             out_file = f"{tmpdir}/outfile"
 
@@ -99,9 +95,7 @@ def generate_html(options):
     thead = "<tr><th>{}</th></tr>".format("</th><th>".join(headers))
     tbody = ""
     for row in rows:
-        tbody += "<tr><td>{}</td></tr>".format(
-            "</td><td>".join([str(td) for td in row])
-        )
+        tbody += "<tr><td>{}</td></tr>".format("</td><td>".join([str(td) for td in row]))
 
     return """
 <div>
@@ -125,9 +119,7 @@ def _write_options_to_file(options: Dict[str, Any], in_file: str):
             f.write(json.dumps(options))
     except IOError as e:
         logger.exception(e)
-        raise SuperdeskApiError.internalError(
-            "Failed to write highcharts options to file"
-        )
+        raise SuperdeskApiError.internalError("Failed to write highcharts options to file")
 
 
 def _get_mimetype_short(mimetype: str):
@@ -148,9 +140,7 @@ def _run_highcharts_cli(in_file: str, out_file: str, mimetype: str, width: int =
         highcharts_cli = get_highcharts_cli_path()
 
         if not highcharts_cli:
-            raise SuperdeskApiError.internalError(
-                "'highcharts-export-server' is not installed"
-            )
+            raise SuperdeskApiError.internalError("'highcharts-export-server' is not installed")
 
         args = [
             "node",
@@ -186,9 +176,7 @@ def _run_highcharts_cli(in_file: str, out_file: str, mimetype: str, width: int =
         return response
     except FileNotFoundError as e:
         logger.exception(e)
-        raise SuperdeskApiError.internalError(
-            "'highcharts-export-server' is not installed"
-        )
+        raise SuperdeskApiError.internalError("'highcharts-export-server' is not installed")
     except subprocess.SubprocessError as e:
         logger.exception(e)
         raise SuperdeskApiError.internalError("Failed to run highcharts cli")
@@ -200,6 +188,4 @@ def _load_report_from_file(out_file: str):
             return f.read()
     except IOError as e:
         logger.exception(e)
-        raise SuperdeskApiError.internalError(
-            "Failed to read highcharts report from file"
-        )
+        raise SuperdeskApiError.internalError("Failed to read highcharts report from file")

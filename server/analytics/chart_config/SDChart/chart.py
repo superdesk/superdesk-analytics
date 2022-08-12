@@ -150,9 +150,7 @@ class Chart:
             config["plotOptions"]["series"]["dataLabels"]["enabled"] = self.data_labels
 
             if self.data_label_format:
-                config["plotOptions"]["series"]["dataLabels"][
-                    "format"
-                ] = self.data_label_format
+                config["plotOptions"]["series"]["dataLabels"]["format"] = self.data_label_format
 
         if self.colour_by_point is not None:
             if "bar" not in config["plotOptions"]:

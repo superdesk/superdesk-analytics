@@ -34,9 +34,7 @@ def step_impl_then_get_charts(context, total_count):
     report = (data.get("_items") or [{}])[0]
     num_reports = len(report.get("highcharts"))
 
-    assert int_count == num_reports, "Number of charts not equal. {} != {}".format(
-        int_count, num_reports
-    )
+    assert int_count == num_reports, "Number of charts not equal. {} != {}".format(int_count, num_reports)
 
     if context.text:
         try:
@@ -55,9 +53,7 @@ def step_impl_then_get_charts(context, total_count):
             for key, value in context_chart.items():
                 if isinstance(value, dict):
                     for subkey, subvalue in value.items():
-                        assert (
-                            response_chart[key][subkey] == subvalue
-                        ), "chart[{}][{}][{}] {} != {}".format(
+                        assert response_chart[key][subkey] == subvalue, "chart[{}][{}][{}] {} != {}".format(
                             chart_index,
                             key,
                             subkey,
@@ -65,9 +61,7 @@ def step_impl_then_get_charts(context, total_count):
                             response_chart[key][subkey],
                         )
                 else:
-                    assert (
-                        response_chart[key] == value
-                    ), "chart[{}][{}] {} != {}".format(
+                    assert response_chart[key] == value, "chart[{}][{}] {} != {}".format(
                         chart_index, key, value, response_chart[key]
                     )
 
@@ -90,9 +84,7 @@ def step_impl_then_we_get_config(context, report_id):
 
     data = get_json_data(context.response)
 
-    config = next(
-        (c for c in (data.get("_items") or []) if c.get("_id") == report_id), None
-    )
+    config = next((c for c in (data.get("_items") or []) if c.get("_id") == report_id), None)
 
     expected_config = json.loads(apply_placeholders(context, context.text))
     assert_equal(json_match(expected_config, config), True)
@@ -114,23 +106,17 @@ def step_impl_then_get_stats_for_item(context):
 
         # parent stat entries (i.e. timeline, desk_transitions, featuremedia_updates)
         for stat_type, stat_entries in context_stats.items():
-            assert stat_type in stats.keys(), "stats.{} does not exist".format(
-                stat_type
-            )
+            assert stat_type in stats.keys(), "stats.{} does not exist".format(stat_type)
 
             if stat_entries is None:
-                assert stats[stat_type] is None, "stats.{} is not empty".format(
-                    stat_type
-                )
+                assert stats[stat_type] is None, "stats.{} is not empty".format(stat_type)
                 continue
             elif stats[stat_type] is None:
                 assert stat_entries == stats[stat_type], "stats.{} {} != {}".format(
                     stat_type, stats[stat_type], stat_entries
                 )
 
-            assert len(stat_entries) == len(
-                stats[stat_type]
-            ), "stats.{}. len {} != {}.\nStats={}".format(
+            assert len(stat_entries) == len(stats[stat_type]), "stats.{}. len {} != {}.\nStats={}".format(
                 stat_type, len(stat_entries), len(stats[stat_type]), stats[stat_type]
             )
 
@@ -139,9 +125,7 @@ def step_impl_then_get_stats_for_item(context):
                 expected_stats = stats[stat_type][stat_index]
 
                 for key, value in stat_entry.items():
-                    assert (
-                        key in expected_stats.keys()
-                    ), 'stats.{}[{}] key "{}" not found'.format(
+                    assert key in expected_stats.keys(), 'stats.{}[{}] key "{}" not found'.format(
                         stat_type, stat_index, key
                     )
 
@@ -164,9 +148,7 @@ def step_impl_then_get_stats_for_item(context):
                                 expected_stats[key],
                             )
                     else:
-                        assert (
-                            expected_stats[key] == value
-                        ), "stats.{}[{}].{} {} != {}".format(
+                        assert expected_stats[key] == value, "stats.{}[{}].{} {} != {}".format(
                             stat_type, stat_index, key, expected_stats[key], value
                         )
 

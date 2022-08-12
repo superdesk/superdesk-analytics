@@ -70,16 +70,10 @@ class SendScheduledReports(Command):
 
             try:
                 if not self.should_send_report(scheduled_report, now_local):
-                    logger.info(
-                        "Scheduled Report {} not scheduled to be sent".format(
-                            schedule_id
-                        )
-                    )
+                    logger.info("Scheduled Report {} not scheduled to be sent".format(schedule_id))
                     continue
 
-                logger.info(
-                    "Attempting to send Scheduled Report {}".format(schedule_id)
-                )
+                logger.info("Attempting to send Scheduled Report {}".format(schedule_id))
                 self._send_report(scheduled_report)
 
                 # Update the _last_sent of the schedule
@@ -89,22 +83,14 @@ class SendScheduledReports(Command):
                     scheduled_report,
                 )
             except Exception as e:
-                logger.error(
-                    "Failed to generate report for {}. Error: {}".format(
-                        schedule_id, str(e)
-                    )
-                )
+                logger.error("Failed to generate report for {}. Error: {}".format(schedule_id, str(e)))
                 logger.exception(e)
 
         logger.info("Completed sending scheduled reports: {}".format(now_utc))
 
     @staticmethod
     def get_schedules():
-        return list(
-            get_resource_service("scheduled_reports").get(
-                req=None, lookup={"active": {"$eq": True}}
-            )
-        )
+        return list(get_resource_service("scheduled_reports").get(req=None, lookup={"active": {"$eq": True}}))
 
     @staticmethod
     def should_send_report(scheduled_report, now_local):
@@ -113,9 +99,9 @@ class SendScheduledReports(Command):
 
         last_sent = None
         if scheduled_report.get("_last_sent"):
-            last_sent = utc_to_local(
-                app.config["DEFAULT_TIMEZONE"], scheduled_report.get("_last_sent")
-            ).replace(minute=0, second=0, microsecond=0)
+            last_sent = utc_to_local(app.config["DEFAULT_TIMEZONE"], scheduled_report.get("_last_sent")).replace(
+                minute=0, second=0, microsecond=0
+            )
 
         # Fix issue with incorrect schedule attributes being stored
         get_resource_service("scheduled_reports").set_schedule(scheduled_report)
@@ -157,9 +143,7 @@ class SendScheduledReports(Command):
             raise SuperdeskApiError.notFoundError("Saved report not found")
 
         extra = scheduled_report.get("extra") or {}
-        body = extra.get("body") or "Superdesk Analytics - {}".format(
-            scheduled_report.get("name")
-        )
+        body = extra.get("body") or "Superdesk Analytics - {}".format(scheduled_report.get("name"))
 
         email_service.post(
             [
@@ -172,9 +156,7 @@ class SendScheduledReports(Command):
                     },
                     "email": {
                         "recipients": scheduled_report.get("recipients"),
-                        "subject": "Superdesk Analytics - {}".format(
-                            scheduled_report.get("name")
-                        ),
+                        "subject": "Superdesk Analytics - {}".format(scheduled_report.get("name")),
                         "txt": {"body": body},
                         "html": {"body": body},
                     },

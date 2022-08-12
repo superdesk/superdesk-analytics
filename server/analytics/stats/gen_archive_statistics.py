@@ -167,18 +167,14 @@ class GenArchiveStatistics(Command):
         num_history_items = 0
 
         try:
-            items_processed, failed_ids, num_history_items = self.generate_stats(
-                item_id, gte, chunk_size
-            )
+            items_processed, failed_ids, num_history_items = self.generate_stats(item_id, gte, chunk_size)
         except Exception:
             logger.exception("Failed to generate archive stats")
         finally:
             unlock(lock_name)
 
         if len(failed_ids) > 0:
-            logger.warning(
-                "Failed to generate stats for items {}".format(", ".join(failed_ids))
-            )
+            logger.warning("Failed to generate stats for items {}".format(", ".join(failed_ids)))
 
         duration = (utcnow() - now_utc).total_seconds()
         logger.info(
@@ -200,16 +196,10 @@ class GenArchiveStatistics(Command):
         last_entry_id = last_history.get("guid") or None
 
         if last_history.get("guid"):
-            logger.info(
-                "Found previous run, continuing from history item {}".format(
-                    last_history["guid"]
-                )
-            )
+            logger.info("Found previous run, continuing from history item {}".format(last_history["guid"]))
 
         iterated_started = utcnow()
-        for history_items in statistics_service.get_history_items(
-            last_entry_id, gte, item_id, chunk_size
-        ):
+        for history_items in statistics_service.get_history_items(last_entry_id, gte, item_id, chunk_size):
             if len(history_items) < 1:
                 logger.info("No more history records to process")
                 break
@@ -270,8 +260,7 @@ class GenArchiveStatistics(Command):
             items[entry_id]["updates"]["stats"].update(
                 {
                     STAT_TYPE.TIMELINE: [
-                        _set_timeline_processed(entry)
-                        for entry in item["stats"].get(STAT_TYPE.TIMELINE) or []
+                        _set_timeline_processed(entry) for entry in item["stats"].get(STAT_TYPE.TIMELINE) or []
                     ]
                 }
             )
@@ -319,9 +308,7 @@ class GenArchiveStatistics(Command):
         else:
             # Remove the new task details from the MOVE_FROM operation
             # Task will later be calculated from the previous history item
-            task = entry.pop(
-                "task", {"user": history.get("user_id"), "desk": None, "stage": None}
-            )
+            task = entry.pop("task", {"user": history.get("user_id"), "desk": None, "stage": None})
 
             entry["task"] = {
                 "user": history.get("user_id"),
@@ -340,19 +327,12 @@ class GenArchiveStatistics(Command):
             item["updates"]["stats"][STAT_TYPE.TIMELINE].append(entry)
 
     def set_operation(self, history):
-        if (
-            history["operation"] == OPERATION.UPDATE
-            and history["update"].get("operation") == OPERATION.DESCHEDULE
-        ):
+        if history["operation"] == OPERATION.UPDATE and history["update"].get("operation") == OPERATION.DESCHEDULE:
             history["operation"] = OPERATION.DESCHEDULE
         elif history["operation"] == OPERATION.PUBLISH:
-            if history["update"].get(ITEM_STATE) != CONTENT_STATE.PUBLISHED and history[
-                "update"
-            ].get(PUBLISH_SCHEDULE):
+            if history["update"].get(ITEM_STATE) != CONTENT_STATE.PUBLISHED and history["update"].get(PUBLISH_SCHEDULE):
                 history["operation"] = OPERATION.PUBLISH_SCHEDULED
-            elif history["update"].get(
-                ITEM_STATE
-            ) == CONTENT_STATE.PUBLISHED and history["update"].get(EMBARGO):
+            elif history["update"].get(ITEM_STATE) == CONTENT_STATE.PUBLISHED and history["update"].get(EMBARGO):
                 history["operation"] = OPERATION.PUBLISH_EMBARGO
 
     def set_metadata_updates(self, item, history):
@@ -437,10 +417,7 @@ class GenArchiveStatistics(Command):
                 failed_ids.append(item_id)
                 continue
 
-            if (
-                item["updates"].get("rewrite_of")
-                and (item["updates"].get("time_to_first_publish") or 0) > 0
-            ):
+            if item["updates"].get("rewrite_of") and (item["updates"].get("time_to_first_publish") or 0) > 0:
                 rewrites.append(item_id)
 
             if not item["item"].get(config.ID_FIELD):
@@ -452,9 +429,7 @@ class GenArchiveStatistics(Command):
                     statistics_service.patch(item_id, item["updates"])
                 except Exception:
                     logger.exception(
-                        "Failed to update stats for item {}. updates={}".format(
-                            item_id, item.get("updates")
-                        )
+                        "Failed to update stats for item {}. updates={}".format(item_id, item.get("updates"))
                     )
                     failed_ids.append(item_id)
 
@@ -463,11 +438,7 @@ class GenArchiveStatistics(Command):
                 statistics_service.post(items_to_create)
             except Exception:
                 item_ids = [item.get(config.ID_FIELD) for item in items_to_create]
-                logger.exception(
-                    "Failed to create stat entries for items {}".format(
-                        ", ".join(item_ids)
-                    )
-                )
+                logger.exception("Failed to create stat entries for items {}".format(", ".join(item_ids)))
                 failed_ids.extend(failed_ids)
 
         for item_id in rewrites:
@@ -490,18 +461,12 @@ class GenArchiveStatistics(Command):
 
             published_at = original.get("firstpublished")
             if not published_at:
-                logger.warning(
-                    "Failed {}, published_at not defined".format(original_id)
-                )
+                logger.warning("Failed {}, published_at not defined".format(original_id))
                 continue
 
             statistics_service.patch(
                 original_id,
-                {
-                    "time_to_next_update_publish": (
-                        updated_at - published_at
-                    ).total_seconds()
-                },
+                {"time_to_next_update_publish": (updated_at - published_at).total_seconds()},
             )
 
     def _store_update_fields(self, entry):
@@ -539,9 +504,7 @@ class GenArchiveStatistics(Command):
                 key=lambda k: (k["operation_created"], k["history_id"]),
             )
         except Exception as e:
-            logger.exception(
-                "Failed to sort timeline {}".format(stats[STAT_TYPE.TIMELINE])
-            )
+            logger.exception("Failed to sort timeline {}".format(stats[STAT_TYPE.TIMELINE]))
             raise e
 
         # If the first history item has original_item_id attribute,
@@ -580,9 +543,7 @@ class GenArchiveStatistics(Command):
                 updates["_published"] = True
                 if not updates.get("firstpublished"):
                     updates["firstpublished"] = operation_created
-            elif operation in [OPERATION.CREATE, OPERATION.FETCH] and not updates.get(
-                "firstcreated"
-            ):
+            elif operation in [OPERATION.CREATE, OPERATION.FETCH] and not updates.get("firstcreated"):
                 updates["firstcreated"] = operation_created
 
             desk_transitions.process(entry, new_timeline, updates, update, stats)
@@ -596,22 +557,16 @@ class GenArchiveStatistics(Command):
             )
 
         desk_transitions.complete(stats, updates)
-        gen_stats_signals["complete"].send(
-            self, stats=stats, orig=item, updates=updates
-        )
+        gen_stats_signals["complete"].send(self, stats=stats, orig=item, updates=updates)
 
         if updates.get("firstpublished") and updates.get("firstcreated"):
-            updates["time_to_first_publish"] = (
-                updates["firstpublished"] - updates["firstcreated"]
-            ).total_seconds()
+            updates["time_to_first_publish"] = (updates["firstpublished"] - updates["firstcreated"]).total_seconds()
 
         def _remove_tmp_fields(entry):
             entry.pop("_processed", None)
             return entry
 
-        stats[STAT_TYPE.TIMELINE] = [
-            _remove_tmp_fields(entry) for entry in new_timeline
-        ]
+        stats[STAT_TYPE.TIMELINE] = [_remove_tmp_fields(entry) for entry in new_timeline]
 
         for key in list(updates.keys()):
             if key.startswith("_"):

@@ -93,17 +93,13 @@ class BaseReportServiceTestCase(TestCase):
         with self.app.app_context():
             # Test source_category aggregation
             self.assertEqual(
-                self.service.get_aggregation_buckets(
-                    aggregation_response, ["source_category"]
-                ),
+                self.service.get_aggregation_buckets(aggregation_response, ["source_category"]),
                 {
                     "source_category": [
                         {
                             "key": "AAP",
                             "doc_count": 2,
-                            "category": {
-                                "buckets": [{"key": "Advisories", "doc_count": 2}]
-                            },
+                            "category": {"buckets": [{"key": "Advisories", "doc_count": 2}]},
                         }
                     ]
                 },
@@ -153,9 +149,7 @@ class BaseReportServiceTestCase(TestCase):
             )
 
             # DateFilters - Day
-            query = self.service.generate_elastic_query(
-                {"params": {"dates": {"filter": "day", "date": "2018-06-30"}}}
-            )
+            query = self.service.generate_elastic_query({"params": {"dates": {"filter": "day", "date": "2018-06-30"}}})
             self.assert_bool_query(
                 query,
                 {
@@ -175,9 +169,7 @@ class BaseReportServiceTestCase(TestCase):
             )
 
             # DateFilters - Yesterday
-            query = self.service.generate_elastic_query(
-                {"params": {"dates": {"filter": "yesterday"}}}
-            )
+            query = self.service.generate_elastic_query({"params": {"dates": {"filter": "yesterday"}}})
             self.assert_bool_query(
                 query,
                 {
@@ -197,9 +189,7 @@ class BaseReportServiceTestCase(TestCase):
             )
 
             # DateFilters - Last Week
-            query = self.service.generate_elastic_query(
-                {"params": {"dates": {"filter": "last_week"}}}
-            )
+            query = self.service.generate_elastic_query({"params": {"dates": {"filter": "last_week"}}})
             self.assert_bool_query(
                 query,
                 {
@@ -219,9 +209,7 @@ class BaseReportServiceTestCase(TestCase):
             )
 
             # DateFilters - Last Month
-            query = self.service.generate_elastic_query(
-                {"params": {"dates": {"filter": "last_month"}}}
-            )
+            query = self.service.generate_elastic_query({"params": {"dates": {"filter": "last_month"}}})
             self.assert_bool_query(
                 query,
                 {
@@ -285,9 +273,7 @@ class BaseReportServiceTestCase(TestCase):
             )
 
             # DateFilters - Today
-            query = self.service.generate_elastic_query(
-                {"params": {"dates": {"filter": "today"}}}
-            )
+            query = self.service.generate_elastic_query({"params": {"dates": {"filter": "today"}}})
             self.assert_bool_query(
                 query,
                 {
@@ -307,9 +293,7 @@ class BaseReportServiceTestCase(TestCase):
             )
 
             # DateFilters - This Week
-            query = self.service.generate_elastic_query(
-                {"params": {"dates": {"filter": "this_week"}}}
-            )
+            query = self.service.generate_elastic_query({"params": {"dates": {"filter": "this_week"}}})
             self.assert_bool_query(
                 query,
                 {
@@ -329,9 +313,7 @@ class BaseReportServiceTestCase(TestCase):
             )
 
             # DateFilters - This Month
-            query = self.service.generate_elastic_query(
-                {"params": {"dates": {"filter": "this_month"}}}
-            )
+            query = self.service.generate_elastic_query({"params": {"dates": {"filter": "this_month"}}})
             self.assert_bool_query(
                 query,
                 {
@@ -373,9 +355,7 @@ class BaseReportServiceTestCase(TestCase):
                 query,
                 {
                     "must": [],
-                    "must_not": [
-                        {"terms": {"state": ["corrected", "killed", "published"]}}
-                    ],
+                    "must_not": [{"terms": {"state": ["corrected", "killed", "published"]}}],
                 },
             )
 
@@ -397,11 +377,7 @@ class BaseReportServiceTestCase(TestCase):
                 query,
                 {
                     "source": {
-                        "query": {
-                            "filtered": {
-                                "filter": {"bool": {"must": [], "must_not": []}}
-                            }
-                        },
+                        "query": {"filtered": {"filter": {"bool": {"must": [], "must_not": []}}}},
                         "sort": [{"versioncreated": "desc"}],
                         "size": 0,
                         "from": 0,
@@ -414,9 +390,7 @@ class BaseReportServiceTestCase(TestCase):
 
     def test_generate_elastic_query_for_desks(self):
         with self.app.app_context():
-            query = self.service.generate_elastic_query(
-                {"params": {"must": {"desks": ["desk1", "desk2"]}}}
-            )
+            query = self.service.generate_elastic_query({"params": {"must": {"desks": ["desk1", "desk2"]}}})
             self.assert_bool_query(
                 query,
                 {
@@ -425,9 +399,7 @@ class BaseReportServiceTestCase(TestCase):
                 },
             )
 
-            query = self.service.generate_elastic_query(
-                {"params": {"must_not": {"desks": ["desk1", "desk2"]}}}
-            )
+            query = self.service.generate_elastic_query({"params": {"must_not": {"desks": ["desk1", "desk2"]}}})
             self.assert_bool_query(
                 query,
                 {
@@ -438,9 +410,7 @@ class BaseReportServiceTestCase(TestCase):
 
     def test_generate_elastic_query_for_users(self):
         with self.app.app_context():
-            query = self.service.generate_elastic_query(
-                {"params": {"must": {"users": ["user1", "user2"]}}}
-            )
+            query = self.service.generate_elastic_query({"params": {"must": {"users": ["user1", "user2"]}}})
             self.assert_bool_query(
                 query,
                 {
@@ -449,9 +419,7 @@ class BaseReportServiceTestCase(TestCase):
                 },
             )
 
-            query = self.service.generate_elastic_query(
-                {"params": {"must_not": {"users": ["user1", "user2"]}}}
-            )
+            query = self.service.generate_elastic_query({"params": {"must_not": {"users": ["user1", "user2"]}}})
             self.assert_bool_query(
                 query,
                 {
@@ -462,17 +430,13 @@ class BaseReportServiceTestCase(TestCase):
 
     def test_generate_elastic_query_for_genre(self):
         with self.app.app_context():
-            query = self.service.generate_elastic_query(
-                {"params": {"must": {"genre": ["a", "f"]}}}
-            )
+            query = self.service.generate_elastic_query({"params": {"must": {"genre": ["a", "f"]}}})
             self.assert_bool_query(
                 query,
                 {"must": [{"terms": {"genre.qcode": ["a", "f"]}}], "must_not": []},
             )
 
-            query = self.service.generate_elastic_query(
-                {"params": {"must_not": {"genre": ["a", "f"]}}}
-            )
+            query = self.service.generate_elastic_query({"params": {"must_not": {"genre": ["a", "f"]}}})
             self.assert_bool_query(
                 query,
                 {"must": [], "must_not": [{"terms": {"genre.qcode": ["a", "f"]}}]},
@@ -480,25 +444,15 @@ class BaseReportServiceTestCase(TestCase):
 
     def test_generate_elastic_query_for_urgency(self):
         with self.app.app_context():
-            query = self.service.generate_elastic_query(
-                {"params": {"must": {"urgency": [1, 3]}}}
-            )
-            self.assert_bool_query(
-                query, {"must": [{"terms": {"urgency": [1, 3]}}], "must_not": []}
-            )
+            query = self.service.generate_elastic_query({"params": {"must": {"urgency": [1, 3]}}})
+            self.assert_bool_query(query, {"must": [{"terms": {"urgency": [1, 3]}}], "must_not": []})
 
-            query = self.service.generate_elastic_query(
-                {"params": {"must_not": {"urgency": [1, 3]}}}
-            )
-            self.assert_bool_query(
-                query, {"must": [], "must_not": [{"terms": {"urgency": [1, 3]}}]}
-            )
+            query = self.service.generate_elastic_query({"params": {"must_not": {"urgency": [1, 3]}}})
+            self.assert_bool_query(query, {"must": [], "must_not": [{"terms": {"urgency": [1, 3]}}]})
 
     def test_generate_elastic_query_for_ingest_providers(self):
         with self.app.app_context():
-            query = self.service.generate_elastic_query(
-                {"params": {"must": {"ingest_providers": ["ing1", "ing2"]}}}
-            )
+            query = self.service.generate_elastic_query({"params": {"must": {"ingest_providers": ["ing1", "ing2"]}}})
             self.assert_bool_query(
                 query,
                 {
@@ -520,17 +474,13 @@ class BaseReportServiceTestCase(TestCase):
 
     def test_generate_elastic_query_for_desk_stages(self):
         with self.app.app_context():
-            query = self.service.generate_elastic_query(
-                {"params": {"must": {"stages": ["sta1", "sta2"]}}}
-            )
+            query = self.service.generate_elastic_query({"params": {"must": {"stages": ["sta1", "sta2"]}}})
             self.assert_bool_query(
                 query,
                 {"must": [{"terms": {"task.stage": ["sta1", "sta2"]}}], "must_not": []},
             )
 
-            query = self.service.generate_elastic_query(
-                {"params": {"must_not": {"stages": ["sta1", "sta2"]}}}
-            )
+            query = self.service.generate_elastic_query({"params": {"must_not": {"stages": ["sta1", "sta2"]}}})
             self.assert_bool_query(
                 query,
                 {"must": [], "must_not": [{"terms": {"task.stage": ["sta1", "sta2"]}}]},
@@ -538,9 +488,7 @@ class BaseReportServiceTestCase(TestCase):
 
     def test_generate_elastic_query_for_content_types(self):
         with self.app.app_context():
-            query = self.service.generate_elastic_query(
-                {"params": {"must": {"content_types": ["text", "picture"]}}}
-            )
+            query = self.service.generate_elastic_query({"params": {"must": {"content_types": ["text", "picture"]}}})
             self.assert_bool_query(
                 query,
                 {"must": [{"terms": {"type": ["picture", "text"]}}], "must_not": []},
@@ -556,17 +504,13 @@ class BaseReportServiceTestCase(TestCase):
 
     def test_generate_elastic_query_for_states(self):
         with self.app.app_context():
-            query = self.service.generate_elastic_query(
-                {"params": {"must": {"states": ["draft", "ingested"]}}}
-            )
+            query = self.service.generate_elastic_query({"params": {"must": {"states": ["draft", "ingested"]}}})
             self.assert_bool_query(
                 query,
                 {"must": [{"terms": {"state": ["draft", "ingested"]}}], "must_not": []},
             )
 
-            query = self.service.generate_elastic_query(
-                {"params": {"must_not": {"states": ["corrected", "killed"]}}}
-            )
+            query = self.service.generate_elastic_query({"params": {"must_not": {"states": ["corrected", "killed"]}}})
             self.assert_bool_query(
                 query,
                 {
@@ -642,11 +586,7 @@ class BaseReportServiceTestCase(TestCase):
     def test_generate_elastic_query_for_sources(self):
         with self.app.app_context():
             query = self.service.generate_elastic_query(
-                {
-                    "params": {
-                        "must": {"sources": {"AAP": True, "Reuters": True, "AP": False}}
-                    }
-                }
+                {"params": {"must": {"sources": {"AAP": True, "Reuters": True, "AP": False}}}}
             )
             self.assert_bool_query(
                 query,
@@ -654,13 +594,7 @@ class BaseReportServiceTestCase(TestCase):
             )
 
             query = self.service.generate_elastic_query(
-                {
-                    "params": {
-                        "must_not": {
-                            "sources": {"AAP": True, "Reuters": True, "AP": False}
-                        }
-                    }
-                }
+                {"params": {"must_not": {"sources": {"AAP": True, "Reuters": True, "AP": False}}}}
             )
             self.assert_bool_query(
                 query,
@@ -669,16 +603,10 @@ class BaseReportServiceTestCase(TestCase):
 
     def test_generate_elastic_query_to_exclude_rewrites(self):
         with self.app.app_context():
-            query = self.service.generate_elastic_query(
-                {"params": {"must_not": {"rewrites": True}}}
-            )
-            self.assert_bool_query(
-                query, {"must": [], "must_not": [{"exists": {"field": "rewrite_of"}}]}
-            )
+            query = self.service.generate_elastic_query({"params": {"must_not": {"rewrites": True}}})
+            self.assert_bool_query(query, {"must": [], "must_not": [{"exists": {"field": "rewrite_of"}}]})
 
-            query = self.service.generate_elastic_query(
-                {"params": {"must_not": {"rewrites": False}}}
-            )
+            query = self.service.generate_elastic_query({"params": {"must_not": {"rewrites": False}}})
             self.assert_bool_query(query, {"must": [], "must_not": []})
 
     def test_generate_elastic_query_size(self):
@@ -688,11 +616,7 @@ class BaseReportServiceTestCase(TestCase):
                 query,
                 {
                     "source": {
-                        "query": {
-                            "filtered": {
-                                "filter": {"bool": {"must": [], "must_not": []}}
-                            }
-                        },
+                        "query": {"filtered": {"filter": {"bool": {"must": [], "must_not": []}}}},
                         "sort": [{"versioncreated": "desc"}],
                         "size": 200,
                         "from": 0,
@@ -704,11 +628,7 @@ class BaseReportServiceTestCase(TestCase):
 
     def test_get_with_request(self):
         params = {
-            "source": {
-                "query": {
-                    "filtered": {"filter": {"bool": {"must": [], "must_not": []}}}
-                }
-            },
+            "source": {"query": {"filtered": {"filter": {"bool": {"must": [], "must_not": []}}}}},
             "params": {"dates": {"filter": "yesterday"}},
             "repo": "published",
             "return_type": "text/csv",
@@ -782,11 +702,7 @@ class BaseReportServiceTestCase(TestCase):
 
     def test_get_with_lookup(self):
         lookup = {
-            "source": {
-                "query": {
-                    "filtered": {"filter": {"bool": {"must": [], "must_not": []}}}
-                }
-            },
+            "source": {"query": {"filtered": {"filter": {"bool": {"must": [], "must_not": []}}}}},
             "params": {"dates": {"filter": "yesterday"}},
             "repo": "published",
             "return_type": "text/csv",
@@ -816,9 +732,7 @@ class BaseReportServiceTestCase(TestCase):
         self.assertEqual(args, expected_args)
 
         # return_type default
-        args = self.service._get_request_or_lookup(
-            req=None, source=lookup["source"], repo=lookup["repo"]
-        )
+        args = self.service._get_request_or_lookup(req=None, source=lookup["source"], repo=lookup["repo"])
         self.assertEqual(args.get("return_type"), "aggregations")
 
         # Lookup with params as json in string format

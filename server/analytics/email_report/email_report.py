@@ -108,9 +108,7 @@ class EmailReportService(BaseService):
     def _gen_attachments(report):
         report_service = get_report_service(report.get("type"))
         if report_service is None:
-            raise SuperdeskApiError.badRequestError(
-                'Unknown report type "{}"'.format(report.get("type"))
-            )
+            raise SuperdeskApiError.badRequestError('Unknown report type "{}"'.format(report.get("type")))
 
         if report.get("mimetype") in [
             MIME_TYPES.PNG,
@@ -155,13 +153,9 @@ class EmailReportService(BaseService):
             try:
                 attachments.append(
                     {
-                        "file": generate_report(
-                            option, mimetype=mime_type, base64=True, width=report_width
-                        ),
+                        "file": generate_report(option, mimetype=mime_type, base64=True, width=report_width),
                         "mimetype": mime_type,
-                        "filename": "chart_{}.{}".format(
-                            i, get_mime_type_extension(mime_type)
-                        ),
+                        "filename": "chart_{}.{}".format(i, get_mime_type_extension(mime_type)),
                         "width": report_width,
                     }
                 )
@@ -233,15 +227,11 @@ def send_email_report(
                 try:
                     uuid = str(uuid4())
                     if attachment.get("mimetype") == MIME_TYPES.HTML:
-                        reports.append(
-                            {"id": uuid, "type": "html", "html": attachment.get("file")}
-                        )
+                        reports.append({"id": uuid, "type": "html", "html": attachment.get("file")})
                     else:
                         msg.attach(
                             filename=attachment.get("filename"),
-                            content_type='{}; name="{}"'.format(
-                                attachment.get("mimetype"), attachment.get("filename")
-                            ),
+                            content_type='{}; name="{}"'.format(attachment.get("mimetype"), attachment.get("filename")),
                             data=b64decode(attachment.get("file")),
                             disposition="attachment",
                             headers={

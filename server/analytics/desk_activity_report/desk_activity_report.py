@@ -195,9 +195,7 @@ class DeskActivityReportService(BaseReportService):
             # Calculate the UTC Offset in minutes for the start date of the results
             # This will cause an issue if a report crosses over the daylight savings change
             # Any data after the daylight savings change will be 1 hour out
-            timezone_offset = get_utc_offset_in_minutes(
-                datetime.utcfromtimestamp(int(report["start_epoch"] / 1000))
-            )
+            timezone_offset = get_utc_offset_in_minutes(datetime.utcfromtimestamp(int(report["start_epoch"] / 1000)))
 
             chart = SDChart.Chart(
                 "desk_activity_report",
@@ -226,13 +224,9 @@ class DeskActivityReportService(BaseReportService):
                 stack_labels=False,
             )
 
-            axis.add_series().set_options(
-                field="desk_transition", name="incoming", data=report.get("incoming")
-            )
+            axis.add_series().set_options(field="desk_transition", name="incoming", data=report.get("incoming"))
 
-            axis.add_series().set_options(
-                field="desk_transition", name="outgoing", data=report.get("outgoing")
-            )
+            axis.add_series().set_options(field="desk_transition", name="outgoing", data=report.get("outgoing"))
 
             return chart.gen_config()
 
@@ -257,29 +251,17 @@ class DeskActivityReportService(BaseReportService):
             rows = []
 
             for activity in report.get("histogram"):
-                interval = datetime.strptime(
-                    activity.get("interval"), "%Y-%m-%dT%H:%M:%S"
-                )
+                interval = datetime.strptime(activity.get("interval"), "%Y-%m-%dT%H:%M:%S")
 
-                row = [
-                    interval.strftime(
-                        "%b %-d %H:%M"
-                        if histogram.get("interval") == "hourly"
-                        else "%b %-d"
-                    )
-                ]
+                row = [interval.strftime("%b %-d %H:%M" if histogram.get("interval") == "hourly" else "%b %-d")]
 
                 incoming = activity.get("incoming") or {}
-                incoming_rows = [
-                    incoming.get(field) or 0 for field in ENTER_DESK_OPERATIONS
-                ]
+                incoming_rows = [incoming.get(field) or 0 for field in ENTER_DESK_OPERATIONS]
                 row.append(sum(incoming_rows))
                 row.extend(incoming_rows)
 
                 outgoing = activity.get("outgoing") or {}
-                outgoing_rows = [
-                    outgoing.get(field) or 0 for field in EXIT_DESK_OPERATIONS
-                ]
+                outgoing_rows = [outgoing.get(field) or 0 for field in EXIT_DESK_OPERATIONS]
                 row.append(sum(outgoing_rows))
                 row.extend(outgoing_rows)
 

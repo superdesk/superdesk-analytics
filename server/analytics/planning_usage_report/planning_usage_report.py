@@ -71,11 +71,7 @@ class PlanningUsageReportService(BaseReportService):
         },
         "assignments": {
             "filter": {"term": {"type": "assignment"}},
-            "aggs": {
-                "users": {
-                    "terms": {"field": "original_creator", "size": MAX_TERMS_SIZE}
-                }
-            },
+            "aggs": {"users": {"terms": {"field": "original_creator", "size": MAX_TERMS_SIZE}}},
         },
         "coverages": {
             "nested": {"path": "coverages"},
@@ -159,14 +155,10 @@ class PlanningUsageReportService(BaseReportService):
 
         planning_role_ids = [
             str(role.get("_id"))
-            for role in get_resource_service("roles").get(
-                req=None, lookup={"privileges.planning": 1}
-            )
+            for role in get_resource_service("roles").get(req=None, lookup={"privileges.planning": 1})
         ]
 
-        active_users = get_resource_service("users").get(
-            req=None, lookup={"is_enabled": True}
-        )
+        active_users = get_resource_service("users").get(req=None, lookup={"is_enabled": True})
 
         users_with_planning = []
         for user in active_users:

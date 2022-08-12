@@ -35,9 +35,7 @@ class SDChartSeriesTestCase(TestCase):
             self.assertEqual(val, generated.get(key))
 
     def test_default_config(self):
-        self.assertConfigEqual(
-            self._gen_config({}, {}), {"series": [{"xAxis": 0, "type": "bar"}]}
-        )
+        self.assertConfigEqual(self._gen_config({}, {}), {"series": [{"xAxis": 0, "type": "bar"}]})
 
         self.assertConfigEqual(
             self._gen_config({"default_chart_type": "column"}, {}),
@@ -123,11 +121,7 @@ class SDChartSeriesTestCase(TestCase):
                 {"categories": ["b", "c", "a"]},
                 {"name": "Test Data", "data": {"a": 2, "b": 6, "c": 10}},
             ),
-            {
-                "series": [
-                    {"xAxis": 0, "type": "bar", "name": "Test Data", "data": [6, 10, 2]}
-                ]
-            },
+            {"series": [{"xAxis": 0, "type": "bar", "name": "Test Data", "data": [6, 10, 2]}]},
         )
 
         chart = SDChart.Chart("test_chart")
@@ -145,9 +139,7 @@ class SDChartSeriesTestCase(TestCase):
             x_title=chart.get_translation_title("categories"),
         )
 
-        axis.add_series().set_options(
-            field="categories", data={"a": 2, "b": 6, "c": 10}
-        )
+        axis.add_series().set_options(field="categories", data={"a": 2, "b": 6, "c": 10})
 
         self.assertConfigEqual(
             chart.gen_config(),
@@ -160,8 +152,6 @@ class SDChartSeriesTestCase(TestCase):
                         "title": {"text": "Category"},
                     }
                 ],
-                "series": [
-                    {"xAxis": 0, "type": "bar", "name": "Category", "data": [6, 10, 2]}
-                ],
+                "series": [{"xAxis": 0, "type": "bar", "name": "Category", "data": [6, 10, 2]}],
             },
         )

@@ -57,9 +57,7 @@ class SDChartChartTestCase(TestCase):
                 "time": {"useUTC": True},
                 "legend": {"enabled": False},
                 "tooltip": {},
-                "plotOptions": {
-                    "series": {"dataLabels": {"enabled": False}, "shadow": True}
-                },
+                "plotOptions": {"series": {"dataLabels": {"enabled": False}, "shadow": True}},
                 "credits": {"enabled": False},
                 "title": {"text": "Default Title"},
                 "subtitle": {"text": "Default Subtitle"},
@@ -70,9 +68,7 @@ class SDChartChartTestCase(TestCase):
     def test_set_options(self):
         self.assertConfigEqual(self._gen_config(chart_type="table"), {"type": "table"})
 
-        self.assertConfigEqual(
-            self._gen_config(title="Test Title"), {"title": {"text": "Test Title"}}
-        )
+        self.assertConfigEqual(self._gen_config(title="Test Title"), {"title": {"text": "Test Title"}})
 
         self.assertConfigEqual(
             self._gen_config(subtitle="Test Subtitle"),
@@ -84,9 +80,7 @@ class SDChartChartTestCase(TestCase):
             {"time": {"timezoneOffset": 660, "useUTC": True}},
         )
 
-        self.assertConfigEqual(
-            self._gen_config(use_utc=False), {"time": {"useUTC": False}}
-        )
+        self.assertConfigEqual(self._gen_config(use_utc=False), {"time": {"useUTC": False}})
 
         self.assertConfigEqual(self._gen_config(height=400), {"chart": {"height": 400}})
 

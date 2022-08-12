@@ -19,9 +19,7 @@ from analytics.common import register_report
 
 def init_app(app):
     endpoint_name = "publishing_performance_report"
-    service = PublishingPerformanceReportService(
-        endpoint_name, backend=superdesk.get_backend()
-    )
+    service = PublishingPerformanceReportService(endpoint_name, backend=superdesk.get_backend())
     PublishingPerformanceReportResource(endpoint_name, app=app, service=service)
     register_report("publishing_performance_report", "publishing_performance_report")
 

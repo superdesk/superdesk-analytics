@@ -16,11 +16,7 @@ class StatsReportService(BaseReportService):
     repos = ["archive_statistics"]
 
     def get_elastic_index(self, types):
-        return (
-            app.config.get("STATISTICS_ELASTIC_INDEX")
-            or app.config.get("STATISTICS_MONGO_DBNAME")
-            or "statistics"
-        )
+        return app.config.get("STATISTICS_ELASTIC_INDEX") or app.config.get("STATISTICS_MONGO_DBNAME") or "statistics"
 
     def get_es_stats_type(self, query, params):
         query["must"].append({"term": {"stats_type": "archive"}})
@@ -95,13 +91,7 @@ class StatsReportService(BaseReportService):
                 {
                     "nested": {
                         "path": "stats.desk_transitions",
-                        "query": {
-                            "terms": {
-                                "stats.desk_transitions.entered_operation": value[
-                                    "enter"
-                                ]
-                            }
-                        },
+                        "query": {"terms": {"stats.desk_transitions.entered_operation": value["enter"]}},
                     }
                 }
             )
@@ -111,11 +101,7 @@ class StatsReportService(BaseReportService):
                 {
                     "nested": {
                         "path": "stats.desk_transitions",
-                        "query": {
-                            "terms": {
-                                "stats.desk_transitions.exited_operation": value["exit"]
-                            }
-                        },
+                        "query": {"terms": {"stats.desk_transitions.exited_operation": value["exit"]}},
                     }
                 }
             )
@@ -166,9 +152,7 @@ class StatsReportService(BaseReportService):
                                 "filter": {
                                     "and": [
                                         {
-                                            "term": {
-                                                "stats.timeline.operation": "publish"
-                                            },
+                                            "term": {"stats.timeline.operation": "publish"},
                                         },
                                         {"term": {"stats.timeline.par_count": value}},
                                     ]

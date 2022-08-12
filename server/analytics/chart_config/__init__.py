@@ -126,11 +126,7 @@ class ChartConfig:
         :return list: Key names
         """
 
-        return (
-            self.get_single_sorted_keys(data)
-            if not self.is_multi_source()
-            else self.get_multi_sorted_keys(data)
-        )
+        return self.get_single_sorted_keys(data) if not self.is_multi_source() else self.get_multi_sorted_keys(data)
 
     def get_single_sorted_keys(self, data):
         """Generates array of keys for single series data
@@ -158,9 +154,7 @@ class ChartConfig:
             category
             for category, count in sorted(
                 data.items(),
-                key=lambda kv: sum(kv[1].values())
-                if self.sort_order == "asc"
-                else -sum(kv[1].values()),
+                key=lambda kv: sum(kv[1].values()) if self.sort_order == "asc" else -sum(kv[1].values()),
             )
         ]
 
@@ -194,9 +188,7 @@ class ChartConfig:
 
         axis_options = {
             "type": "category",
-            "default_chart_type": "column"
-            if self.chart_type == "table"
-            else self.chart_type,
+            "default_chart_type": "column" if self.chart_type == "table" else self.chart_type,
             "y_title": self.get_y_axis_title(),
             "x_title": chart.get_translation_title(parent["field"]),
             "category_field": parent["field"],
@@ -213,9 +205,7 @@ class ChartConfig:
 
             axis.add_series().set_options(
                 field=parent["field"],
-                data=[
-                    parent["data"][key] for key in self.get_sorted_keys(parent["data"])
-                ],
+                data=[parent["data"][key] for key in self.get_sorted_keys(parent["data"])],
             )
         else:
             child = self.get_child()
@@ -235,10 +225,7 @@ class ChartConfig:
                     stackType="normal",
                     data=[
                         counts.get(child_key) or 0
-                        for counts in [
-                            parent["data"][key]
-                            for key in self.get_sorted_keys(parent["data"])
-                        ]
+                        for counts in [parent["data"][key] for key in self.get_sorted_keys(parent["data"])]
                     ],
                 )
 
@@ -290,9 +277,7 @@ class ChartConfig:
                 "Desk",
                 {
                     str(desk.get("_id")): desk.get("name")
-                    for desk in list(
-                        get_resource_service("desks").get(req=None, lookup={})
-                    )
+                    for desk in list(get_resource_service("desks").get(req=None, lookup={}))
                 },
             )
         elif field == "task.user":
@@ -301,27 +286,17 @@ class ChartConfig:
                 "User",
                 {
                     str(user.get("_id")): user.get("display_name")
-                    for user in list(
-                        get_resource_service("users").get(req=None, lookup={})
-                    )
+                    for user in list(get_resource_service("users").get(req=None, lookup={}))
                 },
             )
         elif field == "anpa_category.qcode":
-            self._set_translation(
-                "anpa_category.qcode", "Category", get_cv_by_qcode("categories", "name")
-            )
+            self._set_translation("anpa_category.qcode", "Category", get_cv_by_qcode("categories", "name"))
         elif field == "genre.qcode":
-            self._set_translation(
-                "genre.qcode", "Genre", get_cv_by_qcode("genre", "name")
-            )
+            self._set_translation("genre.qcode", "Genre", get_cv_by_qcode("genre", "name"))
         elif field == "subject.qcode":
-            self._set_translation(
-                "subject.qcode", "Subject", get_cv_by_qcode("subjectcodes", "name")
-            )
+            self._set_translation("subject.qcode", "Subject", get_cv_by_qcode("subjectcodes", "name"))
         elif field == "urgency":
-            self._set_translation(
-                "urgency", "Urgency", get_cv_by_qcode("urgency", "name")
-            )
+            self._set_translation("urgency", "Urgency", get_cv_by_qcode("urgency", "name"))
         elif field == "state":
             self._set_translation(
                 "state",
@@ -343,9 +318,7 @@ class ChartConfig:
                 "Author",
                 {
                     str(user.get("_id")): user.get("display_name")
-                    for user in list(
-                        get_resource_service("users").get(req=None, lookup={})
-                    )
+                    for user in list(get_resource_service("users").get(req=None, lookup={}))
                 },
             )
 
@@ -400,9 +373,7 @@ class ChartConfig:
             start = datetime.strptime(dates.get("start"), "%Y-%m-%d")
             end = datetime.strptime(dates.get("end"), "%Y-%m-%d")
 
-            return "{} - {}".format(
-                start.strftime("%B %-d, %Y"), end.strftime("%B %-d, %Y")
-            )
+            return "{} - {}".format(start.strftime("%B %-d, %Y"), end.strftime("%B %-d, %Y"))
         elif date_filter == DATE_FILTERS.DAY:
             date_str = params.get("date") or dates.get("date")
             date = datetime.strptime(date_str, "%Y-%m-%d")
@@ -435,17 +406,13 @@ class ChartConfig:
             start = week - timedelta(days=week.weekday() + 1)
             end = start + timedelta(days=6)
 
-            return "{} - {}".format(
-                start.strftime("%B %-d, %Y"), end.strftime("%B %-d, %Y")
-            )
+            return "{} - {}".format(start.strftime("%B %-d, %Y"), end.strftime("%B %-d, %Y"))
         elif date_filter == DATE_FILTERS.THIS_WEEK:
             week = datetime.today()
             start = week - timedelta(days=week.weekday() + 1)
             end = start + timedelta(days=6)
 
-            return "{} - {}".format(
-                start.strftime("%B %-d, %Y"), end.strftime("%B %-d, %Y")
-            )
+            return "{} - {}".format(start.strftime("%B %-d, %Y"), end.strftime("%B %-d, %Y"))
 
         # MONTHS
         elif date_filter == DATE_FILTERS.RELATIVE_MONTHS:

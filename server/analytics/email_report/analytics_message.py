@@ -49,9 +49,7 @@ class AnalyticsMessage(SuperdeskMessage):
             msg.attach(self._mimetext(self.body))
         else:
             # Anything else
-            msg = MIMEMultipart(
-                "related"
-            )  # This fixes embedded images in the html body
+            msg = MIMEMultipart("related")  # This fixes embedded images in the html body
             alternative = MIMEMultipart("alternative")
             alternative.attach(self._mimetext(self.body, "plain"))
             alternative.attach(self._mimetext(self.html, "html"))
@@ -95,9 +93,7 @@ class AnalyticsMessage(SuperdeskMessage):
             except UnicodeEncodeError:
                 filename = ("UTF8", "", filename)
 
-            f.add_header(
-                "Content-Disposition", attachment.disposition, filename=filename
-            )
+            f.add_header("Content-Disposition", attachment.disposition, filename=filename)
 
             for key, value in attachment.headers:
                 f.add_header(key, value)

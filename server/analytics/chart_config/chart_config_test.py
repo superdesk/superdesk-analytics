@@ -427,9 +427,7 @@ class ChartConfigTestCase(TestCase):
             config["series"],
             [{"name": "Category", "data": [1, 3, 4], "type": "column", "xAxis": 0}],
         )
-        self.assertEqual(
-            config["rows"], [["Cricket", 1], ["Advisories", 3], ["Basketball", 4]]
-        )
+        self.assertEqual(config["rows"], [["Cricket", 1], ["Advisories", 3], ["Basketball", 4]])
 
         chart.sort_order = "desc"
         config = chart.gen_config()
@@ -448,9 +446,7 @@ class ChartConfigTestCase(TestCase):
             config["series"],
             [{"name": "Category", "data": [4, 3, 1], "type": "column", "xAxis": 0}],
         )
-        self.assertEqual(
-            config["rows"], [["Basketball", 4], ["Advisories", 3], ["Cricket", 1]]
-        )
+        self.assertEqual(config["rows"], [["Basketball", 4], ["Advisories", 3], ["Cricket", 1]])
 
     def test_generate_multi_column_table(self):
         chart = self._gen_stacked_chart("tid", "table")
@@ -756,6 +752,4 @@ class ChartConfigTestCase(TestCase):
         self.assertEqual(chart.translations, {})
 
         chart.load_translations()
-        self.assertEqual(
-            chart.translations, {"source": {"title": "Source", "names": {}}}
-        )
+        self.assertEqual(chart.translations, {"source": {"title": "Source", "names": {}}})

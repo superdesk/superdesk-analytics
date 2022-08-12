@@ -116,12 +116,8 @@ class SavedReportsService(BaseService):
         """
         User can only create global report if they have 'global_saved_reports' permission
         """
-        if doc.get("is_global", False) and not current_user_has_privilege(
-            "global_saved_reports"
-        ):
-            raise SuperdeskApiError.forbiddenError(
-                "Unauthorized to create global report."
-            )
+        if doc.get("is_global", False) and not current_user_has_privilege("global_saved_reports"):
+            raise SuperdeskApiError.forbiddenError("Unauthorized to create global report.")
 
     @staticmethod
     def _validate_ownership(doc):
@@ -134,27 +130,19 @@ class SavedReportsService(BaseService):
         session_user = get_user(required=True)
         if str(session_user["_id"]) != str(doc.get("user", "")):
             if not doc.get("is_global", False):
-                raise SuperdeskApiError.forbiddenError(
-                    "Unauthorized to modify other user's local report."
-                )
+                raise SuperdeskApiError.forbiddenError("Unauthorized to modify other user's local report.")
             elif not current_user_has_privilege("global_saved_reports"):
-                raise SuperdeskApiError.forbiddenError(
-                    "Unauthorized to modify global report."
-                )
+                raise SuperdeskApiError.forbiddenError("Unauthorized to modify global report.")
 
     def _validate_on_update(self, updates, original):
         self._validate_ownership(original)
 
         scheduled_service = get_resource_service("scheduled_reports")
-        schedules = scheduled_service.get(
-            req=None, lookup={"saved_report": original["_id"]}
-        )
+        schedules = scheduled_service.get(req=None, lookup={"saved_report": original["_id"]})
 
         if schedules.count() > 0:
             if original.get("is_global") and not updates.get("is_global"):
-                raise SuperdeskApiError.badRequestError(
-                    "Cannot remove global flag as schedule(s) are attached"
-                )
+                raise SuperdeskApiError.badRequestError("Cannot remove global flag as schedule(s) are attached")
 
     def _validate_on_delete(self, doc):
         self._validate_ownership(doc)
@@ -163,9 +151,7 @@ class SavedReportsService(BaseService):
         schedules = scheduled_service.get(req=None, lookup={"saved_report": doc["_id"]})
 
         if schedules.count() > 0:
-            raise SuperdeskApiError.badRequestError(
-                "Cannot delete saved report as schedule(s) are attached"
-            )
+            raise SuperdeskApiError.badRequestError("Cannot delete saved report as schedule(s) are attached")
 
     def get_aggregations(self, req, **lookup):
         saved_report = self.find_one(req=req, **lookup)
@@ -177,9 +163,7 @@ class SavedReportsService(BaseService):
             raise SuperdeskApiError.badRequestError("Invalid report type")
 
         if not getattr(report_service, "generate_request_from_saved_report"):
-            raise SuperdeskApiError.internalError(
-                "Cannot generate aggregations from this saved report"
-            )
+            raise SuperdeskApiError.internalError("Cannot generate aggregations from this saved report")
 
         request = report_service.generate_request_from_saved_report(saved_report)
         aggregations = list(report_service.get(request, lookup=None))[0]

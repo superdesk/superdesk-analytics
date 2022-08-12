@@ -102,9 +102,7 @@ class ChartTypes(NamedTuple):
     SPLINE: str
 
 
-CHART_TYPES: ChartTypes = ChartTypes(
-    "bar", "column", "table", "area", "line", "pie", "scatter", "spline"
-)
+CHART_TYPES: ChartTypes = ChartTypes("bar", "column", "table", "area", "line", "pie", "scatter", "spline")
 
 
 class ReportConfigs(NamedTuple):
@@ -113,9 +111,7 @@ class ReportConfigs(NamedTuple):
     DEFAULT_PARAMS: str
 
 
-REPORT_CONFIG: ReportConfigs = ReportConfigs(
-    "date_filters", "chart_types", "default_params"
-)
+REPORT_CONFIG: ReportConfigs = ReportConfigs("date_filters", "chart_types", "default_params")
 
 
 def get_mime_type_extension(mimetype):
@@ -265,9 +261,7 @@ def relative_to_absolute_datetime(value, format, now=None, offset=None):
     """
 
     try:
-        values = re.search(
-            r"^now(?P<offset>(-\d+[mhdwMy])?)(?P<granularity>(/[mhdwMy])?)$", value
-        ).groupdict()
+        values = re.search(r"^now(?P<offset>(-\d+[mhdwMy])?)(?P<granularity>(/[mhdwMy])?)$", value).groupdict()
     except AttributeError as e:
         logger.exception("Value {} is in incorrect relative format".format(value))
         raise

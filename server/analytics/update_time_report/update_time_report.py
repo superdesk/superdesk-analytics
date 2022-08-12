@@ -68,9 +68,7 @@ class UpdateTimeReportService(StatsReportService):
             ]
         )
 
-        query["source"]["query"]["filtered"]["filter"]["bool"]["must_not"].extend(
-            [{"exists": {"field": "rewrite_of"}}]
-        )
+        query["source"]["query"]["filtered"]["filter"]["bool"]["must_not"].extend([{"exists": {"field": "rewrite_of"}}])
 
         return query
 
@@ -86,21 +84,15 @@ class UpdateTimeReportService(StatsReportService):
         chart_params = params.get("chart") or {}
 
         title = chart_params.get("title") or "Update Time"
-        subtitle = chart_params.get("subtitle") or ChartConfig.gen_subtitle_for_dates(
-            params
-        )
+        subtitle = chart_params.get("subtitle") or ChartConfig.gen_subtitle_for_dates(params)
 
         rows = []
 
         def gen_date_str(date):
-            return utc_to_local(app.config["DEFAULT_TIMEZONE"], date).strftime(
-                "%d/%m/%Y %H:%M"
-            )
+            return utc_to_local(app.config["DEFAULT_TIMEZONE"], date).strftime("%d/%m/%Y %H:%M")
 
         def gen_update_string(seconds):
-            times = (utcnow().replace(minute=0, hour=0, second=0)) + timedelta(
-                seconds=seconds
-            )
+            times = (utcnow().replace(minute=0, hour=0, second=0)) + timedelta(seconds=seconds)
             times = times.strftime("%H:%M").split(":")
 
             if int(times[0]) > 0:
@@ -110,9 +102,7 @@ class UpdateTimeReportService(StatsReportService):
 
         for item in items:
             publish_time = item.get("firstpublished")
-            update_time = publish_time + timedelta(
-                seconds=item.get("time_to_next_update_publish")
-            )
+            update_time = publish_time + timedelta(seconds=item.get("time_to_next_update_publish"))
             updated = "{} ({})".format(
                 gen_update_string(item.get("time_to_next_update_publish")),
                 gen_date_str(update_time),

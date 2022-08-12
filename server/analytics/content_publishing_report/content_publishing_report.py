@@ -59,9 +59,7 @@ class ContentPublishingReportService(BaseReportService):
         aggregations = {"parent": self._get_aggregation_query(aggs["group"])}
 
         if aggs.get("subgroup"):
-            aggregations["parent"]["aggs"] = {
-                "child": self._get_aggregation_query(aggs["subgroup"])
-            }
+            aggregations["parent"]["aggs"] = {"child": self._get_aggregation_query(aggs["subgroup"])}
 
         return aggregations
 
@@ -137,9 +135,7 @@ class ContentPublishingReportService(BaseReportService):
                 subgroup_type = subgroup.get("field")
                 subgroup_title = chart_config.get_source_name(subgroup_type)
 
-                return "Published Stories per {} with {} breakdown".format(
-                    group_title, subgroup_title
-                )
+                return "Published Stories per {} with {} breakdown".format(group_title, subgroup_title)
 
             return "Published Stories per {}".format(group_title)
 
