@@ -1,0 +1,21 @@
+[tool.black]
+line-length = 120
+target-version = ['py38']
+include = '\.py$'
+exclude = '''
+(
+    \.eggs
+    | \.git
+    | \.mypy_cache
+    | \.tox
+    | \.env
+    | _build
+    | build
+    | dist
+    | env
+)
+'''
+
+[tool.pytest.ini_options]
+testpaths = ["server/analytics"]
+python_files = "*_test.py *_tests.py test_*.py tests_*.py tests.py test.py"
