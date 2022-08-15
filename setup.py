@@ -3,7 +3,6 @@ from setuptools.command.develop import develop
 from setuptools.command.install import install
 from subprocess import check_call
 from os import path
-from sys import exit
 from distutils import log
 
 
@@ -15,7 +14,6 @@ def install_highcharts():
         )
     except Exception as e:
         log.error('\t**NodeJs not found, report scheduling will not work**:\n\t{}'.format(e))
-        exit(1)
 
 
 class PostDevelopCommand(develop):
