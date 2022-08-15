@@ -57,9 +57,7 @@ LDAP_FQDN = env("LDAP_FQDN", "")
 LDAP_BASE_FILTER = env("LDAP_BASE_FILTER", "")
 
 # change the user depending on the LDAP directory structure
-LDAP_USER_FILTER = env(
-    "LDAP_USER_FILTER", "(&(objectCategory=user)(objectClass=user)(sAMAccountName={}))"
-)
+LDAP_USER_FILTER = env("LDAP_USER_FILTER", "(&(objectCategory=user)(objectClass=user)(sAMAccountName={}))")
 
 # LDAP User Attributes to fetch. Keys would be LDAP Attribute Name and Value would be Supderdesk Model Attribute Name
 LDAP_USER_ATTRIBUTES = json.loads(
@@ -200,12 +198,8 @@ HIGHCHARTS_SERVER_WORK_LIMIT = env("HIGHCHARTS_SERVER_WORK_LIMIT", "10")
 HIGHCHARTS_SERVER_LOG_LEVEL = env("HIGHCHARTS_SERVER_LOG_LEVEL", "4")
 HIGHCHARTS_SERVER_QUEUE_SIZE = env("HIGHCHARTS_SERVER_QUEUE_SIZE", "10")
 HIGHCHARTS_SERVER_RATE_LIMIT = env("HIGHCHARTS_SERVER_RATE_LIMIT", False)
-ANALYTICS_ENABLE_SCHEDULED_REPORTS = strtobool(
-    env("ANALYTICS_ENABLE_SCHEDULED_REPORTS", "false")
-)
+ANALYTICS_ENABLE_SCHEDULED_REPORTS = strtobool(env("ANALYTICS_ENABLE_SCHEDULED_REPORTS", "false"))
 
 # Archive Statistics
 STATISTICS_MONGO_DBNAME = "sptests"
-ANALYTICS_ENABLE_ARCHIVE_STATS = strtobool(
-    env("ANALYTICS_ENABLE_ARCHIVE_STATS", "true")
-)
+ANALYTICS_ENABLE_ARCHIVE_STATS = strtobool(env("ANALYTICS_ENABLE_ARCHIVE_STATS", "true"))

@@ -32,9 +32,7 @@ class FeaturemediaUpdates:
             return
 
         # Store the featuremedia updates for use during future iterations
-        update.update(
-            {ASSOCIATIONS: (entry.get("update") or {}).get(ASSOCIATIONS) or None}
-        )
+        update.update({ASSOCIATIONS: (entry.get("update") or {}).get(ASSOCIATIONS) or None})
 
     def init(self, sender, stats):
         # Clear the featuremedia stats as we'll recalculate them here
@@ -72,11 +70,7 @@ class FeaturemediaUpdates:
             # Calculate featuremedia stats
             associations = update.get(ASSOCIATIONS) or None
 
-            media = (
-                None
-                if associations is None
-                else associations.get("featuremedia") or None
-            )
+            media = None if associations is None else associations.get("featuremedia") or None
 
             # If there are no associations in this update, then media has not changed
             if associations is None:
@@ -158,9 +152,7 @@ class FeaturemediaUpdates:
                     update,
                 )
 
-    def _add_media_operation(
-        self, entry, operation, new_timeline, updates, stats, name, media=None
-    ):
+    def _add_media_operation(self, entry, operation, new_timeline, updates, stats, name, media=None):
         media_operation = deepcopy(entry)
         media_operation["_auto_generated"] = True
         media_operation["operation"] = name
@@ -168,9 +160,7 @@ class FeaturemediaUpdates:
         if media is not None:
             media_operation["update"] = {ASSOCIATIONS: {"featuremedia": media}}
 
-        if operation != name and not entry.get(
-            "_processed", False
-        ):  # and name != OPERATION.PUBLISH:
+        if operation != name and not entry.get("_processed", False):  # and name != OPERATION.PUBLISH:
             new_timeline.append(media_operation)
 
         if updates["_published"]:  # and not operation == OPERATION.PUBLISH:
@@ -178,9 +168,7 @@ class FeaturemediaUpdates:
 
     def _renditions_changed(self, original, updates):
         def poi_changed(original_poi, updated_poi):
-            if original_poi.get("x") != updated_poi.get("x") or original_poi.get(
-                "y"
-            ) != updated_poi.get("y"):
+            if original_poi.get("x") != updated_poi.get("x") or original_poi.get("y") != updated_poi.get("y"):
                 return True
             return False
 
@@ -206,9 +194,7 @@ class FeaturemediaUpdates:
         for key, original_rendition in original_renditions.items():
             updated_rendition = updated_renditions[key]
 
-            if poi_changed(
-                original_rendition.get("poi") or {}, updated_rendition.get("poi") or {}
-            ):
+            if poi_changed(original_rendition.get("poi") or {}, updated_rendition.get("poi") or {}):
                 return True
 
             for attrib in attribs:
@@ -230,20 +216,12 @@ class FeaturemediaUpdates:
             self.rewrite_ids.add(orig["_id"])
 
     def _get_featuremedia(self, entry):
-        return (
-            None
-            if entry is None
-            else ((entry.get("update") or {}).get("associations") or {}).get(
-                "featuremedia"
-            )
-        )
+        return None if entry is None else ((entry.get("update") or {}).get("associations") or {}).get("featuremedia")
 
     def finish(self, sender):
         service = get_resource_service("archive_statistics")
 
-        query = {
-            "query": {"bool": {"must": {"terms": {"_id": list(self.rewrite_ids)}}}}
-        }
+        query = {"query": {"bool": {"must": {"terms": {"_id": list(self.rewrite_ids)}}}}}
         docs = {doc["_id"]: doc for doc in service.search(query)}
 
         def get_parent_id(doc):
@@ -256,9 +234,7 @@ class FeaturemediaUpdates:
 
                 if not parent:
                     # Stats entry for the parent item was not found
-                    logger.warn(
-                        "Failed to get parent item {}".format(doc["rewrite_of"])
-                    )
+                    logger.warn("Failed to get parent item {}".format(doc["rewrite_of"]))
                     return None
                 else:
                     docs[doc["rewrite_of"]] = parent
@@ -285,9 +261,7 @@ class FeaturemediaUpdates:
                 last_entry = next(
                     (
                         entry
-                        for entry in reversed(
-                            (doc.get("stats") or {}).get("timeline") or []
-                        )
+                        for entry in reversed((doc.get("stats") or {}).get("timeline") or [])
                         if entry.get("operation") in FEATUREMEDIA_OPERATIONS
                     ),
                     None,
@@ -314,14 +288,10 @@ class FeaturemediaUpdates:
                 is_new = True
                 original = service.find_one(req=None, _id=doc_id) or {}
 
-            sorted_entries = sorted(
-                stats, key=lambda k: (k["operation_created"], k["history_id"])
-            )
+            sorted_entries = sorted(stats, key=lambda k: (k["operation_created"], k["history_id"]))
 
             last_stat = sorted_entries[0]
-            merged_stats = (
-                [sorted_entries[0]] if self._get_featuremedia(last_stat) else []
-            )
+            merged_stats = [sorted_entries[0]] if self._get_featuremedia(last_stat) else []
 
             for entry in sorted_entries[1:]:
                 current_media = self._get_featuremedia(last_stat)

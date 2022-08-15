@@ -20,9 +20,7 @@ from collections import namedtuple
 from copy import deepcopy
 
 frequencies = ["hourly", "daily", "weekly", "monthly"]
-FREQUENCIES = namedtuple("FREQUENCIES", ["HOURLY", "DAILY", "WEEKLY", "MONTHLY"])(
-    *frequencies
-)
+FREQUENCIES = namedtuple("FREQUENCIES", ["HOURLY", "DAILY", "WEEKLY", "MONTHLY"])(*frequencies)
 
 
 class ScheduledReportsResource(Resource):
@@ -117,21 +115,13 @@ class ScheduledReportsService(BaseService):
 
         # Fix issue with incorrect schedule attributes being stored
         if frequency == "hourly":
-            updates["schedule"].update(
-                {"frequency": "hourly", "hour": -1, "day": -1, "week_days": []}
-            )
+            updates["schedule"].update({"frequency": "hourly", "hour": -1, "day": -1, "week_days": []})
         elif frequency == "daily":
-            updates["schedule"].update(
-                {"frequency": "daily", "hour": hour, "day": -1, "week_days": []}
-            )
+            updates["schedule"].update({"frequency": "daily", "hour": hour, "day": -1, "week_days": []})
         elif frequency == "weekly":
-            updates["schedule"].update(
-                {"frequency": "weekly", "hour": hour, "day": -1, "week_days": week_days}
-            )
+            updates["schedule"].update({"frequency": "weekly", "hour": hour, "day": -1, "week_days": week_days})
         elif frequency == "monthly":
-            updates["schedule"].update(
-                {"frequency": "monthly", "hour": hour, "day": day, "week_days": []}
-            )
+            updates["schedule"].update({"frequency": "monthly", "hour": hour, "day": day, "week_days": []})
 
     @staticmethod
     def _validate_on_create_or_update(doc):
@@ -139,9 +129,7 @@ class ScheduledReportsService(BaseService):
         saved_report = saved_service.find_one(req=None, _id=doc["saved_report"])
 
         if not saved_report.get("is_global"):
-            raise SuperdeskApiError.badRequestError(
-                "A schedule must be attached to a global saved report"
-            )
+            raise SuperdeskApiError.badRequestError("A schedule must be attached to a global saved report")
 
     @staticmethod
     def _push_notification(doc, operation):

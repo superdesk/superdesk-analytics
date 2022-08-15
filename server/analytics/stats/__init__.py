@@ -20,33 +20,23 @@ from .featuremedia_updates import *  # noqa
 
 def init_app(app):
     if not app.config.get("STATISTICS_MONGO_DBNAME"):
-        app.config["STATISTICS_MONGO_DBNAME"] = env(
-            "STATISTICS_MONGO_DBNAME", "statistics"
-        )
+        app.config["STATISTICS_MONGO_DBNAME"] = env("STATISTICS_MONGO_DBNAME", "statistics")
 
     db_name = app.config["STATISTICS_MONGO_DBNAME"]
 
     if not app.config.get("STATISTICS_MONGO_URI"):
-        app.config["STATISTICS_MONGO_URI"] = env(
-            "STATISTICS_MONGO_URI", "mongodb://localhost/%s" % db_name
-        )
+        app.config["STATISTICS_MONGO_URI"] = env("STATISTICS_MONGO_URI", "mongodb://localhost/%s" % db_name)
 
     if not app.config.get("STATISTICS_ELASTIC_URL"):
-        app.config["STATISTICS_ELASTIC_URL"] = env(
-            "STATISTICS_ELASTIC_URL", app.config["ELASTICSEARCH_URL"]
-        )
+        app.config["STATISTICS_ELASTIC_URL"] = env("STATISTICS_ELASTIC_URL", app.config["ELASTICSEARCH_URL"])
 
     if not app.config.get("STATISTICS_ELASTIC_INDEX"):
-        app.config["STATISTICS_ELASTIC_INDEX"] = env(
-            "STATISTICS_ELASTIC_INDEX", db_name
-        )
+        app.config["STATISTICS_ELASTIC_INDEX"] = env("STATISTICS_ELASTIC_INDEX", db_name)
 
     if not app.config.get("STATISTICS_ELASTIC_SETTINGS"):
         # Copy the ``ContentAPI` elastic mapping for the ``Statistics`` type
         # This is so the ``html_field_analyzer`` is used (for the ``headline`` field)
-        app.config["STATISTICS_ELASTIC_SETTINGS"] = app.config[
-            "CONTENTAPI_ELASTICSEARCH_SETTINGS"
-        ]
+        app.config["STATISTICS_ELASTIC_SETTINGS"] = app.config["CONTENTAPI_ELASTICSEARCH_SETTINGS"]
 
     init_gen_stats_task(app)
 

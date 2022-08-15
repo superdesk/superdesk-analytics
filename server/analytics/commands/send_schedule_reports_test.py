@@ -30,9 +30,7 @@ def to_naive(date_str):
 
 
 def to_utc(date_str):
-    return local_to_utc(
-        app.config["DEFAULT_TIMEZONE"], datetime.strptime(date_str, "%Y-%m-%dT%H")
-    )
+    return local_to_utc(app.config["DEFAULT_TIMEZONE"], datetime.strptime(date_str, "%Y-%m-%dT%H"))
 
 
 def to_local(date_str):
@@ -43,9 +41,7 @@ def to_local(date_str):
 
 
 mock_file = b64encode(bytearray(urandom(123)))
-mock_csv = b64encode(
-    "Source,Domestic Sport,Finance\r\nAAP,2,3\r\nAP,5,10\r\n".encode("UTF-8")
-)
+mock_csv = b64encode("Source,Domestic Sport,Finance\r\nAAP,2,3\r\nAP,5,10\r\n".encode("UTF-8"))
 mock_array = [
     {
         "file": b64encode(bytearray(urandom(456))),
@@ -112,16 +108,12 @@ class SendScheduleReportTestCase(TestCase):
 
             if response:
                 # Update the last sent time to now
-                report["_last_sent"] = local_to_utc(
-                    app.config["DEFAULT_TIMEZONE"], now_local
-                )
+                report["_last_sent"] = local_to_utc(app.config["DEFAULT_TIMEZONE"], now_local)
                 count += 1
 
         self.assertEqual(len(expected_hits), count)
 
-    @mock.patch(
-        "analytics.email_report.email_report.generate_report", return_value=mock_file
-    )
+    @mock.patch("analytics.email_report.email_report.generate_report", return_value=mock_file)
     def test_run_hourly_png(self, mocked):
         with self.app.app_context():
             self.app.data.insert("users", mock_users)
@@ -170,9 +162,7 @@ class SendScheduleReportTestCase(TestCase):
 
                 # Test the first email
                 self.assertEqual(outbox[0].sender, "superdesk@test.com")
-                self.assertEqual(
-                    outbox[0].subject, "Superdesk Analytics - Scheduled Report"
-                )
+                self.assertEqual(outbox[0].subject, "Superdesk Analytics - Scheduled Report")
                 self.assertTrue(outbox[0].body.startswith("\nThis is a test email"))
                 self.assertTrue("This is a test email" in outbox[0].html)
                 self.assertTrue('<img src="cid:' in outbox[0].html)
@@ -191,9 +181,7 @@ class SendScheduleReportTestCase(TestCase):
             report = scheduled_service.find_one(req=None, _id="sched1")
             self.assertEqual(report.get("_last_sent"), to_utc("2018-06-30T03"))
 
-    @mock.patch(
-        "analytics.email_report.email_report.generate_report", return_value=mock_file
-    )
+    @mock.patch("analytics.email_report.email_report.generate_report", return_value=mock_file)
     def test_run_daily_jpeg(self, mocked):
         with self.app.app_context():
             self.app.data.insert("users", mock_users)
@@ -241,9 +229,7 @@ class SendScheduleReportTestCase(TestCase):
                         should_have_updated = True
                         self.assertNotIn("_last_sent", report)
                     else:
-                        self.assertEqual(
-                            report.get("_last_sent"), to_utc("2018-06-30T01")
-                        )
+                        self.assertEqual(report.get("_last_sent"), to_utc("2018-06-30T01"))
 
                 # Test that the command sent only 1 email
                 self.assertEqual(len(outbox), 1)
@@ -259,9 +245,7 @@ class SendScheduleReportTestCase(TestCase):
             report = scheduled_service.find_one(req=None, _id="sched1")
             self.assertEqual(report.get("_last_sent"), to_utc("2018-06-30T01"))
 
-    @mock.patch(
-        "analytics.email_report.email_report.generate_report", return_value=mock_csv
-    )
+    @mock.patch("analytics.email_report.email_report.generate_report", return_value=mock_csv)
     def test_email_csv(self, mocked):
         with self.app.app_context():
             self.app.data.insert("users", mock_users)
@@ -351,18 +335,14 @@ class SendScheduleReportTestCase(TestCase):
                     '{}; name="chart_1.png"'.format(MIME_TYPES.PNG),
                 )
                 self.assertEqual(outbox[0].attachments[0].filename, "chart_1.png")
-                self.assertEqual(
-                    outbox[0].attachments[0].data, b64decode(mock_array[0].get("file"))
-                )
+                self.assertEqual(outbox[0].attachments[0].data, b64decode(mock_array[0].get("file")))
 
                 self.assertEqual(
                     outbox[0].attachments[1].content_type,
                     '{}; name="chart_2.png"'.format(MIME_TYPES.PNG),
                 )
                 self.assertEqual(outbox[0].attachments[1].filename, "chart_2.png")
-                self.assertEqual(
-                    outbox[0].attachments[1].data, b64decode(mock_array[1].get("file"))
-                )
+                self.assertEqual(outbox[0].attachments[1].data, b64decode(mock_array[1].get("file")))
 
     def test_send_report_hourly(self):
         # Test every hour
@@ -370,9 +350,7 @@ class SendScheduleReportTestCase(TestCase):
             report={"schedule": {"frequency": "hourly", "hour": -1}},
             start="2018-06-30T00",
             end="2018-06-30T23",
-            expected_hits=[
-                to_local("2018-06-30T{}".format(hour)) for hour in range(0, 24)
-            ],
+            expected_hits=[to_local("2018-06-30T{}".format(hour)) for hour in range(0, 24)],
         )
 
         # Test every hour, already sent this hour
@@ -383,9 +361,7 @@ class SendScheduleReportTestCase(TestCase):
             },
             start="2018-06-30T00",
             end="2018-06-30T23",
-            expected_hits=[
-                to_local("2018-06-30T{}".format(hour)) for hour in range(14, 24)
-            ],
+            expected_hits=[to_local("2018-06-30T{}".format(hour)) for hour in range(14, 24)],
         )
 
     def test_send_report_hour_of_the_day(self):
@@ -409,9 +385,7 @@ class SendScheduleReportTestCase(TestCase):
             expected_hits=[to_local("2018-06-30T10")],
         )
         # Test running this day again
-        self._test(
-            report=report, start="2018-06-30T00", end="2018-06-30T23", expected_hits=[]
-        )
+        self._test(report=report, start="2018-06-30T00", end="2018-06-30T23", expected_hits=[])
 
         # Test exact hour, already sent this hour
         self._test(
@@ -430,9 +404,7 @@ class SendScheduleReportTestCase(TestCase):
             report={"schedule": {"frequency": "daily", "hour": 8}},
             start="2018-06-01T00",
             end="2018-06-30T23",
-            expected_hits=[
-                to_local("2018-06-{}T08".format(day)) for day in range(1, 31)
-            ],
+            expected_hits=[to_local("2018-06-{}T08".format(day)) for day in range(1, 31)],
         )
 
     def test_send_report_weekly(self):

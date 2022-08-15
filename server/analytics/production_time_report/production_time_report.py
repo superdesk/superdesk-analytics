@@ -38,11 +38,7 @@ class ProductionTimeReportResource(Resource):
 
 
 class ProductionTimeReportService(StatsReportService):
-    aggregations = {
-        "operations": {
-            "terms": {"field": "stats.timeline.operation", "size": MAX_TERMS_SIZE}
-        }
-    }
+    aggregations = {"operations": {"terms": {"field": "stats.timeline.operation", "size": MAX_TERMS_SIZE}}}
     histogram_source_field = "stats.timeline.operation_created"
     date_filter_field = "versioncreated"
 
@@ -70,13 +66,7 @@ class ProductionTimeReportService(StatsReportService):
                                     "field": "stats.desk_transitions.desk",
                                     "size": MAX_TERMS_SIZE,
                                 },
-                                "aggs": {
-                                    "stats": {
-                                        "stats": {
-                                            "field": "stats.desk_transitions.duration"
-                                        }
-                                    }
-                                },
+                                "aggs": {"stats": {"stats": {"field": "stats.desk_transitions.duration"}}},
                             }
                         },
                     }
@@ -125,21 +115,13 @@ class ProductionTimeReportService(StatsReportService):
         sort_order = chart_params.get("sort_order") or "desc"
 
         def get_sum_stats(desk_id):
-            return sum(
-                [
-                    value
-                    for stat, value in desk_stats[desk_id].items()
-                    if stat in stat_types
-                ]
-            )
+            return sum([value for stat, value in desk_stats[desk_id].items() if stat in stat_types])
 
         sorted_desk_ids = [
             desk_id
             for desk_id in sorted(
                 desk_ids,
-                key=lambda kv: get_sum_stats(kv)
-                if sort_order == "asc"
-                else -get_sum_stats(kv),
+                key=lambda kv: get_sum_stats(kv) if sort_order == "asc" else -get_sum_stats(kv),
             )
         ]
 
@@ -192,8 +174,7 @@ class ProductionTimeReportService(StatsReportService):
                 stack=0,
                 stack_type="normal",
                 data=[
-                    gen_data_entry((desk_stats.get(desk_id) or {}).get(stat_type) or 0)
-                    for desk_id in sorted_desk_ids
+                    gen_data_entry((desk_stats.get(desk_id) or {}).get(stat_type) or 0) for desk_id in sorted_desk_ids
                 ],
             )
 

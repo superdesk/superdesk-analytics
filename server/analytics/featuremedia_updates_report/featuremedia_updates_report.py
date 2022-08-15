@@ -117,9 +117,7 @@ class FeaturemediaUpdatesTimeReportService(StatsReportService):
             featuremedia_updates = stats.get("featuremedia_updates") or []
 
             try:
-                featuremedia = get_featuremedia(
-                    featuremedia_updates[0].get("update") or {}
-                )
+                featuremedia = get_featuremedia(featuremedia_updates[0].get("update") or {})
                 original_image = {
                     "_id": featuremedia.get("_id"),
                     "guid": featuremedia.get("guid"),
@@ -169,21 +167,15 @@ class FeaturemediaUpdatesTimeReportService(StatsReportService):
         items = report.get("items") or []
 
         title = chart_params.get("title") or "Changes to Featuremedia"
-        subtitle = chart_params.get("subtitle") or ChartConfig.gen_subtitle_for_dates(
-            params
-        )
+        subtitle = chart_params.get("subtitle") or ChartConfig.gen_subtitle_for_dates(params)
 
         translations = ChartConfig.get_translations(["task.user", "operation"])
         user_translations = (translations.get("task_user") or {}).get("names") or {}
-        operation_translations = (translations.get("operation") or {}).get(
-            "names"
-        ) or {}
+        operation_translations = (translations.get("operation") or {}).get("names") or {}
         rows = []
 
         def gen_date_str(date):
-            return utc_to_local(app.config["DEFAULT_TIMEZONE"], date).strftime(
-                "%d/%m/%Y %H:%M"
-            )
+            return utc_to_local(app.config["DEFAULT_TIMEZONE"], date).strftime("%d/%m/%Y %H:%M")
 
         for item in items:
             original_image = item.get("original_image") or {}
@@ -193,8 +185,7 @@ class FeaturemediaUpdatesTimeReportService(StatsReportService):
                 updates.append(
                     "{} - {} by {}".format(
                         gen_date_str(parse_date(update.get("operation_created"))),
-                        operation_translations.get(update.get("operation"))
-                        or update.get("operation"),
+                        operation_translations.get(update.get("operation")) or update.get("operation"),
                         user_translations.get(update.get("user")) or "",
                     )
                 )
@@ -204,9 +195,7 @@ class FeaturemediaUpdatesTimeReportService(StatsReportService):
                     gen_date_str(item.get("versioncreated")),
                     user_translations.get(item.get("original_creator")) or "",
                     item.get("slugline") or "",
-                    original_image.get("headline")
-                    or original_image.get("alt_text")
-                    or "",
+                    original_image.get("headline") or original_image.get("alt_text") or "",
                     "<ul><li>{}</li></ul>".format("</li><li>".join(updates)),
                 ]
             )

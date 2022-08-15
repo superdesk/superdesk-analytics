@@ -65,9 +65,7 @@ class Series:
         if self.field is None:
             return self.name
         elif self.name is not None:
-            name = (self.chart.get_translation_names(self.field) or {}).get(
-                self.name
-            ) or self.name
+            name = (self.chart.get_translation_names(self.field) or {}).get(self.name) or self.name
         else:
             name = self.chart.get_translation_title(self.field) or self.name
 

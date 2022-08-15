@@ -67,9 +67,7 @@ class UserActivityReportService(StatsReportService):
             stats = doc.get("stats") or {}
 
             def calc_timestamp(entry):
-                entry["operation_timestamp"] = parse_date(
-                    entry.get("operation_created")
-                ).timestamp()
+                entry["operation_timestamp"] = parse_date(entry.get("operation_created")).timestamp()
 
                 return entry
 
@@ -83,11 +81,7 @@ class UserActivityReportService(StatsReportService):
                 "activity": [],
             }
 
-            locks = [
-                lock
-                for lock in timeline
-                if lock.get("operation") in ["item_lock", "item_unlock"]
-            ]
+            locks = [lock for lock in timeline if lock.get("operation") in ["item_lock", "item_unlock"]]
 
             user_id = ((args.get("params") or {}).get("must") or {}).get("user_locks")
             current_lock = None

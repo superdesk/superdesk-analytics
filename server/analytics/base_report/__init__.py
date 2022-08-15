@@ -64,9 +64,7 @@ class BaseReportService(SearchService):
         Overriding from the base SearchService so we can control which stages to include.
         """
         if self.exclude_stages_with_global_read_off:
-            stages = get_resource_service("stages").get_stages_by_visibility(
-                is_visible=False
-            )
+            stages = get_resource_service("stages").get_stages_by_visibility(is_visible=False)
             return [str(stage["_id"]) for stage in stages]
 
         return []
@@ -115,9 +113,7 @@ class BaseReportService(SearchService):
 
         for aggregation_id in aggregation_ids:
             aggregations = docs.get("aggregations") or {}
-            buckets[aggregation_id] = (aggregations.get(aggregation_id) or {}).get(
-                "buckets"
-            ) or []
+            buckets[aggregation_id] = (aggregations.get(aggregation_id) or {}).get("buckets") or []
 
         return buckets
 
@@ -281,9 +277,7 @@ class BaseReportService(SearchService):
         docs = self.elastic.search(query, types, params={})
 
         for resource in types:
-            response = {
-                app.config["ITEMS"]: [doc for doc in docs if doc["_type"] == resource]
-            }
+            response = {app.config["ITEMS"]: [doc for doc in docs if doc["_type"] == resource]}
             getattr(app, "on_fetched_resource")(resource, response)
             getattr(app, "on_fetched_resource_%s" % resource)(response)
 
@@ -351,9 +345,7 @@ class BaseReportService(SearchService):
     def _es_filter_categories(self, query, categories, must, params):
         field = params.get("category_field") or "qcode"
 
-        query[must].append(
-            {"terms": {"anpa_category.{}".format(field): sorted(categories)}}
-        )
+        query[must].append({"terms": {"anpa_category.{}".format(field): sorted(categories)}})
 
     def _es_filter_sources(self, query, sources, must, params):
         query[must].append({"terms": {"source": sorted(sources)}})
@@ -399,11 +391,7 @@ class BaseReportService(SearchService):
 
     def _es_set_repos(self, query, params):
         query["repo"] = ",".join(
-            [
-                repo
-                for repo, value in sorted((params.get("repos") or {}).items())
-                if value and repo
-            ]
+            [repo for repo, value in sorted((params.get("repos") or {}).items()) if value and repo]
         )
 
     def _es_set_size(self, query, params):
@@ -565,9 +553,7 @@ class BaseReportService(SearchService):
 
                 funcs = query_funcs.get(field)
 
-                values = (
-                    filters if not funcs.get("values") else funcs["values"](filters)
-                )
+                values = filters if not funcs.get("values") else funcs["values"](filters)
                 func = funcs.get("query")
 
                 if (isinstance(values, list) and len(values) < 1) or not func:
@@ -593,14 +579,12 @@ class BaseReportService(SearchService):
         query_keys = query.keys()
 
         if len(query.get("should") or []) > 0:
-            es_query["source"]["query"]["filtered"]["filter"]["bool"]["should"] = query[
-                "should"
-            ]
+            es_query["source"]["query"]["filtered"]["filter"]["bool"]["should"] = query["should"]
 
         if "minimum_should_match" in query_keys:
-            es_query["source"]["query"]["filtered"]["filter"]["bool"][
+            es_query["source"]["query"]["filtered"]["filter"]["bool"]["minimum_should_match"] = query[
                 "minimum_should_match"
-            ] = query["minimum_should_match"]
+            ]
 
         if "size" in query_keys:
             es_query["source"]["size"] = query["size"]

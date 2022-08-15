@@ -44,13 +44,9 @@ class SDChartAxisTestCase(TestCase):
             {"xAxis": [{"type": "datetime", "allowDecimals": False}]},
         )
 
-        self.assertConfigEqual(
-            self._gen_config(default_chart_type="column"), {"chart": {"zoomType": "x"}}
-        )
+        self.assertConfigEqual(self._gen_config(default_chart_type="column"), {"chart": {"zoomType": "x"}})
 
-        self.assertConfigEqual(
-            self._gen_config(default_chart_type="bar"), {"chart": {"zoomType": "y"}}
-        )
+        self.assertConfigEqual(self._gen_config(default_chart_type="bar"), {"chart": {"zoomType": "y"}})
 
         self.assertConfigEqual(
             self._gen_config(categories=["cat1", "cat2", "cat3"]),

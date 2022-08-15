@@ -116,6 +116,4 @@ class ReportConfigsService(Service):
 
         config["date_filters"] = updated_config["date_filters"]
         config["chart_types"] = updated_config["chart_types"]
-        config["default_params"] = (
-            config.get("default_params") or default_config["default_params"]
-        )
+        config["default_params"] = config.get("default_params") or default_config["default_params"]

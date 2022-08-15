@@ -22,9 +22,7 @@ def init_app(app):
         return
 
     endpoint_name = "production_time_report"
-    service = ProductionTimeReportService(
-        endpoint_name, backend=superdesk.get_backend()
-    )
+    service = ProductionTimeReportService(endpoint_name, backend=superdesk.get_backend())
     ProductionTimeReportResource(endpoint_name, app=app, service=service)
 
     register_report("production_time_report", "production_time_report")
