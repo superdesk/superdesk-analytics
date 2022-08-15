@@ -18,4 +18,6 @@ if [ "$SERVER" == "true" ]; then
     cd ..
     chmod a+x server/scripts/install-highcharts-export-server.sh
     pip install -e .
+    cd server/scripts
+    ./install-highcharts-export-server.sh
 fi
