@@ -1,5 +1,24 @@
 # Superdesk Analytics Changelog
 
+## [2.5.0] 2022-10-28
+### Fixes
+- [SDESK-6489] fix: Copy ContentAPI es settings for Statistics (#140)
+- [SDESK-6490] fix: Use Highcharts cli instead of the HTTP server (#141)
+- [SDESK-6490] fix: Install highcharts cli locally (#142)
+
+## [2.1.2] 2021-03-03
+### Fixes
+- fix(schema): Production Time not returning data (#137)
+
+## [2.1.1] 2021-02-26
+### Fixes
+- [SDESK-5839] fix(elastic): Show more than 10 entries in reports (#136)
+
+## * Release 2.1.0 - 2021-02-11
+
+## [2.1.0-rc.1] 2021-01-28
+- Update Superdesk & Planning to release/2.1 branch
+
 ## [2.0.0] 2020-10-28
 ### Features
 
