@@ -1,5 +1,9 @@
 # Superdesk Analytics Changelog
 
+## [2.5.1] 2022-10-28
+### Fixes
+- [SDESK-6588] fix: Make table reports use full width available (#144)
+
 ## [2.5.0] 2022-10-28
 ### Fixes
 - [SDESK-6489] fix: Copy ContentAPI es settings for Statistics (#140)
