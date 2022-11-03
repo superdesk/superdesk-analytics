@@ -152,12 +152,19 @@ def get_report_service(report_type):
 
 
 def get_highcharts_cli_path() -> Optional[str]:
-    highcharts_cli_path = env("HIGHCHARTS_CLI_PATH", path.join(
-        ANALYTICS_PATH,
-        "node_modules/.bin/highcharts-export-server",
-    ))
+    highcharts_cli_path = env(
+        "HIGHCHARTS_CLI_PATH",
+        path.join(
+            ANALYTICS_PATH,
+            "node_modules/.bin/highcharts-export-server",
+        ),
+    )
 
-    return highcharts_cli_path if path.exists(highcharts_cli_path) else which("highcharts-export-server")
+    return (
+        highcharts_cli_path
+        if path.exists(highcharts_cli_path)
+        else which("highcharts-export-server")
+    )
 
 
 def get_cv_by_qcode(name, field=None):
