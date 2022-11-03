@@ -8,12 +8,14 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-from typing import NamedTuple
+from typing import NamedTuple, Optional
 from os import path
+from shutil import which
 
 from superdesk import get_resource_service
 from superdesk.utc import utcnow, utc_to_local
-from subprocess import check_call, PIPE
+from superdesk.default_settings import env
+
 from flask import current_app as app
 import pytz
 from datetime import datetime, timedelta
@@ -149,13 +151,13 @@ def get_report_service(report_type):
         return None
 
 
-def get_highcharts_cli_path():
-    highcharts_cli_path = path.join(
+def get_highcharts_cli_path() -> Optional[str]:
+    highcharts_cli_path = env("HIGHCHARTS_CLI_PATH", path.join(
         ANALYTICS_PATH,
         "node_modules/.bin/highcharts-export-server",
-    )
+    ))
 
-    return highcharts_cli_path if path.exists(highcharts_cli_path) else None
+    return highcharts_cli_path if path.exists(highcharts_cli_path) else which("highcharts-export-server")
 
 
 def get_cv_by_qcode(name, field=None):
