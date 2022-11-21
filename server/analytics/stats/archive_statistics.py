@@ -254,30 +254,33 @@ class ArchiveStatisticsResource(Resource):
     }
 
 
+LAST_RUN_DOC_ID = "last_run"
+
+
 class ArchiveStatisticsService(BaseService):
-    def get_last_run(self):
-        return self.find_one(req=None, stats_type="last_run") or {}
+    def get_last_run_guid(self):
+        return (self.find_one(req=None, _id=LAST_RUN_DOC_ID) or {}).get("guid")
 
-    def set_last_run_id(self, entry_id, last_run=None):
-        if not (last_run or {}).get(config.ID_FIELD):
-            last_run = self.get_last_run()
+    def set_last_run_guid(self, entry_id):
+        try:
+            self.patch(LAST_RUN_DOC_ID, {"guid": entry_id})
+            return
+        except SuperdeskApiError as e:
+            # Failed to patch last run doc
+            # log the error and delete last run doc
+            logger.error(f"Patch `last_run` doc failed, attempting to recreate it. {e}")
+            self.delete(lookup={config.ID_FIELD: LAST_RUN_DOC_ID})
 
-        last_run_id = (last_run or {}).get(config.ID_FIELD)
-        if last_run_id:
-            try:
-                self.patch(last_run_id, {"guid": entry_id})
-            except SuperdeskApiError as e:
-                # Failed to patch last run doc
-                # log the error
-                # delete last run doc(s)
-                # and create a new one
-                logger.error(
-                    f"Patch `last_run` doc {last_run_id} failed, attempting to recreate it. {e}"
-                )
-                self.delete(lookup={"stats_type": "last_run"})
-                self.post([{"guid": entry_id, "stats_type": "last_run"}])
-        else:
-            self.post([{"guid": entry_id, "stats_type": "last_run"}])
+        # Last run doc doesn't exist, create it now
+        self.post(
+            [
+                {
+                    config.ID_FIELD: LAST_RUN_DOC_ID,
+                    "guid": entry_id,
+                    "stats_type": "last_run",
+                }
+            ]
+        )
 
     def get_history_items(self, last_id, gte, item_id, chunk_size=0):
         history_service = get_resource_service("archive_history")
