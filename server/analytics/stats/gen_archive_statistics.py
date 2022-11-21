@@ -194,15 +194,12 @@ class GenArchiveStatistics(Command):
 
         statistics_service = get_resource_service("archive_statistics")
 
-        # Get the system record from the last run
-        # This document stores the id of the last processed archive_history item
-        last_history = statistics_service.get_last_run()
-        last_entry_id = last_history.get("guid") or None
-
-        if last_history.get("guid"):
+        # Get the ID of the last processed item from ``archive_history``
+        last_entry_id = statistics_service.get_last_run_guid()
+        if last_entry_id:
             logger.info(
                 "Found previous run, continuing from history item {}".format(
-                    last_history["guid"]
+                    last_entry_id
                 )
             )
 
@@ -241,7 +238,7 @@ class GenArchiveStatistics(Command):
         if not item_id:
             # Create/Update the system record from this run
             # Storing the id of the last processed archive_history item
-            statistics_service.set_last_run_id(last_entry_id, last_history)
+            statistics_service.set_last_run_guid(last_entry_id)
 
         return items_processed, failed_ids, num_history_items
 

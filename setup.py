@@ -32,6 +32,9 @@ class PostInstallCommand(install):
 
 package_data = {
     "scripts": ["*.sh"],
+    "analytics": [
+        "data_updates/*.py",
+    ],
 }
 
 
