@@ -265,7 +265,7 @@ class ArchiveStatisticsService(BaseService):
         try:
             self.patch(LAST_RUN_DOC_ID, {"guid": entry_id})
             return
-        except SuperdeskApiError as e:
+        except (SuperdeskApiError, AttributeError) as e:
             # Failed to patch last run doc
             # log the error and delete last run doc
             logger.error(f"Patch `last_run` doc failed, attempting to recreate it. {e}")
