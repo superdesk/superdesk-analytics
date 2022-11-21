@@ -8,6 +8,7 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
+from os import path
 import superdesk
 
 from analytics.report_configs import ReportConfigsResource, ReportConfigsService
@@ -41,6 +42,8 @@ from superdesk.default_settings import celery_queue, crontab
 
 __version__ = "2.5.1"
 
+SERVER_PATH = path.dirname(path.realpath(__file__))
+
 
 def init_schedule_task(app):
     # Now check the application config to see if scheduled reports is enabled
@@ -73,6 +76,9 @@ def init_schedule_task(app):
             "task": "analytics.send_scheduled_reports",
             "schedule": crontab(minute="0"),  # Runs once every hour
         }
+
+    app.config.setdefault("APPS_DATA_UPDATES_PATHS", [])
+    app.config["APPS_DATA_UPDATES_PATHS"].append(path.join(SERVER_PATH, "data_updates"))
 
 
 def init_app(app):
