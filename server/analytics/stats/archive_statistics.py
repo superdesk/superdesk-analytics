@@ -9,6 +9,8 @@
 # at https://www.sourcefabric.org/superdesk/license
 
 
+import logging
+
 from superdesk import get_resource_service, json
 from superdesk.services import BaseService
 from superdesk.resource import Resource, not_indexed, not_analyzed, not_enabled
@@ -21,11 +23,14 @@ from superdesk.metadata.item import (
     BYLINE,
 )
 from superdesk.metadata.utils import item_url
+from superdesk.errors import SuperdeskApiError
 from apps.archive.common import ARCHIVE_SCHEMA_FIELDS
 
 from analytics.stats.common import STAT_TYPE
 
 from eve.utils import config, ParsedRequest, date_to_str
+
+logger = logging.getLogger(__name__)
 
 
 class ArchiveStatisticsResource(Resource):
@@ -254,11 +259,23 @@ class ArchiveStatisticsService(BaseService):
         return self.find_one(req=None, stats_type="last_run") or {}
 
     def set_last_run_id(self, entry_id, last_run=None):
-        if last_run is None:
+        if not (last_run or {}).get(config.ID_FIELD):
             last_run = self.get_last_run()
 
-        if last_run and last_run.get(config.ID_FIELD):
-            self.patch(last_run[config.ID_FIELD], {"guid": entry_id})
+        last_run_id = (last_run or {}).get(config.ID_FIELD)
+        if last_run_id:
+            try:
+                self.patch(last_run_id, {"guid": entry_id})
+            except SuperdeskApiError as e:
+                # Failed to patch last run doc
+                # log the error
+                # delete last run doc(s)
+                # and create a new one
+                logger.error(
+                    f"Patch `last_run` doc {last_run_id} failed, attempting to recreate it. {e}"
+                )
+                self.delete(lookup={"stats_type": "last_run"})
+                self.post([{"guid": entry_id, "stats_type": "last_run"}])
         else:
             self.post([{"guid": entry_id, "stats_type": "last_run"}])
 
