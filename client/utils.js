@@ -292,3 +292,15 @@ export const convertHtmlStringToText = (data) => {
 
     return text;
 };
+
+export function getWeekDayIndex(weekday) {
+    return [
+        'sunday',
+        'monday',
+        'tuesday',
+        'wednesday',
+        'thursday',
+        'friday',
+        'saturday',
+    ].indexOf(weekday);
+}

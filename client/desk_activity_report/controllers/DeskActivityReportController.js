@@ -6,11 +6,13 @@ import {
     ENTER_DESK_OPERATIONS,
     EXIT_DESK_OPERATIONS,
     gettext,
+    getWeekDayIndex,
 } from '../../utils';
 import {CHART_FIELDS, CHART_TYPES} from '../../charts/directives/ChartOptions';
 import {SDChart} from '../../charts/SDChart';
 import {REPORT_CONFIG} from '../../services/ReportConfigService';
 import {searchReportService} from '../../search/services/SearchReport';
+import {superdeskApi} from 'superdeskApi';
 
 DeskActivityReportController.$inject = [
     '$scope',
@@ -360,7 +362,7 @@ export function DeskActivityReportController(
             chartType: 'highcharts',
             title: $scope.generateTitle(),
             subtitle: $scope.generateSubtitle(),
-            startOfWeek: appConfig.start_of_week || appConfig.startingDay || 0,
+            startOfWeek: getWeekDayIndex(superdeskApi.instance.settings.locale.firstDayOfWeek),
             timezoneOffset: utcOffset,
             useUTC: false,
             fullHeight: false,
