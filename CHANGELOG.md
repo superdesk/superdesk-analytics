@@ -1,5 +1,14 @@
 # Superdesk Analytics Changelog
 
+## [v2.6.0-rc1] 2022-12-12
+### Improvements
+- chore: Enable CI on Python 3.10 (#143)
+
+### Fixes
+- fix(build): Replace sass table border var with css var (8fda4d0)
+- fix(flake8): Remove hash from config (8bd3b7b)
+- fix(mypy): Add optional to _run_highcharts_cli signature (166e68b)
+
 ## [2.5.1] 2022-10-28
 ### Fixes
 - [SDESK-6588] fix: Make table reports use full width available (#144)
