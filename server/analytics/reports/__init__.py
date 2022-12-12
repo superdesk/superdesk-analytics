@@ -135,7 +135,7 @@ def _get_mimetype_short(mimetype: str):
         return "jpg"
 
 
-def _run_highcharts_cli(in_file: str, out_file: str, mimetype: str, width: int = None):
+def _run_highcharts_cli(in_file: str, out_file: str, mimetype: str, width: Optional[int] = None):
     try:
         highcharts_cli = get_highcharts_cli_path()
 
