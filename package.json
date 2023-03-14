@@ -19,7 +19,13 @@
   "license": "AGPL-3.0",
   "homepage": "https://github.com/superdesk/superdesk-analytics#readme",
   "dependencies": {
+    "angular-embed": "github:superdesk/angular-embed#d75968e",
+    "angular-embedly": "github:Urigo/angular-embedly#0.0.8",
     "highcharts": "^6.2.0",
+    "lodash": "4.17.19",
+    "moment": "2.20.1",
+    "moment-timezone": "0.5.14",
+    "rangy": "1.3.0",
     "ts-loader": "3.5.0",
     "twix": "^1.1.5"
   },
@@ -43,15 +49,7 @@
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^2.0.13",
     "superdesk-code-style": "1.5.0",
-    "superdesk-core": "github:superdesk/superdesk-client-core#hotfix/2.6.2",
+    "superdesk-core": "github:superdesk/superdesk-client-core#release/2.6",
     "superdesk-ui-framework": "3.0.0-rc12"
-  },
-  "peerDependencies": {
-    "angular-embed": "github:superdesk/angular-embed#d75968e",
-    "angular-embedly": "github:Urigo/angular-embedly#0.0.8",
-    "lodash": "^4.17.19",
-    "moment": "^2.29.4",
-    "moment-timezone": "^0.5.41",
-    "rangy": "1.3.0"
   }
 }
