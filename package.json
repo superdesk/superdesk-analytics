@@ -23,8 +23,8 @@
     "angular-embedly": "github:Urigo/angular-embedly#0.0.8",
     "highcharts": "^6.2.0",
     "lodash": "4.17.19",
-    "moment": "2.20.1",
-    "moment-timezone": "0.5.14",
+    "moment": "^2.29.4",
+    "moment-timezone": "^0.5.41",
     "rangy": "1.3.0",
     "ts-loader": "3.5.0",
     "twix": "^1.1.5"
