@@ -126,7 +126,6 @@ class PublishingPerformanceReportService(BaseReportService):
                 report["subgroups"][state_key] += doc_count
 
         if args and args.get("show_all_desks"):
-
             desk_with_no_articles = {
                 "killed": 0,
                 "corrected": 0,
