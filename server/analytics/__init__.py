@@ -39,7 +39,7 @@ from analytics.common import get_highcharts_cli_path, register_report
 from superdesk.celery_app import celery
 from superdesk.default_settings import celery_queue, crontab
 
-__version__ = "2.6.0-dev"
+__version__ = "2.6.0rc1"
 
 
 def init_schedule_task(app):
