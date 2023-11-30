@@ -40,7 +40,7 @@ from analytics.common import get_highcharts_cli_path, register_report
 from superdesk.celery_app import celery
 from superdesk.default_settings import celery_queue, crontab
 
-__version__ = "2.5.1"
+__version__ = "2.5.2"
 
 SERVER_PATH = path.dirname(path.realpath(__file__))
 

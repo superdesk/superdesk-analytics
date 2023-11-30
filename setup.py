@@ -40,7 +40,7 @@ package_data = {
 
 setup(
     name="superdesk-analytics",
-    version="2.5.1",
+    version="2.5.2",
     package_dir={'': 'server'},
     packages=find_packages('server'),
     package_data=package_data,
