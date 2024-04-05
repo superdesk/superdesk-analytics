@@ -29,7 +29,7 @@ class GenerateReportTestCase(TestCase):
             report = generate_report(options, mimetype=MIME_TYPES.SVG, base64=False)
 
             # Report is a buffer of bytes with size > 0
-            self.assertTrue(type(report) == bytes)
+            self.assertTrue(isinstance(report, bytes))
             self.assertTrue(len(report) > 0)
 
             # The bytes buffer represents an xml/svg file
@@ -47,7 +47,7 @@ class GenerateReportTestCase(TestCase):
             report = generate_report(options, mimetype=MIME_TYPES.PNG, base64=False, width=800)
 
             # Report is a buffer of bytes with size > 0
-            self.assertTrue(type(report) == bytes)
+            self.assertTrue(isinstance(report, bytes))
             self.assertTrue(len(report) > 0)
 
             image = Image.open(BytesIO(report))
@@ -67,7 +67,7 @@ class GenerateReportTestCase(TestCase):
             report = generate_report(options, mimetype=MIME_TYPES.JPEG, base64=False, width=1200)
 
             # Report is a buffer of bytes with size > 0
-            self.assertTrue(type(report) == bytes)
+            self.assertTrue(isinstance(report, bytes))
             self.assertTrue(len(report) > 0)
 
             image = Image.open(BytesIO(report))
@@ -87,7 +87,7 @@ class GenerateReportTestCase(TestCase):
             report = generate_report(options, mimetype=MIME_TYPES.PDF, base64=False, width=1200)
 
             # Report is a buffer of bytes with size > 0
-            self.assertTrue(type(report) == bytes)
+            self.assertTrue(isinstance(report, bytes))
             self.assertTrue(len(report) > 0)
 
             # PDF header/footer signature
