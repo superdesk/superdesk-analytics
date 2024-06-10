@@ -102,6 +102,12 @@ class BaseReportService(SearchService):
         """
         return {}
 
+    def get_custom_aggs_query(self, query, aggs):
+        """
+        Overwrite this method to update the query
+        """
+        return {}
+
     def get_aggregation_buckets(self, docs, aggregation_ids=None):
         """
         Retrieves the aggregation buckets from the documents provided
@@ -273,6 +279,8 @@ class BaseReportService(SearchService):
             set_filters(query, filters)
 
         index = self.get_elastic_index(types)
+
+        self.get_custom_aggs_query(query, aggs)
 
         docs = self.elastic.search(query, types, params={})
 

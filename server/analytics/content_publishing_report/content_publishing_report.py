@@ -11,6 +11,7 @@
 from analytics.base_report import BaseReportService, BaseReportResource
 from analytics.chart_config import ChartConfig
 from analytics.common import MAX_TERMS_SIZE
+import json
 
 
 class ContentPublishingReportResource(BaseReportResource):
@@ -90,7 +91,11 @@ class ContentPublishingReportService(BaseReportService):
 
             report["groups"][parent_key] = {}
 
-            for child in (parent.get("child") or {}).get("buckets") or []:
+            for child in (
+                (parent.get("child") or {}).get("buckets")
+                or (parent.get("child_aggs", {}).get("child", {}).get("buckets"))
+                or []
+            ):
                 child_key = child.get("key")
 
                 if not child_key:
@@ -151,3 +156,50 @@ class ContentPublishingReportService(BaseReportService):
         report["highcharts"] = [chart_config.gen_config()]
 
         return report
+
+    def get_aggregation_buckets(self, docs, aggregation_ids=None):
+        buckets = {}
+        filtered_subjects = docs.get("aggregations", {}).get("parent", {}).get("qcode_filter")
+        if filtered_subjects:
+            buckets[aggregation_ids[0]] = filtered_subjects.get("qcode_terms", {}).get("buckets") or []
+            return buckets
+
+        return super().get_aggregation_buckets(docs, aggregation_ids)
+
+    def get_custom_aggs_query(self, query, aggs):
+        field = self.parse_field_param(aggs.get("parent", {}).get("terms", {}).get("field"))
+        if field:
+            # Construct the nested aggregation query
+            qcode_terms_agg = {"terms": {"field": "subject.qcode", "size": 1000}}
+
+            # Retrieve child aggregations if any
+            child = self.get_child_aggs(query)
+            if child:
+                qcode_terms_agg["aggs"] = {"child_aggs": {"reverse_nested": {}, "aggs": child}}
+
+            query["aggs"]["parent"] = {
+                "nested": {"path": "subject"},
+                "aggs": {
+                    "qcode_filter": {
+                        "filter": {"term": {"subject.scheme": field}},
+                        "aggs": {"qcode_terms": qcode_terms_agg},
+                    }
+                },
+            }
+
+    def get_child_aggs(self, query):
+        parent_aggs = query.get("aggs", {}).get("parent", {})
+        if "aggs" in parent_aggs:
+            return parent_aggs["aggs"]
+        return {}
+
+    def parse_field_param(self, field_param):
+        try:
+            # Check if the field_param is a JSON string and parse it
+            field_dict = json.loads(field_param)
+            if isinstance(field_dict, dict) and "scheme" in field_dict:
+                return field_dict["scheme"]
+        except json.JSONDecodeError:
+            pass
+
+        return None
