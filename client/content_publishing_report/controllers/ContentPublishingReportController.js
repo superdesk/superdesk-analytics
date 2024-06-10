@@ -85,7 +85,7 @@ export function ContentPublishingReportController(
         );
 
         $scope.report_groups = searchReportService.filterDataFields(
-            ['anpa_category.qcode', 'genre.qcode', 'source', 'urgency', 'subject.qcode']
+            ['anpa_category.qcode', 'genre.qcode', 'source', 'urgency', 'subject.qcode', 'authors.parent', 'language']
         );
 
         $scope.currentParams = {
@@ -118,7 +118,9 @@ export function ContentPublishingReportController(
 
         $scope.defaultReportParams = _.cloneDeep($scope.currentParams);
 
-        $scope.group_by = _.cloneDeep($scope.report_groups);
+        $scope.group_by = [...$scope.report_groups, ...$scope.config?.group_by.filter(
+            (item) => !new Set($scope.report_groups.map((item) => item.name)).has(item.name))];
+
         $scope.updateGroupOptions();
     };
 
@@ -342,7 +344,14 @@ export const generateTitle = (chart, params) => {
         return params.chart.title;
     }
 
-    const parentField = _.get(params, 'aggs.group.field');
+    let parentField = _.get(params, 'aggs.group.field');
+
+    if (parentField.startsWith('{"scheme')) {
+        const obj = JSON.parse(parentField);
+
+        parentField = obj?.scheme || '';
+    }
+
     const parentName = chart.getSourceName(parentField);
 
     if (_.get(params, 'aggs.subgroup.field.length', 0) > 0) {

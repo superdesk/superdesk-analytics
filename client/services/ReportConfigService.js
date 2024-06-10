@@ -10,6 +10,7 @@ export const REPORT_CONFIG = {
     DATE_FILTERS: 'date_filters',
     CHART_TYPES: 'chart_types',
     DEFAULT_PARAMS: 'default_params',
+    GROUP_BY: 'group_by',
 };
 
 /**

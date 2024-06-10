@@ -121,6 +121,9 @@ function getSupportedDataFields(): Array<IDataFilter> {
     }, {
         qcode: DATA_FIELD.STATE,
         name: gettext('State'),
+    }, {
+        qcode: DATA_FIELD.LANGUAGE,
+        name: gettext('Language'),
     }];
 }
 

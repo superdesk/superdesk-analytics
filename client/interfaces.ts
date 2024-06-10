@@ -40,6 +40,7 @@ export enum DATA_FIELD {
     SUBJECT = 'subject.qcode',
     AUTHOR = 'authors.parent',
     STATE = 'state',
+    LANGUAGE = 'language'
 }
 
 export enum REPORT_RESPONSE_TYPE {
@@ -125,6 +126,7 @@ export interface IReportParams extends IBaseReportParams {
     };
     repos?: IReposFilter;
     return_type?: REPORT_RESPONSE_TYPE;
+    show_all_desks?: number;
 }
 
 export interface IReportPayload {
@@ -136,6 +138,7 @@ export interface IReportPayload {
     max_results?: number;
     page?: number;
     sort?: Array<{ [key: string]: string }>;
+    show_all_desks?: number;
 }
 
 export interface IAnalyticsConfig extends ISuperdeskGlobalConfig {
