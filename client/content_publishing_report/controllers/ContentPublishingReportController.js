@@ -354,6 +354,13 @@ export const generateTitle = (chart, params) => {
 
     let parentField = _.get(params, 'aggs.group.field');
 
+    if (parentField.startsWith('{"scheme')) {
+        const obj = JSON.parse(parentField);
+
+        parentField = getCustomVocabulariesData().find(
+            (value) => value.qcode.scheme == obj.scheme)?.name;
+    }
+
     const parentName = chart.getSourceName(parentField);
 
     if (_.get(params, 'aggs.subgroup.field.length', 0) > 0) {
