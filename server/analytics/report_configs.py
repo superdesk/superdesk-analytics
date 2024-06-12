@@ -31,7 +31,6 @@ class ReportConfigsResource(Resource):
         REPORT_CONFIG.DATE_FILTERS: {"type": "dict"},
         REPORT_CONFIG.CHART_TYPES: {"type": "dict"},
         REPORT_CONFIG.DEFAULT_PARAMS: {"type": "dict"},
-        REPORT_CONFIG.GROUP_BY: {"type": "list"},
     }
 
 
@@ -69,7 +68,6 @@ base_config = {
         DATE_FILTERS.LAST_YEAR: {"enabled": True},
         DATE_FILTERS.THIS_YEAR: {"enabled": True},
     },
-    REPORT_CONFIG.GROUP_BY: [],
 }
 
 
@@ -85,8 +83,6 @@ class ReportConfigsService(Service):
             for key, val in base_config.items():
                 if key not in default_config:
                     default_config[key] = val
-            if report_id == "content_publishing_report":
-                default_config[REPORT_CONFIG.GROUP_BY] = self.get_group_by_values()
 
             config = next((c for c in configs if c.get("_id") == report_id), None)
 
@@ -121,12 +117,3 @@ class ReportConfigsService(Service):
         config["date_filters"] = updated_config["date_filters"]
         config["chart_types"] = updated_config["chart_types"]
         config["default_params"] = config.get("default_params") or default_config["default_params"]
-
-    def get_group_by_values(self):
-        non_subj_fields = ["languages", "genre", "author_roles"]
-        vocab_service = get_resource_service("vocabularies").get_custom_vocabularies()
-        return [
-            {"name": voc["display_name"], "qcode": {"scheme": voc["_id"]}}
-            for voc in vocab_service
-            if voc["_id"] not in non_subj_fields
-        ]

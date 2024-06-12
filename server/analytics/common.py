@@ -109,10 +109,9 @@ class ReportConfigs(NamedTuple):
     DATE_FILTERS: str
     CHART_TYPES: str
     DEFAULT_PARAMS: str
-    GROUP_BY: str
 
 
-REPORT_CONFIG: ReportConfigs = ReportConfigs("date_filters", "chart_types", "default_params", "group_by")
+REPORT_CONFIG: ReportConfigs = ReportConfigs("date_filters", "chart_types", "default_params")
 
 
 def get_mime_type_extension(mimetype):
