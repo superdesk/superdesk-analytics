@@ -355,10 +355,7 @@ export const generateTitle = (chart, params) => {
     let parentField = _.get(params, 'aggs.group.field');
 
     if (parentField.startsWith('{"scheme')) {
-        const obj = JSON.parse(parentField);
-
-        parentField = getCustomVocabulariesData().find(
-            (value) => value.qcode.scheme == obj.scheme)?.name;
+        parentField = getCustomVocabFieldName(parentField);
     }
 
     const parentName = chart.getSourceName(parentField);
@@ -376,8 +373,21 @@ export const generateTitle = (chart, params) => {
     return gettext('Published Stories per {{group}}', {group: parentName});
 };
 
+export function getCustomVocabFieldName(field) {
+    const obj = JSON.parse(field);
+
+    return getCustomVocabulariesData().find(
+        (value) => value.qcode.scheme == obj.scheme)?.name;
+}
+
 export function getCustomVocabulariesData() {
-    return superdeskApi.entities.vocabulary.getCustomVocabulary().map((data) => {
-        return {'name': data['display_name'], 'qcode': {'scheme': data['_id']}};
-    });
+    const superdeskVocab = superdeskApi.entities.vocabulary;
+
+    return superdeskVocab
+        .getAllVocabulary()
+        .filter((vocabulary) => superdeskVocab.isCustomVocabulary(vocabulary))
+        .map((data) => ({
+            name: data.display_name,
+            qcode: {scheme: data._id},
+        }));
 }

@@ -2,6 +2,7 @@ import {forEach, get, sum, drop, cloneDeep} from 'lodash';
 
 import {Axis} from './Axis';
 import {convertHtmlStringToText} from '../../utils';
+import {getCustomVocabFieldName} from '../../content_publishing_report/controllers/ContentPublishingReportController';
 
 /**
  * @ngdoc class
@@ -795,7 +796,12 @@ export class Chart {
      * @description Helper function to get the translated title for a field
      */
     getTranslationTitle(field) {
-        return this.getTranslation(field).title || field;
+        let _field = field;
+
+        if (_field.startsWith('{"scheme')) {
+            _field = getCustomVocabFieldName(_field);
+        }
+        return this.getTranslation(_field).title || _field;
     }
 
     /**
