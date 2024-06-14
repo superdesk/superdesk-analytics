@@ -377,7 +377,8 @@ export function getCustomVocabFieldName(field) {
     const obj = JSON.parse(field);
 
     return getCustomVocabulariesData().find(
-        (value) => value.qcode.scheme == obj.scheme)?.name;
+        (value) => value.qcode.scheme == obj.scheme
+    )?.name;
 }
 
 export function getCustomVocabulariesData() {
