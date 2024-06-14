@@ -385,7 +385,8 @@ export function getCustomVocabulariesData() {
     const superdeskVocab = superdeskApi.entities.vocabulary;
 
     return superdeskVocab
-        .getAllVocabulary()
+        .getAll()
+        .toArray()
         .filter((vocabulary) => superdeskVocab.isCustomVocabulary(vocabulary))
         .map((data) => ({
             name: data.display_name,
