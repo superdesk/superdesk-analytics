@@ -8,13 +8,13 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
+from datetime import datetime
+
+from superdesk.core import get_app_config
 from superdesk import Command, command, Option, get_resource_service
 from superdesk.logging import logger
 from superdesk.errors import SuperdeskApiError
 from superdesk.utc import utc_to_local, utcnow, local_to_utc
-
-from flask import current_app as app
-from datetime import datetime
 
 
 class SendScheduledReports(Command):
@@ -40,19 +40,17 @@ class SendScheduledReports(Command):
     ]
 
     def run(self, now=None):
+        default_timezone = get_app_config("DEFAULT_TIMEZONE")
         if now:
             now_utc = (
                 now
                 if isinstance(now, datetime)
-                else local_to_utc(
-                    app.config["DEFAULT_TIMEZONE"],
-                    datetime.strptime(now, "%Y-%m-%dT%H"),
-                )
+                else local_to_utc(default_timezone, datetime.strptime(now, "%Y-%m-%dT%H"))
             )
         else:
             now_utc = utcnow()
 
-        now_local = utc_to_local(app.config["DEFAULT_TIMEZONE"], now_utc)
+        now_local = utc_to_local(default_timezone, now_utc)
 
         logger.info("Starting to send scheduled reports: {}".format(now_utc))
 
@@ -99,7 +97,7 @@ class SendScheduledReports(Command):
 
         last_sent = None
         if scheduled_report.get("_last_sent"):
-            last_sent = utc_to_local(app.config["DEFAULT_TIMEZONE"], scheduled_report.get("_last_sent")).replace(
+            last_sent = utc_to_local(get_app_config("DEFAULT_TIMEZONE"), scheduled_report.get("_last_sent")).replace(
                 minute=0, second=0, microsecond=0
             )
 

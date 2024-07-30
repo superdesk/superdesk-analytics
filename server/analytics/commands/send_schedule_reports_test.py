@@ -8,6 +8,14 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
+from datetime import datetime
+from dateutil.rrule import rrule, HOURLY
+import pytz
+from unittest import mock
+from os import urandom
+from base64 import b64encode, b64decode
+
+from superdesk.core import get_app_config
 from superdesk import get_resource_service
 from superdesk.utc import local_to_utc
 
@@ -16,13 +24,7 @@ from analytics.commands.send_scheduled_reports import SendScheduledReports
 from analytics.common import MIME_TYPES
 from analytics.email_report.email_report import EmailReportService
 
-from datetime import datetime
-from flask import current_app as app
-from dateutil.rrule import rrule, HOURLY
-import pytz
-from unittest import mock
-from os import urandom
-from base64 import b64encode, b64decode
+
 
 
 def to_naive(date_str):
@@ -30,11 +32,11 @@ def to_naive(date_str):
 
 
 def to_utc(date_str):
-    return local_to_utc(app.config["DEFAULT_TIMEZONE"], datetime.strptime(date_str, "%Y-%m-%dT%H"))
+    return local_to_utc(get_app_config("DEFAULT_TIMEZONE"), datetime.strptime(date_str, "%Y-%m-%dT%H"))
 
 
 def to_local(date_str):
-    local_tz = pytz.timezone(app.config["DEFAULT_TIMEZONE"])
+    local_tz = pytz.timezone(get_app_config("DEFAULT_TIMEZONE"))
     local_datetime = datetime.strptime(date_str, "%Y-%m-%dT%H")
 
     return local_tz.localize(local_datetime)
@@ -94,8 +96,9 @@ class SendScheduleReportTestCase(TestCase):
 
     def _test(self, report, start, end, expected_hits):
         count = 0
+        default_timezone = get_app_config("DEFAULT_TIMEZONE")
         for now in rrule(HOURLY, dtstart=to_naive(start), until=to_naive(end)):
-            local_tz = pytz.timezone(app.config["DEFAULT_TIMEZONE"])
+            local_tz = pytz.timezone(default_timezone)
             now_local = local_tz.localize(now)
 
             response = self.should_send(report, now_local)
@@ -108,7 +111,7 @@ class SendScheduleReportTestCase(TestCase):
 
             if response:
                 # Update the last sent time to now
-                report["_last_sent"] = local_to_utc(app.config["DEFAULT_TIMEZONE"], now_local)
+                report["_last_sent"] = local_to_utc(default_timezone, now_local)
                 count += 1
 
         self.assertEqual(len(expected_hits), count)
@@ -145,11 +148,12 @@ class SendScheduleReportTestCase(TestCase):
             # Simulate running every hour for a few hours
             start_date = to_naive("2018-06-30T00")
             end_date = to_naive("2018-06-30T03")
-            local_tz = pytz.timezone(app.config["DEFAULT_TIMEZONE"])
+            default_timezone = get_app_config("DEFAULT_TIMEZONE")
+            local_tz = default_timezone
             with self.app.mail.record_messages() as outbox:
                 for now in rrule(HOURLY, dtstart=start_date, until=end_date):
                     now_local = local_tz.localize(now)
-                    now_utc = local_to_utc(app.config["DEFAULT_TIMEZONE"], now_local)
+                    now_utc = local_to_utc(default_timezone, now_local)
 
                     SendScheduledReports().run(now_utc)
 
@@ -214,11 +218,12 @@ class SendScheduleReportTestCase(TestCase):
             start_date = to_naive("2018-06-30T00")
             end_date = to_naive("2018-06-30T03")
             should_have_updated = False
+            default_timezone = get_app_config("DEFAULT_TIMEZONE")
             with self.app.mail.record_messages() as outbox:
                 for now in rrule(HOURLY, dtstart=start_date, until=end_date):
-                    local_tz = pytz.timezone(app.config["DEFAULT_TIMEZONE"])
+                    local_tz = pytz.timezone(default_timezone)
                     now_local = local_tz.localize(now)
-                    now_utc = local_to_utc(app.config["DEFAULT_TIMEZONE"], now_local)
+                    now_utc = local_to_utc(default_timezone, now_local)
 
                     SendScheduledReports().run(now_utc)
 

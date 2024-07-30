@@ -8,7 +8,9 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
+from eve.utils import ParsedRequest, date_to_str
 
+from superdesk.resource_fields import ID_FIELD
 from superdesk import get_resource_service, json
 from superdesk.services import BaseService
 from superdesk.resource import Resource, not_indexed, not_analyzed, not_enabled
@@ -24,8 +26,6 @@ from superdesk.metadata.utils import item_url
 from apps.archive.common import ARCHIVE_SCHEMA_FIELDS
 
 from analytics.stats.common import STAT_TYPE
-
-from eve.utils import config, ParsedRequest, date_to_str
 
 
 class ArchiveStatisticsResource(Resource):
@@ -44,7 +44,7 @@ class ArchiveStatisticsResource(Resource):
     query_objectid_as_string = True
 
     schema = {
-        config.ID_FIELD: metadata_schema[config.ID_FIELD],
+        ID_FIELD: metadata_schema[ID_FIELD],
         "guid": metadata_schema["guid"],
         "stats_type": {"type": "string"},
         "stats": {
@@ -257,8 +257,8 @@ class ArchiveStatisticsService(BaseService):
         if last_run is None:
             last_run = self.get_last_run()
 
-        if last_run and last_run.get(config.ID_FIELD):
-            self.patch(last_run[config.ID_FIELD], {"guid": entry_id})
+        if last_run and last_run.get(ID_FIELD):
+            self.patch(last_run[ID_FIELD], {"guid": entry_id})
         else:
             self.post([{"guid": entry_id, "stats_type": "last_run"}])
 
@@ -292,5 +292,5 @@ class ArchiveStatisticsService(BaseService):
             if len(items) < 1:
                 break
 
-            last_processed_id = items[-1][config.ID_FIELD]
+            last_processed_id = items[-1][ID_FIELD]
             yield items

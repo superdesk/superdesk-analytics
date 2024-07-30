@@ -8,9 +8,10 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-from flask import json, current_app as app
 from eve_elastic.elastic import set_filters, ElasticCursor
 
+from superdesk.core import json, get_app_config, get_current_app
+from superdesk.resource_fields import ITEMS
 from superdesk import get_resource_service, es_utils
 from superdesk.resource import Resource
 from superdesk.utils import ListCursor
@@ -272,8 +273,9 @@ class BaseReportService(SearchService):
         filters = self._get_filters(types, excluded_stages)
 
         # if the system has a setting value for the maximum search depth then apply the filter
-        if not app.settings["MAX_SEARCH_DEPTH"] == -1:
-            query["terminate_after"] = app.settings["MAX_SEARCH_DEPTH"]
+        max_search_depth = get_app_config("MAX_SEARCH_DEPTH")
+        if max_search_depth != -1:
+            query["terminate_after"] = max_search_depth
 
         if filters:
             set_filters(query, filters)
@@ -284,8 +286,9 @@ class BaseReportService(SearchService):
 
         docs = self.elastic.search(query, types, params={})
 
+        app = get_current_app().as_any()
         for resource in types:
-            response = {app.config["ITEMS"]: [doc for doc in docs if doc["_type"] == resource]}
+            response = {ITEMS: [doc for doc in docs if doc["_type"] == resource]}
             getattr(app, "on_fetched_resource")(resource, response)
             getattr(app, "on_fetched_resource_%s" % resource)(response)
 
@@ -330,7 +333,7 @@ class BaseReportService(SearchService):
         return ListCursor([report])
 
     def get_utc_offset(self):
-        return get_timezone_offset(app.config["DEFAULT_TIMEZONE"], utcnow())
+        return get_timezone_offset(get_app_config("DEFAULT_TIMEZONE"), utcnow())
 
     def format_date(self, date, end_of_day=False):
         time_suffix = "T23:59:59" if end_of_day else "T00:00:00"

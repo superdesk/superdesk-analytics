@@ -8,6 +8,13 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
+from email.charset import Charset, QP
+from base64 import b64decode
+from uuid import uuid4
+from bson import ObjectId
+
+from superdesk.core import get_current_app, get_app_config
+from superdesk.flask import render_template
 from superdesk.services import BaseService
 from superdesk.resource import Resource
 from superdesk.errors import SuperdeskApiError
@@ -22,12 +29,6 @@ from analytics.common import (
 )
 from analytics.reports import generate_report
 from .analytics_message import AnalyticsMessage
-
-from flask import current_app as app, render_template
-from email.charset import Charset, QP
-from base64 import b64decode
-from uuid import uuid4
-from bson import ObjectId
 
 
 class EmailReportResource(Resource):
@@ -175,7 +176,7 @@ class EmailReportService(BaseService):
             kwargs={
                 "_id": str(ObjectId()),
                 "subject": email.get("subject"),
-                "sender": email.get("sender") or app.config["ADMINS"][0],
+                "sender": email.get("sender") or get_app_config("ADMINS")[0],
                 "recipients": email.get("recipients"),
                 "text_body": txt.get("body") or "",
                 "html_body": html.get("body") or "",
@@ -261,6 +262,7 @@ def send_email_report(
             html_body=html_body.replace("\r", "").replace("\n", "<br>"),
             reports=reports,
         )
+        app = get_current_app()
 
         return app.mail.send(msg)
     except Exception as e:
