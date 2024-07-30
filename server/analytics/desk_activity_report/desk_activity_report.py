@@ -8,6 +8,9 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
+from datetime import datetime
+
+from superdesk.core import get_app_config
 from superdesk.resource import Resource
 from superdesk.errors import SuperdeskApiError
 
@@ -20,9 +23,6 @@ from analytics.common import (
     CHART_TYPES,
     MAX_TERMS_SIZE,
 )
-
-from flask import current_app as app
-from datetime import datetime
 
 
 class DeskActivityReportResource(Resource):
@@ -202,7 +202,7 @@ class DeskActivityReportService(BaseReportService):
                 title=title,
                 subtitle=subtitle,
                 chart_type="highcharts",
-                start_of_week=app.config.get("START_OF_WEEK") or 0,
+                start_of_week=get_app_config("START_OF_WEEK") or 0,
                 timezone_offset=timezone_offset,
                 use_utc=False,
                 legend_title="Desk Transitions",

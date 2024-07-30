@@ -8,7 +8,7 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-from flask import current_app as app
+from superdesk.core import get_app_config
 from analytics.base_report import BaseReportService
 
 
@@ -16,7 +16,7 @@ class StatsReportService(BaseReportService):
     repos = ["archive_statistics"]
 
     def get_elastic_index(self, types):
-        return app.config.get("STATISTICS_ELASTIC_INDEX") or app.config.get("STATISTICS_MONGO_DBNAME") or "statistics"
+        return get_app_config("STATISTICS_ELASTIC_INDEX") or get_app_config("STATISTICS_MONGO_DBNAME") or "statistics"
 
     def get_es_stats_type(self, query, params):
         query["must"].append({"term": {"stats_type": "archive"}})

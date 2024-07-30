@@ -8,8 +8,6 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-from superdesk.emails import SuperdeskMessage
-
 import re
 import unicodedata
 
@@ -18,7 +16,6 @@ from email.encoders import encode_base64
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 
-from flask import current_app
 from flask_mail import (
     sanitize_subject,
     sanitize_address,
@@ -26,6 +23,9 @@ from flask_mail import (
     force_text,
     formatdate,
 )
+
+from superdesk.core import get_current_app
+from superdesk.emails import SuperdeskMessage
 
 string_types = (str,)
 text_type = str
@@ -35,7 +35,7 @@ message_policy = policy.SMTP
 class AnalyticsMessage(SuperdeskMessage):
     def _message(self):
         """Creates email as 'multipart/related' instead of 'multipart/mixed'"""
-        ascii_attachments = current_app.extensions["mail"].ascii_attachments
+        ascii_attachments = get_current_app().extensions["mail"].ascii_attachments
         encoding = self.charset or "utf-8"
 
         attachments = self.attachments or []

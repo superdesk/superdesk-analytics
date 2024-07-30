@@ -8,6 +8,10 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
+from copy import deepcopy
+from datetime import timedelta
+
+from superdesk.resource_fields import ID_FIELD
 from superdesk import Command, command, get_resource_service, Option
 from superdesk.logging import logger
 from superdesk.utc import utcnow
@@ -28,10 +32,6 @@ from superdesk.signals import signals
 
 from analytics.stats.common import STAT_TYPE, OPERATION
 from analytics.stats import desk_transitions
-
-from eve.utils import config
-from copy import deepcopy
-from datetime import timedelta
 
 gen_stats_signals = {
     "start": signals.signal("gen_archive_statistics:start"),
@@ -207,7 +207,7 @@ class GenArchiveStatistics(Command):
             gen_stats_signals["start"].send(self)
 
             num_history_items += len(history_items)
-            last_entry_id = history_items[-1].get(config.ID_FIELD)
+            last_entry_id = history_items[-1].get(ID_FIELD)
 
             items = self.gen_history_timelines(history_items)
             items_processed += len(items)
@@ -277,7 +277,7 @@ class GenArchiveStatistics(Command):
             except Exception:
                 logger.exception(
                     "Failed to process archive_history for item:{} history:{}".format(
-                        item_id, history_item.get(config.ID_FIELD)
+                        item_id, history_item.get(ID_FIELD)
                     )
                 )
 
@@ -288,7 +288,7 @@ class GenArchiveStatistics(Command):
 
         task = history["update"].get("task") or {}
         entry = {
-            "history_id": history.get(config.ID_FIELD),
+            "history_id": history.get(ID_FIELD),
             "operation": history.get("operation"),
             "operation_created": history.get("_created"),
             "task": {
@@ -420,8 +420,8 @@ class GenArchiveStatistics(Command):
             if item["updates"].get("rewrite_of") and (item["updates"].get("time_to_first_publish") or 0) > 0:
                 rewrites.append(item_id)
 
-            if not item["item"].get(config.ID_FIELD):
-                item["updates"][config.ID_FIELD] = item_id
+            if not item["item"].get(ID_FIELD):
+                item["updates"][ID_FIELD] = item_id
                 item["updates"]["stats_type"] = "archive"
                 items_to_create.append(item["updates"])
             else:
@@ -437,7 +437,7 @@ class GenArchiveStatistics(Command):
             try:
                 statistics_service.post(items_to_create)
             except Exception:
-                item_ids = [item.get(config.ID_FIELD) for item in items_to_create]
+                item_ids = [item.get(ID_FIELD) for item in items_to_create]
                 logger.exception("Failed to create stat entries for items {}".format(", ".join(item_ids)))
                 failed_ids.extend(failed_ids)
 
