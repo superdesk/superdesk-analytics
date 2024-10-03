@@ -101,6 +101,7 @@ class ContentPublishingReportService(BaseReportService):
                     .get("qcode_terms", {})
                     .get("buckets")
                 )
+                or (parent.get("child", {}).get("qcode_filter", {}).get("qcode_terms", {}).get("buckets"))
                 or []
             ):
                 child_key = child.get("key")
@@ -174,49 +175,56 @@ class ContentPublishingReportService(BaseReportService):
         return super().get_aggregation_buckets(docs, aggregation_ids)
 
     def get_custom_aggs_query(self, query, aggs):
-        field = self.parse_field_param(aggs.get("parent", {}).get("terms", {}).get("field"))
-        if field:
-            # Construct the terms aggregation for qcode
-            qcode_terms_agg = {"terms": {"field": "subject.qcode", "size": 1000}}
+        # reterive parent field
+        parent_field = self.parse_field_param(aggs.get("parent", {}).get("terms", {}).get("field"))
 
-            # Retrieve child aggregations if any
-            child = self.get_child_aggs(query)
-            if child:
-                child_field = self.parse_field_param(child.get("child", {}).get("terms", {}).get("field"))
-                if child_field:
-                    # Create child aggregation structure for Vocabularies
-                    qcode_terms_agg["aggs"] = {
-                        "child_aggs": {
-                            "reverse_nested": {},
-                            "aggs": {
-                                "child_qcode_filter": {
-                                    "nested": {"path": "subject"},
-                                    "aggs": {
-                                        "qcode_filter": {
-                                            "filter": {"term": {"subject.scheme": child_field}},
-                                            "aggs": {
-                                                "qcode_terms": {"terms": {"field": "subject.qcode", "size": 1000}}
-                                            },
-                                        }
-                                    },
-                                }
-                            },
-                        }
-                    }
-                else:
-                    # If no child_field is found, include the predefined child aggregation
-                    qcode_terms_agg["aggs"] = {"child_aggs": {"reverse_nested": {}, "aggs": child}}
+        # reterive child field
+        child = self.get_child_aggs(query)
+        child_field = self.parse_field_param(child.get("child", {}).get("terms", {}).get("field")) if child else None
 
-            # Construct the parent aggregation
-            query["aggs"]["parent"] = {
+        # helper function
+        def construct_nested_query(field):
+            return {
                 "nested": {"path": "subject"},
                 "aggs": {
                     "qcode_filter": {
                         "filter": {"term": {"subject.scheme": field}},
+                        "aggs": {"qcode_terms": {"terms": {"field": "subject.qcode", "size": 1000}}},
+                    }
+                },
+            }
+
+        # if parent field is a schema field
+        if parent_field:
+            # Construct the terms aggregation for qcode
+            qcode_terms_agg = {"terms": {"field": "subject.qcode", "size": 1000}}
+
+            if child_field:
+                # Create child aggregation structure
+                qcode_terms_agg["aggs"] = {
+                    "child_aggs": {
+                        "reverse_nested": {},
+                        "aggs": {"child_qcode_filter": construct_nested_query(child_field)},
+                    }
+                }
+            else:
+                # If child_field is not a schema field, include the predefined child aggregation
+                qcode_terms_agg["aggs"] = {"child_aggs": {"reverse_nested": {}, "aggs": child}}
+
+            # Construct the parent-child combine aggregation
+            query["aggs"]["parent"] = {
+                "nested": {"path": "subject"},
+                "aggs": {
+                    "qcode_filter": {
+                        "filter": {"term": {"subject.scheme": parent_field}},
                         "aggs": {"qcode_terms": qcode_terms_agg},
                     }
                 },
             }
+
+        # if parent field is not schema field but child field is schema field
+        if not parent_field and child_field:
+            query["aggs"]["parent"]["aggs"]["child"] = construct_nested_query(child_field)
 
     def get_child_aggs(self, query):
         parent_aggs = query.get("aggs", {}).get("parent", {})
