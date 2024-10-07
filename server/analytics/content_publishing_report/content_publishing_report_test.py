@@ -66,7 +66,6 @@ class ContentPublishingReportTestCase(TestCase):
 
     def test_get_aggregation_buckets(self):
         with self.app.app_context():
-
             params = {
                 "source": {
                     "query": {
