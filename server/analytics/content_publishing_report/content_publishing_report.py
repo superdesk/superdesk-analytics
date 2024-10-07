@@ -12,6 +12,7 @@ from analytics.base_report import BaseReportService, BaseReportResource
 from analytics.chart_config import ChartConfig
 from analytics.common import MAX_TERMS_SIZE
 import json
+from flask import current_app as app
 
 
 class ContentPublishingReportResource(BaseReportResource):
@@ -175,6 +176,7 @@ class ContentPublishingReportService(BaseReportService):
         return super().get_aggregation_buckets(docs, aggregation_ids)
 
     def get_custom_aggs_query(self, query, aggs):
+        terms_aggs_size = app.config.get("TERMS_AGGREGATION_SIZE", 1000)
         # reterive parent field
         parent_field = self.parse_field_param(aggs.get("parent", {}).get("terms", {}).get("field"))
 
@@ -189,7 +191,7 @@ class ContentPublishingReportService(BaseReportService):
                 "aggs": {
                     "qcode_filter": {
                         "filter": {"term": {"subject.scheme": field}},
-                        "aggs": {"qcode_terms": {"terms": {"field": "subject.qcode", "size": 1000}}},
+                        "aggs": {"qcode_terms": {"terms": {"field": "subject.qcode", "size": terms_aggs_size}}},
                     }
                 },
             }
@@ -197,7 +199,7 @@ class ContentPublishingReportService(BaseReportService):
         # if parent field is a schema field
         if parent_field:
             # Construct the terms aggregation for qcode
-            qcode_terms_agg = {"terms": {"field": "subject.qcode", "size": 1000}}
+            qcode_terms_agg = {"terms": {"field": "subject.qcode", "size": terms_aggs_size}}
 
             if child_field:
                 # Create child aggregation structure
