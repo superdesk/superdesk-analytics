@@ -188,8 +188,8 @@ export function ContentPublishingReportController(
             (item) => !new Set($scope.report_groups.map((item) => item.name)).has(item.name))];
 
         $scope.subgroup_by = _.filter(
-            $scope.report_groups,
-            (group) => group.qcode !== $scope.currentParams.params.aggs.group.field
+            $scope.group_by,
+            (group) => JSON.stringify(group.qcode) !== $scope.currentParams.params.aggs.group.field
         );
 
         if (_.get($scope, 'currentParams.params.aggs.subgroup.field.length', 0) < 1) {
@@ -361,7 +361,11 @@ export const generateTitle = (chart, params) => {
     const parentName = chart.getSourceName(parentField);
 
     if (_.get(params, 'aggs.subgroup.field.length', 0) > 0) {
-        const childField = _.get(params, 'aggs.subgroup.field');
+        let childField = _.get(params, 'aggs.subgroup.field');
+
+        if (childField.startsWith('{"scheme')) {
+            childField = getCustomVocabFieldName(childField);
+        }
         const childName = chart.getSourceName(childField);
 
         return gettext(
