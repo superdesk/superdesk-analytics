@@ -25,8 +25,6 @@ from analytics.common import MIME_TYPES
 from analytics.email_report.email_report import EmailReportService
 
 
-
-
 def to_naive(date_str):
     return datetime.strptime(date_str, "%Y-%m-%dT%H")
 
