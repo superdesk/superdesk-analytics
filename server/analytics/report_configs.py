@@ -11,8 +11,8 @@
 from copy import deepcopy
 
 from superdesk.resource import Resource
-from superdesk import Service, get_resource_service
-from superdesk.utils import ListCursor
+from superdesk import get_resource_service
+from superdesk.eve_async import AsyncBaseService, AsyncListCursor
 
 from analytics.common import (
     registered_reports,
@@ -71,9 +71,9 @@ base_config = {
 }
 
 
-class ReportConfigsService(Service):
-    def get(self, req, lookup):
-        configs = list(super().get(req, lookup))
+class ReportConfigsService(AsyncBaseService):
+    async def get_async(self, req, lookup):
+        configs_cursor = await super().get_async(req, lookup)
         merged_configs = []
 
         for report_id, endpoint in registered_reports.items():
@@ -84,7 +84,7 @@ class ReportConfigsService(Service):
                 if key not in default_config:
                     default_config[key] = val
 
-            config = next((c for c in configs if c.get("_id") == report_id), None)
+            config = next((c async for c in configs_cursor if c.get("_id") == report_id), None)
 
             if config is None:
                 default_config["_id"] = report_id
@@ -93,7 +93,7 @@ class ReportConfigsService(Service):
                 self.merge_config(config, default_config)
                 merged_configs.append(config)
 
-        return ListCursor(merged_configs)
+        return AsyncListCursor(merged_configs)
 
     def merge_config(self, config, default_config):
         """Merge the default config and config from mongo
