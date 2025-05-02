@@ -8,6 +8,11 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
+from typing import Any
+
+from settings import INSTALLED_APPS
+from superdesk.default_settings import MODULES
+
 from superdesk.tests import TestCase as _TestCase, update_config, setup
 from superdesk.factory.app import get_app
 
@@ -22,3 +27,10 @@ class TestCase(_TestCase):
         self.app = get_app(config)
         setup.app = self.app
         super().setUp()
+
+
+class BaseTestCase(_TestCase):
+    app_config: dict[str, Any] = {
+        "INSTALLED_APPS": INSTALLED_APPS,
+        "MODULES": MODULES + ["planning.module"],
+    }
