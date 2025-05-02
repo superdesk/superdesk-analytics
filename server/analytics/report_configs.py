@@ -84,8 +84,7 @@ class ReportConfigsService(AsyncBaseService):
                 if key not in default_config:
                     default_config[key] = val
 
-            config = next((c async for c in configs_cursor if c.get("_id") == report_id), None)
-
+            config = await anext((c async for c in configs_cursor if c.get("_id") == report_id), None)
             if config is None:
                 default_config["_id"] = report_id
                 merged_configs.append(default_config)
