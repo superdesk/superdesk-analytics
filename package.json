@@ -49,5 +49,8 @@
     "superdesk-code-style": "1.5.0",
     "superdesk-core": "github:superdesk/superdesk-client-core#develop",
     "superdesk-ui-framework": "3.0.14"
+  },
+  "volta": {
+    "node": "14.21.3"
   }
 }

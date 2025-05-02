@@ -15,9 +15,9 @@ from bson import ObjectId
 
 from superdesk.core import get_current_app, get_app_config
 from superdesk.flask import render_template
-from superdesk.services import BaseService
 from superdesk.resource import Resource
 from superdesk.errors import SuperdeskApiError
+from superdesk.eve_async import AsyncBaseService
 from superdesk.lock import lock, unlock
 from superdesk.logging import logger
 from superdesk.celery_app import celery
@@ -95,8 +95,8 @@ class EmailReportResource(Resource):
     }
 
 
-class EmailReportService(BaseService):
-    def create(self, docs, **kwargs):
+class EmailReportService(AsyncBaseService):
+    async def create_async(self, docs, **kwargs):
         for doc in docs:
             attachments = self._gen_attachments(doc.get("report") or {})
             self._email_report(doc.get("email") or {}, attachments)
@@ -107,6 +107,7 @@ class EmailReportService(BaseService):
 
     @staticmethod
     def _gen_attachments(report):
+        # TODO-ASYNC: make this async once all report services are made async
         report_service = get_report_service(report.get("type"))
         if report_service is None:
             raise SuperdeskApiError.badRequestError('Unknown report type "{}"'.format(report.get("type")))
