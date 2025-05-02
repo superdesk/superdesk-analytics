@@ -13,5 +13,5 @@ responses
 pytest
 pytest-env
 
--e git+https://github.com/superdesk/superdesk-core.git@develop#egg=Superdesk-Core
--e git+https://github.com/superdesk/superdesk-planning.git@develop#egg=superdesk-planning
+-e git+https://github.com/superdesk/superdesk-core.git@async#egg=Superdesk-Core
+-e git+https://github.com/superdesk/superdesk-planning.git@async#egg=superdesk-planning
