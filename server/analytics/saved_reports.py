@@ -8,12 +8,12 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-from superdesk import json, get_resource_service
-from superdesk.services import BaseService
 from superdesk.resource import Resource
-from superdesk.notification import push_notification
 from superdesk.errors import SuperdeskApiError
+from superdesk import json, get_resource_service
+from superdesk.notification import push_notification
 from superdesk.users.services import current_user_has_privilege
+from superdesk.eve_async import AsyncBaseService
 
 from apps.auth import get_user_id
 from apps.archive.common import get_user, get_auth
@@ -46,18 +46,18 @@ class SavedReportsResource(Resource):
     }
 
 
-class SavedReportsService(BaseService):
-    def on_create(self, docs):
+class SavedReportsService(AsyncBaseService):
+    async def on_create_async(self, docs: list[dict]):
         for doc in docs:
             self._validate_on_create(doc)
             doc["user"] = get_user_id(required=True)
-        super().on_create(docs)
+        await super().on_create_async(docs)
 
-    def on_created(self, docs):
+    async def on_created_async(self, docs: list[dict]):
         for doc in docs:
             self._push_notification(doc, "create")
 
-    def on_update(self, updates, original):
+    async def on_update_async(self, updates: dict, original: dict):
         """Runs on update
 
         Checks if the request owner and the saved search owner are the same person
@@ -65,18 +65,18 @@ class SavedReportsService(BaseService):
         """
         self._validate_on_update(updates, original)
         self._null_updates_from_original(updates, original)
-        super().on_update(updates, original)
+        await super().on_update_async(updates, original)
 
-    def on_updated(self, updates, original):
+    async def on_updated_async(self, updates: dict, original: dict):
         self._push_notification(original, "update")
 
-    def on_delete(self, doc):
+    async def on_delete_async(self, doc: dict):
         self._validate_on_delete(doc)
 
-    def on_deleted(self, doc):
+    async def on_deleted_async(self, doc: dict):
         self._push_notification(doc, "delete")
 
-    def get(self, req, lookup):
+    async def get_async(self, req: ParsedRequest | None, lookup: dict | None):
         """
         Overriding to pass user as search parameter
         """
@@ -98,7 +98,7 @@ class SavedReportsService(BaseService):
 
         req.where = json.dumps(where)
 
-        return super().get(req, lookup=None)
+        return await super().get_async(req, lookup=None)
 
     @staticmethod
     def _push_notification(doc, operation):
