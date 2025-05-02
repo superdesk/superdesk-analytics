@@ -75,6 +75,7 @@ class SendScheduledReports(Command):
                 self._send_report(scheduled_report)
 
                 # Update the _last_sent of the schedule
+                # TODO-ASYNC: update all usages of `scheduled_reports` once the command is migrated to async
                 get_resource_service("scheduled_reports").system_update(
                     scheduled_report.get("_id"),
                     {"_last_sent": now_utc},
@@ -133,6 +134,7 @@ class SendScheduledReports(Command):
     @staticmethod
     def _send_report(scheduled_report):
         email_service = get_resource_service("email_report")
+        # TODO-ASYNC: update usage of `saved_reports` to async once the command is async
         saved_report = get_resource_service("saved_reports").find_one(
             req=None, _id=scheduled_report.get("saved_report")
         )

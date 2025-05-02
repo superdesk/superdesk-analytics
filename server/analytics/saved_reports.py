@@ -63,7 +63,7 @@ class SavedReportsService(AsyncBaseService):
         Checks if the request owner and the saved search owner are the same person
         If not then the request owner should have global saved reports privilege
         """
-        self._validate_on_update(updates, original)
+        await self._validate_on_update(updates, original)
         self._null_updates_from_original(updates, original)
         await super().on_update_async(updates, original)
 
@@ -71,7 +71,7 @@ class SavedReportsService(AsyncBaseService):
         self._push_notification(original, "update")
 
     async def on_delete_async(self, doc: dict):
-        self._validate_on_delete(doc)
+        await self._validate_on_delete(doc)
 
     async def on_deleted_async(self, doc: dict):
         self._push_notification(doc, "delete")
@@ -101,7 +101,7 @@ class SavedReportsService(AsyncBaseService):
         return await super().get_async(req, lookup=None)
 
     @staticmethod
-    def _push_notification(doc, operation):
+    def _push_notification(doc: dict, operation: str):
         push_notification(
             "savedreports:update",
             report_type=doc["report"],
@@ -112,7 +112,7 @@ class SavedReportsService(AsyncBaseService):
         )
 
     @staticmethod
-    def _validate_on_create(doc):
+    def _validate_on_create(doc: dict):
         """
         User can only create global report if they have 'global_saved_reports' permission
         """
@@ -120,7 +120,7 @@ class SavedReportsService(AsyncBaseService):
             raise SuperdeskApiError.forbiddenError("Unauthorized to create global report.")
 
     @staticmethod
-    def _validate_ownership(doc):
+    def _validate_ownership(doc: dict):
         """
         Validate saved reports on update/delete
 
@@ -134,30 +134,31 @@ class SavedReportsService(AsyncBaseService):
             elif not current_user_has_privilege("global_saved_reports"):
                 raise SuperdeskApiError.forbiddenError("Unauthorized to modify global report.")
 
-    def _validate_on_update(self, updates, original):
-        self._validate_ownership(original)
+    async def _validate_on_update(self, updates: dict, original: dict):
+        await self._validate_ownership(original)
 
         scheduled_service = get_resource_service("scheduled_reports")
-        schedules = scheduled_service.get(req=None, lookup={"saved_report": original["_id"]})
+        schedules_count = await scheduled_service.count_async({"saved_report": original["_id"]})
 
-        if schedules.count() > 0:
+        if schedules_count > 0:
             if original.get("is_global") and not updates.get("is_global"):
                 raise SuperdeskApiError.badRequestError("Cannot remove global flag as schedule(s) are attached")
 
-    def _validate_on_delete(self, doc):
+    async def _validate_on_delete(self, doc: dict):
         self._validate_ownership(doc)
 
         scheduled_service = get_resource_service("scheduled_reports")
-        schedules = scheduled_service.get(req=None, lookup={"saved_report": doc["_id"]})
+        schedules_count = await scheduled_service.count_async({"saved_report": doc["_id"]})
 
-        if schedules.count() > 0:
+        if schedules_count > 0:
             raise SuperdeskApiError.badRequestError("Cannot delete saved report as schedule(s) are attached")
 
-    def get_aggregations(self, req, **lookup):
-        saved_report = self.find_one(req=req, **lookup)
+    async def get_aggregations(self, req: ParsedRequest | None, **lookup: dict):
+        saved_report = await self.find_one_async(req=req, **lookup)
         if not saved_report:
             raise SuperdeskApiError.notFoundError("Saved report not found")
 
+        # TODO-ASYNC: update usage of `get_report_service` to async once all reports are async
         report_service = get_report_service(saved_report.get("report"))
         if report_service is None:
             raise SuperdeskApiError.badRequestError("Invalid report type")
@@ -170,7 +171,7 @@ class SavedReportsService(AsyncBaseService):
 
         return saved_report, aggregations
 
-    def _null_updates_from_original(self, updates, original):
+    def _null_updates_from_original(self, updates: dict, original: dict):
         """Null values that are not in the updated report params"""
 
         self._null_values(updates, original, "translations")
@@ -183,7 +184,7 @@ class SavedReportsService(AsyncBaseService):
             self._null_values(updates["params"], original["params"], "aggs")
             self._null_values(updates["params"], original["params"], "repos")
 
-    def _null_values(self, updates, original, field):
+    def _null_values(self, updates: dict, original: dict, field: str):
         """Sets values to None that are in original but not in updates"""
 
         if field not in updates:
