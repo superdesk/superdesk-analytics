@@ -141,8 +141,7 @@ class SendScheduleReportTestCase(BaseTestCase):
         )
 
         scheduled_service = get_resource_service("scheduled_reports")
-
-        report = scheduled_service.find_one(req=None, _id="sched1")
+        report = await scheduled_service.find_one_async(req=None, _id="sched1")
         self.assertNotIn("_last_sent", report)
 
         # Simulate running every hour for a few hours
@@ -158,7 +157,7 @@ class SendScheduleReportTestCase(BaseTestCase):
                 SendScheduledReports().run(now_utc)
 
                 # _last sent is updated
-                report = scheduled_service.find_one(req=None, _id="sched1")
+                report = await scheduled_service.find_one_async(req=None, _id="sched1")
                 self.assertEqual(report.get("_last_sent"), now_utc)
 
             # Test that the command sent emails across the 4 iterations
@@ -210,8 +209,7 @@ class SendScheduleReportTestCase(BaseTestCase):
         )
 
         scheduled_service = get_resource_service("scheduled_reports")
-
-        report = scheduled_service.find_one(req=None, _id="sched1")
+        report = await scheduled_service.find_one_async(req=None, _id="sched1")
         self.assertNotIn("_last_sent", report)
 
         # Simulate running every hour for a few hours
@@ -228,7 +226,7 @@ class SendScheduleReportTestCase(BaseTestCase):
                 SendScheduledReports().run(now_utc)
 
                 # _last sent is updated
-                report = scheduled_service.find_one(req=None, _id="sched1")
+                report = await scheduled_service.find_one_async(req=None, _id="sched1")
 
                 if not should_have_updated:
                     should_have_updated = True
