@@ -8,87 +8,82 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-from superdesk.tests import TestCase
-
-from analytics import init_app
+from analytics.tests import BaseTestCase
 from analytics.chart_config import ChartConfig
 
 
-class ChartConfigTestCase(TestCase):
-    def setUp(self):
-        self.maxDiff = None
+class ChartConfigTestCase(BaseTestCase):
+    async def asyncSetUp(self):
+        await super().asyncSetUp()
 
-        with self.app.app_context():
-            init_app(self.app)
+        self.app.data.insert(
+            "vocabularies",
+            [
+                {
+                    "_id": "categories",
+                    "items": [
+                        {"qcode": "a", "name": "Advisories", "is_active": True},
+                        {"qcode": "b", "name": "Basketball", "is_active": True},
+                        {"qcode": "c", "name": "Cricket", "is_active": True},
+                    ],
+                },
+                {
+                    "_id": "urgency",
+                    "items": [
+                        {"qcode": 1, "name": 1, "is_active": True},
+                        {"qcode": 2, "name": 2, "is_active": True},
+                        {"qcode": 3, "name": 3, "is_active": True},
+                        {"qcode": 4, "name": 4, "is_active": True},
+                        {"qcode": 5, "name": 5, "is_active": True},
+                    ],
+                },
+                {
+                    "_id": "genre",
+                    "items": [
+                        {
+                            "qcode": "Article",
+                            "name": "Article (news)",
+                            "is_active": True,
+                        },
+                        {"qcode": "Sidebar", "name": "Sidebar", "is_active": True},
+                        {"qcode": "Factbox", "name": "Factbox", "is_active": True},
+                    ],
+                },
+            ],
+        )
 
-            self.app.data.insert(
-                "vocabularies",
-                [
-                    {
-                        "_id": "categories",
-                        "items": [
-                            {"qcode": "a", "name": "Advisories", "is_active": True},
-                            {"qcode": "b", "name": "Basketball", "is_active": True},
-                            {"qcode": "c", "name": "Cricket", "is_active": True},
-                        ],
-                    },
-                    {
-                        "_id": "urgency",
-                        "items": [
-                            {"qcode": 1, "name": 1, "is_active": True},
-                            {"qcode": 2, "name": 2, "is_active": True},
-                            {"qcode": 3, "name": 3, "is_active": True},
-                            {"qcode": 4, "name": 4, "is_active": True},
-                            {"qcode": 5, "name": 5, "is_active": True},
-                        ],
-                    },
-                    {
-                        "_id": "genre",
-                        "items": [
-                            {
-                                "qcode": "Article",
-                                "name": "Article (news)",
-                                "is_active": True,
-                            },
-                            {"qcode": "Sidebar", "name": "Sidebar", "is_active": True},
-                            {"qcode": "Factbox", "name": "Factbox", "is_active": True},
-                        ],
-                    },
-                ],
-            )
+        self.app.data.insert(
+            "desks",
+            [
+                {"_id": "desk1", "name": "Politic Desk"},
+                {"_id": "desk2", "name": "Sports Desk"},
+                {"_id": "desk3", "name": "System Desk"},
+            ],
+        )
 
-            self.app.data.insert(
-                "desks",
-                [
-                    {"_id": "desk1", "name": "Politic Desk"},
-                    {"_id": "desk2", "name": "Sports Desk"},
-                    {"_id": "desk3", "name": "System Desk"},
-                ],
-            )
-
-            self.app.data.insert(
-                "users",
-                [
-                    {
-                        "_id": "user1",
-                        "display_name": "first user",
-                        "is_active": True,
-                        "is_enabled": True,
-                    },
-                    {
-                        "_id": "user2",
-                        "display_name": "second user",
-                        "is_active": True,
-                        "is_enabled": True,
-                    },
-                    {
-                        "_id": "user3",
-                        "display_name": "last user",
-                        "is_active": True,
-                        "is_enabled": True,
-                    },
-                ],
-            )
+        self.app.data.insert(
+            "users",
+            [
+                {
+                    "_id": "user1",
+                    "display_name": "first user",
+                    "is_active": True,
+                    "is_enabled": True,
+                },
+                {
+                    "_id": "user2",
+                    "display_name": "second user",
+                    "is_active": True,
+                    "is_enabled": True,
+                },
+                {
+                    "_id": "user3",
+                    "display_name": "last user",
+                    "is_active": True,
+                    "is_enabled": True,
+                },
+            ],
+        )
 
     @staticmethod
     def _gen_single_chart(chart_id, chart_type):
@@ -110,7 +105,7 @@ class ChartConfigTestCase(TestCase):
         chart.add_source("urgency", {1: 4, 3: 4, 5: 1})
         return chart
 
-    def test_generate_single_series(self):
+    async def test_generate_single_series(self):
         chart = self._gen_single_chart("cid", "bar")
         chart.title = "Charts"
         chart.subtitle = "For Today"
@@ -163,7 +158,7 @@ class ChartConfigTestCase(TestCase):
             },
         )
 
-    def test_sort_single_series(self):
+    async def test_sort_single_series(self):
         chart = self._gen_single_chart("cid", "bar")
         chart.sort_order = "asc"
 
@@ -209,7 +204,7 @@ class ChartConfigTestCase(TestCase):
             ],
         )
 
-    def test_generate_stacked_series(self):
+    async def test_generate_stacked_series(self):
         chart = self._gen_stacked_chart("cid", "column")
         chart.title = "Charts"
         chart.subtitle = "For Today"
@@ -283,7 +278,7 @@ class ChartConfigTestCase(TestCase):
             },
         )
 
-    def test_sort_stacked_series(self):
+    async def test_sort_stacked_series(self):
         chart = self._gen_stacked_chart("cid", "bar")
         chart.sort_order = "asc"
 
@@ -372,7 +367,7 @@ class ChartConfigTestCase(TestCase):
             ],
         )
 
-    def test_generate_single_column_table(self):
+    async def test_generate_single_column_table(self):
         chart = self._gen_single_chart("tid", "table")
         chart.title = "Tables"
         chart.subtitle = "For Today"
@@ -407,7 +402,7 @@ class ChartConfigTestCase(TestCase):
             },
         )
 
-    def test_sort_single_column_table(self):
+    async def test_sort_single_column_table(self):
         chart = self._gen_single_chart("tid", "table")
         chart.sort_order = "asc"
 
@@ -448,7 +443,7 @@ class ChartConfigTestCase(TestCase):
         )
         self.assertEqual(config["rows"], [["Basketball", 4], ["Advisories", 3], ["Cricket", 1]])
 
-    def test_generate_multi_column_table(self):
+    async def test_generate_multi_column_table(self):
         chart = self._gen_stacked_chart("tid", "table")
         chart.title = "Tables"
         chart.subtitle = "For Today"
@@ -505,7 +500,7 @@ class ChartConfigTestCase(TestCase):
             },
         )
 
-    def test_sort_multi_column_table(self):
+    async def test_sort_multi_column_table(self):
         chart = self._gen_stacked_chart("tid", "table")
         chart.sort_order = "asc"
 
@@ -610,7 +605,7 @@ class ChartConfigTestCase(TestCase):
             ],
         )
 
-    def test_translate_anpa_category(self):
+    async def test_translate_anpa_category(self):
         chart = ChartConfig("catrgory", "bar")
         chart.add_source("anpa_category.qcode", {"a": 3, "b": 4, "c": 1})
 
@@ -627,7 +622,7 @@ class ChartConfigTestCase(TestCase):
             },
         )
 
-    def test_translate_urgency(self):
+    async def test_translate_urgency(self):
         chart = ChartConfig("urgency", "bar")
         chart.add_source("urgency", {1: 4, 3: 4, 5: 1})
 
@@ -639,7 +634,7 @@ class ChartConfigTestCase(TestCase):
             {"urgency": {"title": "Urgency", "names": {1: 1, 2: 2, 3: 3, 4: 4, 5: 5}}},
         )
 
-    def test_translate_genre(self):
+    async def test_translate_genre(self):
         chart = ChartConfig("genre", "bar")
         chart.add_source("genre.qcode", {"Article": 4, "Sidebar": 5, "Factbox": 1})
 
@@ -660,7 +655,7 @@ class ChartConfigTestCase(TestCase):
             },
         )
 
-    def test_translate_desk(self):
+    async def test_translate_desk(self):
         chart = ChartConfig("desk", "bar")
         chart.add_source("task.desk", {"desk1": 4, "desk2": 5, "desk3": 1})
 
@@ -681,7 +676,7 @@ class ChartConfigTestCase(TestCase):
             },
         )
 
-    def test_translate_user(self):
+    async def test_translate_user(self):
         chart = ChartConfig("user", "bar")
         chart.add_source("task.user", {"user1": 3, "user2": 4, "user3": 5})
 
@@ -702,7 +697,7 @@ class ChartConfigTestCase(TestCase):
             },
         )
 
-    def test_translate_authors(self):
+    async def test_translate_authors(self):
         chart = ChartConfig("author", "bar")
         chart.add_source("authors.parent", {"user1": 3, "user2": 4, "user3": 5})
 
@@ -723,7 +718,7 @@ class ChartConfigTestCase(TestCase):
             },
         )
 
-    def test_translate_state(self):
+    async def test_translate_state(self):
         chart = ChartConfig("state", "bar")
         chart.add_source("state", {"published": 3, "killed": 1, "updated": 5})
 
@@ -745,7 +740,7 @@ class ChartConfigTestCase(TestCase):
             },
         )
 
-    def test_translate_source(self):
+    async def test_translate_source(self):
         chart = ChartConfig("source", "bar")
         chart.add_source("source", {"aap": 3, "ftp": 1, "ap": 5})
 

@@ -8,25 +8,22 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-from superdesk.tests import TestCase
+from analytics.tests import BaseTestCase
 
 from analytics.chart_config import SDChart
 
 
-class SDChartChartTestCase(TestCase):
-    def setUp(self):
-        self.maxDiff = None
-
+class SDChartChartTestCase(BaseTestCase):
     def _gen_config(self, **chart_config):
         chart = SDChart.Chart("test_chart", **chart_config)
 
         return chart.gen_config()
 
-    def assertConfigEqual(self, generated, expected):
+    async def assertConfigEqual(self, generated, expected):
         for key, val in expected.items():
             self.assertEqual(val, generated.get(key))
 
-    def test_default_config(self):
+    async def test_default_config(self):
         self.assertEqual(
             self._gen_config(),
             {
@@ -65,7 +62,7 @@ class SDChartChartTestCase(TestCase):
             },
         )
 
-    def test_set_options(self):
+    async def test_set_options(self):
         self.assertConfigEqual(self._gen_config(chart_type="table"), {"type": "table"})
 
         self.assertConfigEqual(self._gen_config(title="Test Title"), {"title": {"text": "Test Title"}})

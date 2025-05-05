@@ -8,15 +8,12 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-from superdesk.tests import TestCase
+from analytics.tests import BaseTestCase
 
 from analytics.chart_config import SDChart
 
 
-class SDChartSeriesTestCase(TestCase):
-    def setUp(self):
-        self.maxDiff = None
-
+class SDChartSeriesTestCase(BaseTestCase):
     def _gen_config(self, axis_config, series_config):
         chart = SDChart.Chart("test_chart")
 
@@ -30,11 +27,11 @@ class SDChartSeriesTestCase(TestCase):
 
         return chart.gen_config()
 
-    def assertConfigEqual(self, generated, expected):
+    async def assertConfigEqual(self, generated, expected):
         for key, val in expected.items():
             self.assertEqual(val, generated.get(key))
 
-    def test_default_config(self):
+    async def test_default_config(self):
         self.assertConfigEqual(self._gen_config({}, {}), {"series": [{"xAxis": 0, "type": "bar"}]})
 
         self.assertConfigEqual(
@@ -47,7 +44,7 @@ class SDChartSeriesTestCase(TestCase):
             {"series": [{"xAxis": 1, "type": "bar"}]},
         )
 
-    def test_add_multiple_series(self):
+    async def test_add_multiple_series(self):
         self.assertConfigEqual(
             self._gen_config({}, [{}, {}]),
             {"series": [{"xAxis": 0, "type": "bar"}, {"xAxis": 0, "type": "bar"}]},
@@ -74,7 +71,7 @@ class SDChartSeriesTestCase(TestCase):
             },
         )
 
-    def test_series_data(self):
+    async def test_series_data(self):
         self.assertConfigEqual(
             self._gen_config({}, {"name": "Test Data", "data": [5, 2, 8, 1]}),
             {
@@ -115,7 +112,7 @@ class SDChartSeriesTestCase(TestCase):
             },
         )
 
-    def test_category_based_config(self):
+    async def test_category_based_config(self):
         self.assertConfigEqual(
             self._gen_config(
                 {"categories": ["b", "c", "a"]},

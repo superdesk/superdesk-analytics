@@ -9,8 +9,8 @@
 # at https://www.sourcefabric.org/superdesk/license
 
 from superdesk import get_resource_service
-from superdesk.services import BaseService
 from superdesk.resource import Resource
+from superdesk.eve_async import AsyncBaseService
 from superdesk.notification import push_notification
 from superdesk.errors import SuperdeskApiError
 
@@ -83,24 +83,24 @@ class ScheduledReportsResource(Resource):
     }
 
 
-class ScheduledReportsService(BaseService):
-    def on_created(self, docs):
+class ScheduledReportsService(AsyncBaseService):
+    async def on_created_async(self, docs: list[dict]):
         for doc in docs:
             self.set_schedule(doc)
-            self._validate_on_create_or_update(doc)
+            await self._validate_on_create_or_update(doc)
             self._push_notification(doc, "create")
 
-    def on_updated(self, updates, original):
+    async def on_updated_async(self, updates: dict, original: dict):
         self.set_schedule(updates)
         doc = deepcopy(original)
         doc.update(updates)
-        self._validate_on_create_or_update(doc)
+        await self._validate_on_create_or_update(doc)
         self._push_notification(original, "update")
 
-    def on_deleted(self, doc):
+    async def on_deleted_async(self, doc: dict):
         self._push_notification(doc, "delete")
 
-    def set_schedule(self, updates):
+    def set_schedule(self, updates: dict):
         # Sometimes 'schedule' is not in the updates provided
         # Eve/Cerberus will ensure the document has 'schedule' set
         # as it is configured as required
@@ -124,9 +124,9 @@ class ScheduledReportsService(BaseService):
             updates["schedule"].update({"frequency": "monthly", "hour": hour, "day": day, "week_days": []})
 
     @staticmethod
-    def _validate_on_create_or_update(doc):
+    async def _validate_on_create_or_update(doc: dict):
         saved_service = get_resource_service("saved_reports")
-        saved_report = saved_service.find_one(req=None, _id=doc["saved_report"])
+        saved_report = await saved_service.find_one_async(req=None, _id=doc["saved_report"])
 
         if not saved_report.get("is_global"):
             raise SuperdeskApiError.badRequestError("A schedule must be attached to a global saved report")
