@@ -12,7 +12,6 @@ describe('emailReport', () => {
         }
 
         $provide.service('api', fakeApi);
-        $provide.value('session', {identity: {_id: 'user1'}});
     }));
 
     beforeEach(window.module('superdesk.core.notify'));
