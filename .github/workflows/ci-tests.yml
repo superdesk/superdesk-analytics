@@ -32,7 +32,7 @@ jobs:
       SERVER: true
       OPENSSL_CONF: /dev/null  # fixes phantomjs error
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
@@ -57,7 +57,7 @@ jobs:
       matrix:
         node-version: ['14', '20']
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
