@@ -7,17 +7,10 @@ import {REPORT_CONFIG} from '../ReportConfigService';
 describe('reportConfigs', () => {
     let service;
     let api;
-    let $q;
     let configs;
     let config;
 
-    beforeEach(() => {
-        api = {
-            getAll: jasmine.createSpy().and.returnValue(Promise.resolve(configs)),
-        };
-        $q = {when: (response) => Promise.resolve(response)};
-        service = new ReportConfigService(api, $q, _);
-
+    beforeEach(inject(($q) => {
         configs = [{
             _id: 'test_report',
             [REPORT_CONFIG.CHART_TYPES]: {
@@ -71,13 +64,19 @@ describe('reportConfigs', () => {
                 },
             },
         }];
-    });
+
+        api = {
+            getAll: jasmine.createSpy().and.returnValue(Promise.resolve(configs)),
+        };
+
+        service = new ReportConfigService(api, $q, _);
+    }));
 
     it('defaults to empty config', () => {
         expect(service.configs).toEqual({});
     });
 
-    it('loads the configs', (done) => {
+    it('loads the configs', inject(($rootScope) => {
         service.loadAll()
             .then(() => {
                 expect(service.configs).toEqual({
@@ -86,9 +85,10 @@ describe('reportConfigs', () => {
                 });
 
                 done();
-            })
-            .catch(done.fail);
-    });
+            });
+
+        $rootScope.$apply();
+    }));
 
     it('provides filtering functionality', () => {
         service.configs = {

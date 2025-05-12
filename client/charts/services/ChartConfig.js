@@ -377,7 +377,7 @@ export function ChartConfig(
             } else {
                 const child = this.getChild();
 
-                chart.legendTitle = this.getSourceName(child.field);
+                chart.legendTitle = chart.getTranslationTitle(child.field);
                 chart.tooltipHeader = '{series.name}/{point.x}: {point.y}';
                 chart.colourByPoint = false;
 

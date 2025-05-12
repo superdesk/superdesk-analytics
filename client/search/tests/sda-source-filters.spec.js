@@ -28,6 +28,7 @@ describe('sda-source-filters', () => {
     });
 
     beforeEach(window.module('superdesk.core.activity'));
+    beforeEach(window.module('superdesk.core.translate'));
     beforeEach(window.module('superdesk.apps.users'));
     beforeEach(window.module('superdesk.apps.desks'));
     beforeEach(window.module('angularMoment'));

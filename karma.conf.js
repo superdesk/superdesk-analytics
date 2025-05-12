@@ -57,5 +57,10 @@ module.exports = function(config) {
 
         // Seams default 10s is not enough for CI sometime, so let's try 30s
         browserNoActivityTimeout: 30000,
+
+        // allow typescript files
+        mime: {
+            'text/x-typescript': ['ts', 'tsx'],
+        },
     });
 };
