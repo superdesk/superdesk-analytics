@@ -31,7 +31,7 @@
     "@types/lodash": "4.14.117",
     "@typescript-eslint/parser": "2.6.1",
     "angular-mocks": "1.6.9",
-    "css-loader": "^5.2.7",
+    "css-loader": "^7.1.2",
     "eslint": "6.6.0",
     "eslint-plugin-angular": "^1.6.1",
     "eslint-plugin-jasmine": "^1.8.1",
