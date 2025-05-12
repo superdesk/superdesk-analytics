@@ -6,7 +6,7 @@ jobs:
   black:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: actions/setup-python@v5
     - run: pip install black~=23.0
     - run: black --check server
@@ -14,7 +14,7 @@ jobs:
   flake8:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: actions/setup-python@v5
     - run: pip install flake8
     - run: flake8 server
@@ -22,7 +22,7 @@ jobs:
   mypy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: actions/setup-python@v5
     - run: pip install -Ur mypy-requirements.txt
     - run: mypy server
