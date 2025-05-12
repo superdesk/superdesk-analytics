@@ -19,6 +19,7 @@ module.exports = function makeConfig(grunt) {
     const sdConfig = lodash.defaultsDeep(require(appConfigPath)(grunt), getDefaults(grunt));
 
     return {
+        mode: 'development',
         entry: [path.join(__dirname, 'index')],
         devtool: 'inline-source-map', //just do inline source maps instead of the default
         output: {
@@ -51,6 +52,8 @@ module.exports = function makeConfig(grunt) {
                     __dirname,
                     'node_modules/rangy/lib/rangy-selectionsaverestore'
                 ),
+
+                'draft-js': '@sourcefabric/draft-js',
             }
         },
         module: {
@@ -89,10 +92,6 @@ module.exports = function makeConfig(grunt) {
                         'css-loader',
                         'sass-loader'
                     ]
-                },
-                {
-                    test: /\.json$/,
-                    use: ['json-loader']
                 },
                 {
                     test: /\.(png|gif|jpeg|jpg|woff|woff2|eot|ttf|svg)(\?.*$|$)/,

@@ -12,17 +12,17 @@ describe('scheduledReports', () => {
         }
 
         $provide.service('api', fakeApi);
-        $provide.value('session', {identity: {_id: 'user1'}});
     }));
 
     beforeEach(window.module('superdesk.analytics.scheduled_reports'));
 
-    beforeEach(inject((_scheduledReports_, _$q_, _$rootScope_) => {
+    beforeEach(inject((_scheduledReports_, _$q_, _$rootScope_, session) => {
         scheduledReports = _scheduledReports_;
         $q = _$q_;
         $rootScope = _$rootScope_;
 
         apiMock = {};
+        session.identity = {_id: 'user1'};
     }));
 
     it('can fetch a scheduled report by its ID', () => {

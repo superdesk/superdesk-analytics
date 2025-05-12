@@ -12,7 +12,6 @@ describe('savedReports', () => {
         }
 
         $provide.service('api', fakeApi);
-        $provide.value('session', {identity: {_id: 'user1'}});
     }));
 
     beforeEach(window.module('superdesk.core.notify'));
@@ -41,7 +40,7 @@ describe('savedReports', () => {
         expect(report).toEqual({report: 'one'});
     });
 
-    it('can fetch all saved reports for the current user', () => {
+    it('can fetch all saved reports for the current user', inject((session) => {
         apiMock.query = jasmine.createSpy().and.returnValue($q.when({_items: [
             {name: 'report1', user: 'user1', is_global: false},
             {name: 'report2', user: 'user1', is_global: true},
@@ -49,6 +48,8 @@ describe('savedReports', () => {
             {name: 'report4', user: 'user2', is_global: true},
         ]}));
         let reports;
+
+        session.identity = {_id: 'user1'};
 
         savedReports.fetchAll('source_category_report').then((fetchedReports) => {
             reports = fetchedReports;
@@ -71,7 +72,7 @@ describe('savedReports', () => {
                 {name: 'report4', user: 'user2', is_global: true},
             ],
         });
-    });
+    }));
 
     it('can create a new saved report', () => {
         apiMock.save = jasmine.createSpy().and.callFake((original, updates) => $q.when({
@@ -112,11 +113,14 @@ describe('savedReports', () => {
         expect(report).toEqual({_id: 'report1', name: 'test report', report: 'test_report'});
     });
 
-    it('can remove a saved report', () => {
+    it('can remove a saved report', inject((session) => {
         apiMock.remove = jasmine.createSpy().and.returnValue($q.when({}));
+
+        session.identity = {_id: 'user1'};
+
         savedReports.remove({report: 'one'});
 
         expect(apiEndpoint).toHaveBeenCalledWith('saved_reports', {_id: 'user1'});
         expect(apiMock.remove).toHaveBeenCalledWith({report: 'one'});
-    });
+    }));
 });
