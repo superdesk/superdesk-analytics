@@ -114,15 +114,6 @@
         }
     }
 
-    .report-form__footer {
-        // Moves this class further up the importance list
-        // forcing this to take precedence over others
-        .ml-auto {
-            margin-left: auto !important;
-        }
-
-    }
-
     .user-select {
         .tags-input__add-button {
             display: none;
