@@ -72,13 +72,13 @@ class BaseReportService(SearchService):
 
     def on_fetched(self, doc):
         """
-        Overriding this method so the base SearchService doesn't construct custom HATEOS
+        Overriding this method so the base SearchService doesn't construct custom HATEOAS
         """
         pass
 
     async def on_fetched_async(self, doc):
         """
-        Overriding this method so the base SearchService doesn't construct custom HATEOS
+        Overriding this method so the base SearchService doesn't construct custom HATEOAS
         """
         pass
 
