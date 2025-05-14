@@ -15,12 +15,12 @@
                      class="subnav__button-stack subnav__button-stack--padded"
                 >
                 </div>
-                <div class="subnav__button-stack" ng-if="currentReport.allowScheduling && showSchedules">
+                <div class="subnav__button-stack gap-1" ng-if="currentReport.allowScheduling && showSchedules">
                     <span sd-check
-                          type="radio"
-                          ng-model="flags.contentView"
-                          ng-value="report"
-                          label-position="inside"
+                        type="radio"
+                        ng-model="flags.contentView"
+                        ng-value="report"
+                        label-position="inside"
                     >
                         Report
                     </span>
@@ -33,7 +33,7 @@
                         Schedules
                     </span>
                 </div>
-                <div class="subnav__stretch-bar subnav__stretch-bar--right">
+                <div class="subnav__stretch-bar subnav__stretch-bar--right gap-1">
                     <button class="btn btn--primary"
                             ng-click="openCreateScheduleModal()"
                             ng-if="currentReport.allowScheduling && flags.contentView === 'schedules'"
