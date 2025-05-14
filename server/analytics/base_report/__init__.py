@@ -76,6 +76,12 @@ class BaseReportService(SearchService):
         """
         pass
 
+    async def on_fetched_async(self, doc):
+        """
+        Overriding this method so the base SearchService doesn't construct custom HATEOS
+        """
+        pass
+
     def generate_report(self, docs, args):
         """
         Overwrite this method to generate a report based on the aggregation data
