@@ -135,7 +135,7 @@ class SavedReportsService(AsyncBaseService):
                 raise SuperdeskApiError.forbiddenError("Unauthorized to modify global report.")
 
     async def _validate_on_update(self, updates: dict, original: dict):
-        await self._validate_ownership(original)
+        self._validate_ownership(original)
 
         scheduled_service = get_resource_service("scheduled_reports")
         schedules_count = await scheduled_service.count_async({"saved_report": original["_id"]})

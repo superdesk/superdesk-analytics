@@ -99,7 +99,7 @@ class EmailReportService(AsyncBaseService):
     async def create_async(self, docs, **kwargs):
         for doc in docs:
             attachments = self._gen_attachments(doc.get("report") or {})
-            self._email_report(doc.get("email") or {}, attachments)
+            await self._email_report(doc.get("email") or {}, attachments)
 
         # We're not actually saving anything to the database
         # So return empty array here
@@ -169,11 +169,11 @@ class EmailReportService(AsyncBaseService):
         return attachments
 
     @staticmethod
-    def _email_report(email, attachments):
+    async def _email_report(email, attachments):
         txt = email.get("txt") or {}
         html = email.get("html") or {}
 
-        send_email_report.apply_async(
+        await send_email_report.apply_async(
             kwargs={
                 "_id": str(ObjectId()),
                 "subject": email.get("subject"),
@@ -189,7 +189,7 @@ class EmailReportService(AsyncBaseService):
 
 
 @celery.task(bind=True, max_retries=3, soft_time_limit=120)
-def send_email_report(
+async def send_email_report(
     self,
     _id,
     subject,
@@ -256,9 +256,9 @@ def send_email_report(
                     logger.error("Failed to generate attachment.")
                     logger.exception(e)
 
-        msg.body = render_template(txt_template, text_body=text_body, reports=reports)
+        msg.body = await render_template(txt_template, text_body=text_body, reports=reports)
 
-        msg.html = render_template(
+        msg.html = await render_template(
             html_template,
             html_body=html_body.replace("\r", "").replace("\n", "<br>"),
             reports=reports,
