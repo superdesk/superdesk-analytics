@@ -62,7 +62,6 @@ class UserActivityReportService(StatsReportService):
 
     async def generate_report(self, docs, args):
         report = {"items": [], "min": 0, "max": 0}
-        print(await docs.to_list())
 
         async for doc in docs:
             stats = doc.get("stats") or {}
