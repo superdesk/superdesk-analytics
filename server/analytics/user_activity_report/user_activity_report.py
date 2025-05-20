@@ -60,10 +60,11 @@ class UserActivityReportService(StatsReportService):
         """Disable generating aggregations"""
         return None
 
-    def generate_report(self, docs, args):
+    async def generate_report(self, docs, args):
         report = {"items": [], "min": 0, "max": 0}
+        print(await docs.to_list())
 
-        for doc in docs:
+        async for doc in docs:
             stats = doc.get("stats") or {}
 
             def calc_timestamp(entry):
