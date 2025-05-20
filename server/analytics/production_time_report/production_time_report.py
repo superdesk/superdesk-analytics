@@ -74,7 +74,7 @@ class ProductionTimeReportService(StatsReportService):
             }
         }
 
-    def generate_report(self, docs, args):
+    async def generate_report(self, docs, args):
         aggregations = getattr(docs, "hits", {}).get("aggregations") or {}
 
         date_filter = (aggregations.get("inner") or {}).get("date_filter") or {}
@@ -103,10 +103,10 @@ class ProductionTimeReportService(StatsReportService):
 
         return report
 
-    def generate_highcharts_config(self, docs, args):
+    async def generate_highcharts_config(self, docs, args):
         params = args.get("params") or {}
         chart_params = params.get("chart") or {}
-        report = self.generate_report(docs, args)
+        report = await self.generate_report(docs, args)
 
         stats = params.get("stats") or {}
         desk_stats = report.get("desk_stats") or {}

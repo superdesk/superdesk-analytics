@@ -12,7 +12,7 @@ from eve.utils import ParsedRequest, date_to_str
 
 from superdesk.resource_fields import ID_FIELD
 from superdesk import get_resource_service, json
-from superdesk.services import BaseService
+from superdesk.eve_async import AsyncBaseService
 from superdesk.resource import Resource, not_indexed, not_analyzed, not_enabled
 from superdesk.metadata.item import (
     metadata_schema,
@@ -249,20 +249,20 @@ class ArchiveStatisticsResource(Resource):
     }
 
 
-class ArchiveStatisticsService(BaseService):
-    def get_last_run(self):
-        return self.find_one(req=None, stats_type="last_run") or {}
+class ArchiveStatisticsService(AsyncBaseService):
+    async def get_last_run(self):
+        return await self.find_one_async(req=None, stats_type="last_run") or {}
 
-    def set_last_run_id(self, entry_id, last_run=None):
+    async def set_last_run_id(self, entry_id, last_run=None):
         if last_run is None:
-            last_run = self.get_last_run()
+            last_run = await self.get_last_run()
 
         if last_run and last_run.get(ID_FIELD):
-            self.patch(last_run[ID_FIELD], {"guid": entry_id})
+            await self.patch_async(last_run[ID_FIELD], {"guid": entry_id})
         else:
-            self.post([{"guid": entry_id, "stats_type": "last_run"}])
+            await self.post_async([{"guid": entry_id, "stats_type": "last_run"}])
 
-    def get_history_items(self, last_id, gte, item_id, chunk_size=0):
+    async def get_history_items(self, last_id, gte, item_id, chunk_size=0):
         history_service = get_resource_service("archive_history")
 
         last_processed_id = last_id
@@ -287,7 +287,7 @@ class ArchiveStatisticsService(BaseService):
             if chunk_size > 0:
                 req.max_results = int(chunk_size)
 
-            items = list(history_service.get(req=req, lookup=None))
+            items = await history_service.get_async(req=req, lookup=None)
 
             if len(items) < 1:
                 break

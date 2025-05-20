@@ -219,6 +219,7 @@ class FeaturemediaUpdates:
         return None if entry is None else ((entry.get("update") or {}).get("associations") or {}).get("featuremedia")
 
     def finish(self, sender):
+        # TODO-ASYNC: update to async calls once this class is migrated to async
         service = get_resource_service("archive_statistics")
 
         query = {"query": {"bool": {"must": {"terms": {"_id": list(self.rewrite_ids)}}}}}

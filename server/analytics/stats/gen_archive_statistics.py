@@ -188,6 +188,7 @@ class GenArchiveStatistics(Command):
         failed_ids = []
         num_history_items = 0
 
+        # TODO-ASYNC: update to async calls once this command is migrated to async
         statistics_service = get_resource_service("archive_statistics")
 
         # Get the system record from the last run
@@ -238,6 +239,7 @@ class GenArchiveStatistics(Command):
     def gen_history_timelines(self, history_items):
         items = {}
 
+        # TODO-ASYNC: update to async calls once this command is migrated to async
         statistics_service = get_resource_service("archive_statistics")
 
         def add_item(entry_id):
@@ -405,6 +407,7 @@ class GenArchiveStatistics(Command):
                 item["updates"][field] = history["update"][field]
 
     def process_timelines(self, items, failed_ids):
+        # TODO-ASYNC: update to async calls once this command is migrated to async
         statistics_service = get_resource_service("archive_statistics")
         items_to_create = []
         rewrites = []

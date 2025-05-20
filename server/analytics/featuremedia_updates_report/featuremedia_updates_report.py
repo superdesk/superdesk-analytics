@@ -101,7 +101,7 @@ class FeaturemediaUpdatesTimeReportService(StatsReportService):
 
         return query
 
-    def generate_report(self, docs, args):
+    async def generate_report(self, docs, args):
         chart_params = (args.get("params") or {}).get("chart") or {}
         report = {"items": []}
 
@@ -159,8 +159,8 @@ class FeaturemediaUpdatesTimeReportService(StatsReportService):
 
         return report
 
-    def generate_highcharts_config(self, docs, args):
-        report = self.generate_report(docs, args)
+    async def generate_highcharts_config(self, docs, args):
+        report = await self.generate_report(docs, args)
 
         params = args.get("params") or {}
         chart_params = params.get("chart") or {}
