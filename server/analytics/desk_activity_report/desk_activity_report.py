@@ -120,7 +120,7 @@ class DeskActivityReportService(BaseReportService):
     def get_elastic_index(self, types):
         return "statistics"
 
-    def generate_report(self, docs, args):
+    async def generate_report(self, docs, args):
         aggregations = getattr(docs, "hits", {}).get("aggregations") or {}
         desk_filter = (aggregations.get("timeline") or {}).get("desk_filter") or {}
         agg_dates = (desk_filter.get("timeline_filter") or {}).get("dates") or {}
@@ -170,9 +170,9 @@ class DeskActivityReportService(BaseReportService):
 
         return report
 
-    def generate_highcharts_config(self, docs, args):
+    async def generate_highcharts_config(self, docs, args):
         params = args.get("params") or {}
-        report = self.generate_report(docs, args)
+        report = await self.generate_report(docs, args)
         histogram = params.get("histogram") or {}
 
         def gen_chart_config():

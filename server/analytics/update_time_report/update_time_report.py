@@ -72,13 +72,14 @@ class UpdateTimeReportService(StatsReportService):
 
         return query
 
-    def generate_report(self, docs, args):
+    async def generate_report(self, docs, args):
         for doc in docs:
             doc.pop("stats", None)
         return docs
 
-    def generate_highcharts_config(self, docs, args):
-        items = list(self.generate_report(docs, args))
+    async def generate_highcharts_config(self, docs, args):
+        cursor = await self.generate_report(docs, args)
+        items = await cursor.to_list()
 
         params = args.get("params") or {}
         chart_params = params.get("chart") or {}

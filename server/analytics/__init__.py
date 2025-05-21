@@ -28,7 +28,7 @@ from analytics.planning_usage_report import init_app as init_planning_usage_repo
 from analytics.stats import init_app as init_stats
 from analytics.desk_activity_report import init_app as init_desk_activity_report
 from analytics.production_time_report import init_app as init_production_time_report
-from analytics.user_activity_report import init_app as init_user_acitivity_report
+from analytics.user_activity_report import init_app as init_user_activity_report
 from analytics.featuremedia_updates_report import (
     init_app as init_featuremedia_updates_report,
 )
@@ -111,7 +111,7 @@ def init_app(app):
     init_stats(app)
     init_desk_activity_report(app)
     init_production_time_report(app)
-    init_user_acitivity_report(app)
+    init_user_activity_report(app)
     init_featuremedia_updates_report(app)
     init_update_time_report(app)
 

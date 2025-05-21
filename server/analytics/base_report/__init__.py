@@ -82,7 +82,7 @@ class BaseReportService(SearchService):
         """
         pass
 
-    def generate_report(self, docs, args):
+    async def generate_report(self, docs, args):
         """
         Overwrite this method to generate a report based on the aggregation data
         """
@@ -91,7 +91,7 @@ class BaseReportService(SearchService):
 
         return self.get_aggregation_buckets(docs.hits)
 
-    def generate_highcharts_config(self, docs, args):
+    async def generate_highcharts_config(self, docs, args):
         """
         Overwrite this method to generate the highcharts config based on the aggregation data
         """
@@ -258,13 +258,12 @@ class BaseReportService(SearchService):
     def get_elastic_index(self, types):
         return es_utils.get_index(types)
 
-    def run_query(self, params, args):
+    async def run_query(self, params, args):
         query = params.get("source") or {}
         if "query" not in query:
             query["query"] = {"filtered": {}}
 
-        aggs = self.get_request_aggregations(params, args)
-        if aggs:
+        if aggs := self.get_request_aggregations(params, args):
             query["aggs"] = aggs
 
         types = params.get("repo")
@@ -286,21 +285,18 @@ class BaseReportService(SearchService):
         if filters:
             set_filters(query, filters)
 
-        index = self.get_elastic_index(types)
-
         self.get_custom_aggs_query(query, aggs)
-
-        docs = self.elastic.search(query, types, params={})
+        docs = await self.elastic_async.search(query, types, params={})
 
         app = get_current_app().as_any()
         for resource in types:
-            response = {ITEMS: [doc for doc in docs if doc["_type"] == resource]}
+            response = {ITEMS: [doc async for doc in docs if doc["_type"] == resource]}
             getattr(app, "on_fetched_resource")(resource, response)
             getattr(app, "on_fetched_resource_%s" % resource)(response)
 
         return docs
 
-    def get(self, req, **lookup):
+    async def get_async(self, req, **lookup):
         args = self._get_request_or_lookup(req, **lookup)
 
         if args.get("source"):
@@ -316,16 +312,16 @@ class BaseReportService(SearchService):
         else:
             raise SuperdeskApiError.badRequestError("source/query not provided")
 
-        docs = self.run_query(params, args)
+        docs = await self.run_query(params, args)
 
         if args["return_type"] == "highcharts_config":
-            report = self.generate_highcharts_config(docs, args)
+            report = await self.generate_highcharts_config(docs, args)
         elif args["return_type"] == MIME_TYPES.CSV:
             report = self.generate_csv(docs, args)
         elif args["return_type"] == MIME_TYPES.HTML:
             report = self.generate_html(docs, args)
         else:
-            report = self.generate_report(docs, args)
+            report = await self.generate_report(docs, args)
 
         if "include_items" in args and int(args["include_items"]):
             report["_items"] = list(docs)
