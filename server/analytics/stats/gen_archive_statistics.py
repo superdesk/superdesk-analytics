@@ -8,13 +8,16 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
+import click
+
 from copy import deepcopy
 from datetime import timedelta
 
-from superdesk.resource_fields import ID_FIELD
-from superdesk import Command, command, get_resource_service, Option
-from superdesk.logging import logger
 from superdesk.utc import utcnow
+from superdesk.commands import cli
+from superdesk.logging import logger
+from superdesk import get_resource_service
+from superdesk.resource_fields import ID_FIELD
 from superdesk.metadata.item import (
     ITEM_STATE,
     ITEM_TYPE,
@@ -32,6 +35,7 @@ from superdesk.signals import signals
 
 from analytics.stats.common import STAT_TYPE, OPERATION
 from analytics.stats import desk_transitions
+
 
 gen_stats_signals = {
     "start": signals.signal("gen_archive_statistics:start"),
@@ -79,14 +83,17 @@ def connect_stats_signals(
         gen_stats_signals["finish"].connect(on_finish)
 
 
-class GenArchiveStatistics(Command):
+@cli.command("analytics:gen_archive_statistics")
+@click.option("--max-days", "-d", required=False, default=3)
+@click.option("--item-id", "-i", required=False)
+@click.option("--chunk-size", "-c", required=False, default=1000)
+async def gen_archive_statistics(max_days: int, item_id: str, chunk_size: int):
     """Generate statistics for archive documents based on archive_history documents
 
     Generates a linear timeline of operations based on documents from archive_history.
     This data is then used to search and aggregate for usage in generating charts.
 
-    Options
-    ::
+    Options:
 
         -d, --max-days (defaults to 3):
         Maximum number of days to process from archive_history
@@ -99,7 +106,6 @@ class GenArchiveStatistics(Command):
     celery on a schedule every hour (minute=0).
 
     Example:
-    ::
 
         $ python manage.py analytics:gen_archive_statistics
         $ python manage.py analytics:gen_archive_statistics -d 1
@@ -114,7 +120,6 @@ class GenArchiveStatistics(Command):
     There is a dictionary in the schema for custom stats to be stored under the 'extra' attribute.
 
     Example:
-    ::
 
         from analytics.stats.gen_archive_statistics import connect_stats_signals
 
@@ -124,13 +129,15 @@ class GenArchiveStatistics(Command):
 
     """
 
-    option_list = [
-        Option("--max-days", "-d", dest="max_days", default=3),
-        Option("--item-id", "-i", dest="item_id", default=None),
-        Option("--chunk-size", "-c", dest="chunk_size", default=1000),
-    ]
+    await GenArchiveStatistics().run(max_days, item_id, chunk_size)
 
-    def run(self, max_days=3, item_id=None, chunk_size=1000):
+
+class GenArchiveStatistics:
+    """
+    Generate archive statistics command handler class.
+    """
+
+    async def run(self, max_days=3, item_id=None, chunk_size=1000):
         now_utc = utcnow()
 
         # If we're generating stats for a single item, then
@@ -167,7 +174,7 @@ class GenArchiveStatistics(Command):
         num_history_items = 0
 
         try:
-            items_processed, failed_ids, num_history_items = self.generate_stats(item_id, gte, chunk_size)
+            items_processed, failed_ids, num_history_items = await self.generate_stats(item_id, gte, chunk_size)
         except Exception:
             logger.exception("Failed to generate archive stats")
         finally:
@@ -183,24 +190,23 @@ class GenArchiveStatistics(Command):
             )
         )
 
-    def generate_stats(self, item_id, gte, chunk_size):
+    async def generate_stats(self, item_id, gte, chunk_size):
         items_processed = 0
         failed_ids = []
         num_history_items = 0
-
-        # TODO-ASYNC: update to async calls once this command is migrated to async
         statistics_service = get_resource_service("archive_statistics")
 
         # Get the system record from the last run
         # This document stores the id of the last processed archive_history item
-        last_history = statistics_service.get_last_run()
+        last_history = await statistics_service.get_last_run()
         last_entry_id = last_history.get("guid") or None
 
         if last_history.get("guid"):
             logger.info("Found previous run, continuing from history item {}".format(last_history["guid"]))
 
         iterated_started = utcnow()
-        for history_items in statistics_service.get_history_items(last_entry_id, gte, item_id, chunk_size):
+
+        async for history_items in statistics_service.get_history_items(last_entry_id, gte, item_id, chunk_size):
             if len(history_items) < 1:
                 logger.info("No more history records to process")
                 break
@@ -210,9 +216,9 @@ class GenArchiveStatistics(Command):
             num_history_items += len(history_items)
             last_entry_id = history_items[-1].get(ID_FIELD)
 
-            items = self.gen_history_timelines(history_items)
+            items = await self.gen_history_timelines(history_items)
             items_processed += len(items)
-            self.process_timelines(items, failed_ids)
+            await self.process_timelines(items, failed_ids)
 
             time_diff = (utcnow() - iterated_started).total_seconds()
             logger.info(
@@ -232,21 +238,19 @@ class GenArchiveStatistics(Command):
         if not item_id:
             # Create/Update the system record from this run
             # Storing the id of the last processed archive_history item
-            statistics_service.set_last_run_id(last_entry_id, last_history)
+            await statistics_service.set_last_run_id(last_entry_id, last_history)
 
         return items_processed, failed_ids, num_history_items
 
-    def gen_history_timelines(self, history_items):
+    async def gen_history_timelines(self, history_items):
         items = {}
-
-        # TODO-ASYNC: update to async calls once this command is migrated to async
         statistics_service = get_resource_service("archive_statistics")
 
-        def add_item(entry_id):
+        async def add_item(entry_id):
             if items.get(entry_id):
                 return
 
-            item = statistics_service.find_one(req=None, _id=str(entry_id)) or {}
+            item = await statistics_service.find_one_async(req=None, _id=str(entry_id)) or {}
 
             if not item.get("stats"):
                 item["stats"] = {}
@@ -274,7 +278,7 @@ class GenArchiveStatistics(Command):
                 history_item["update"] = {}
 
             try:
-                add_item(item_id)
+                await add_item(item_id)
                 self.gen_archive_stats_from_history(items[item_id], history_item)
             except Exception:
                 logger.exception(
@@ -406,8 +410,7 @@ class GenArchiveStatistics(Command):
             if field in history["update"]:
                 item["updates"][field] = history["update"][field]
 
-    def process_timelines(self, items, failed_ids):
-        # TODO-ASYNC: update to async calls once this command is migrated to async
+    async def process_timelines(self, items, failed_ids):
         statistics_service = get_resource_service("archive_statistics")
         items_to_create = []
         rewrites = []
@@ -429,7 +432,7 @@ class GenArchiveStatistics(Command):
                 items_to_create.append(item["updates"])
             else:
                 try:
-                    statistics_service.patch(item_id, item["updates"])
+                    await statistics_service.patch_async(item_id, item["updates"])
                 except Exception:
                     logger.exception(
                         "Failed to update stats for item {}. updates={}".format(item_id, item.get("updates"))
@@ -438,7 +441,7 @@ class GenArchiveStatistics(Command):
 
         if len(items_to_create) > 0:
             try:
-                statistics_service.post(items_to_create)
+                await statistics_service.post_async(items_to_create)
             except Exception:
                 item_ids = [item.get(ID_FIELD) for item in items_to_create]
                 logger.exception("Failed to create stat entries for items {}".format(", ".join(item_ids)))
@@ -457,7 +460,7 @@ class GenArchiveStatistics(Command):
                 logger.warning("Failed {}, original_id not defined".format(item_id))
                 continue
 
-            original = statistics_service.find_one(req=None, _id=original_id)
+            original = await statistics_service.find_one_async(req=None, _id=original_id)
             if not original:
                 logger.warning("Failed {}, original not found".format(item_id))
                 continue
@@ -467,7 +470,7 @@ class GenArchiveStatistics(Command):
                 logger.warning("Failed {}, published_at not defined".format(original_id))
                 continue
 
-            statistics_service.patch(
+            await statistics_service.patch_async(
                 original_id,
                 {"time_to_next_update_publish": (updated_at - published_at).total_seconds()},
             )
@@ -627,6 +630,3 @@ class GenArchiveStatistics(Command):
 
         if "original_par_count" not in updates and entry["par_count"] > 0:
             updates["original_par_count"] = entry["par_count"]
-
-
-command("analytics:gen_archive_statistics", GenArchiveStatistics())

@@ -10,19 +10,19 @@
 
 import pytz
 
+from os import urandom
+from unittest import mock
 from datetime import datetime
 from dateutil.rrule import rrule, HOURLY
-from unittest import mock
-from os import urandom
 from base64 import b64encode, b64decode
 
 from superdesk.core import get_app_config
 from superdesk import get_resource_service
 from superdesk.utc import local_to_utc
 
-from analytics.tests import BaseTestCase, markers
-from analytics.commands.send_scheduled_reports import SendScheduledReports
 from analytics.common import MIME_TYPES
+from analytics.tests import BaseTestCase
+from analytics.commands.send_scheduled_reports import SendScheduledReports
 from analytics.email_report.email_report import EmailReportService
 
 
@@ -101,7 +101,7 @@ class SendScheduleReportTestCase(BaseTestCase):
             local_tz = pytz.timezone(default_timezone)
             now_local = local_tz.localize(now)
 
-            response = self.should_send(report, now_local)
+            response = await self.should_send(report, now_local)
 
             self.assertEqual(
                 response,
@@ -117,7 +117,6 @@ class SendScheduleReportTestCase(BaseTestCase):
         self.assertEqual(len(expected_hits), count)
 
     @mock.patch("analytics.email_report.email_report.generate_report", return_value=mock_file)
-    @markers.requires_async_commands
     async def test_run_hourly_png(self, mocked):
         self.app.data.insert("users", mock_users)
         self.app.data.insert("vocabularies", mock_vocabs)
@@ -148,13 +147,13 @@ class SendScheduleReportTestCase(BaseTestCase):
         start_date = to_naive("2018-06-30T00")
         end_date = to_naive("2018-06-30T03")
         default_timezone = get_app_config("DEFAULT_TIMEZONE")
-        local_tz = default_timezone
+        local_tz = pytz.timezone(default_timezone)
         with self.app.mail.record_messages() as outbox:
             for now in rrule(HOURLY, dtstart=start_date, until=end_date):
                 now_local = local_tz.localize(now)
                 now_utc = local_to_utc(default_timezone, now_local)
 
-                SendScheduledReports().run(now_utc)
+                await SendScheduledReports().run(now_utc)
 
                 # _last sent is updated
                 report = await scheduled_service.find_one_async(req=None, _id="sched1")
@@ -185,7 +184,6 @@ class SendScheduleReportTestCase(BaseTestCase):
         self.assertEqual(report.get("_last_sent"), to_utc("2018-06-30T03"))
 
     @mock.patch("analytics.email_report.email_report.generate_report", return_value=mock_file)
-    @markers.requires_async_commands
     async def test_run_daily_jpeg(self, mocked):
         self.app.data.insert("users", mock_users)
         self.app.data.insert("vocabularies", mock_vocabs)
@@ -217,13 +215,13 @@ class SendScheduleReportTestCase(BaseTestCase):
         end_date = to_naive("2018-06-30T03")
         should_have_updated = False
         default_timezone = get_app_config("DEFAULT_TIMEZONE")
+        local_tz = pytz.timezone(default_timezone)
         with self.app.mail.record_messages() as outbox:
             for now in rrule(HOURLY, dtstart=start_date, until=end_date):
-                local_tz = pytz.timezone(default_timezone)
                 now_local = local_tz.localize(now)
                 now_utc = local_to_utc(default_timezone, now_local)
 
-                SendScheduledReports().run(now_utc)
+                await SendScheduledReports().run(now_utc)
 
                 # _last sent is updated
                 report = await scheduled_service.find_one_async(req=None, _id="sched1")
@@ -249,7 +247,6 @@ class SendScheduleReportTestCase(BaseTestCase):
         self.assertEqual(report.get("_last_sent"), to_utc("2018-06-30T01"))
 
     @mock.patch("analytics.email_report.email_report.generate_report", return_value=mock_csv)
-    @markers.requires_async_commands
     async def test_email_csv(self, mocked):
         self.app.data.insert("users", mock_users)
         self.app.data.insert("vocabularies", mock_vocabs)
@@ -272,7 +269,7 @@ class SendScheduleReportTestCase(BaseTestCase):
         )
 
         with self.app.mail.record_messages() as outbox:
-            SendScheduledReports().run("2018-06-30T00")
+            await SendScheduledReports().run("2018-06-30T00")
 
             self.assertEqual(len(outbox), 1)
 
@@ -286,7 +283,6 @@ class SendScheduleReportTestCase(BaseTestCase):
             self.assertEqual(outbox[0].attachments[0].data, b64decode(mock_csv))
 
     @mock.patch.object(EmailReportService, "_gen_attachments", return_value=mock_array)
-    @markers.requires_async_commands
     async def test_email_multiple_attachments(self, mock):
         self.app.data.insert("users", mock_users)
         self.app.data.insert("vocabularies", mock_vocabs)
@@ -327,7 +323,7 @@ class SendScheduleReportTestCase(BaseTestCase):
         )
 
         with self.app.mail.record_messages() as outbox:
-            SendScheduledReports().run("2018-06-30T00")
+            await SendScheduledReports().run("2018-06-30T00")
 
             self.assertEqual(len(outbox), 1)
 

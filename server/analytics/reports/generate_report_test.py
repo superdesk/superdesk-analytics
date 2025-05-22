@@ -8,7 +8,7 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-from analytics.tests import BaseTestCase, markers
+from analytics.tests import BaseTestCase
 from analytics.reports import generate_report
 from analytics.common import MIME_TYPES
 
@@ -23,7 +23,6 @@ options = {
 }
 
 
-@markers.fix_highchart_server
 class GenerateReportTestCase(BaseTestCase):
     async def test_generate_svg(self):
         report = generate_report(options, mimetype=MIME_TYPES.SVG, base64=False)

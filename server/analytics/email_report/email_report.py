@@ -98,7 +98,7 @@ class EmailReportResource(Resource):
 class EmailReportService(AsyncBaseService):
     async def create_async(self, docs, **kwargs):
         for doc in docs:
-            attachments = self._gen_attachments(doc.get("report") or {})
+            attachments = await self._gen_attachments(doc.get("report") or {})
             await self._email_report(doc.get("email") or {}, attachments)
 
         # We're not actually saving anything to the database
@@ -106,9 +106,10 @@ class EmailReportService(AsyncBaseService):
         return [0]
 
     @staticmethod
-    def _gen_attachments(report):
+    async def _gen_attachments(report):
         # TODO-ASYNC: make this async once all report services are made async
         report_service = get_report_service(report.get("type"))
+
         if report_service is None:
             raise SuperdeskApiError.badRequestError('Unknown report type "{}"'.format(report.get("type")))
 
@@ -127,7 +128,7 @@ class EmailReportService(AsyncBaseService):
             return_type = "aggregations"
 
         generated_report = list(
-            report_service.get(
+            await report_service.get_async(
                 req=None,
                 params=report.get("params") or {},
                 translations=report.get("translations") or {},

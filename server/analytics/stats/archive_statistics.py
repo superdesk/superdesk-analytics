@@ -267,30 +267,28 @@ class ArchiveStatisticsService(AsyncBaseService):
 
         last_processed_id = last_id
 
+        def build_query():
+            conditions = []
+            if gte:
+                conditions.append({"_created": {"$gte": date_to_str(gte)}})
+            if item_id:
+                conditions.append({"item_id": str(item_id)})
+            if last_processed_id:
+                conditions.append({"_id": {"$gt": str(last_processed_id)}})
+            return {"$and": conditions}
+
         while True:
             req = ParsedRequest()
             req.sort = '[("_id", 1), ("version", 1)]'
-
-            query = {"$and": []}
-
-            if gte:
-                query["$and"].append({"_created": {"$gte": date_to_str(gte)}})
-
-            if item_id:
-                query["$and"].append({"item_id": str(item_id)})
-
-            if last_processed_id:
-                query["$and"].append({"_id": {"$gt": str(last_processed_id)}})
-
-            req.where = json.dumps(query)
+            req.where = json.dumps(build_query())
 
             if chunk_size > 0:
                 req.max_results = int(chunk_size)
 
             items = await history_service.get_async(req=req, lookup=None)
-
-            if len(items) < 1:
+            if not await items.count():
                 break
 
+            items = await items.to_list()
             last_processed_id = items[-1][ID_FIELD]
             yield items
