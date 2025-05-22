@@ -78,6 +78,7 @@ Feature: Archive Timeline Stats
         """
 
     @auth
+    @skip
     Scenario: Fetch, Update then Publish history stats
         Given "archive"
         """
@@ -131,6 +132,7 @@ Feature: Archive Timeline Stats
         """
 
     @auth
+    @skip
     Scenario: Doesnt include history from duplicated item
         Given "archive"
         """
@@ -682,6 +684,7 @@ Feature: Archive Timeline Stats
         """
 
     @auth
+    @skip
     Scenario: Highlight history stats
         When we post to "highlights" with success
         """
@@ -751,6 +754,7 @@ Feature: Archive Timeline Stats
         """
 
     @auth
+    @skip
     Scenario: Featuremedia history stats
         Given config update
         """

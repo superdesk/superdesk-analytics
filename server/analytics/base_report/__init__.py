@@ -18,6 +18,7 @@ from superdesk.utils import ListCursor
 from superdesk.utc import utcnow, get_timezone_offset
 from superdesk.errors import SuperdeskApiError
 from superdesk.es_utils import REPOS
+from superdesk.eve_async.cursors import ElasticAsyncEveCursor
 
 from apps.search import SearchService
 
@@ -324,7 +325,7 @@ class BaseReportService(SearchService):
             report = await self.generate_report(docs, args)
 
         if "include_items" in args and int(args["include_items"]):
-            report["_items"] = list(docs)
+            report["_items"] = await docs.to_list()
 
         if isinstance(report, list):
             return ListCursor(report)
@@ -332,6 +333,8 @@ class BaseReportService(SearchService):
             return report
         elif isinstance(report, ElasticCursor):
             return report
+        elif isinstance(report, ElasticAsyncEveCursor):
+            return ListCursor(await report.to_list())
         return ListCursor([report])
 
     def get_utc_offset(self):

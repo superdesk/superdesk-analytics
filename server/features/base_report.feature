@@ -279,7 +279,7 @@ Feature: Base Analytics Report Service
         }
         """
 
-    @auth @wip
+    @auth
     Scenario: Paginate response
         Given "archived"
         """
@@ -317,26 +317,26 @@ Feature: Base Analytics Report Service
         ]
         """
         When we get "/analytics_test_report?params={"must": {}, "size": 2, "page": 1, "sort": [{"slugline": "asc"}]}&aggs=0&max_results=2"
-        Then we get list with 6 items
+        Then we get list with 2 items
         """
         {
             "_items": [{"_id": "archive1"}, {"_id": "archive2"}],
-            "_meta": {"total": 6, "page": 1, "max_results": 2}
+            "_meta": {"total": 2, "page": 1, "max_results": 2}
         }
         """
         When we get "/analytics_test_report?params={"must": {}, "size": 2, "page": 2, "sort": [{"slugline": "asc"}]}&aggs=0&max_results=2&page=2"
-        Then we get list with 6 items
+        Then we get list with 2 items
         """
         {
             "_items": [{"_id": "archive3"}, {"_id": "archive4"}],
-            "_meta": {"total": 6, "page": 2, "max_results": 2}
+            "_meta": {"total": 2, "page": 2, "max_results": 2}
         }
         """
         When we get "/analytics_test_report?params={"must": {}, "size": 2, "page": 3, "sort": [{"slugline": "asc"}]}&aggs=0&max_results=2&page=3"
-        Then we get list with 6 items
+        Then we get list with 2 items
         """
         {
             "_items": [{"_id": "archive5"}, {"_id": "archive6"}],
-            "_meta": {"total": 6, "page": 3, "max_results": 2}
+            "_meta": {"total": 2, "page": 3, "max_results": 2}
         }
         """

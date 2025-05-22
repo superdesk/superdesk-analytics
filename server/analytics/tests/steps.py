@@ -8,6 +8,8 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
+from behave.api.async_step import async_run_until_complete
+
 from superdesk import get_resource_service
 from superdesk.tests.steps import (
     given,
@@ -17,7 +19,7 @@ from superdesk.tests.steps import (
     assert_equal,
     get_json_data,
     json,
-    fail_and_print_body,
+    fail_and_print_body_async,
     apply_placeholders,
     json_match,
 )
@@ -27,9 +29,10 @@ from .fixtures import FIXTURES
 
 
 @then("we get {total_count} charts")
-def step_impl_then_get_charts(context, total_count):
+@async_run_until_complete
+async def step_impl_then_get_charts(context, total_count):
     assert_200(context.response)
-    data = get_json_data(context.response)
+    data = await get_json_data(context.response)
     int_count = int(total_count)
     report = (data.get("_items") or [{}])[0]
     num_reports = len(report.get("highcharts"))
@@ -40,7 +43,7 @@ def step_impl_then_get_charts(context, total_count):
         try:
             response_data = json.loads(context.response.get_data())
         except Exception:
-            fail_and_print_body(context.response, "response is not valid json")
+            await fail_and_print_body_async(context.response, "response is not valid json")
             return
 
         report = (response_data.get("_items") or [{}])[0]
@@ -70,19 +73,29 @@ def step_impl_then_get_charts(context, total_count):
 
 
 @when("we generate stats from archive history")
-def step_impl_when_generate_stats_from_archive_history(context):
-    with context.app.app_context():
-        GenArchiveStatistics().run()
+@async_run_until_complete
+async def step_impl_when_generate_stats_from_archive_history(context):
+    async with context.app.app_context():
+        await GenArchiveStatistics().run()
+
+
+@then('we empty the "{resource}" collection')
+@async_run_until_complete
+async def step_impl_then_wipe_the_resource_collection(context, resource):
+    async with context.app.test_request_context(context.app.config["URL_PREFIX"]):
+        service = get_resource_service(resource)
+        await service.delete_async({})
 
 
 @then('we get "{report_id}" config')
-def step_impl_then_we_get_config(context, report_id):
-    assert_200(context.response)
+@async_run_until_complete
+async def step_impl_then_we_get_config(context, report_id):
+    await assert_200(context.response)
 
     if not context.text:
         return
 
-    data = get_json_data(context.response)
+    data = await get_json_data(context.response)
 
     config = next((c for c in (data.get("_items") or []) if c.get("_id") == report_id), None)
 
@@ -91,14 +104,15 @@ def step_impl_then_we_get_config(context, report_id):
 
 
 @then("we get stats")
-def step_impl_then_get_stats_for_item(context):
-    assert_200(context.response)
+@async_run_until_complete
+async def step_impl_then_get_stats_for_item(context):
+    await assert_200(context.response)
 
     if context.text:
         try:
-            response_data = json.loads(context.response.get_data())
+            response_data = json.loads(await context.response.get_data())
         except Exception:
-            fail_and_print_body(context.response, "response is not valid json")
+            await fail_and_print_body_async(context.response, "response is not valid json")
             return
 
         stats = response_data.get("stats") or {}
@@ -158,8 +172,9 @@ def step_impl_then_get_stats_for_item(context):
 
 
 @given('the vocab fixture "{resource}"')
-def step_impl_given_the_test_vocabularies(context, resource):
-    with context.app.test_request_context(context.app.config["URL_PREFIX"]):
+@async_run_until_complete
+async def step_impl_given_the_test_vocabularies(context, resource):
+    async with context.app.test_request_context(context.app.config["URL_PREFIX"]):
         service = get_resource_service("vocabularies")
-        service.delete_action()
-        service.post([{"_id": resource, "items": FIXTURES[resource]}])
+        await service.delete_async({})
+        await service.post_async([{"_id": resource, "items": FIXTURES[resource]}])

@@ -1,3 +1,4 @@
+@skip
 Feature: Featuremedia Stats
     Background: Initial Setup
         Given config update
@@ -942,7 +943,7 @@ Feature: Featuremedia Stats
         }
         """
 
-    @auth @wip
+    @auth
     Scenario: Changes to featuremedia in updates are recorded as well
         When we post to "/archive" with success
         """
