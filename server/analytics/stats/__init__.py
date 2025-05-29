@@ -63,5 +63,5 @@ def init_gen_stats_task(app):
 
 
 @celery.task(soft_time_limit=600)
-def gen_archive_stats():
-    GenArchiveStatistics().run()
+async def gen_archive_stats():
+    await GenArchiveStatistics().run()
