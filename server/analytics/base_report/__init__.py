@@ -327,15 +327,10 @@ class BaseReportService(SearchService):
         if "include_items" in args and int(args["include_items"]):
             report["_items"] = await docs.to_list()
 
-        if isinstance(report, list):
-            return ListCursor(report)
-        elif isinstance(report, ListCursor):
+        if isinstance(report, ElasticAsyncEveCursor):
             return report
-        elif isinstance(report, ElasticCursor):
-            return report
-        elif isinstance(report, ElasticAsyncEveCursor):
-            return ListCursor(await report.to_list())
-        return ListCursor([report])
+
+        return ListCursor(report if isinstance(report, list) else [report])
 
     def get_utc_offset(self):
         return get_timezone_offset(get_app_config("DEFAULT_TIMEZONE"), utcnow())
