@@ -12,6 +12,7 @@ httmock==1.4.0
 responses
 pytest
 pytest-env
+aioresponses==0.7.8
 
 -e git+https://github.com/superdesk/superdesk-core.git@async#egg=Superdesk-Core
 -e git+https://github.com/superdesk/superdesk-planning.git@async#egg=superdesk-planning
