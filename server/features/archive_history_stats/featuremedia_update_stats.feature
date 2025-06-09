@@ -1,4 +1,3 @@
-@skip
 Feature: Featuremedia Stats
     Background: Initial Setup
         Given config update

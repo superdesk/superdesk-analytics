@@ -11,8 +11,8 @@
 import asyncio
 from superdesk.tests.environment import (
     setup_before_all,
-    before_feature as setup_before_feature,
-    before_scenario_async as setup_before_scenario,
+    before_feature,
+    before_scenario_async,
     before_step,
     after_scenario,
 )  # noqa
@@ -40,19 +40,5 @@ def run_async_task(task):
         raise e
 
 
-def before_feature(context, feature):
-    # TODO-ASYNC: remove once `FeaturemediaUpdates` is migrated to async
-    if "skip" in feature.tags:
-        feature.skip("Feature has been skipped")
-        return
-
-    setup_before_feature(context, feature)
-
-
 def before_scenario(context, scenario):
-    # TODO-ASYNC: remove once `FeaturemediaUpdates` is migrated to async
-    if "skip" in scenario.tags:
-        scenario.skip("Scenario has been skipped")
-        return
-
-    run_async_task(setup_before_scenario(context, scenario))
+    run_async_task(before_scenario_async(context, scenario))

@@ -120,19 +120,17 @@ async def step_impl_then_get_stats_for_item(context):
 
         # parent stat entries (i.e. timeline, desk_transitions, featuremedia_updates)
         for stat_type, stat_entries in context_stats.items():
-            assert stat_type in stats.keys(), "stats.{} does not exist".format(stat_type)
+            assert stat_type in stats.keys(), f"stats.{stat_type} does not exist"
 
             if stat_entries is None:
-                assert stats[stat_type] is None, "stats.{} is not empty".format(stat_type)
+                assert stats[stat_type] is None, f"stats.{stat_type} is not empty"
                 continue
             elif stats[stat_type] is None:
-                assert stat_entries == stats[stat_type], "stats.{} {} != {}".format(
-                    stat_type, stats[stat_type], stat_entries
-                )
+                assert stat_entries == stats[stat_type], f"stats.{stat_type} {stats[stat_type]} != {stat_entries}"
 
-            assert len(stat_entries) == len(stats[stat_type]), "stats.{}. len {} != {}.\nStats={}".format(
-                stat_type, len(stat_entries), len(stats[stat_type]), stats[stat_type]
-            )
+            assert len(stat_entries) == len(
+                stats[stat_type]
+            ), f"stats.{stat_type}. len {len(stat_entries)} != {len(stats[stat_type])}.\nStats={stats[stat_type]}"
 
             stat_index = 0
             for stat_entry in stat_entries:

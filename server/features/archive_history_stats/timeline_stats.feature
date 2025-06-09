@@ -78,7 +78,6 @@ Feature: Archive Timeline Stats
         """
 
     @auth
-    @skip
     Scenario: Fetch, Update then Publish history stats
         Given "archive"
         """
@@ -90,6 +89,7 @@ Feature: Archive Timeline Stats
             "state": "fetched"
         }]
         """
+        And empty "archive_history"
         And "archive_history"
         """
         [{
@@ -132,7 +132,6 @@ Feature: Archive Timeline Stats
         """
 
     @auth
-    @skip
     Scenario: Doesnt include history from duplicated item
         Given "archive"
         """
@@ -144,6 +143,7 @@ Feature: Archive Timeline Stats
             "state": "in_progress"
         }]
         """
+        And empty "archive_history"
         And "archive_history"
         """
         [{
@@ -684,7 +684,6 @@ Feature: Archive Timeline Stats
         """
 
     @auth
-    @skip
     Scenario: Highlight history stats
         When we post to "highlights" with success
         """
@@ -754,7 +753,6 @@ Feature: Archive Timeline Stats
         """
 
     @auth
-    @skip
     Scenario: Featuremedia history stats
         Given config update
         """
