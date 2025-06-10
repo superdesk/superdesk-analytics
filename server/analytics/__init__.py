@@ -177,5 +177,5 @@ def init_app(app):
 
 
 @celery.task(soft_time_limit=600)
-def send_scheduled_reports():
-    SendScheduledReports().run()
+async def send_scheduled_reports():
+    await SendScheduledReports().run()
