@@ -8,9 +8,9 @@ from distutils import log
 
 def install_highcharts():
     try:
-        check_call("./install-highcharts-export-server.sh", cwd=path.realpath("server/scripts"))
+        check_call("./install-highcharts-export-server.sh", cwd=path.realpath("server/analytics/scripts"))
     except Exception as e:
-        log.error("\t**NodeJs not found, report scheduling will not work**:\n\t{}".format(e))
+        log.error(f"\t**NodeJs not found, report scheduling will not work**:\n\t{e}")
 
 
 class PostDevelopCommand(develop):
@@ -30,20 +30,28 @@ class PostInstallCommand(install):
 
 
 package_data = {
-    "scripts": ["*.sh"],
+    "analytics": ["scripts/*.sh"],
 }
 
 
 setup(
     name="superdesk-analytics",
     version="2.8.0",
-    package_dir={'': 'server'},
-    packages=find_packages('server'),
+    package_dir={"": "server"},
+    packages=find_packages("server"),
     package_data=package_data,
     include_package_data=True,
     author="Sourcefabric",
     author_email="contact@sourcefabric.org",
     license="MIT",
     url="https://github.com/superdesk/superdesk-analytics",
-    cmdclass={"develop": PostDevelopCommand, "install": PostInstallCommand},
+    cmdclass={
+        "develop": PostDevelopCommand,
+        "install": PostInstallCommand,
+    },
+    entry_points={
+        "console_scripts": [
+            "install-highcharts-server=analytics.install_highcharts:install_highcharts_server",
+        ],
+    },
 )
