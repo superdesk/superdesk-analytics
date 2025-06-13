@@ -134,13 +134,6 @@ To have the license details available to the end user in the Analytics page of S
 
 
 ## Config Options
-* HIGHCHARTS_SERVER_HOST (defaults to 'localhost')
-* HIGHCHARTS_SERVER_PORT (defaults to '6060')
-* HIGHCHARTS_SERVER_WORKERS (defaults to 4) - Number of workers to spawn
-* HIGHCHARTS_SERVER_WORK_LIMIT (defaults to 60) - The pieces of work that can be performed before restarting a phantom process
-* HIGHCHARTS_SERVER_LOG_LEVEL (defaults to 3) - Set the log level. Available options are:
-* HIGHCHARTS_SERVER_QUEUE_SIZE (defaults to 10) - how many request can be stored in overflow count when there are not enough
-* HIGHCHARTS_SERVER_RATE_LIMIT (defaults to False) - The max requests allowed in one minute
 * ANALYTICS_ENABLE_SCHEDULED_REPORTS (defaults to False) - Enable the emailing of scheduled reports
 * ANALYTICS_ENABLE_ARCHIVE_STATS (defaults to False)
 * STATISTICS_MONGO_DBNAME (defaults to 'statistics')
@@ -148,7 +141,7 @@ To have the license details available to the end user in the Analytics page of S
 * STATISTICS_ELASTIC_URL (defaults to ELASTICSEARCH_URL config)
 
 ## Highcharts Export Server
-To be able to generate charts on the server, we need to install/run the Highcharts Export Server.
+To be able to generate charts on the server, we need to install the Highcharts Export Server.
 
 ### Installing the service
 ```
@@ -157,47 +150,19 @@ npm install -g highcharts-export-server
 
 There is also a script that can be used to automate the install:
 ```
-cd server/scripts && ./install-highcharts-export-server.sh
+install-highcharts-server
 ```
+
+Alternatively you can install it manually with:
+```
+cd server/analytics/scripts && ./install-highcharts-export-server.sh
+```
+
 This will automatically accept the end user licence, and use a specific version of highcharts
 * ACCEPT_HIGHCHARTS_LICENSE=1
 * HIGHCHARTS_VERSION=6.2.0
 * HIGHCHARTS_USE_STYLED=1
 * HIGHCHARTS_MOMENT=1
-
-### Running the service
-There is a python module to allow running the highcharts export server.
-```
-python3 -u -m analytics.reports.highcharts_server
-```
-
-This will start the service using the host/port configured in settings.py (relative to your current working directory)
-* HIGHCHARTS_SERVER_HOST (defaults to 'localhost')
-* HIGHCHARTS_SERVER_PORT (defaults to '6060')
-
-### Adding the service to a Honcho Procfile
-You can add the service to your Honcho Procfile with the following line:
-```
-highcharts: python3 -u -m analytics.reports.highcharts_server
-```
-
-### Configuring Process Workers
-The export server uses a pool of PhantomJs worker threads. You can configure this pool in settings.py
-* HIGHCHARTS_SERVER_WORKERS (defaults to 4) - Number of workers to spawn
-* HIGHCHARTS_SERVER_WORK_LIMIT (defaults to 60) - The pieces of work that can be performed before restarting a phantom process
-* HIGHCHARTS_SERVER_LOG_LEVEL (defaults to 3) - Set the log level. Available options are:
-    * 0 - off
-    * 1 - errors
-    * 2 - warn
-    * 3 - notice
-    * 4 - verbose
-* HIGHCHARTS_SERVER_QUEUE_SIZE (defaults to 10) - how many request can be stored in overflow count when there are not enough
-
-### Rate limiting  Highcharts requests
-The highcharts export server has the ability to rate limit the requests that it receives.
-By default rate limiting is turned off. You can turn it on in your settings.py
-* HIGHCHARTS_SERVER_RATE_LIMIT (defaults to False) - The max requests allowed in one minute
-
 
 ## Scheduled Reports
 To enable reports to be periodically scheduled (emailed), you must enable the config in settings.py.

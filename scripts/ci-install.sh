@@ -16,8 +16,8 @@ if [ "$SERVER" == "true" ]; then
     cd server
     pip install -r requirements.txt
     cd ..
-    chmod a+x server/scripts/install-highcharts-export-server.sh
+    chmod a+x server/analytics/scripts/install-highcharts-export-server.sh
     pip install -e .
-    cd server/scripts
+    cd server/analytics/scripts
     ./install-highcharts-export-server.sh
 fi
