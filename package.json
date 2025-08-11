@@ -33,7 +33,7 @@
     "angular-mocks": "1.6.9",
     "css-loader": "^5.2.7",
     "eslint": "6.6.0",
-    "eslint-plugin-angular": "^1.6.1",
+    "eslint-plugin-angular": "^4.1.0",
     "eslint-plugin-jasmine": "^1.8.1",
     "eslint-plugin-react": "7.16.0",
     "file-loader": "^6.2.0",
