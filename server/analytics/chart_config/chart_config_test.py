@@ -71,18 +71,21 @@ class ChartConfigTestCase(TestCase):
                 [
                     {
                         "_id": "user1",
+                        "username": "user1",
                         "display_name": "first user",
                         "is_active": True,
                         "is_enabled": True,
                     },
                     {
                         "_id": "user2",
+                        "username": "user2",
                         "display_name": "second user",
                         "is_active": True,
                         "is_enabled": True,
                     },
                     {
                         "_id": "user3",
+                        "username": "user3",
                         "display_name": "last user",
                         "is_active": True,
                         "is_enabled": True,
