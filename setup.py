@@ -36,7 +36,7 @@ package_data = {
 
 setup(
     name="superdesk-analytics",
-    version="2.8.0",
+    version="3.0.0-dev.0",
     package_dir={"": "server"},
     packages=find_packages("server"),
     package_data=package_data,

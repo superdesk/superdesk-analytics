@@ -35,8 +35,8 @@ class PlanningUsageReportTestCase(BaseTestCase):
         self.app.data.insert(
             "roles",
             [
-                {"_id": "role1", "privileges": {"planning": 0}},
-                {"_id": "role2", "privileges": {"planning": 1}},
+                {"_id": "role1", "name": "role1", "privileges": {"planning": 0}},
+                {"_id": "role2", "name": "role2", "privileges": {"planning": 1}},
             ],
         )
 
@@ -45,18 +45,21 @@ class PlanningUsageReportTestCase(BaseTestCase):
             [
                 {
                     "_id": "user1",
+                    "username": "user1",
                     "privileges": {"planning": 0},
                     "is_active": True,
                     "is_enabled": True,
                 },
                 {
                     "_id": "user2",
+                    "username": "user2",
                     "privileges": {"planning": 1},
                     "is_active": True,
                     "is_enabled": True,
                 },
                 {
                     "_id": "user3",
+                    "username": "user3",
                     "privileges": {},
                     "role": "role1",
                     "is_active": True,
@@ -64,6 +67,7 @@ class PlanningUsageReportTestCase(BaseTestCase):
                 },
                 {
                     "_id": "user4",
+                    "username": "user4",
                     "privileges": {},
                     "role": "role2",
                     "is_active": True,
