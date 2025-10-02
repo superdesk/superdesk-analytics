@@ -279,7 +279,7 @@ Feature: Base Analytics Report Service
         }
         """
 
-    @auth @wip
+    @auth
     Scenario: Paginate response
         Given "archived"
         """

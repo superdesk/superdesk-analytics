@@ -77,7 +77,7 @@ class PublishingPerformanceReportService(BaseReportService):
 
         return aggregations
 
-    def generate_report(self, docs, args):
+    async def generate_report(self, docs, args):
         """Returns the publishing statistics
 
         :param docs: document used for generating the statistics
@@ -142,7 +142,7 @@ class PublishingPerformanceReportService(BaseReportService):
 
         return report
 
-    def generate_highcharts_config(self, docs, args):
+    async def generate_highcharts_config(self, docs, args):
         params = args.get("params") or {}
         aggs = args.get("aggs") or {}
         group = aggs.get("group") or {}
@@ -152,7 +152,7 @@ class PublishingPerformanceReportService(BaseReportService):
         chart = params.get("chart") or {}
         chart_type = chart.get("type") or "bar"
 
-        report = self.generate_report(docs, args)
+        report = await self.generate_report(docs, args)
 
         chart_config = ChartConfig("content_publishing", chart_type)
 

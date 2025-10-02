@@ -164,7 +164,7 @@ Feature: Saved Reports
         {"description": "updated global report"}
         """
         Then we get OK response
-        When we login as user "foo" with password "bar" and user type "user"
+        When we login as user "foo" with password "barbar" and user type "user"
         """
         {
             "user_type": "user",

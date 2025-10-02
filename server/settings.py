@@ -110,9 +110,7 @@ INSTALLED_APPS.extend(
         "apps.privilege",
         "apps.rules",
         "apps.highlights",
-        "apps.products",
         "apps.publish",
-        "apps.publish.enqueue",
         "apps.publish.formatters",
         "apps.content_filters",
         "apps.content_types",
@@ -190,14 +188,6 @@ is_testing = os.environ.get("SUPERDESK_TESTING", "").lower() == "true"
 ELASTICSEARCH_FORCE_REFRESH = is_testing
 ELASTICSEARCH_AUTO_AGGREGATIONS = True
 
-# URL of the Highcharts Export Server (used in analytics for generating charts on the server)
-HIGHCHARTS_SERVER_HOST = env("HIGHCHARTS_SERVER_HOST", "localhost")
-HIGHCHARTS_SERVER_PORT = env("HIGHCHARTS_SERVER_PORT", "6060")
-HIGHCHARTS_SERVER_WORKERS = env("HIGHCHARTS_SERVER_WORKERS", "1")
-HIGHCHARTS_SERVER_WORK_LIMIT = env("HIGHCHARTS_SERVER_WORK_LIMIT", "10")
-HIGHCHARTS_SERVER_LOG_LEVEL = env("HIGHCHARTS_SERVER_LOG_LEVEL", "4")
-HIGHCHARTS_SERVER_QUEUE_SIZE = env("HIGHCHARTS_SERVER_QUEUE_SIZE", "10")
-HIGHCHARTS_SERVER_RATE_LIMIT = env("HIGHCHARTS_SERVER_RATE_LIMIT", False)
 ANALYTICS_ENABLE_SCHEDULED_REPORTS = strtobool(env("ANALYTICS_ENABLE_SCHEDULED_REPORTS", "false"))
 
 # Archive Statistics

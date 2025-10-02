@@ -8,15 +8,11 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-from superdesk.tests import TestCase
-
+from analytics.tests import BaseTestCase
 from analytics.chart_config import SDChart
 
 
-class SDChartAxisTestCase(TestCase):
-    def setUp(self):
-        self.maxDiff = None
-
+class SDChartAxisTestCase(BaseTestCase):
     def _gen_config(self, **axis_config):
         chart = SDChart.Chart("test_chart")
 
@@ -24,11 +20,11 @@ class SDChartAxisTestCase(TestCase):
 
         return chart.gen_config()
 
-    def assertConfigEqual(self, generated, expected):
+    async def assertConfigEqual(self, generated, expected):
         for key, val in expected.items():
             self.assertEqual(val, generated.get(key))
 
-    def test_default_config(self):
+    async def test_default_config(self):
         self.assertConfigEqual(
             self._gen_config(),
             {
@@ -38,7 +34,7 @@ class SDChartAxisTestCase(TestCase):
             },
         )
 
-    def test_set_options(self):
+    async def test_set_options(self):
         self.assertConfigEqual(
             self._gen_config(type="datetime"),
             {"xAxis": [{"type": "datetime", "allowDecimals": False}]},
@@ -92,7 +88,7 @@ class SDChartAxisTestCase(TestCase):
             {"yAxis": [{"allowDecimals": False, "title": {"text": "Test Y Title"}}]},
         )
 
-    def test_translate_categories(self):
+    async def test_translate_categories(self):
         chart = SDChart.Chart("test_chart")
 
         chart.set_translation(

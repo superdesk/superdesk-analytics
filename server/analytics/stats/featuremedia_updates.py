@@ -8,16 +8,16 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
+from copy import deepcopy
+
+from superdesk.core import get_app_config
+from superdesk.resource_fields import ID_FIELD
 from superdesk import get_resource_service
 from superdesk.metadata.item import ASSOCIATIONS, CONTENT_TYPE
 from superdesk.logging import logger
 
 from analytics.stats.common import STAT_TYPE, OPERATION, FEATUREMEDIA_OPERATIONS
 from analytics.stats.gen_archive_statistics import connect_stats_signals
-
-from copy import deepcopy
-from flask import current_app as app
-from eve.utils import config
 
 
 class FeaturemediaUpdates:
@@ -40,7 +40,7 @@ class FeaturemediaUpdates:
 
     def process(self, sender, entry, new_timeline, updates, update, stats):
         # Generating stats with PUBLISH_ASSOCIATED_ITEMS=True is currently not supported
-        if app.config.get("PUBLISH_ASSOCIATED_ITEMS", False):
+        if get_app_config("PUBLISH_ASSOCIATED_ITEMS", False):
             return
 
         operation = entry.get("operation")
@@ -219,6 +219,7 @@ class FeaturemediaUpdates:
         return None if entry is None else ((entry.get("update") or {}).get("associations") or {}).get("featuremedia")
 
     def finish(self, sender):
+        # TODO-ASYNC: update to async calls once this class is migrated to async
         service = get_resource_service("archive_statistics")
 
         query = {"query": {"bool": {"must": {"terms": {"_id": list(self.rewrite_ids)}}}}}
@@ -226,7 +227,7 @@ class FeaturemediaUpdates:
 
         def get_parent_id(doc):
             if not doc.get("rewrite_of"):
-                return doc[config.ID_FIELD]
+                return doc[ID_FIELD]
             elif doc["rewrite_of"] not in docs:
                 # If the parent item was not part of this stats iteration
                 # then load it now

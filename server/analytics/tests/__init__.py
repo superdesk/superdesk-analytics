@@ -8,17 +8,17 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-from superdesk.tests import TestCase as _TestCase, update_config, setup
-from superdesk.factory.app import get_app
+from typing import Any
+
+from settings import INSTALLED_APPS
+from superdesk.default_settings import MODULES
+
+from superdesk.tests import TestCase
 
 
-class TestCase(_TestCase):
-    def setUp(self):
-        config = {
-            "INSTALLED_APPS": ["analytics"],
-            "STATISTICS_MONGO_DBNAME": "sptests_statistics",
-        }
-        update_config(config)
-        self.app = get_app(config)
-        setup.app = self.app
-        super().setUp()
+class BaseTestCase(TestCase):
+    app_config: dict[str, Any] = {
+        "INSTALLED_APPS": INSTALLED_APPS + ["analytics"],
+        "MODULES": MODULES + ["planning.module"],
+        "STATISTICS_MONGO_DBNAME": "sptests_statistics",
+    }

@@ -184,7 +184,6 @@ Feature: Content Publishing Report
         """
 
     @auth
-    @wip
     Scenario: Generate sorted stacked source highcharts config for Content Published
         When we get "/content_publishing_report?params={"chart": {"sort_order": "asc"}}&aggs={"group": {"field": "anpa_category.qcode"}, "subgroup": {"field": "urgency"}}&return_type=highcharts_config"
         Then we get list with 1 items
@@ -262,6 +261,7 @@ Feature: Content Publishing Report
     @auth
     Scenario: Displays results with more than 10 entries
         Given the vocab fixture "categories"
+        Then we empty the "archived" collection
         Given "archived"
         """
         [{

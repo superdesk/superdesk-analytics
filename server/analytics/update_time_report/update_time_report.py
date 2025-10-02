@@ -8,6 +8,10 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
+from datetime import timedelta
+from copy import deepcopy
+
+from superdesk.core import get_app_config
 from superdesk.resource import Resource
 from superdesk.utc import utc_to_local, utcnow
 
@@ -15,10 +19,6 @@ from analytics.stats.archive_statistics import ArchiveStatisticsResource
 from analytics.stats.stats_report_service import StatsReportService
 from analytics.chart_config import ChartConfig
 from analytics.common import REPORT_CONFIG, CHART_TYPES
-
-from flask import current_app as app
-from datetime import timedelta
-from copy import deepcopy
 
 
 class UpdateTimeReportResource(Resource):
@@ -72,13 +72,14 @@ class UpdateTimeReportService(StatsReportService):
 
         return query
 
-    def generate_report(self, docs, args):
+    async def generate_report(self, docs, args):
         for doc in docs:
             doc.pop("stats", None)
         return docs
 
-    def generate_highcharts_config(self, docs, args):
-        items = list(self.generate_report(docs, args))
+    async def generate_highcharts_config(self, docs, args):
+        cursor = await self.generate_report(docs, args)
+        items = await cursor.to_list()
 
         params = args.get("params") or {}
         chart_params = params.get("chart") or {}
@@ -89,7 +90,7 @@ class UpdateTimeReportService(StatsReportService):
         rows = []
 
         def gen_date_str(date):
-            return utc_to_local(app.config["DEFAULT_TIMEZONE"], date).strftime("%d/%m/%Y %H:%M")
+            return utc_to_local(get_app_config("DEFAULT_TIMEZONE"), date).strftime("%d/%m/%Y %H:%M")
 
         def gen_update_string(seconds):
             times = (utcnow().replace(minute=0, hour=0, second=0)) + timedelta(seconds=seconds)

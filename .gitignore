@@ -28,3 +28,4 @@ _build_html
 .project
 .settings
 .idea
+.vscode/

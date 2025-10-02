@@ -89,6 +89,7 @@ Feature: Archive Timeline Stats
             "state": "fetched"
         }]
         """
+        And empty "archive_history"
         And "archive_history"
         """
         [{
@@ -142,6 +143,7 @@ Feature: Archive Timeline Stats
             "state": "in_progress"
         }]
         """
+        And empty "archive_history"
         And "archive_history"
         """
         [{

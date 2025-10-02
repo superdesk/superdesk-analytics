@@ -10,17 +10,17 @@
 
 from typing import NamedTuple
 from os import path
-
-from superdesk import get_resource_service
-from superdesk.utc import utcnow, utc_to_local
-from subprocess import check_call, PIPE
-from flask import current_app as app
 import pytz
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from math import floor
 import re
 import logging
+
+from superdesk.core import get_app_config, get_current_app
+from superdesk import get_resource_service
+from superdesk.utc import utcnow, utc_to_local
+
 
 ANALYTICS_PATH = path.abspath(path.dirname(path.realpath(__file__)))
 
@@ -168,6 +168,7 @@ def get_cv_by_qcode(name, field=None):
 
 
 def get_elastic_version():
+    app = get_current_app()
     return app.data.elastic.es.info()["version"]["number"]
 
 
@@ -181,7 +182,7 @@ def get_weekstart_offset_hr():
     """
     offset = 0
 
-    start_of_week = app.config.get("START_OF_WEEK") or 0
+    start_of_week = get_app_config("START_OF_WEEK") or 0
     if start_of_week == 0:
         offset -= 24
     elif start_of_week > 1:
@@ -196,7 +197,7 @@ def get_utc_offset_in_minutes(utc_datetime):
     :param datetime utc_datetime: The date/time instance used to calculate utc offset
     :return: UTC Offset in minutes
     """
-    timezone = pytz.timezone(app.config["DEFAULT_TIMEZONE"])
+    timezone = pytz.timezone(get_app_config("DEFAULT_TIMEZONE"))
     return timezone.utcoffset(utc_datetime).total_seconds() / 60
 
 
@@ -267,7 +268,7 @@ def relative_to_absolute_datetime(value, format, now=None, offset=None):
         raise
 
     if now is None:
-        now = utc_to_local(app.config.get("DEFAULT_TIMEZONE"), utcnow())
+        now = utc_to_local(get_app_config("DEFAULT_TIMEZONE"), utcnow())
 
     if values.get("offset"):
         # Retrieve the offset value and granularity, then shift the datetime
@@ -310,7 +311,7 @@ def relative_to_absolute_datetime(value, format, now=None, offset=None):
             if isoweekday == 7:
                 isoweekday = 0
 
-            start_of_week = app.config.get("START_OF_WEEK") or 0
+            start_of_week = get_app_config("START_OF_WEEK") or 0
             offset = 7 - start_of_week + isoweekday
 
             if offset < 7:

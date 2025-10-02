@@ -8,15 +8,15 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
+from eve_elastic.elastic import parse_date
+
+from superdesk.core import get_app_config
 from superdesk.resource import Resource
 from superdesk.utc import utc_to_local
 
 from analytics.stats.stats_report_service import StatsReportService
 from analytics.chart_config import ChartConfig
 from analytics.common import REPORT_CONFIG, CHART_TYPES
-
-from flask import current_app as app
-from eve_elastic.elastic import parse_date
 
 
 class FeaturemdiaUpdatesReportResource(Resource):
@@ -101,7 +101,7 @@ class FeaturemediaUpdatesTimeReportService(StatsReportService):
 
         return query
 
-    def generate_report(self, docs, args):
+    async def generate_report(self, docs, args):
         chart_params = (args.get("params") or {}).get("chart") or {}
         report = {"items": []}
 
@@ -159,8 +159,8 @@ class FeaturemediaUpdatesTimeReportService(StatsReportService):
 
         return report
 
-    def generate_highcharts_config(self, docs, args):
-        report = self.generate_report(docs, args)
+    async def generate_highcharts_config(self, docs, args):
+        report = await self.generate_report(docs, args)
 
         params = args.get("params") or {}
         chart_params = params.get("chart") or {}
@@ -175,7 +175,7 @@ class FeaturemediaUpdatesTimeReportService(StatsReportService):
         rows = []
 
         def gen_date_str(date):
-            return utc_to_local(app.config["DEFAULT_TIMEZONE"], date).strftime("%d/%m/%Y %H:%M")
+            return utc_to_local(get_app_config("DEFAULT_TIMEZONE"), date).strftime("%d/%m/%Y %H:%M")
 
         for item in items:
             original_image = item.get("original_image") or {}

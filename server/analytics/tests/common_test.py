@@ -9,7 +9,7 @@
 # at https://www.sourcefabric.org/superdesk/license
 
 
-from superdesk.tests import TestCase
+from analytics.tests import BaseTestCase
 
 from analytics.common import (
     get_weekstart_offset_hr,
@@ -21,8 +21,8 @@ from analytics.common import (
 from datetime import datetime, timedelta
 
 
-class CommonTestCase(TestCase):
-    def test_weekstart_offset_hr(self):
+class CommonTestCase(BaseTestCase):
+    async def test_weekstart_offset_hr(self):
         self.app.config["START_OF_WEEK"] = 0
         self.assertEqual(get_weekstart_offset_hr(), -24)
 
@@ -44,13 +44,13 @@ class CommonTestCase(TestCase):
         self.app.config["START_OF_WEEK"] = 6
         self.assertEqual(get_weekstart_offset_hr(), 120)
 
-    def test_utc_offset_in_minutes(self):
+    async def test_utc_offset_in_minutes(self):
         self.app.config["DEFAULT_TIMEZONE"] = "Australia/Sydney"
         self.assertEqual(get_utc_offset_in_minutes(datetime(2018, 10, 1)), 600)
 
         self.assertEqual(get_utc_offset_in_minutes(datetime(2018, 10, 10)), 660)
 
-    def test_seconds_to_human_readable(self):
+    async def test_seconds_to_human_readable(self):
         # Seconds
         self.assertEqual(seconds_to_human_readable(1), "1 second")
         self.assertEqual(seconds_to_human_readable(1.5), "1 second")
@@ -74,7 +74,7 @@ class CommonTestCase(TestCase):
         self.assertEqual(seconds_to_human_readable(172800), "2 days")
         self.assertEqual(seconds_to_human_readable(216000), "2 days")
 
-    def test_relative_to_absolute_datetime(self):
+    async def test_relative_to_absolute_datetime(self):
         self.app.config.update({"DEFAULT_TIMEZONE": "Australia/Sydney", "START_OF_WEEK": 0})  # Sunday
         fm = "%Y-%m-%dT%H:%M:%S"
         dt = datetime(2019, 10, 25, 13, 25, 52)
@@ -119,7 +119,7 @@ class CommonTestCase(TestCase):
         self.assertEqual(relative_to_absolute_datetime("now-26m/M", fm, dt), "2019-10-01T00:00:00")
         self.assertEqual(relative_to_absolute_datetime("now-26m/y", fm, dt), "2019-01-01T00:00:00")
 
-    def test_relative_to_absolute_datetime_week_granularity(self):
+    async def test_relative_to_absolute_datetime_week_granularity(self):
         """Starting on Sunday 2019-10-20, test shifting the week using different START_OF_WEEK values"""
 
         results = {

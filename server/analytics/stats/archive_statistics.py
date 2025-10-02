@@ -8,9 +8,11 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
+from eve.utils import ParsedRequest, date_to_str
 
+from superdesk.resource_fields import ID_FIELD
 from superdesk import get_resource_service, json
-from superdesk.services import BaseService
+from superdesk.eve_async import AsyncBaseService
 from superdesk.resource import Resource, not_indexed, not_analyzed, not_enabled
 from superdesk.metadata.item import (
     metadata_schema,
@@ -24,8 +26,6 @@ from superdesk.metadata.utils import item_url
 from apps.archive.common import ARCHIVE_SCHEMA_FIELDS
 
 from analytics.stats.common import STAT_TYPE
-
-from eve.utils import config, ParsedRequest, date_to_str
 
 
 class ArchiveStatisticsResource(Resource):
@@ -44,7 +44,7 @@ class ArchiveStatisticsResource(Resource):
     query_objectid_as_string = True
 
     schema = {
-        config.ID_FIELD: metadata_schema[config.ID_FIELD],
+        ID_FIELD: metadata_schema[ID_FIELD],
         "guid": metadata_schema["guid"],
         "stats_type": {"type": "string"},
         "stats": {
@@ -249,48 +249,46 @@ class ArchiveStatisticsResource(Resource):
     }
 
 
-class ArchiveStatisticsService(BaseService):
-    def get_last_run(self):
-        return self.find_one(req=None, stats_type="last_run") or {}
+class ArchiveStatisticsService(AsyncBaseService):
+    async def get_last_run(self):
+        return await self.find_one_async(req=None, stats_type="last_run") or {}
 
-    def set_last_run_id(self, entry_id, last_run=None):
+    async def set_last_run_id(self, entry_id, last_run=None):
         if last_run is None:
-            last_run = self.get_last_run()
+            last_run = await self.get_last_run()
 
-        if last_run and last_run.get(config.ID_FIELD):
-            self.patch(last_run[config.ID_FIELD], {"guid": entry_id})
+        if last_run and last_run.get(ID_FIELD):
+            await self.patch_async(last_run[ID_FIELD], {"guid": entry_id})
         else:
-            self.post([{"guid": entry_id, "stats_type": "last_run"}])
+            await self.post_async([{"guid": entry_id, "stats_type": "last_run"}])
 
-    def get_history_items(self, last_id, gte, item_id, chunk_size=0):
+    async def get_history_items(self, last_id, gte, item_id, chunk_size=0):
         history_service = get_resource_service("archive_history")
 
         last_processed_id = last_id
 
+        def build_query():
+            conditions = []
+            if gte:
+                conditions.append({"_created": {"$gte": date_to_str(gte)}})
+            if item_id:
+                conditions.append({"item_id": str(item_id)})
+            if last_processed_id:
+                conditions.append({"_id": {"$gt": str(last_processed_id)}})
+            return {"$and": conditions}
+
         while True:
             req = ParsedRequest()
             req.sort = '[("_id", 1), ("version", 1)]'
-
-            query = {"$and": []}
-
-            if gte:
-                query["$and"].append({"_created": {"$gte": date_to_str(gte)}})
-
-            if item_id:
-                query["$and"].append({"item_id": str(item_id)})
-
-            if last_processed_id:
-                query["$and"].append({"_id": {"$gt": str(last_processed_id)}})
-
-            req.where = json.dumps(query)
+            req.where = json.dumps(build_query())
 
             if chunk_size > 0:
                 req.max_results = int(chunk_size)
 
-            items = list(history_service.get(req=req, lookup=None))
-
-            if len(items) < 1:
+            items = await history_service.get_async(req=req, lookup=None)
+            if not await items.count():
                 break
 
-            last_processed_id = items[-1][config.ID_FIELD]
+            items = await items.to_list()
+            last_processed_id = items[-1][ID_FIELD]
             yield items

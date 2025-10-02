@@ -8,6 +8,9 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
+from datetime import datetime
+
+from superdesk.core import get_app_config
 from superdesk.resource import Resource
 from superdesk.errors import SuperdeskApiError
 
@@ -20,9 +23,6 @@ from analytics.common import (
     CHART_TYPES,
     MAX_TERMS_SIZE,
 )
-
-from flask import current_app as app
-from datetime import datetime
 
 
 class DeskActivityReportResource(Resource):
@@ -120,7 +120,7 @@ class DeskActivityReportService(BaseReportService):
     def get_elastic_index(self, types):
         return "statistics"
 
-    def generate_report(self, docs, args):
+    async def generate_report(self, docs, args):
         aggregations = getattr(docs, "hits", {}).get("aggregations") or {}
         desk_filter = (aggregations.get("timeline") or {}).get("desk_filter") or {}
         agg_dates = (desk_filter.get("timeline_filter") or {}).get("dates") or {}
@@ -170,9 +170,9 @@ class DeskActivityReportService(BaseReportService):
 
         return report
 
-    def generate_highcharts_config(self, docs, args):
+    async def generate_highcharts_config(self, docs, args):
         params = args.get("params") or {}
-        report = self.generate_report(docs, args)
+        report = await self.generate_report(docs, args)
         histogram = params.get("histogram") or {}
 
         def gen_chart_config():
@@ -202,7 +202,7 @@ class DeskActivityReportService(BaseReportService):
                 title=title,
                 subtitle=subtitle,
                 chart_type="highcharts",
-                start_of_week=app.config.get("START_OF_WEEK") or 0,
+                start_of_week=get_app_config("START_OF_WEEK") or 0,
                 timezone_offset=timezone_offset,
                 use_utc=False,
                 legend_title="Desk Transitions",

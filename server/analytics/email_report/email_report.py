@@ -8,9 +8,16 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-from superdesk.services import BaseService
+from email.charset import Charset, QP
+from base64 import b64decode
+from uuid import uuid4
+from bson import ObjectId
+
+from superdesk.core import get_current_app, get_app_config
+from superdesk.flask import render_template
 from superdesk.resource import Resource
 from superdesk.errors import SuperdeskApiError
+from superdesk.eve_async import AsyncBaseService
 from superdesk.lock import lock, unlock
 from superdesk.logging import logger
 from superdesk.celery_app import celery
@@ -22,12 +29,6 @@ from analytics.common import (
 )
 from analytics.reports import generate_report
 from .analytics_message import AnalyticsMessage
-
-from flask import current_app as app, render_template
-from email.charset import Charset, QP
-from base64 import b64decode
-from uuid import uuid4
-from bson import ObjectId
 
 
 class EmailReportResource(Resource):
@@ -94,19 +95,21 @@ class EmailReportResource(Resource):
     }
 
 
-class EmailReportService(BaseService):
-    def create(self, docs, **kwargs):
+class EmailReportService(AsyncBaseService):
+    async def create_async(self, docs, **kwargs):
         for doc in docs:
-            attachments = self._gen_attachments(doc.get("report") or {})
-            self._email_report(doc.get("email") or {}, attachments)
+            attachments = await self._gen_attachments(doc.get("report") or {})
+            await self._email_report(doc.get("email") or {}, attachments)
 
         # We're not actually saving anything to the database
         # So return empty array here
         return [0]
 
     @staticmethod
-    def _gen_attachments(report):
+    async def _gen_attachments(report):
+        # TODO-ASYNC: make this async once all report services are made async
         report_service = get_report_service(report.get("type"))
+
         if report_service is None:
             raise SuperdeskApiError.badRequestError('Unknown report type "{}"'.format(report.get("type")))
 
@@ -125,7 +128,7 @@ class EmailReportService(BaseService):
             return_type = "aggregations"
 
         generated_report = list(
-            report_service.get(
+            await report_service.get_async(
                 req=None,
                 params=report.get("params") or {},
                 translations=report.get("translations") or {},
@@ -167,15 +170,15 @@ class EmailReportService(BaseService):
         return attachments
 
     @staticmethod
-    def _email_report(email, attachments):
+    async def _email_report(email, attachments):
         txt = email.get("txt") or {}
         html = email.get("html") or {}
 
-        send_email_report.apply_async(
+        await send_email_report.apply_async(
             kwargs={
                 "_id": str(ObjectId()),
                 "subject": email.get("subject"),
-                "sender": email.get("sender") or app.config["ADMINS"][0],
+                "sender": email.get("sender") or get_app_config("ADMINS")[0],
                 "recipients": email.get("recipients"),
                 "text_body": txt.get("body") or "",
                 "html_body": html.get("body") or "",
@@ -187,7 +190,7 @@ class EmailReportService(BaseService):
 
 
 @celery.task(bind=True, max_retries=3, soft_time_limit=120)
-def send_email_report(
+async def send_email_report(
     self,
     _id,
     subject,
@@ -254,13 +257,14 @@ def send_email_report(
                     logger.error("Failed to generate attachment.")
                     logger.exception(e)
 
-        msg.body = render_template(txt_template, text_body=text_body, reports=reports)
+        msg.body = await render_template(txt_template, text_body=text_body, reports=reports)
 
-        msg.html = render_template(
+        msg.html = await render_template(
             html_template,
             html_body=html_body.replace("\r", "").replace("\n", "<br>"),
             reports=reports,
         )
+        app = get_current_app()
 
         return app.mail.send(msg)
     except Exception as e:

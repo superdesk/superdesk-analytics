@@ -9,7 +9,7 @@
 # at https://www.sourcefabric.org/superdesk/license
 
 import superdesk
-from .user_acitivity_report import UserActivityReportResource, UserActivityReportService
+from .user_activity_report import UserActivityReportResource, UserActivityReportService
 from analytics.common import register_report
 
 

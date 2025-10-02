@@ -18,6 +18,14 @@ from .gen_archive_statistics import GenArchiveStatistics
 from .featuremedia_updates import *  # noqa
 
 
+def get_default_mongo_uri(app, db_name: str) -> str:
+    """
+    Get the default MongoDB URI for the given database name.
+    """
+    base_uri = app.config["MONGO_URI"]
+    return base_uri.rsplit("/", 1)[0] + "/" + db_name
+
+
 def init_app(app):
     if not app.config.get("STATISTICS_MONGO_DBNAME"):
         app.config["STATISTICS_MONGO_DBNAME"] = env("STATISTICS_MONGO_DBNAME", "statistics")
@@ -25,7 +33,10 @@ def init_app(app):
     db_name = app.config["STATISTICS_MONGO_DBNAME"]
 
     if not app.config.get("STATISTICS_MONGO_URI"):
-        app.config["STATISTICS_MONGO_URI"] = env("STATISTICS_MONGO_URI", "mongodb://localhost/%s" % db_name)
+        app.config["STATISTICS_MONGO_URI"] = env(
+            "STATISTICS_MONGO_URI",
+            get_default_mongo_uri(app, db_name),
+        )
 
     if not app.config.get("STATISTICS_ELASTIC_URL"):
         app.config["STATISTICS_ELASTIC_URL"] = env("STATISTICS_ELASTIC_URL", app.config["ELASTICSEARCH_URL"])
@@ -63,5 +74,5 @@ def init_gen_stats_task(app):
 
 
 @celery.task(soft_time_limit=600)
-def gen_archive_stats():
-    GenArchiveStatistics().run()
+async def gen_archive_stats():
+    await GenArchiveStatistics().run()
