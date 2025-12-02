@@ -52,26 +52,38 @@ module.exports = function makeConfig(grunt) {
                     __dirname,
                     'node_modules/rangy/lib/rangy-selectionsaverestore'
                 ),
-
                 'draft-js': '@sourcefabric/draft-js',
-            }
+                '@uswriting/exiftool/cjs': require.resolve('@uswriting/exiftool/cjs'),
+            },
         },
         module: {
             rules: [
                 {
-                    test: /\.(ts|tsx)?$/,
-                    exclude: /node_modules\/(?!(superdesk-core)\/).*/,
+                    test: /\.(ts|tsx|js|jsx)$/,
+                    exclude: function(absolutePath) {
+                        // don't exclude anything outside node_modules
+                        if (absolutePath.indexOf('node_modules') === -1) {
+                            return false;
+                        }
+
+                        if (
+                            absolutePath.includes('/node_modules/superdesk-core/')
+
+                            // date-fns uses optional chaining and nullish coalescing
+                            || absolutePath.includes('/node_modules/date-fns/')
+
+                            // @sourcefabric/date-fns-tz uses logical OR assignment operator ||=
+                            || absolutePath.includes('/@sourcefabric/date-fns-tz/')
+                            || absolutePath.includes('/@sourcefabric/common/')
+                        ) {
+                            return false;
+                        }
+
+                        return true;
+                    },
                     loader: 'ts-loader',
                     options: {
-                        transpileOnly: true
-                    }
-                },
-                {
-                    test: /\.(js|jsx)?$/,
-                    exclude: /node_modules\/(?!(superdesk-core)\/).*/,
-                    loader: 'ts-loader',
-                    options: {
-                        transpileOnly: true
+                        transpileOnly: true,
                     }
                 },
                 {
