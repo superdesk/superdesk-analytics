@@ -12,7 +12,7 @@ jobs:
               - "6379:6379"
 
       mongo:
-          image: mongo:4.4
+          image: mongo:6
           ports:
               - "27017:27017"
 
@@ -27,13 +27,13 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ['3.10']
-        node-version: ['14', '20']
+        node-version: ['22']
     env:
       SERVER: true
       OPENSSL_CONF: /dev/null  # fixes phantomjs error
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
@@ -41,7 +41,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-      - run: git config --global url."https://git@".insteadOf git://
       - name: Setup Environment
         run: ./scripts/ci-install.sh
       - name: Pytest
@@ -55,14 +54,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: ['14', '20']
+        node-version: ['22']
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
-      - run: git config --global url."https://git@".insteadOf git://
       - name: Install dependencies
         run: npm install
       - name: Lint
