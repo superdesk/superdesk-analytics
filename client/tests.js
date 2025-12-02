@@ -28,6 +28,9 @@ const testConfig = {
         url: 'http://localhost:5000',
         ws: undefined,
     },
+    ui: {
+        authoring: true,
+    },
 };
 
 beforeEach(() => { // reset config before each test

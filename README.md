@@ -1,7 +1,7 @@
 # Superdesk Analytics
 _Jan 2017_
 
-[![Build Status](https://travis-ci.org/superdesk/superdesk-analytics.svg?branch=master)](https://travis-ci.org/superdesk/superdesk-analytics)
+[![Build Status](https://github.com/superdesk/superdesk-analytics/workflows/CI/badge.svg)](https://github.com/superdesk/superdesk-analytics/actions?query=workflow%3ACI)
 [![Coverage Status](https://coveralls.io/repos/github/superdesk/superdesk-analytics/badge.svg?branch=master)](https://coveralls.io/github/superdesk/superdesk-analytics?branch=master)
 
 ## Overview
