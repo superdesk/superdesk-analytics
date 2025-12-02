@@ -8,55 +8,55 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-from superdesk import Command, command, Option, get_resource_service
+import click
+from datetime import datetime
+
+from superdesk.commands import cli
 from superdesk.logging import logger
+from superdesk.core import get_app_config
+from superdesk import get_resource_service
 from superdesk.errors import SuperdeskApiError
 from superdesk.utc import utc_to_local, utcnow, local_to_utc
 
-from flask import current_app as app
-from datetime import datetime
 
-
-class SendScheduledReports(Command):
+@cli.command("analytics:send_scheduled_reports")
+@click.option(
+    "--now", "-n", is_flag=True, required=False, help="Local date/hour in the format '%Y-%m-%dT%H', i.e. 2018-09-13T10"
+)
+async def send_scheduled_reports(now):
     """
     Send scheduled reports
 
     Example:
-    ::
 
         $ python manage.py analytics:send_scheduled_reports
         $ python manage.py analytics:send_scheduled_reports --now
 
     """
+    await SendScheduledReports().run(now)
 
-    option_list = [
-        Option(
-            "--now",
-            "-n",
-            dest="now",
-            required=False,
-            help="Local date/hour in the format '%Y-%m-%dT%H', i.e. 2018-09-13T10",
-        )
-    ]
 
-    def run(self, now=None):
+class SendScheduledReports:
+    """
+    Send scheduled reports command class handler
+    """
+
+    async def run(self, now=None):
+        default_timezone = get_app_config("DEFAULT_TIMEZONE")
         if now:
             now_utc = (
                 now
                 if isinstance(now, datetime)
-                else local_to_utc(
-                    app.config["DEFAULT_TIMEZONE"],
-                    datetime.strptime(now, "%Y-%m-%dT%H"),
-                )
+                else local_to_utc(default_timezone, datetime.strptime(now, "%Y-%m-%dT%H"))
             )
         else:
             now_utc = utcnow()
 
-        now_local = utc_to_local(app.config["DEFAULT_TIMEZONE"], now_utc)
+        now_local = utc_to_local(default_timezone, now_utc)
 
         logger.info("Starting to send scheduled reports: {}".format(now_utc))
 
-        schedules = self.get_schedules()
+        schedules = await self.get_schedules()
 
         if len(schedules) < 1:
             logger.info("No enabled schedules found, not continuing")
@@ -69,15 +69,15 @@ class SendScheduledReports(Command):
             schedule_id = str(scheduled_report.get("_id"))
 
             try:
-                if not self.should_send_report(scheduled_report, now_local):
+                if not await self.should_send_report(scheduled_report, now_local):
                     logger.info("Scheduled Report {} not scheduled to be sent".format(schedule_id))
                     continue
 
                 logger.info("Attempting to send Scheduled Report {}".format(schedule_id))
-                self._send_report(scheduled_report)
+                await self._send_report(scheduled_report)
 
                 # Update the _last_sent of the schedule
-                get_resource_service("scheduled_reports").system_update(
+                await get_resource_service("scheduled_reports").system_update_async(
                     scheduled_report.get("_id"),
                     {"_last_sent": now_utc},
                     scheduled_report,
@@ -89,17 +89,18 @@ class SendScheduledReports(Command):
         logger.info("Completed sending scheduled reports: {}".format(now_utc))
 
     @staticmethod
-    def get_schedules():
-        return list(get_resource_service("scheduled_reports").get(req=None, lookup={"active": {"$eq": True}}))
+    async def get_schedules():
+        cursor = await get_resource_service("scheduled_reports").get_async(req=None, lookup={"active": {"$eq": True}})
+        return await cursor.to_list()
 
     @staticmethod
-    def should_send_report(scheduled_report, now_local):
+    async def should_send_report(scheduled_report, now_local):
         # Set now to the beginning of the hour (in local time)
         now_to_hour = now_local.replace(minute=0, second=0, microsecond=0)
 
         last_sent = None
         if scheduled_report.get("_last_sent"):
-            last_sent = utc_to_local(app.config["DEFAULT_TIMEZONE"], scheduled_report.get("_last_sent")).replace(
+            last_sent = utc_to_local(get_app_config("DEFAULT_TIMEZONE"), scheduled_report.get("_last_sent")).replace(
                 minute=0, second=0, microsecond=0
             )
 
@@ -133,9 +134,9 @@ class SendScheduledReports(Command):
         return True
 
     @staticmethod
-    def _send_report(scheduled_report):
+    async def _send_report(scheduled_report):
         email_service = get_resource_service("email_report")
-        saved_report = get_resource_service("saved_reports").find_one(
+        saved_report = await get_resource_service("saved_reports").find_one_async(
             req=None, _id=scheduled_report.get("saved_report")
         )
 
@@ -145,7 +146,7 @@ class SendScheduledReports(Command):
         extra = scheduled_report.get("extra") or {}
         body = extra.get("body") or "Superdesk Analytics - {}".format(scheduled_report.get("name"))
 
-        email_service.post(
+        await email_service.post_async(
             [
                 {
                     "report": {
@@ -163,6 +164,3 @@ class SendScheduledReports(Command):
                 }
             ]
         )
-
-
-command("analytics:send_scheduled_reports", SendScheduledReports())

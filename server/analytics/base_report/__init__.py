@@ -8,15 +8,17 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-from flask import json, current_app as app
 from eve_elastic.elastic import set_filters, ElasticCursor
 
+from superdesk.core import json, get_app_config, get_current_app
+from superdesk.resource_fields import ITEMS
 from superdesk import get_resource_service, es_utils
 from superdesk.resource import Resource
 from superdesk.utils import ListCursor
 from superdesk.utc import utcnow, get_timezone_offset
 from superdesk.errors import SuperdeskApiError
 from superdesk.es_utils import REPOS
+from superdesk.eve_async.cursors import ElasticAsyncEveCursor
 
 from apps.search import SearchService
 
@@ -71,11 +73,17 @@ class BaseReportService(SearchService):
 
     def on_fetched(self, doc):
         """
-        Overriding this method so the base SearchService doesn't construct custom HATEOS
+        Overriding this method so the base SearchService doesn't construct custom HATEOAS
         """
         pass
 
-    def generate_report(self, docs, args):
+    async def on_fetched_async(self, doc):
+        """
+        Overriding this method so the base SearchService doesn't construct custom HATEOAS
+        """
+        pass
+
+    async def generate_report(self, docs, args):
         """
         Overwrite this method to generate a report based on the aggregation data
         """
@@ -84,7 +92,7 @@ class BaseReportService(SearchService):
 
         return self.get_aggregation_buckets(docs.hits)
 
-    def generate_highcharts_config(self, docs, args):
+    async def generate_highcharts_config(self, docs, args):
         """
         Overwrite this method to generate the highcharts config based on the aggregation data
         """
@@ -251,13 +259,12 @@ class BaseReportService(SearchService):
     def get_elastic_index(self, types):
         return es_utils.get_index(types)
 
-    def run_query(self, params, args):
+    async def run_query(self, params, args):
         query = params.get("source") or {}
         if "query" not in query:
             query["query"] = {"filtered": {}}
 
-        aggs = self.get_request_aggregations(params, args)
-        if aggs:
+        if aggs := self.get_request_aggregations(params, args):
             query["aggs"] = aggs
 
         types = params.get("repo")
@@ -272,26 +279,25 @@ class BaseReportService(SearchService):
         filters = self._get_filters(types, excluded_stages)
 
         # if the system has a setting value for the maximum search depth then apply the filter
-        if not app.settings["MAX_SEARCH_DEPTH"] == -1:
-            query["terminate_after"] = app.settings["MAX_SEARCH_DEPTH"]
+        max_search_depth = get_app_config("MAX_SEARCH_DEPTH")
+        if max_search_depth != -1:
+            query["terminate_after"] = max_search_depth
 
         if filters:
             set_filters(query, filters)
 
-        index = self.get_elastic_index(types)
-
         self.get_custom_aggs_query(query, aggs)
+        docs = await self.elastic_async.search(query, types, params={})
 
-        docs = self.elastic.search(query, types, params={})
-
+        app = get_current_app().as_any()
         for resource in types:
-            response = {app.config["ITEMS"]: [doc for doc in docs if doc["_type"] == resource]}
+            response = {ITEMS: [doc async for doc in docs if doc["_type"] == resource]}
             getattr(app, "on_fetched_resource")(resource, response)
             getattr(app, "on_fetched_resource_%s" % resource)(response)
 
         return docs
 
-    def get(self, req, **lookup):
+    async def get_async(self, req, **lookup):
         args = self._get_request_or_lookup(req, **lookup)
 
         if args.get("source"):
@@ -307,30 +313,27 @@ class BaseReportService(SearchService):
         else:
             raise SuperdeskApiError.badRequestError("source/query not provided")
 
-        docs = self.run_query(params, args)
+        docs = await self.run_query(params, args)
 
         if args["return_type"] == "highcharts_config":
-            report = self.generate_highcharts_config(docs, args)
+            report = await self.generate_highcharts_config(docs, args)
         elif args["return_type"] == MIME_TYPES.CSV:
             report = self.generate_csv(docs, args)
         elif args["return_type"] == MIME_TYPES.HTML:
             report = self.generate_html(docs, args)
         else:
-            report = self.generate_report(docs, args)
+            report = await self.generate_report(docs, args)
 
         if "include_items" in args and int(args["include_items"]):
-            report["_items"] = list(docs)
+            report["_items"] = await docs.to_list()
 
-        if isinstance(report, list):
-            return ListCursor(report)
-        elif isinstance(report, ListCursor):
+        if isinstance(report, ElasticAsyncEveCursor):
             return report
-        elif isinstance(report, ElasticCursor):
-            return report
-        return ListCursor([report])
+
+        return ListCursor(report if isinstance(report, list) else [report])
 
     def get_utc_offset(self):
-        return get_timezone_offset(app.config["DEFAULT_TIMEZONE"], utcnow())
+        return get_timezone_offset(get_app_config("DEFAULT_TIMEZONE"), utcnow())
 
     def format_date(self, date, end_of_day=False):
         time_suffix = "T23:59:59" if end_of_day else "T00:00:00"

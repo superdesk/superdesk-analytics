@@ -89,7 +89,7 @@ class PlanningUsageReportService(BaseReportService):
     def _get_filters(self, repos, invisible_stages):
         return None
 
-    def generate_report(self, docs, args):
+    async def generate_report(self, docs, args):
         """
         Report schema:
         {
@@ -172,13 +172,13 @@ class PlanningUsageReportService(BaseReportService):
 
         return users_with_planning
 
-    def generate_highcharts_config(self, docs, args):
+    async def generate_highcharts_config(self, docs, args):
         params = args.get("params") or {}
 
         chart = params.get("chart") or {}
         chart_type = chart.get("type") or "bar"
 
-        report = self.generate_report(docs, args)
+        report = await self.generate_report(docs, args)
 
         chart_config = ChartConfig("planning_usage", chart_type)
 

@@ -17,7 +17,7 @@ import tempfile
 from os import path
 from base64 import b64encode
 
-from flask import json
+from superdesk.core import json
 from superdesk.errors import SuperdeskApiError
 from superdesk.timer import timer
 from analytics.common import MIME_TYPES, get_highcharts_cli_path
@@ -165,7 +165,7 @@ def _run_highcharts_cli(in_file: str, out_file: str, mimetype: str, width: Optio
             text=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
-            timeout=5,  # Don't allow process to run for more than 5 seconds,
+            timeout=10,  # Don't allow process to run for more than 10 seconds,
         )
 
         if not path.exists(out_file):
