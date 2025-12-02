@@ -38,7 +38,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
           cache-dependency-path: 'server/requirements.txt'
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
       - name: Setup Environment
@@ -62,7 +62,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
       - name: Install dependencies
-        run: npm install
+        run: npm ci
       - name: Lint
         run: npm run hint
       - name: Unit Tests
