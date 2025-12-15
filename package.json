@@ -30,7 +30,7 @@
     "@types/lodash": "4.17.21",
     "@typescript-eslint/parser": "2.6.1",
     "@uswriting/exiftool": "^1.0.5",
-    "angular-mocks": "1.6.9",
+    "angular-mocks": "1.8.3",
     "css-loader": "^5.2.7",
     "eslint": "6.6.0",
     "eslint-plugin-angular": "^1.6.1",
