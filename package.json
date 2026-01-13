@@ -28,7 +28,7 @@
   "devDependencies": {
     "@types/jasmine": "^5.1.13",
     "@types/lodash": "4.17.21",
-    "@typescript-eslint/parser": "2.6.1",
+    "@typescript-eslint/parser": "8.49.0",
     "@uswriting/exiftool": "^1.0.5",
     "angular-mocks": "1.6.9",
     "css-loader": "^5.2.7",
