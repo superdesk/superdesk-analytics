@@ -10,6 +10,7 @@
 
 from typing import NamedTuple
 from os import path
+import shutil
 
 from superdesk import get_resource_service
 from superdesk.utc import utcnow, utc_to_local
@@ -151,7 +152,10 @@ def get_highcharts_cli_path():
         "node_modules/.bin/highcharts-export-server",
     )
 
-    return highcharts_cli_path if path.exists(highcharts_cli_path) else None
+    if path.exists(highcharts_cli_path):
+        return highcharts_cli_path
+
+    return shutil.which("highcharts-export-server")
 
 
 def get_cv_by_qcode(name, field=None):
