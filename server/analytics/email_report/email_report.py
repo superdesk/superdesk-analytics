@@ -8,12 +8,12 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
-from email.charset import Charset, QP
 from base64 import b64decode
 from uuid import uuid4
 from bson import ObjectId
 
-from superdesk.core import get_current_app, get_app_config
+from superdesk.core import get_app_config
+from superdesk.core.emails import send_email, EmailAttachment
 from superdesk.flask import render_template
 from superdesk.resource import Resource
 from superdesk.errors import SuperdeskApiError
@@ -28,7 +28,6 @@ from analytics.common import (
     get_mime_type_extension,
 )
 from analytics.reports import generate_report
-from .analytics_message import AnalyticsMessage
 
 
 class EmailReportResource(Resource):
@@ -209,21 +208,8 @@ async def send_email_report(
         return
 
     try:
-        charset = Charset("utf-8")
-        charset.header_encoding = QP
-        charset.body_encoding = QP
-
-        msg = AnalyticsMessage(
-            subject,
-            sender=sender,
-            recipients=recipients,
-            cc=cc,
-            bcc=bcc,
-            body=text_body,
-            charset=charset,
-        )
-
         reports = []
+        email_attachments: list[EmailAttachment] = []
 
         if attachments is not None:
             for attachment in attachments:
@@ -232,15 +218,13 @@ async def send_email_report(
                     if attachment.get("mimetype") == MIME_TYPES.HTML:
                         reports.append({"id": uuid, "type": "html", "html": attachment.get("file")})
                     else:
-                        msg.attach(
-                            filename=attachment.get("filename"),
-                            content_type='{}; name="{}"'.format(attachment.get("mimetype"), attachment.get("filename")),
-                            data=b64decode(attachment.get("file")),
-                            disposition="attachment",
-                            headers={
-                                "Content-ID": "<{}>".format(uuid),
-                                "X-Attachment-Id": uuid,
-                            }.items(),
+                        email_attachments.append(
+                            EmailAttachment(
+                                filename=attachment.get("filename"),
+                                content_type=attachment.get("mimetype"),
+                                data=b64decode(attachment.get("file")),
+                                cid=uuid,
+                            )
                         )
 
                         reports.append(
@@ -252,21 +236,28 @@ async def send_email_report(
                             }
                         )
 
-                        msg.body += "\n[image: {}]".format(attachment.get("filename"))
+                        text_body += "\n[image: {}]".format(attachment.get("filename"))
                 except Exception as e:
                     logger.error("Failed to generate attachment.")
                     logger.exception(e)
 
-        msg.body = await render_template(txt_template, text_body=text_body, reports=reports)
-
-        msg.html = await render_template(
+        text_body_rendered = await render_template(txt_template, text_body=text_body, reports=reports)
+        html_body_rendered = await render_template(
             html_template,
             html_body=html_body.replace("\r", "").replace("\n", "<br>"),
             reports=reports,
         )
-        app = get_current_app()
 
-        return app.mail.send(msg)
+        await send_email(
+            subject=subject,
+            sender=sender,
+            recipients=recipients,
+            cc=cc,
+            bcc=bcc,
+            text_body=text_body_rendered,
+            html_body=html_body_rendered,
+            attachments=email_attachments,
+        )
     except Exception as e:
         logger.error("Failed to send report email. Error: {}".format(str(e)))
         logger.exception(e)
