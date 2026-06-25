@@ -163,22 +163,20 @@ class SendScheduleReportTestCase(BaseTestCase):
             self.assertEqual(len(outbox), 4)
 
             # Test the first email
-            self.assertEqual(outbox[0].sender, "superdesk@test.com")
+            self.assertEqual(outbox[0]["From"], "superdesk@test.com")
             self.assertEqual(outbox[0].subject, "Superdesk Analytics - Scheduled Report")
             self.assertTrue(outbox[0].body.startswith("\nThis is a test email"))
             self.assertTrue("This is a test email" in outbox[0].html)
             self.assertTrue('<img src="cid:' in outbox[0].html)
 
-            self.assertEqual(outbox[0].recipients, ["superdesk@localhost.com"])
+            self.assertEqual(outbox[0]["To"], "superdesk@localhost.com")
 
             # Test attachment
-            self.assertEqual(len(outbox[0].attachments), 1)
-            self.assertEqual(outbox[0].attachments[0].data, b64decode(mock_file))
-            self.assertEqual(
-                outbox[0].attachments[0].content_type,
-                '{}; name="chart_1.png"'.format(MIME_TYPES.PNG),
-            )
-            self.assertEqual(outbox[0].attachments[0].filename, "chart_1.png")
+            attachments = list(outbox[0].iter_attachments())
+            self.assertEqual(len(attachments), 1)
+            self.assertEqual(attachments[0].get_content(), b64decode(mock_file))
+            self.assertEqual(attachments[0].get_content_type(), MIME_TYPES.PNG)
+            self.assertEqual(attachments[0].get_filename(), "chart_1.png")
 
         report = scheduled_service.find_one(req=None, _id="sched1")
         self.assertEqual(report.get("_last_sent"), to_utc("2018-06-30T03"))
@@ -236,12 +234,10 @@ class SendScheduleReportTestCase(BaseTestCase):
             self.assertEqual(len(outbox), 1)
 
             # Test attachment
-            self.assertEqual(len(outbox[0].attachments), 1)
-            self.assertEqual(
-                outbox[0].attachments[0].content_type,
-                '{}; name="chart_1.jpeg"'.format(MIME_TYPES.JPEG),
-            )
-            self.assertEqual(outbox[0].attachments[0].filename, "chart_1.jpeg")
+            attachments = list(outbox[0].iter_attachments())
+            self.assertEqual(len(attachments), 1)
+            self.assertEqual(attachments[0].get_content_type(), MIME_TYPES.JPEG)
+            self.assertEqual(attachments[0].get_filename(), "chart_1.jpeg")
 
         report = scheduled_service.find_one(req=None, _id="sched1")
         self.assertEqual(report.get("_last_sent"), to_utc("2018-06-30T01"))
@@ -274,13 +270,11 @@ class SendScheduleReportTestCase(BaseTestCase):
             self.assertEqual(len(outbox), 1)
 
             # Test attachment
-            self.assertEqual(len(outbox[0].attachments), 1)
-            self.assertEqual(
-                outbox[0].attachments[0].content_type,
-                '{}; name="chart_1.csv"'.format(MIME_TYPES.CSV),
-            )
-            self.assertEqual(outbox[0].attachments[0].filename, "chart_1.csv")
-            self.assertEqual(outbox[0].attachments[0].data, b64decode(mock_csv))
+            attachments = list(outbox[0].iter_attachments())
+            self.assertEqual(len(attachments), 1)
+            self.assertEqual(attachments[0].get_content_type(), MIME_TYPES.CSV)
+            self.assertEqual(attachments[0].get_filename(), "chart_1.csv")
+            self.assertEqual(attachments[0].get_content(), b64decode(mock_csv))
 
     @mock.patch.object(EmailReportService, "_gen_attachments", return_value=mock_array)
     async def test_email_multiple_attachments(self, mock):
@@ -328,20 +322,15 @@ class SendScheduleReportTestCase(BaseTestCase):
             self.assertEqual(len(outbox), 1)
 
             # Test attachment
-            self.assertEqual(len(outbox[0].attachments), 2)
-            self.assertEqual(
-                outbox[0].attachments[0].content_type,
-                '{}; name="chart_1.png"'.format(MIME_TYPES.PNG),
-            )
-            self.assertEqual(outbox[0].attachments[0].filename, "chart_1.png")
-            self.assertEqual(outbox[0].attachments[0].data, b64decode(mock_array[0].get("file")))
+            attachments = list(outbox[0].iter_attachments())
+            self.assertEqual(len(attachments), 2)
+            self.assertEqual(attachments[0].get_content_type(), MIME_TYPES.PNG)
+            self.assertEqual(attachments[0].get_filename(), "chart_1.png")
+            self.assertEqual(attachments[0].get_content(), b64decode(mock_array[0].get("file")))
 
-            self.assertEqual(
-                outbox[0].attachments[1].content_type,
-                '{}; name="chart_2.png"'.format(MIME_TYPES.PNG),
-            )
-            self.assertEqual(outbox[0].attachments[1].filename, "chart_2.png")
-            self.assertEqual(outbox[0].attachments[1].data, b64decode(mock_array[1].get("file")))
+            self.assertEqual(attachments[1].get_content_type(), MIME_TYPES.PNG)
+            self.assertEqual(attachments[1].get_filename(), "chart_2.png")
+            self.assertEqual(attachments[1].get_content(), b64decode(mock_array[1].get("file")))
 
     async def test_send_report_hourly(self):
         # Test every hour
