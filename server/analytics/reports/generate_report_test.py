@@ -8,6 +8,8 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
+import unittest
+
 from analytics.tests import BaseTestCase
 from analytics.reports import generate_report
 from analytics.common import MIME_TYPES
@@ -24,6 +26,10 @@ options = {
 
 
 class GenerateReportTestCase(BaseTestCase):
+    @unittest.skip(
+        "highcharts-export-server v2.1 (PhantomJS) hangs on the svg code path under Node 22 "
+        "(introduced by SDESK-7830). Re-enable once the CLI is upgraded to v3+ (Puppeteer)."
+    )
     async def test_generate_svg(self):
         report = generate_report(options, mimetype=MIME_TYPES.SVG, base64=False)
 
