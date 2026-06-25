@@ -165,7 +165,7 @@ def _run_highcharts_cli(in_file: str, out_file: str, mimetype: str, width: Optio
             text=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
-            timeout=10,  # Don't allow process to run for more than 10 seconds,
+            timeout=30,  # Don't allow process to run for more than 30 seconds,
         )
 
         if not path.exists(out_file):
