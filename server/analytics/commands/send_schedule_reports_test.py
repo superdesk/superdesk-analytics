@@ -172,7 +172,7 @@ class SendScheduleReportTestCase(BaseTestCase):
             self.assertEqual(outbox[0]["To"], "superdesk@localhost.com")
 
             # Test attachment
-            attachments = list(outbox[0].iter_attachments())
+            attachments = [p for p in outbox[0].walk() if p.get("Content-ID")]
             self.assertEqual(len(attachments), 1)
             self.assertEqual(attachments[0].get_content(), b64decode(mock_file))
             self.assertEqual(attachments[0].get_content_type(), MIME_TYPES.PNG)
@@ -234,7 +234,7 @@ class SendScheduleReportTestCase(BaseTestCase):
             self.assertEqual(len(outbox), 1)
 
             # Test attachment
-            attachments = list(outbox[0].iter_attachments())
+            attachments = [p for p in outbox[0].walk() if p.get("Content-ID")]
             self.assertEqual(len(attachments), 1)
             self.assertEqual(attachments[0].get_content_type(), MIME_TYPES.JPEG)
             self.assertEqual(attachments[0].get_filename(), "chart_1.jpeg")
@@ -270,7 +270,7 @@ class SendScheduleReportTestCase(BaseTestCase):
             self.assertEqual(len(outbox), 1)
 
             # Test attachment
-            attachments = list(outbox[0].iter_attachments())
+            attachments = [p for p in outbox[0].walk() if p.get("Content-ID")]
             self.assertEqual(len(attachments), 1)
             self.assertEqual(attachments[0].get_content_type(), MIME_TYPES.CSV)
             self.assertEqual(attachments[0].get_filename(), "chart_1.csv")
@@ -322,7 +322,7 @@ class SendScheduleReportTestCase(BaseTestCase):
             self.assertEqual(len(outbox), 1)
 
             # Test attachment
-            attachments = list(outbox[0].iter_attachments())
+            attachments = [p for p in outbox[0].walk() if p.get("Content-ID")]
             self.assertEqual(len(attachments), 2)
             self.assertEqual(attachments[0].get_content_type(), MIME_TYPES.PNG)
             self.assertEqual(attachments[0].get_filename(), "chart_1.png")
