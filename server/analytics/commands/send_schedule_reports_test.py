@@ -274,7 +274,7 @@ class SendScheduleReportTestCase(BaseTestCase):
             self.assertEqual(len(attachments), 1)
             self.assertEqual(attachments[0].get_content_type(), MIME_TYPES.CSV)
             self.assertEqual(attachments[0].get_filename(), "chart_1.csv")
-            self.assertEqual(attachments[0].get_content(), b64decode(mock_csv))
+            self.assertEqual(attachments[0].get_content(), b64decode(mock_csv).decode("utf-8"))
 
     @mock.patch.object(EmailReportService, "_gen_attachments", return_value=mock_array)
     async def test_email_multiple_attachments(self, mock):
