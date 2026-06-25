@@ -26,7 +26,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.10']
+        python-version: ['3.12']
         node-version: ['22']
     env:
       SERVER: true
@@ -44,10 +44,10 @@ jobs:
       - name: Setup Environment
         run: ./scripts/ci-install.sh
       - name: Pytest
-        run: pytest --log-level=ERROR -vv --disable-warnings
+        run: python -m pytest --log-level=ERROR -vv --disable-warnings
       - name: Behave
         working-directory: ./server
-        run: behave --format progress2 --logging-level=ERROR
+        run: python -m behave --format progress2 --logging-level=ERROR
 
   client:
     runs-on: ubuntu-latest
