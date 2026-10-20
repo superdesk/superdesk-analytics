@@ -31,7 +31,7 @@
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
     "@uswriting/exiftool": "^1.0.5",
-    "angular-mocks": "1.6.9",
+    "angular-mocks": "1.8.3",
     "css-loader": "^5.2.7",
     "eslint": "^8.57.1",
     "eslint-plugin-angular": "^4.1.0",
