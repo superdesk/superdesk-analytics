@@ -344,7 +344,8 @@ class GenArchiveStatistics:
     def set_metadata_updates(self, item, history):
         fields = [
             "original_creator",
-            "version_creator" "versioncreated",
+            "version_creator",
+            "versioncreated",
             "firstpublished",
             "firstcreated",
             "source",
