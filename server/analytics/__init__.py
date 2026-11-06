@@ -8,6 +8,8 @@
 # AUTHORS and LICENSE files distributed with this source code, or
 # at https://www.sourcefabric.org/superdesk/license
 
+from importlib.metadata import version
+
 import superdesk
 
 from analytics.report_configs import ReportConfigsResource, ReportConfigsService
@@ -39,7 +41,7 @@ from analytics.common import get_highcharts_cli_path, register_report
 from superdesk.celery_app import celery
 from superdesk.default_settings import celery_queue, crontab
 
-__version__ = "3.2.0-dev.0"
+__version__ = version("superdesk-analytics")
 
 
 def init_schedule_task(app):
